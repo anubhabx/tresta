@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
+import { prisma } from "@workspace/database/prisma";
 
 const app = express();
 
