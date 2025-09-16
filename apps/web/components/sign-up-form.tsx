@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSignUp } from "@clerk/nextjs";
 import {
   Card,
@@ -31,7 +31,7 @@ import { Separator } from "@workspace/ui/components/separator";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, UseFormHandleSubmit } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import {
   FaGithub,
@@ -41,6 +41,9 @@ import {
   FaChevronLeft
 } from "react-icons/fa";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const signUpFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
@@ -53,9 +56,22 @@ const codeFormSchema = z.object({
 
 const SignUpForm = () => {
   const { signUp, setActive } = useSignUp();
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const [authStep, setAuthStep] = useState<"email" | "code">("email");
   const [showPassword, setShowPassword] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -73,11 +89,105 @@ const SignUpForm = () => {
   });
 
   const onSubmitSignUp = async (data: z.infer<typeof signUpFormSchema>) => {
-    setAuthStep("code");
+    console.log("Sign Up Data:", data);
+
+    if (data.password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      return;
+    }
+
+    if (signUpForm.formState.errors.email) {
+      toast.error(signUpForm.formState.errors.email.message);
+      return;
+    }
+
+    if (signUpForm.formState.errors.password) {
+      toast.error(signUpForm.formState.errors.password.message);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const completeSignUp = await signUp?.create({
+        emailAddress: data.email,
+        password: data.password
+      });
+
+      if (!completeSignUp) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
+
+      await completeSignUp.prepareEmailAddressVerification({
+        strategy: "email_code"
+      });
+
+      toast.success("Verification code sent to your email.");
+      setAuthStep("code");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onSubmitCode = async (data: z.infer<typeof codeFormSchema>) => {
-    setAuthStep("email");
+    console.log("Code Data:", data);
+
+    if (codeForm.formState.errors.code) {
+      toast.error(codeForm.formState.errors.code.message);
+      return;
+    }
+
+    if (!setActive) {
+      toast.error("Something went wrong. Please try again.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const completeSignUp = await signUp?.attemptEmailAddressVerification({
+        code: data.code
+      });
+
+      if (!completeSignUp) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
+
+      await setActive({ session: completeSignUp.createdSessionId });
+      router.push("/dashboard");
+      toast.success("Email verification successful!");
+    } catch (error) {
+      toast.error("Invalid code. Please try again.");
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onResendCode = async () => {
+    if (resendCooldown > 0) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await signUp?.prepareEmailAddressVerification({
+        strategy: "email_code"
+      });
+      toast.success("Verification code resent to your email.");
+      setResendCooldown(60);
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -160,7 +270,8 @@ const SignUpForm = () => {
                   </FormItem>
                 )}
               />
-              <Button className="w-full" type="submit">
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Continue
               </Button>
             </form>
@@ -241,7 +352,15 @@ const SignUpForm = () => {
               Back
             </Button>
 
-            <Button variant={"link"}>Resend Code</Button>
+            <Button
+              variant={"link"}
+              onClick={onResendCode}
+              disabled={resendCooldown > 0}
+            >
+              {resendCooldown > 0
+                ? `Resend Code in ${resendCooldown}s`
+                : "Resend Code"}
+            </Button>
           </div>
         )}
       </CardFooter>

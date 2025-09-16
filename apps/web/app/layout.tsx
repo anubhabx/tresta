@@ -3,6 +3,7 @@ import { Figtree, Lora, Fira_Code } from "next/font/google";
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@workspace/ui/components/sonner";
 
 const fontSans = Figtree({
   subsets: ["latin"],
@@ -30,7 +31,10 @@ export default function RootLayout({
         <body
           className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} font-sans antialiased `}
         >
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <Toaster position="bottom-right" />
+          </Providers>
         </body>
       </html>
     </ClerkProvider>
