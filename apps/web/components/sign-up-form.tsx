@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSignUp } from "@clerk/nextjs";
+
 import {
   Card,
   CardContent,
@@ -22,7 +23,6 @@ import { Input } from "@workspace/ui/components/input";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
   REGEXP_ONLY_DIGITS
 } from "@workspace/ui/components/input-otp";
@@ -190,6 +190,14 @@ const SignUpForm = () => {
     }
   };
 
+  const onOAuthSignUp = (provider: "google" | "github") => {
+    void signUp?.authenticateWithRedirect({
+      strategy: `oauth_${provider}`,
+      redirectUrl: `${window.location.origin}/sso-callback`,
+      redirectUrlComplete: `${window.location.origin}/dashboard`
+    });
+  };
+
   return (
     <Card className="min-w-[350px] text-center">
       <CardHeader>
@@ -199,11 +207,19 @@ const SignUpForm = () => {
       <CardContent>
         {authStep === "email" && (
           <div className="flex gap-2 items-center justify-center">
-            <Button variant={"secondary"} className="flex-1 px-2">
+            <Button
+              variant={"secondary"}
+              className="flex-1 px-2"
+              onClick={() => onOAuthSignUp("google")}
+            >
               <FaGoogle className="mr-2 h-4 w-4" />
               Continue with Google
             </Button>
-            <Button variant={"secondary"} className="flex-1 px-2">
+            <Button
+              variant={"secondary"}
+              className="flex-1 px-2"
+              onClick={() => onOAuthSignUp("github")}
+            >
               <FaGithub className="mr-2 h-4 w-4" />
               Continue with Github
             </Button>

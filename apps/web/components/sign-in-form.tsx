@@ -120,6 +120,14 @@ const SignInForm = () => {
     }
   };
 
+  const onOAuthSignUp = (provider: "google" | "github") => {
+    void signIn?.authenticateWithRedirect({
+      strategy: `oauth_${provider}`,
+      redirectUrl: `${window.location.origin}/sso-callback`,
+      redirectUrlComplete: `${window.location.origin}/dashboard`
+    });
+  };
+
   return (
     <Card className="min-w-[350px] text-center">
       <CardHeader>
@@ -128,11 +136,19 @@ const SignInForm = () => {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 items-center justify-center">
-          <Button variant={"secondary"} className="flex-1 px-2">
+          <Button
+            variant={"secondary"}
+            className="flex-1 px-2"
+            onClick={() => onOAuthSignUp("google")}
+          >
             <FaGoogle className="mr-2 h-4 w-4" />
             Continue with Google
           </Button>
-          <Button variant={"secondary"} className="flex-1 px-2">
+          <Button
+            variant={"secondary"}
+            className="flex-1 px-2"
+            onClick={() => onOAuthSignUp("github")}
+          >
             <FaGithub className="mr-2 h-4 w-4" />
             Continue with Github
           </Button>
@@ -213,12 +229,12 @@ const SignInForm = () => {
         </div>
 
         <div>
-          Already have an account?
+          Don&apos;t have an account?
           <Link
-            href="/sign-in"
+            href="/sign-up"
             className="text-primary ml-1 hover:underline hover:underline-offset-4"
           >
-            Sign In
+            Sign Up
           </Link>
         </div>
       </CardFooter>
