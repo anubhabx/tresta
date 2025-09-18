@@ -3,10 +3,13 @@
   "type": "module",
   "exports": {
     "./prisma": "./src/prisma.ts",
-    "./migrations/*": "./prisma/migrations/*"
+    "./generated/*": "./prisma/generated/*"
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "prisma": "^6.16.1"
+  },
+  "scripts": {
+    "dev": "prisma generate --watch"
   }
 }

@@ -37,6 +37,8 @@ import {
   AvatarFallback,
   AvatarImage
 } from "@workspace/ui/components/avatar";
+import { Separator } from "@workspace/ui/components/separator";
+import { FaGithub } from "react-icons/fa";
 
 const products = [
   {
@@ -57,11 +59,14 @@ const UISidebar = () => {
 
   return (
     <Sidebar className="border-none group/collapsible" collapsible="icon">
-      <SidebarHeader className="py-6 px-4 text-lg font-semibold">
-        Tresta
+      <SidebarHeader className="px-4 py-3 text-lg font-semibold flex flex-row items-center justify-start">
+        <FaGithub className="group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6" />
+        <span className="group-data-[collapsible=icon]:hidden">Tresta</span>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      <Separator />
+
+      <SidebarContent className="px-2 py-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton isActive={pathname === "/dashboard"} asChild>
@@ -73,15 +78,20 @@ const UISidebar = () => {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton isActive={pathname === "/products"} asChild>
-              <Button className="justify-start w-full" variant="ghost">
-                <Layers2Icon className="h-4 w-4" />
-                Products
-              </Button>
+              <Link href="/products" className="px-3">
+                <Button
+                  className="justify-start w-full has-[>svg]:px-0"
+                  variant="ghost"
+                >
+                  <Layers2Icon className="h-4 w-4" />
+                  Products
+                </Button>
+              </Link>
             </SidebarMenuButton>
 
             <SidebarMenuAction asChild>
               <Button
-                className="size-7 p-0"
+                className="h-6 w-6"
                 variant="ghost"
                 size="icon"
                 aria-label="Create new product"
@@ -130,7 +140,7 @@ const UISidebar = () => {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="px-4 py-2 pb-6">
+      <SidebarFooter className="px-4 py-4 border-t border-border">
         {!isLoaded && <SidebarMenuSkeleton className="h-8 w-full" />}
 
         {isLoaded && user && (
