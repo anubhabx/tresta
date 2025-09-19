@@ -10,6 +10,6 @@
     "prisma": "^6.16.1"
   },
   "scripts": {
-    "dev": "prisma generate --watch"
+    "dev": "prisma generate"
   }
 }

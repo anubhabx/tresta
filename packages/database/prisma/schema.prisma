@@ -13,3 +13,128 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String  @id @default(cuid()) // Clerk user Id
+  email     String  @unique
+  firstName String?
+  lastName  String?
+
+  plan         UserPlan      @default(FREE)
+  projects     Project[]
+  testimonials Testimonial[]
+  subscription Subscription? // null for free tier users
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String        @db.VarChar(255)
+  description  String?       @db.Text
+  slug         String        @unique @db.VarChar(255)
+  isActive     Boolean       @default(true)
+  testimonials Testimonial[]
+  widgets      Widget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String             @unique
+  status    SubscriptionStatus // e.g., "active", "canceled", etc.
+  plan      UserPlan           @default(FREE) // e.g., "free", "pro", etc.
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  externalSubscriptionId String?   @unique
+  externalCustomerId     String?
+  priceId                String?
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean   @default(false)
+
+  amount   Int? // Amount in smallest currenct usits
+  currency String? @default("INR") // Currncy Code
+  interval String? // "month", "year"
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Testimonial {
+  id          String          @id @default(cuid())
+  userId      String?
+  projectId   String?
+  authorName  String          @db.VarChar(255)
+  authorEmail String?         @db.VarChar(255)
+  content     String          @db.Text
+  type        TestimonialType @default(TEXT)
+  videoUrl    String?
+  mediaUrl    String?
+  source      String?         @db.VarChar(100) // e.g., "manual", "twitter", etc.
+  sourceUrl   String?         @db.VarChar(500) // e.g., URL of the tweet if sourced from Twitter
+  oembedData  Json? // Store oEmbed (Extracted Embed Info)
+  isPublished Boolean         @default(false)
+  rating      Int?            @db.SmallInt // e.g., 1 to 5 stars
+  isApproved  Boolean         @default(false) // For moderation purposes
+  ipAddress   String?         @db.VarChar(45) // To store IPv6 addresses if needed
+  userAgent   String?         @db.Text // To store user agent string if needed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tags    Tag[]    @relation("TestimonialTags")
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([isPublished])
+  @@index([createdAt])
+}
+
+enum TestimonialType {
+  TEXT
+  VIDEO
+  AUDIO
+}
+
+model Widget {
+  id        String   @id @default(cuid())
+  projectId String?
+  embedType String // e.g., "carousel", "grid", etc.
+  config    Json // Customization tokens, colors, layout, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  testimonials Testimonial[] @relation("TestimonialTags")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  PAUSED
+  INCOMPLETE
+  TRIALING
+}
+
+enum UserPlan {
+  FREE
+  PRO
+}
