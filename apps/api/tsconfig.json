@@ -5,6 +5,8 @@
     "paths": {
       "@/*": ["./*"],
       "@workspace/database/*": ["../../packages/database/src/*"]
-    }
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   }
 }
