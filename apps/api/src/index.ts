@@ -6,6 +6,8 @@ import * as dotenv from "dotenv";
 import { prisma } from "@workspace/database/prisma";
 
 import { webhookRouter } from "./routes/webhook.route.ts";
+import { clerkMiddleware } from "@clerk/express";
+import { attachUser } from "./middleware/auth.middleware.ts";
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.raw({ type: "application/json" }));
+app.use(clerkMiddleware());
 
 app.get("/health", (req, res) => {
   res.status(200).send("OK");

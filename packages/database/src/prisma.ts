@@ -5,3 +5,4 @@ const prisma = new PrismaClient({
 });
 
 export { prisma };
+export * from "./generated/prisma/index.js";

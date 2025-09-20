@@ -1,3 +1,9 @@
 {
-  "extends": ["@workspace/typescript-config/base.json"]
+  "extends": ["@workspace/typescript-config/base.json"],
+  "compilerOptions": {
+    "paths": {
+      "@workspace/database/*": ["./src/*"],
+      "@/*": ["./src/*"]
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Prisma } from "@workspace/database/generated/prisma/index.js";
+import { Prisma } from "@workspace/database/prisma";
 /**
  * Base class for all API errors.
  * Includes a status code to be sent in the HTTP response.

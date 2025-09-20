@@ -2,8 +2,7 @@
   "name": "@workspace/database",
   "type": "module",
   "exports": {
-    "./prisma": "./src/prisma.ts",
-    "./generated/*": "./prisma/generated/*"
+    "./prisma": "./src/prisma.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",
