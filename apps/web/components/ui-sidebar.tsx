@@ -39,6 +39,8 @@ import {
 } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
+import ProjectForm from "./project-form";
+import { useRouter } from "next/navigation";
 
 const products = [
   {
@@ -53,7 +55,7 @@ const products = [
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
-  console.log("User in Sidebar:", user);
+  const router = useRouter();
 
   const pathname = usePathname();
 
@@ -77,28 +79,20 @@ const UISidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton isActive={pathname === "/products"} asChild>
-              <Link href="/products" className="px-3">
+            <SidebarMenuButton isActive={pathname === "/projects"} asChild>
+              <Link href="/projects" className="px-3">
                 <Button
                   className="justify-start w-full has-[>svg]:px-0"
                   variant="ghost"
                 >
                   <Layers2Icon className="h-4 w-4" />
-                  Products
+                  Projects
                 </Button>
               </Link>
             </SidebarMenuButton>
 
-            <SidebarMenuAction asChild>
-              <Button
-                className="h-6 w-6"
-                variant="ghost"
-                size="icon"
-                aria-label="Create new product"
-                title="Create new product"
-              >
-                <PlusIcon className="h-4 w-4" />
-              </Button>
+            <SidebarMenuAction>
+              <ProjectForm />
             </SidebarMenuAction>
 
             {products.length > 0 && (

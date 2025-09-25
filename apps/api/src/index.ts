@@ -9,6 +9,8 @@ import { webhookRouter } from "./routes/webhook.route.ts";
 import { clerkMiddleware } from "@clerk/express";
 import { attachUser } from "./middleware/auth.middleware.ts";
 
+import { projectRouter } from "./routes/project.route.ts";
+
 dotenv.config();
 
 const app = express();
@@ -26,6 +28,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/webhook", webhookRouter);
+
+app.use("/api/projects", attachUser, projectRouter);
 
 const PORT = process.env.PORT || 8000;
 
