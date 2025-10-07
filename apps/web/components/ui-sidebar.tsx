@@ -40,7 +40,6 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
 import ProjectForm from "./project-form";
-import { useRouter } from "next/navigation";
 
 const products = [
   {
@@ -55,8 +54,6 @@ const products = [
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
-  const router = useRouter();
-
   const pathname = usePathname();
 
   return (

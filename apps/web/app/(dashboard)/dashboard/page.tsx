@@ -5,19 +5,12 @@ import React from "react";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbPage
 } from "@workspace/ui/components/breadcrumb";
-import { Button } from "@workspace/ui/components/button";
-import { toast } from "sonner";
-import { useApi } from "@/hooks/use-api";
 
-const DashbardPage = () => {
-  const api = useApi();
+const DashboardPage = () => {
 
   return (
     <div className="w-full h-full bg-background rounded-md px-4 shadow-lg">
@@ -32,9 +25,9 @@ const DashbardPage = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      DashbardPage
+      DashboardPage
     </div>
   );
 };
 
-export default DashbardPage;
+export default DashboardPage;

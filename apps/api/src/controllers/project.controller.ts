@@ -1,15 +1,15 @@
 import { prisma } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
 import {
-  ApiError,
-  NotFoundError,
   BadRequestError,
   ConflictError,
-  ForbiddenError,
-  InternalServerError,
-  UnauthorizedError,
-  handlePrismaError
+  UnauthorizedError
 } from "../lib/errors.ts";
+import {
+  ResponseHandler,
+  extractPaginationParams,
+  calculateSkip
+} from "../lib/response.ts";
 
 const createProject = async (
   req: Request,
@@ -17,7 +17,7 @@ const createProject = async (
   next: NextFunction
 ) => {
   try {
-    const { name, decription, slug } = req.body;
+    const { name, description, slug } = req.body;
     const id = req.user?.id;
 
     if (!id) {
@@ -26,6 +26,10 @@ const createProject = async (
 
     if (!name) {
       throw new BadRequestError("Project name is required");
+    }
+
+    if (!slug) {
+      throw new BadRequestError("Project slug is required");
     }
 
     const existingProject = await prisma.project.findUnique({
@@ -40,15 +44,68 @@ const createProject = async (
       data: {
         userId: id,
         name,
-        description: decription,
+        description,
         slug
       }
     });
 
-    res.status(201).json(newProject);
+    return ResponseHandler.created(res, {
+      message: "Project created successfully",
+      data: newProject
+    });
   } catch (error) {
-    next(new InternalServerError("Failed to create product"));
+    next(error);
   }
 };
 
-export { createProject };
+const listProjects = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError("User not authenticated");
+    }
+
+    const { page, limit } = extractPaginationParams(req.query);
+
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where: { userId },
+        skip: calculateSkip(page, limit),
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              testimonials: true
+            }
+          }
+        }
+      }),
+      prisma.project.count({ where: { userId } })
+    ]);
+
+    return ResponseHandler.paginated(res, {
+      data: projects,
+      page,
+      limit,
+      total,
+      message: "Projects retrieved successfully"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createProject, listProjects };

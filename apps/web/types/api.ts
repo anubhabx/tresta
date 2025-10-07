@@ -1,0 +1,104 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
+  meta: {
+    timestamp: string;
+  };
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T[];
+  meta: {
+    timestamp: string;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+  };
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    testimonials: number;
+  };
+}
+
+export enum TestimonialStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED"
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  email: string;
+  content: string;
+  rating: number;
+  status: TestimonialStatus;
+  projectId: string;
+  project?: Project;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum WidgetType {
+  GRID = "GRID",
+  CAROUSEL = "CAROUSEL",
+  MASONRY = "MASONRY"
+}
+
+export interface Widget {
+  id: string;
+  type: WidgetType;
+  settings: Record<string, unknown> | null;
+  projectId: string;
+  project?: Project;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProjectPayload {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface UpdateProjectPayload {
+  name?: string;
+  slug?: string;
+  description?: string;
+}
+
+export interface CreateTestimonialPayload {
+  name: string;
+  email: string;
+  content: string;
+  rating: number;
+  projectSlug: string;
+}
+
+export interface CreateWidgetPayload {
+  projectId: string;
+  type: WidgetType;
+  settings?: Record<string, unknown>;
+}
+
+export interface UpdateWidgetPayload {
+  type?: WidgetType;
+  settings?: Record<string, unknown>;
+}

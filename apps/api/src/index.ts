@@ -8,6 +8,10 @@ import { prisma } from "@workspace/database/prisma";
 import { webhookRouter } from "./routes/webhook.route.ts";
 import { clerkMiddleware } from "@clerk/express";
 import { attachUser } from "./middleware/auth.middleware.ts";
+import {
+  errorHandler,
+  notFoundHandler
+} from "./middleware/error.middleware.ts";
 
 import { projectRouter } from "./routes/project.route.ts";
 
@@ -30,6 +34,12 @@ app.get("/health", (req, res) => {
 app.use("/api/webhook", webhookRouter);
 
 app.use("/api/projects", attachUser, projectRouter);
+
+// 404 handler for unmatched routes
+app.use(notFoundHandler);
+
+// Global error handler (must be last)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 

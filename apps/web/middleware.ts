@@ -1,12 +1,13 @@
-import {
-  auth,
-  clerkMiddleware,
-  createRouteMatcher
-} from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const PUBLIC_ROUTES = ["/", "/testimonial(.*)"];
-const PROTECTED_ROUTES = ["/dashboard(.*)", "/settings(.*)", "/products(.*)"];
+const PROTECTED_ROUTES = [
+  "/dashboard(.*)",
+  "/settings(.*)",
+  "/products(.*)",
+  "/projects(.*)"
+];
 const AUTH_ROUTES = ["/sign-in(.*)", "/sign-up(.*)", "/sso-callback(.*)"];
 
 const isPublicRoute = createRouteMatcher(PUBLIC_ROUTES);

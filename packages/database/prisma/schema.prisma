@@ -63,8 +63,8 @@ model Subscription {
   currentPeriodEnd       DateTime?
   cancelAtPeriodEnd      Boolean   @default(false)
 
-  amount   Int? // Amount in smallest currenct usits
-  currency String? @default("INR") // Currncy Code
+  amount   Int?    // Amount in smallest currency units
+  currency String? @default("INR") // Currency Code
   interval String? // "month", "year"
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

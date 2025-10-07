@@ -34,3 +34,8 @@ npm-debug.log*
 # Misc
 .DS_Store
 *.pem
+
+.github/copilot-instructions.md
+
+*.md
+*/**/*.md
