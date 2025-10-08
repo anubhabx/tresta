@@ -1,19 +1,10 @@
-import UISidebar from "@/components/ui-sidebar";
-import { SidebarProvider } from "@workspace/ui/components/sidebar";
-import { TooltipProvider } from "@workspace/ui/components/tooltip";
-import React, { ReactNode } from "react";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { ReactNode } from "react";
 
-const DashboardLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <SidebarProvider>
-      <TooltipProvider>
-        <div className="flex items-center justify-center min-h-svh w-full">
-          <UISidebar />
-          <div className="flex-1 h-full p-2">{children}</div>
-        </div>
-      </TooltipProvider>
-    </SidebarProvider>
-  );
-};
-
-export default DashboardLayout;
+/**
+ * Server Component layout for dashboard pages
+ * All UI state management is delegated to DashboardShell client component
+ */
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  return <DashboardShell>{children}</DashboardShell>;
+}

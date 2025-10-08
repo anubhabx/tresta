@@ -42,8 +42,8 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { InlineLoader } from "./loader";
 
 const signUpFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
@@ -287,7 +287,7 @@ const SignUpForm = () => {
                 )}
               />
               <Button className="w-full" type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <InlineLoader className="mr-2 h-4 w-4" />}
                 Continue
               </Button>
             </form>
@@ -338,7 +338,8 @@ const SignUpForm = () => {
                 }}
               />
 
-              <Button className="w-full" type="submit">
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading && <InlineLoader className="mr-2 h-4 w-4" />}
                 Verify Code
               </Button>
             </form>

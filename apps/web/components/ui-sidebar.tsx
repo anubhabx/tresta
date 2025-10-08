@@ -20,7 +20,6 @@ import {
   ChevronUp,
   Layers2Icon,
   LayoutDashboardIcon,
-  PlusIcon,
   UserIcon
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -45,10 +44,11 @@ import { projects } from "@/lib/queries";
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
   const pathname = usePathname();
-  
+
   // Fetch projects list - will automatically update when new project is created
-  const { data: projectsData, isLoading: isLoadingProjects } = projects.queries.useList(1, 10);
-  
+  const { data: projectsData, isLoading: isLoadingProjects } =
+    projects.queries.useList(1, 10);
+
   const userProjects = projectsData?.data || [];
 
   return (
@@ -64,10 +64,15 @@ const UISidebar = () => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton isActive={pathname === "/dashboard"} asChild>
-              <Button className="justify-start w-full" variant="ghost">
-                <LayoutDashboardIcon className="h-4 w-4" />
-                Dashboard
-              </Button>
+              <Link href="/dashboard" className="px-3">
+                <Button
+                  className="justify-start w-full has-[>svg]:px-0"
+                  variant="ghost"
+                >
+                  <LayoutDashboardIcon className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

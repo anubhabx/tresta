@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { projects } from "@/lib/queries";
 
 import {
@@ -29,6 +29,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@workspace/ui/components/dialog";
+import { InlineLoader } from "./loader";
 
 const projectFormSchema = z.object({
   name: z
@@ -123,7 +124,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild className="cursor-pointer hover:bg-primary/50 transition-colors rounded-sm">
+      <DialogTrigger
+        asChild
+        className="cursor-pointer hover:bg-primary/50 transition-colors rounded-sm"
+      >
         <PlusIcon
           className="h-6 w-6"
           onClick={() => {
@@ -215,7 +219,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
               </DialogClose>
               <Button type="submit" disabled={createProject.isPending}>
                 {createProject.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <InlineLoader className="mr-2 h-4 w-4" />
                 )}
                 Create Project
               </Button>

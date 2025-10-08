@@ -19,13 +19,6 @@ import {
   FormMessage
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-  REGEXP_ONLY_DIGITS
-} from "@workspace/ui/components/input-otp";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 
@@ -33,17 +26,11 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import {
-  FaGithub,
-  FaGoogle,
-  FaEye,
-  FaEyeSlash,
-  FaChevronLeft
-} from "react-icons/fa";
+import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { InlineLoader } from "./loader";
 
 const SignInFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
@@ -214,7 +201,7 @@ const SignInForm = () => {
               )}
             />
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading && <InlineLoader className="mr-2 h-4 w-4" />}
               Continue
             </Button>
           </form>

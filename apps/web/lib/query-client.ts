@@ -12,18 +12,3 @@ export const queryClient = new QueryClient({
     }
   }
 });
-
-export function useProjects(page = 1, limit = 10) {
-  const api = useApi();
-
-  return useQuery({
-    queryKey: ["projects", page, limit],
-
-    queryFn: async () => {
-      const response = await api.get("/projects", {
-        params: { page, limit }
-      });
-      return response.data;
-    }
-  });
-}
