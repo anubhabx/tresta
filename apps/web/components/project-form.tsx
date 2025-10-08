@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useApi } from "../hooks/use-api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, PlusIcon } from "lucide-react";
+import { projects } from "@/lib/queries";
 
 import {
   Form,
@@ -54,10 +54,9 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
-  const api = useApi();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const createProject = projects.mutations.useCreate();
 
   const form = useForm<z.infer<typeof projectFormSchema>>({
     resolver: zodResolver(projectFormSchema),
@@ -80,40 +79,43 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
   const onSubmit = async (data: z.infer<typeof projectFormSchema>) => {
     try {
-      setLoading(true);
-
-      const response = await api.post("/projects", {
+      // Use TanStack Query mutation
+      const newProject = await createProject.mutateAsync({
         name: data.name,
-        description: data.description || null,
+        description: data.description || undefined,
         slug: data.slug
       });
 
-      if (response.status === 201) {
-        toast.success("Project created successfully!");
-        form.reset();
-        setOpen(false);
-        onSuccess?.();
-        // Optionally redirect to the project page
-        // router.push(`/projects/${data.slug}`);
-      } else {
-        toast.error("Failed to create project");
-      }
+      // Show success message
+      toast.success("Project created successfully!");
+
+      // Reset form and close dialog
+      form.reset();
+      setOpen(false);
+
+      // Call success callback if provided
+      onSuccess?.();
+
+      // Optionally redirect to the new project page
+      // router.push(`/projects/${newProject.slug}`);
     } catch (error) {
       console.error("Error creating project:", error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+
+      // Handle errors from backend
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to create project");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
   const handleNameChange = (name: string) => {
     form.setValue("name", name);
 
-    // Auto-generate slug if slug field is empty or matches the previous auto-generated value
     const currentSlug = form.getValues("slug");
     const generatedSlug = generateSlug(name);
 
-    // Only update slug if it's empty or if it looks like it was auto-generated
     if (!currentSlug || currentSlug === generateSlug(form.getValues("name"))) {
       form.setValue("slug", generatedSlug);
     }
@@ -121,7 +123,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className="cursor-pointer hover:bg-primary/50 transition-colors rounded-sm">
         <PlusIcon
           className="h-6 w-6"
           onClick={() => {
@@ -203,12 +205,18 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={createProject.isPending}
+                >
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={createProject.isPending}>
+                {createProject.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Create Project
               </Button>
             </DialogFooter>

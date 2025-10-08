@@ -40,21 +40,16 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
 import ProjectForm from "./project-form";
-
-const products = [
-  {
-    name: "Portfolio",
-    href: "/products/1"
-  },
-  {
-    name: "My SaaS Product",
-    href: "/products/2"
-  }
-];
+import { projects } from "@/lib/queries";
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
   const pathname = usePathname();
+  
+  // Fetch projects list - will automatically update when new project is created
+  const { data: projectsData, isLoading: isLoadingProjects } = projects.queries.useList(1, 10);
+  
+  const userProjects = projectsData?.data || [];
 
   return (
     <Sidebar className="border-none group/collapsible" collapsible="icon">
@@ -92,13 +87,21 @@ const UISidebar = () => {
               <ProjectForm />
             </SidebarMenuAction>
 
-            {products.length > 0 && (
+            {isLoadingProjects && (
               <SidebarMenuSub>
-                {products.slice(0, 3).map((product) => (
-                  <SidebarMenuSubItem key={product.href}>
-                    <Link href={product.href} className="w-full">
+                <SidebarMenuSubItem>
+                  <SidebarMenuSkeleton className="h-8 w-full" />
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            )}
+
+            {!isLoadingProjects && userProjects.length > 0 && (
+              <SidebarMenuSub>
+                {userProjects.slice(0, 3).map((project) => (
+                  <SidebarMenuSubItem key={project.id}>
+                    <Link href={`/projects/${project.slug}`} className="w-full">
                       <SidebarMenuSubButton
-                        isActive={pathname === product.href}
+                        isActive={pathname === `/projects/${project.slug}`}
                         asChild
                       >
                         <Button
@@ -106,23 +109,25 @@ const UISidebar = () => {
                           variant="ghost"
                           size="sm"
                         >
-                          {product.name}
+                          {project.name}
                         </Button>
                       </SidebarMenuSubButton>
                     </Link>
                   </SidebarMenuSubItem>
                 ))}
-                {products.length > 3 && (
+                {userProjects.length > 3 && (
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton asChild>
-                      <Button
-                        className="justify-start w-full text-muted-foreground"
-                        variant="ghost"
-                        size="sm"
-                      >
-                        All Products
-                      </Button>
-                    </SidebarMenuSubButton>
+                    <Link href="/projects" className="w-full">
+                      <SidebarMenuSubButton asChild>
+                        <Button
+                          className="justify-start w-full text-muted-foreground"
+                          variant="ghost"
+                          size="sm"
+                        >
+                          View All ({userProjects.length})
+                        </Button>
+                      </SidebarMenuSubButton>
+                    </Link>
                   </SidebarMenuSubItem>
                 )}
               </SidebarMenuSub>
