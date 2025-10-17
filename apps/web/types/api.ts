@@ -29,18 +29,20 @@ export interface Project {
   name: string;
   slug: string;
   description: string | null;
+  isActive: boolean;
   userId: string;
   createdAt: string;
   updatedAt: string;
   _count?: {
     testimonials: number;
+    widgets?: number;
   };
 }
 
 export enum TestimonialStatus {
   PENDING = "PENDING",
   APPROVED = "APPROVED",
-  REJECTED = "REJECTED"
+  REJECTED = "REJECTED",
 }
 
 export interface Testimonial {
@@ -59,7 +61,7 @@ export interface Testimonial {
 export enum WidgetType {
   GRID = "GRID",
   CAROUSEL = "CAROUSEL",
-  MASONRY = "MASONRY"
+  MASONRY = "MASONRY",
 }
 
 export interface Widget {
@@ -82,6 +84,7 @@ export interface UpdateProjectPayload {
   name?: string;
   slug?: string;
   description?: string;
+  isActive?: boolean;
 }
 
 export interface CreateTestimonialPayload {

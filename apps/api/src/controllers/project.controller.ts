@@ -3,18 +3,20 @@ import type { Request, Response, NextFunction } from "express";
 import {
   BadRequestError,
   ConflictError,
-  UnauthorizedError
+  UnauthorizedError,
+  NotFoundError,
+  ForbiddenError,
 } from "../lib/errors.ts";
 import {
   ResponseHandler,
   extractPaginationParams,
-  calculateSkip
+  calculateSkip,
 } from "../lib/response.ts";
 
 const createProject = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { name, description, slug } = req.body;
@@ -33,7 +35,7 @@ const createProject = async (
     }
 
     const existingProject = await prisma.project.findUnique({
-      where: { slug }
+      where: { slug },
     });
 
     if (existingProject) {
@@ -45,13 +47,13 @@ const createProject = async (
         userId: id,
         name,
         description,
-        slug
-      }
+        slug,
+      },
     });
 
     return ResponseHandler.created(res, {
       message: "Project created successfully",
-      data: newProject
+      data: newProject,
     });
   } catch (error) {
     next(error);
@@ -61,7 +63,7 @@ const createProject = async (
 const listProjects = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const userId = req.user?.id;
@@ -88,12 +90,12 @@ const listProjects = async (
           updatedAt: true,
           _count: {
             select: {
-              testimonials: true
-            }
-          }
-        }
+              testimonials: true,
+            },
+          },
+        },
       }),
-      prisma.project.count({ where: { userId } })
+      prisma.project.count({ where: { userId } }),
     ]);
 
     return ResponseHandler.paginated(res, {
@@ -101,11 +103,140 @@ const listProjects = async (
       page,
       limit,
       total,
-      message: "Projects retrieved successfully"
+      message: "Projects retrieved successfully",
     });
   } catch (error) {
     next(error);
   }
 };
 
-export { createProject, listProjects };
+const getProjectBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError("User not authenticated");
+    }
+
+    const project = await prisma.project.findFirst({
+      where: { slug, userId },
+      include: {
+        _count: {
+          select: {
+            testimonials: true,
+            widgets: true,
+          },
+        },
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundError("Project not found");
+    }
+
+    return ResponseHandler.success(res, {
+      message: "Project retrieved successfully",
+      data: project,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+    const { name, description, isActive } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError("User not authenticated");
+    }
+
+    // Check if project exists and belongs to user
+    const existingProject = await prisma.project.findFirst({
+      where: { slug, userId },
+    });
+
+    if (!existingProject) {
+      throw new NotFoundError("Project not found");
+    }
+
+    // Build update data object
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (isActive !== undefined) updateData.isActive = isActive;
+
+    // Update project
+    const updatedProject = await prisma.project.update({
+      where: { id: existingProject.id },
+      data: updateData,
+      include: {
+        _count: {
+          select: {
+            testimonials: true,
+            widgets: true,
+          },
+        },
+      },
+    });
+
+    return ResponseHandler.updated(res, {
+      message: "Project updated successfully",
+      data: updatedProject,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError("User not authenticated");
+    }
+
+    // Check if project exists and belongs to user
+    const existingProject = await prisma.project.findFirst({
+      where: { slug, userId },
+    });
+
+    if (!existingProject) {
+      throw new NotFoundError("Project not found");
+    }
+
+    // Delete project (cascade will handle related testimonials and widgets)
+    await prisma.project.delete({
+      where: { id: existingProject.id },
+    });
+
+    return ResponseHandler.deleted(res, "Project deleted successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createProject,
+  listProjects,
+  getProjectBySlug,
+  updateProject,
+  deleteProject,
+};

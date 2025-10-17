@@ -15,7 +15,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
@@ -27,7 +27,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { InlineLoader } from "./loader";
 
@@ -45,8 +45,8 @@ const projectFormSchema = z.object({
     .min(1, { message: "Project slug is required" })
     .max(255, { message: "Project slug must be less than 255 characters" })
     .regex(/^[a-z0-9-]+$/, {
-      message: "Slug can only contain lowercase letters, numbers, and hyphens"
-    })
+      message: "Slug can only contain lowercase letters, numbers, and hyphens",
+    }),
 });
 
 interface ProjectFormProps {
@@ -64,8 +64,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
     defaultValues: {
       name: "",
       description: "",
-      slug: ""
-    }
+      slug: "",
+    },
   });
 
   // Auto-generate slug from name
@@ -84,7 +84,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
       const newProject = await createProject.mutateAsync({
         name: data.name,
         description: data.description || undefined,
-        slug: data.slug
+        slug: data.slug,
       });
 
       // Show success message
@@ -124,16 +124,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        asChild
-        className="cursor-pointer hover:bg-primary/50 transition-colors rounded-sm"
-      >
-        <PlusIcon
-          className="h-6 w-6"
-          onClick={() => {
-            setOpen(true);
-          }}
-        />
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button>
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Create Project
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

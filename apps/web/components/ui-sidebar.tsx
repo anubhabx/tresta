@@ -14,13 +14,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarMenuSkeleton
+  SidebarMenuSkeleton,
 } from "@workspace/ui/components/sidebar";
 import {
   ChevronUp,
   Layers2Icon,
   LayoutDashboardIcon,
-  UserIcon
+  UserIcon,
+  PlusIcon,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { usePathname } from "next/navigation";
@@ -29,12 +30,12 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage
+  AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
@@ -89,7 +90,11 @@ const UISidebar = () => {
             </SidebarMenuButton>
 
             <SidebarMenuAction>
-              <ProjectForm />
+              <ProjectForm
+                trigger={
+                  <PlusIcon className="h-6 w-6 cursor-pointer hover:bg-primary/50 transition-colors rounded-sm" />
+                }
+              />
             </SidebarMenuAction>
 
             {isLoadingProjects && (

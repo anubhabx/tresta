@@ -8,9 +8,10 @@ export const useApi = () => {
   const api = useMemo(() => {
     const instance = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+      withCredentials: true,
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
 
     instance.interceptors.request.use(async (config) => {

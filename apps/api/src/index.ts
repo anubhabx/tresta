@@ -3,14 +3,13 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
-import { prisma } from "@workspace/database/prisma";
 
 import { webhookRouter } from "./routes/webhook.route.ts";
 import { clerkMiddleware } from "@clerk/express";
 import { attachUser } from "./middleware/auth.middleware.ts";
 import {
   errorHandler,
-  notFoundHandler
+  notFoundHandler,
 } from "./middleware/error.middleware.ts";
 
 import { projectRouter } from "./routes/project.route.ts";
@@ -20,7 +19,14 @@ dotenv.config();
 const app = express();
 
 app.use(helmet.hidePoweredBy());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
