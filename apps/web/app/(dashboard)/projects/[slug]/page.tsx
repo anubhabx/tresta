@@ -45,6 +45,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { TestimonialList } from "@/components/testimonial-list";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -336,23 +337,11 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
             <CardHeader>
               <CardTitle>Testimonials</CardTitle>
               <CardDescription>
-                Manage testimonials for this project
+                Manage and moderate testimonials for this project
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <MessageSquareIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  No testimonials yet
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Share your collection URL to start receiving testimonials
-                </p>
-                <Button onClick={handleCopyUrl}>
-                  <CopyIcon className="h-4 w-4 mr-2" />
-                  Copy Collection URL
-                </Button>
-              </div>
+              <TestimonialList projectSlug={slug} />
             </CardContent>
           </Card>
         </TabsContent>

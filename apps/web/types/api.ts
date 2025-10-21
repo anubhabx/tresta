@@ -47,13 +47,21 @@ export enum TestimonialStatus {
 
 export interface Testimonial {
   id: string;
-  name: string;
-  email: string;
+  authorName: string;
+  authorEmail: string | null;
   content: string;
-  rating: number;
-  status: TestimonialStatus;
-  projectId: string;
-  project?: Project;
+  type: "TEXT" | "VIDEO" | "AUDIO";
+  videoUrl: string | null;
+  mediaUrl: string | null;
+  rating: number | null;
+  isApproved: boolean;
+  isPublished: boolean;
+  projectId: string | null;
+  Project?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -74,7 +82,12 @@ export interface Widget {
   updatedAt: string;
 }
 
-export interface CreateProjectPayload {
+export interface UpdateTestimonialPayload {
+  isApproved?: boolean;
+  isPublished?: boolean;
+}
+
+export interface CreateWidgetPayload {
   name: string;
   slug: string;
   description?: string;
@@ -88,11 +101,12 @@ export interface UpdateProjectPayload {
 }
 
 export interface CreateTestimonialPayload {
-  name: string;
-  email: string;
+  authorName: string;
+  authorEmail?: string;
   content: string;
-  rating: number;
-  projectSlug: string;
+  rating?: number;
+  type?: "TEXT" | "VIDEO" | "AUDIO";
+  videoUrl?: string;
 }
 
 export interface CreateWidgetPayload {
