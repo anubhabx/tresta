@@ -200,14 +200,20 @@ const listProjects = async (
         select: {
           id: true,
           name: true,
+          shortDescription: true,
           slug: true,
           description: true,
+          logoUrl: true,
+          projectType: true,
+          visibility: true,
+          tags: true,
           isActive: true,
           createdAt: true,
           updatedAt: true,
           _count: {
             select: {
               testimonials: true,
+              widgets: true,
             },
           },
         },
