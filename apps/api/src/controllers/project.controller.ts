@@ -12,6 +12,16 @@ import {
   extractPaginationParams,
   calculateSkip,
 } from "../lib/response.ts";
+import {
+  isValidHexColor,
+  isValidUrl,
+  isValidSlug,
+  isValidProjectType,
+  isValidVisibility,
+  validateSocialLinks,
+  validateTags,
+} from "../lib/validators.ts";
+import type { CreateProjectPayload } from "../types/api-responses.ts";
 
 const createProject = async (
   req: Request,
@@ -19,21 +29,112 @@ const createProject = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, description, slug } = req.body;
+    const {
+      name,
+      shortDescription,
+      description,
+      slug,
+      logoUrl,
+      projectType,
+      websiteUrl,
+      collectionFormUrl,
+      brandColorPrimary,
+      brandColorSecondary,
+      socialLinks,
+      tags,
+      visibility,
+    } = req.body as CreateProjectPayload;
     const id = req.user?.id;
 
     if (!id) {
       throw new UnauthorizedError("User not authenticated");
     }
 
-    if (!name) {
+    // Required field validations
+    if (!name || name.trim().length === 0) {
       throw new BadRequestError("Project name is required");
     }
 
-    if (!slug) {
+    if (name.length > 255) {
+      throw new BadRequestError(
+        "Project name must be less than 255 characters",
+      );
+    }
+
+    if (!slug || slug.trim().length === 0) {
       throw new BadRequestError("Project slug is required");
     }
 
+    if (!isValidSlug(slug)) {
+      throw new BadRequestError(
+        "Slug can only contain lowercase letters, numbers, and hyphens",
+      );
+    }
+
+    if (slug.length > 255) {
+      throw new BadRequestError("Slug must be less than 255 characters");
+    }
+
+    // Optional field validations
+    if (shortDescription && shortDescription.length > 500) {
+      throw new BadRequestError(
+        "Short description must be less than 500 characters",
+      );
+    }
+
+    if (description && description.length > 10000) {
+      throw new BadRequestError(
+        "Description must be less than 10,000 characters",
+      );
+    }
+
+    if (logoUrl && !isValidUrl(logoUrl)) {
+      throw new BadRequestError("Invalid logo URL format");
+    }
+
+    if (projectType && !isValidProjectType(projectType)) {
+      throw new BadRequestError("Invalid project type");
+    }
+
+    if (websiteUrl && !isValidUrl(websiteUrl)) {
+      throw new BadRequestError("Invalid website URL format");
+    }
+
+    if (collectionFormUrl && !isValidUrl(collectionFormUrl)) {
+      throw new BadRequestError("Invalid collection form URL format");
+    }
+
+    if (brandColorPrimary && !isValidHexColor(brandColorPrimary)) {
+      throw new BadRequestError(
+        "Invalid primary brand color. Use hex format (e.g., #FF5733)",
+      );
+    }
+
+    if (brandColorSecondary && !isValidHexColor(brandColorSecondary)) {
+      throw new BadRequestError(
+        "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
+      );
+    }
+
+    if (socialLinks) {
+      const { valid, errors } = validateSocialLinks(socialLinks);
+      if (!valid) {
+        throw new BadRequestError(`Invalid social links: ${errors.join(", ")}`);
+      }
+    }
+
+    if (tags) {
+      const { valid, errors } = validateTags(tags);
+      if (!valid) {
+        throw new BadRequestError(`Invalid tags: ${errors.join(", ")}`);
+      }
+    }
+
+    if (visibility && !isValidVisibility(visibility)) {
+      throw new BadRequestError("Invalid visibility option");
+    }
+
+    // Check for existing project with same slug
     const existingProject = await prisma.project.findUnique({
       where: { slug },
     });
@@ -42,12 +143,28 @@ const createProject = async (
       throw new ConflictError("Project with this slug already exists");
     }
 
+    // Auto-generate collection form URL if not provided
+    const finalCollectionFormUrl =
+      collectionFormUrl ||
+      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/testimonials/${slug}`;
+
+    // Create project
     const newProject = await prisma.project.create({
       data: {
         userId: id,
-        name,
-        description,
-        slug,
+        name: name.trim(),
+        shortDescription: shortDescription?.trim() || null,
+        description: description?.trim() || null,
+        slug: slug.toLowerCase().trim(),
+        logoUrl: logoUrl || null,
+        projectType: projectType || "OTHER",
+        websiteUrl: websiteUrl || null,
+        collectionFormUrl: finalCollectionFormUrl,
+        brandColorPrimary: brandColorPrimary || null,
+        brandColorSecondary: brandColorSecondary || null,
+        socialLinks: socialLinks || undefined,
+        tags: tags || [],
+        visibility: visibility || "PRIVATE",
       },
     });
 
