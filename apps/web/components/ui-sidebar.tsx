@@ -39,7 +39,6 @@ import {
 } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
-import ProjectForm from "./project-form";
 import { projects } from "@/lib/queries";
 
 const UISidebar = () => {
@@ -89,12 +88,10 @@ const UISidebar = () => {
               </Link>
             </SidebarMenuButton>
 
-            <SidebarMenuAction>
-              <ProjectForm
-                trigger={
-                  <PlusIcon className="h-6 w-6 cursor-pointer hover:bg-primary/50 transition-colors rounded-sm" />
-                }
-              />
+            <SidebarMenuAction asChild>
+              <Link href="/projects/new" title="Create New Project">
+                <PlusIcon className="h-6 w-6 cursor-pointer hover:bg-primary/50 transition-colors rounded-[2px]" />
+              </Link>
             </SidebarMenuAction>
 
             {isLoadingProjects && (

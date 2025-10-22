@@ -1,4 +1,5 @@
-import { FolderIcon } from "lucide-react";
+import { FolderIcon, PlusIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
   Empty,
@@ -8,7 +9,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@workspace/ui/components/empty";
-import ProjectForm from "./project-form";
+import { Button } from "@workspace/ui/components/button";
 
 export function EmptyProjects() {
   return (
@@ -19,14 +20,17 @@ export function EmptyProjects() {
         </EmptyMedia>
         <EmptyTitle>No Projects Yet</EmptyTitle>
         <EmptyDescription>
-          You haven&apos;t added any projects yet. Get started by adding your
+          You haven&apos;t added any projects yet. Get started by creating your
           first project.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <div className="flex gap-2">
-          <ProjectForm />
-        </div>
+        <Button asChild>
+          <Link href="/projects/new">
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Create Project
+          </Link>
+        </Button>
       </EmptyContent>
     </Empty>
   );
