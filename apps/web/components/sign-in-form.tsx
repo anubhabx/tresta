@@ -10,15 +10,7 @@ import {
   CardHeader,
   CardTitle
 } from "@workspace/ui/components/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
+import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 
@@ -26,11 +18,12 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { InlineLoader } from "./loader";
+import { CustomFormField } from "./custom-form-field";
 
 const SignInFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
@@ -42,8 +35,6 @@ const SignInForm = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-
-  const [showPassword, setShowPassword] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
@@ -155,50 +146,22 @@ const SignInForm = () => {
               void SignInForm.handleSubmit(onSubmitSignIn)(e);
             }}
           >
-            <FormField
+            <CustomFormField
+              type="email"
               control={SignInForm.control}
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Email"
+              placeholder="Enter your email"
+              required
             />
-            <FormField
+
+            <CustomFormField
+              type="password"
               control={SignInForm.control}
               name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        {...field}
-                      />
-                      {showPassword ? (
-                        <FaEyeSlash
-                          className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                          title="Hide password"
-                          onClick={() => setShowPassword(false)}
-                        />
-                      ) : (
-                        <FaEye
-                          className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                          title="Show password"
-                          onClick={() => setShowPassword(true)}
-                        />
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Password"
+              placeholder="Enter your password"
+              required
             />
             <Button className="w-full" type="submit" disabled={loading}>
               {loading && <InlineLoader className="mr-2 h-4 w-4" />}
