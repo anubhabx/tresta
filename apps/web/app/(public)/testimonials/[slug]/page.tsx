@@ -5,22 +5,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { CheckCircle2, Star, MessageSquare } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { CheckCircle2, MessageSquare } from "lucide-react";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse, CreateTestimonialPayload } from "@/types/api";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
-import { Textarea } from "@workspace/ui/components/textarea";
+import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -29,8 +18,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
 import { Separator } from "@workspace/ui/components/separator";
+import { CustomFormField } from "@/components/custom-form-field";
 
 const testimonialFormSchema = z.object({
   authorName: z
@@ -69,7 +58,6 @@ export default function TestimonialSubmissionPage({
   const api = useApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [hoveredRating, setHoveredRating] = useState(0);
 
   const form = useForm<FormData>({
     resolver: zodResolver(testimonialFormSchema),
@@ -77,12 +65,10 @@ export default function TestimonialSubmissionPage({
       authorName: "",
       authorEmail: "",
       content: "",
-      rating: 5,
+      rating: 0,
       videoUrl: "",
     },
   });
-
-  const selectedRating = form.watch("rating") || 0;
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -140,13 +126,6 @@ export default function TestimonialSubmissionPage({
               Your testimonial has been submitted successfully. We truly
               appreciate your feedback!
             </p>
-            <Button
-              onClick={() => setIsSuccess(false)}
-              variant="outline"
-              size="lg"
-            >
-              Submit Another Testimonial
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -154,7 +133,7 @@ export default function TestimonialSubmissionPage({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 w-full">
       <Card className="max-w-2xl w-full">
         <CardHeader className="space-y-1 pb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -178,146 +157,58 @@ export default function TestimonialSubmissionPage({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Name Field */}
-              <FormField
+              <CustomFormField
+                type="text"
                 control={form.control}
                 name="authorName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Your Name <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Your Name"
+                placeholder="John Doe"
+                required
               />
 
               {/* Email Field */}
-              <FormField
+              <CustomFormField
+                type="email"
                 control={form.control}
                 name="authorEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      Email Address
-                      <Badge variant="secondary" className="text-xs font-normal">
-                        Optional
-                      </Badge>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="john@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      We'll never share your email or send spam
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Email Address"
+                placeholder="john@example.com"
+                description="We'll never share your email or send spam"
+                optional
               />
 
               {/* Rating Field */}
-              <FormField
+              <CustomFormField
+                type="rating"
                 control={form.control}
                 name="rating"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      Rating
-                      <Badge variant="secondary" className="text-xs font-normal">
-                        Optional
-                      </Badge>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-2 py-2">
-                        {[1, 2, 3, 4, 5].map((rating) => (
-                          <button
-                            key={rating}
-                            type="button"
-                            onClick={() => field.onChange(rating)}
-                            onMouseEnter={() => setHoveredRating(rating)}
-                            onMouseLeave={() => setHoveredRating(0)}
-                            className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
-                          >
-                            <Star
-                              className={`h-8 w-8 transition-colors ${
-                                rating <= (hoveredRating || selectedRating)
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-muted-foreground/30"
-                              }`}
-                            />
-                          </button>
-                        ))}
-                        {selectedRating > 0 && (
-                          <span className="ml-2 text-sm font-medium text-muted-foreground">
-                            {selectedRating} / 5
-                          </span>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      How would you rate your experience?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Rating"
+                description="How would you rate your experience?"
+                max={5}
+                optional
               />
 
               {/* Content Field */}
-              <FormField
+              <CustomFormField
+                type="textarea"
                 control={form.control}
                 name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Your Testimonial <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Share your experience, what you liked, and how it helped you..."
-                        className="min-h-[140px] resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {field.value.length} / 2000 characters
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Your Testimonial"
+                placeholder="Share your experience, what you liked, and how it helped you..."
+                maxLength={2000}
+                showCharacterCount
+                required
               />
 
               {/* Video URL Field */}
-              <FormField
+              <CustomFormField
+                type="url"
                 control={form.control}
                 name="videoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      Video Testimonial URL
-                      <Badge variant="secondary" className="text-xs font-normal">
-                        Optional
-                      </Badge>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://youtube.com/watch?v=..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Add a link to your video testimonial (YouTube, Vimeo,
-                      etc.)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Video Testimonial URL"
+                placeholder="https://youtube.com/watch?v=..."
+                description="Add a link to your video testimonial (YouTube, Vimeo, etc.)"
+                optional
               />
 
               <Separator className="my-6" />
