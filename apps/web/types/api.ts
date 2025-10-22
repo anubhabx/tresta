@@ -24,11 +24,52 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export enum ProjectType {
+  SAAS_APP = "SAAS_APP",
+  PORTFOLIO = "PORTFOLIO",
+  MOBILE_APP = "MOBILE_APP",
+  CONSULTING_SERVICE = "CONSULTING_SERVICE",
+  E_COMMERCE = "E_COMMERCE",
+  AGENCY = "AGENCY",
+  FREELANCE = "FREELANCE",
+  PRODUCT = "PRODUCT",
+  COURSE = "COURSE",
+  COMMUNITY = "COMMUNITY",
+  OTHER = "OTHER",
+}
+
+export enum ProjectVisibility {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+  INVITE_ONLY = "INVITE_ONLY",
+}
+
+export interface SocialLinks {
+  twitter?: string;
+  linkedin?: string;
+  github?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  website?: string;
+  [key: string]: string | undefined;
+}
+
 export interface Project {
   id: string;
   name: string;
-  slug: string;
+  shortDescription: string | null;
   description: string | null;
+  slug: string;
+  logoUrl: string | null;
+  projectType: ProjectType | null;
+  websiteUrl: string | null;
+  collectionFormUrl: string | null;
+  brandColorPrimary: string | null;
+  brandColorSecondary: string | null;
+  socialLinks: SocialLinks | null;
+  tags: string[];
+  visibility: ProjectVisibility;
   isActive: boolean;
   userId: string;
   createdAt: string;
@@ -93,10 +134,36 @@ export interface CreateWidgetPayload {
   description?: string;
 }
 
+export interface CreateProjectPayload {
+  name: string;
+  shortDescription?: string;
+  description?: string;
+  slug: string;
+  logoUrl?: string;
+  projectType?: ProjectType;
+  websiteUrl?: string;
+  collectionFormUrl?: string;
+  brandColorPrimary?: string;
+  brandColorSecondary?: string;
+  socialLinks?: SocialLinks;
+  tags?: string[];
+  visibility?: ProjectVisibility;
+}
+
 export interface UpdateProjectPayload {
   name?: string;
-  slug?: string;
+  shortDescription?: string;
   description?: string;
+  slug?: string;
+  logoUrl?: string;
+  projectType?: ProjectType;
+  websiteUrl?: string;
+  collectionFormUrl?: string;
+  brandColorPrimary?: string;
+  brandColorSecondary?: string;
+  socialLinks?: SocialLinks;
+  tags?: string[];
+  visibility?: ProjectVisibility;
   isActive?: boolean;
 }
 
