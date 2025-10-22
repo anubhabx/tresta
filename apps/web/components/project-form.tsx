@@ -6,18 +6,8 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { PlusIcon } from "lucide-react";
-import { projects } from "@/lib/queries";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
+import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -27,9 +17,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@workspace/ui/components/dialog";
 import { InlineLoader } from "./loader";
+import { CustomFormField } from "./custom-form-field";
+import { projects } from "@/lib/queries";
 
 const projectFormSchema = z.object({
   name: z
@@ -45,8 +37,8 @@ const projectFormSchema = z.object({
     .min(1, { message: "Project slug is required" })
     .max(255, { message: "Project slug must be less than 255 characters" })
     .regex(/^[a-z0-9-]+$/, {
-      message: "Slug can only contain lowercase letters, numbers, and hyphens",
-    }),
+      message: "Slug can only contain lowercase letters, numbers, and hyphens"
+    })
 });
 
 interface ProjectFormProps {
@@ -64,8 +56,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
     defaultValues: {
       name: "",
       description: "",
-      slug: "",
-    },
+      slug: ""
+    }
   });
 
   // Auto-generate slug from name
@@ -84,7 +76,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
       const newProject = await createProject.mutateAsync({
         name: data.name,
         description: data.description || undefined,
-        slug: data.slug,
+        slug: data.slug
       });
 
       // Show success message
@@ -126,8 +118,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button>
-            <PlusIcon className="h-4 w-4 mr-2" />
+          <Button asChild>
+            <PlusIcon className="h-4 w-4 mr-2 rounded-sm" />
             Create Project
           </Button>
         )}
@@ -142,66 +134,35 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ trigger, onSuccess }) => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
+            <CustomFormField
+              type="text"
               control={form.control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="My Awesome Project"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleNameChange(e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    The display name for your project.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Project Name"
+              placeholder="My Awesome Project"
+              description="The display name for your project."
+              required
+              onChange={(value) => handleNameChange(value)}
             />
 
-            <FormField
+            <CustomFormField
+              type="text"
               control={form.control}
               name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Slug</FormLabel>
-                  <FormControl>
-                    <Input placeholder="my-awesome-project" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    A unique identifier for your project URL. Only lowercase
-                    letters, numbers, and hyphens allowed.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Project Slug"
+              placeholder="my-awesome-project"
+              description="A unique identifier for your project URL. We generate this from the project name, but you can customize it."
+              required
             />
 
-            <FormField
+            <CustomFormField
+              type="textarea"
               control={form.control}
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="A brief description of your project"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Optional description to help you identify this project.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Description"
+              placeholder="A brief description of your project"
+              description="Optional description to help users identify this project."
+              optional
             />
 
             <DialogFooter>
