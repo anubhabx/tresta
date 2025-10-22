@@ -272,7 +272,22 @@ const updateProject = async (
 ) => {
   try {
     const { slug } = req.params;
-    const { name, description, isActive } = req.body;
+    const {
+      name,
+      shortDescription,
+      description,
+      slug: newSlug,
+      logoUrl,
+      projectType,
+      websiteUrl,
+      collectionFormUrl,
+      brandColorPrimary,
+      brandColorSecondary,
+      socialLinks,
+      tags,
+      visibility,
+      isActive,
+    } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -288,10 +303,134 @@ const updateProject = async (
       throw new NotFoundError("Project not found");
     }
 
+    // Validate fields if provided
+    if (name !== undefined) {
+      if (!name || name.trim().length === 0) {
+        throw new BadRequestError("Project name cannot be empty");
+      }
+      if (name.length > 255) {
+        throw new BadRequestError(
+          "Project name must be less than 255 characters",
+        );
+      }
+    }
+
+    if (newSlug !== undefined) {
+      if (!newSlug || newSlug.trim().length === 0) {
+        throw new BadRequestError("Slug cannot be empty");
+      }
+      if (!isValidSlug(newSlug)) {
+        throw new BadRequestError(
+          "Slug can only contain lowercase letters, numbers, and hyphens",
+        );
+      }
+      if (newSlug.length > 255) {
+        throw new BadRequestError("Slug must be less than 255 characters");
+      }
+
+      // Check if new slug is already taken by another project
+      const slugExists = await prisma.project.findFirst({
+        where: {
+          slug: newSlug,
+          id: { not: existingProject.id },
+        },
+      });
+
+      if (slugExists) {
+        throw new ConflictError("This slug is already taken");
+      }
+    }
+
+    if (shortDescription !== undefined && shortDescription.length > 500) {
+      throw new BadRequestError(
+        "Short description must be less than 500 characters",
+      );
+    }
+
+    if (description !== undefined && description.length > 10000) {
+      throw new BadRequestError(
+        "Description must be less than 10,000 characters",
+      );
+    }
+
+    if (logoUrl !== undefined && logoUrl && !isValidUrl(logoUrl)) {
+      throw new BadRequestError("Invalid logo URL format");
+    }
+
+    if (projectType !== undefined && !isValidProjectType(projectType)) {
+      throw new BadRequestError("Invalid project type");
+    }
+
+    if (websiteUrl !== undefined && websiteUrl && !isValidUrl(websiteUrl)) {
+      throw new BadRequestError("Invalid website URL format");
+    }
+
+    if (
+      collectionFormUrl !== undefined &&
+      collectionFormUrl &&
+      !isValidUrl(collectionFormUrl)
+    ) {
+      throw new BadRequestError("Invalid collection form URL format");
+    }
+
+    if (
+      brandColorPrimary !== undefined &&
+      brandColorPrimary &&
+      !isValidHexColor(brandColorPrimary)
+    ) {
+      throw new BadRequestError(
+        "Invalid primary brand color. Use hex format (e.g., #FF5733)",
+      );
+    }
+
+    if (
+      brandColorSecondary !== undefined &&
+      brandColorSecondary &&
+      !isValidHexColor(brandColorSecondary)
+    ) {
+      throw new BadRequestError(
+        "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
+      );
+    }
+
+    if (socialLinks !== undefined) {
+      const { valid, errors } = validateSocialLinks(socialLinks);
+      if (!valid) {
+        throw new BadRequestError(`Invalid social links: ${errors.join(", ")}`);
+      }
+    }
+
+    if (tags !== undefined) {
+      const { valid, errors } = validateTags(tags);
+      if (!valid) {
+        throw new BadRequestError(`Invalid tags: ${errors.join(", ")}`);
+      }
+    }
+
+    if (visibility !== undefined && !isValidVisibility(visibility)) {
+      throw new BadRequestError("Invalid visibility option");
+    }
+
     // Build update data object
     const updateData: any = {};
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
+    if (name !== undefined) updateData.name = name.trim();
+    if (shortDescription !== undefined)
+      updateData.shortDescription = shortDescription?.trim() || null;
+    if (description !== undefined)
+      updateData.description = description?.trim() || null;
+    if (newSlug !== undefined) updateData.slug = newSlug.toLowerCase().trim();
+    if (logoUrl !== undefined) updateData.logoUrl = logoUrl || null;
+    if (projectType !== undefined) updateData.projectType = projectType;
+    if (websiteUrl !== undefined) updateData.websiteUrl = websiteUrl || null;
+    if (collectionFormUrl !== undefined)
+      updateData.collectionFormUrl = collectionFormUrl || null;
+    if (brandColorPrimary !== undefined)
+      updateData.brandColorPrimary = brandColorPrimary || null;
+    if (brandColorSecondary !== undefined)
+      updateData.brandColorSecondary = brandColorSecondary || null;
+    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
+    if (tags !== undefined) updateData.tags = tags;
+    if (visibility !== undefined) updateData.visibility = visibility;
     if (isActive !== undefined) updateData.isActive = isActive;
 
     // Update project
