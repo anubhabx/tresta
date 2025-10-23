@@ -21,7 +21,22 @@ import {
   validateSocialLinks,
   validateTags,
 } from "../lib/validators.ts";
-import type { CreateProjectPayload } from "../types/api-responses.ts";
+import type {
+  CreateProjectPayload,
+  UpdateProjectPayload,
+  ProjectData,
+} from "../../types/api-responses.js";
+
+/**
+ * Helper to serialize Prisma Project to ProjectData
+ */
+const serializeProject = (project: any): ProjectData => {
+  return {
+    ...project,
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+  };
+};
 
 const createProject = async (
   req: Request,
@@ -170,7 +185,7 @@ const createProject = async (
 
     return ResponseHandler.created(res, {
       message: "Project created successfully",
-      data: newProject,
+      data: serializeProject(newProject),
     });
   } catch (error) {
     next(error);
@@ -222,7 +237,7 @@ const listProjects = async (
     ]);
 
     return ResponseHandler.paginated(res, {
-      data: projects,
+      data: projects.map(serializeProject),
       page,
       limit,
       total,
@@ -455,7 +470,7 @@ const updateProject = async (
 
     return ResponseHandler.updated(res, {
       message: "Project updated successfully",
-      data: updatedProject,
+      data: serializeProject(updatedProject),
     });
   } catch (error) {
     next(error);
