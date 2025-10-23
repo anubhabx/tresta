@@ -2,6 +2,7 @@ import {
   createProject,
   listProjects,
   getProjectBySlug,
+  getPublicProjectBySlug,
   updateProject,
   deleteProject,
 } from "../controllers/project.controller.ts";

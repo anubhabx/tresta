@@ -279,7 +279,55 @@ const getProjectBySlug = async (
 
     return ResponseHandler.success(res, {
       message: "Project retrieved successfully",
-      data: project,
+      data: serializeProject(project),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get public project by slug - no authentication required
+ * Only returns PUBLIC projects with limited fields for testimonial collection form
+ */
+const getPublicProjectBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+
+    const project = await prisma.project.findFirst({
+      where: {
+        slug,
+        visibility: "PUBLIC",
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        shortDescription: true,
+        slug: true,
+        logoUrl: true,
+        projectType: true,
+        websiteUrl: true,
+        collectionFormUrl: true,
+        brandColorPrimary: true,
+        brandColorSecondary: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundError("Project not found or not publicly accessible");
+    }
+
+    return ResponseHandler.success(res, {
+      message: "Public project retrieved successfully",
+      data: serializeProject(project),
     });
   } catch (error) {
     next(error);
@@ -514,6 +562,7 @@ export {
   createProject,
   listProjects,
   getProjectBySlug,
+  getPublicProjectBySlug,
   updateProject,
   deleteProject,
 };

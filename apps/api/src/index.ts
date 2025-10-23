@@ -5,6 +5,7 @@ import helmet from "helmet";
 import * as dotenv from "dotenv";
 
 import { webhookRouter } from "./routes/webhook.route.ts";
+import { publicRouter } from "./routes/public.route.ts";
 import { clerkMiddleware } from "@clerk/express";
 import { attachUser } from "./middleware/auth.middleware.ts";
 import {
@@ -38,6 +39,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/webhook", webhookRouter);
+app.use("/api/public", publicRouter);
 
 app.use("/api/projects", attachUser, projectRouter);
 
