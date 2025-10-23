@@ -341,22 +341,7 @@ const updateProject = async (
 ) => {
   try {
     const { slug } = req.params;
-    const {
-      name,
-      shortDescription,
-      description,
-      slug: newSlug,
-      logoUrl,
-      projectType,
-      websiteUrl,
-      collectionFormUrl,
-      brandColorPrimary,
-      brandColorSecondary,
-      socialLinks,
-      tags,
-      visibility,
-      isActive,
-    } = req.body;
+    const payload = req.body as UpdateProjectPayload;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -372,80 +357,92 @@ const updateProject = async (
       throw new NotFoundError("Project not found");
     }
 
-    // Validate fields if provided
-    if (name !== undefined) {
-      if (!name || name.trim().length === 0) {
+    // Validate optional fields if provided
+    if (payload.name !== undefined) {
+      if (!payload.name || payload.name.trim().length === 0) {
         throw new BadRequestError("Project name cannot be empty");
       }
-      if (name.length > 255) {
+      if (payload.name.length > 255) {
         throw new BadRequestError(
           "Project name must be less than 255 characters",
         );
       }
     }
 
-    if (newSlug !== undefined) {
-      if (!newSlug || newSlug.trim().length === 0) {
+    if (payload.slug !== undefined) {
+      if (!payload.slug || payload.slug.trim().length === 0) {
         throw new BadRequestError("Slug cannot be empty");
       }
-      if (!isValidSlug(newSlug)) {
+      if (!isValidSlug(payload.slug)) {
         throw new BadRequestError(
           "Slug can only contain lowercase letters, numbers, and hyphens",
         );
       }
-      if (newSlug.length > 255) {
+      if (payload.slug.length > 255) {
         throw new BadRequestError("Slug must be less than 255 characters");
       }
 
-      // Check if new slug is already taken by another project
+      // Check if new slug already exists (and it's not the current project)
       const slugExists = await prisma.project.findFirst({
         where: {
-          slug: newSlug,
-          id: { not: existingProject.id },
+          slug: payload.slug,
+          NOT: { id: existingProject.id },
         },
       });
 
       if (slugExists) {
-        throw new ConflictError("This slug is already taken");
+        throw new ConflictError("Project with this slug already exists");
       }
     }
 
-    if (shortDescription !== undefined && shortDescription.length > 500) {
+    if (
+      payload.shortDescription !== undefined &&
+      payload.shortDescription &&
+      payload.shortDescription.length > 500
+    ) {
       throw new BadRequestError(
         "Short description must be less than 500 characters",
       );
     }
 
-    if (description !== undefined && description.length > 10000) {
+    if (
+      payload.description !== undefined &&
+      payload.description &&
+      payload.description.length > 10000
+    ) {
       throw new BadRequestError(
         "Description must be less than 10,000 characters",
       );
     }
 
-    if (logoUrl !== undefined && logoUrl && !isValidUrl(logoUrl)) {
+    if (payload.logoUrl !== undefined && payload.logoUrl && !isValidUrl(payload.logoUrl)) {
       throw new BadRequestError("Invalid logo URL format");
     }
 
-    if (projectType !== undefined && !isValidProjectType(projectType)) {
+    if (
+      payload.projectType !== undefined &&
+      payload.projectType &&
+      !isValidProjectType(payload.projectType)
+    ) {
       throw new BadRequestError("Invalid project type");
     }
 
-    if (websiteUrl !== undefined && websiteUrl && !isValidUrl(websiteUrl)) {
+    if (payload.websiteUrl !== undefined && payload.websiteUrl && !isValidUrl(payload.websiteUrl)) {
       throw new BadRequestError("Invalid website URL format");
     }
 
     if (
-      collectionFormUrl !== undefined &&
-      collectionFormUrl &&
-      !isValidUrl(collectionFormUrl)
+      payload.collectionFormUrl !== undefined &&
+      payload.collectionFormUrl &&
+      !isValidUrl(payload.collectionFormUrl)
     ) {
       throw new BadRequestError("Invalid collection form URL format");
     }
 
     if (
-      brandColorPrimary !== undefined &&
-      brandColorPrimary &&
-      !isValidHexColor(brandColorPrimary)
+      payload.brandColorPrimary !== undefined &&
+      payload.brandColorPrimary &&
+      !isValidHexColor(payload.brandColorPrimary)
     ) {
       throw new BadRequestError(
         "Invalid primary brand color. Use hex format (e.g., #FF5733)",
@@ -453,54 +450,54 @@ const updateProject = async (
     }
 
     if (
-      brandColorSecondary !== undefined &&
-      brandColorSecondary &&
-      !isValidHexColor(brandColorSecondary)
+      payload.brandColorSecondary !== undefined &&
+      payload.brandColorSecondary &&
+      !isValidHexColor(payload.brandColorSecondary)
     ) {
       throw new BadRequestError(
         "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
       );
     }
 
-    if (socialLinks !== undefined) {
-      const { valid, errors } = validateSocialLinks(socialLinks);
+    if (payload.socialLinks !== undefined) {
+      const { valid, errors } = validateSocialLinks(payload.socialLinks);
       if (!valid) {
         throw new BadRequestError(`Invalid social links: ${errors.join(", ")}`);
       }
     }
 
-    if (tags !== undefined) {
-      const { valid, errors } = validateTags(tags);
+    if (payload.tags !== undefined) {
+      const { valid, errors } = validateTags(payload.tags);
       if (!valid) {
         throw new BadRequestError(`Invalid tags: ${errors.join(", ")}`);
       }
     }
 
-    if (visibility !== undefined && !isValidVisibility(visibility)) {
+    if (payload.visibility !== undefined && !isValidVisibility(payload.visibility)) {
       throw new BadRequestError("Invalid visibility option");
     }
 
     // Build update data object
     const updateData: any = {};
-    if (name !== undefined) updateData.name = name.trim();
-    if (shortDescription !== undefined)
-      updateData.shortDescription = shortDescription?.trim() || null;
-    if (description !== undefined)
-      updateData.description = description?.trim() || null;
-    if (newSlug !== undefined) updateData.slug = newSlug.toLowerCase().trim();
-    if (logoUrl !== undefined) updateData.logoUrl = logoUrl || null;
-    if (projectType !== undefined) updateData.projectType = projectType;
-    if (websiteUrl !== undefined) updateData.websiteUrl = websiteUrl || null;
-    if (collectionFormUrl !== undefined)
-      updateData.collectionFormUrl = collectionFormUrl || null;
-    if (brandColorPrimary !== undefined)
-      updateData.brandColorPrimary = brandColorPrimary || null;
-    if (brandColorSecondary !== undefined)
-      updateData.brandColorSecondary = brandColorSecondary || null;
-    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
-    if (tags !== undefined) updateData.tags = tags;
-    if (visibility !== undefined) updateData.visibility = visibility;
-    if (isActive !== undefined) updateData.isActive = isActive;
+    if (payload.name !== undefined) updateData.name = payload.name.trim();
+    if (payload.shortDescription !== undefined)
+      updateData.shortDescription = payload.shortDescription?.trim() || null;
+    if (payload.description !== undefined)
+      updateData.description = payload.description?.trim() || null;
+    if (payload.slug !== undefined) updateData.slug = payload.slug.toLowerCase().trim();
+    if (payload.logoUrl !== undefined) updateData.logoUrl = payload.logoUrl || null;
+    if (payload.projectType !== undefined) updateData.projectType = payload.projectType;
+    if (payload.websiteUrl !== undefined) updateData.websiteUrl = payload.websiteUrl || null;
+    if (payload.collectionFormUrl !== undefined)
+      updateData.collectionFormUrl = payload.collectionFormUrl || null;
+    if (payload.brandColorPrimary !== undefined)
+      updateData.brandColorPrimary = payload.brandColorPrimary || null;
+    if (payload.brandColorSecondary !== undefined)
+      updateData.brandColorSecondary = payload.brandColorSecondary || null;
+    if (payload.socialLinks !== undefined) updateData.socialLinks = payload.socialLinks;
+    if (payload.tags !== undefined) updateData.tags = payload.tags;
+    if (payload.visibility !== undefined) updateData.visibility = payload.visibility;
+    if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
 
     // Update project
     const updatedProject = await prisma.project.update({
