@@ -334,9 +334,11 @@ export function CustomFormField<TFieldValues extends FieldValues>(
 
               // Update the form field value
               field.onChange(hex);
-              props.onChange?.(hex);
+              if (props.onChange) {
+                props.onChange(hex);
+              }
             },
-            [field, props]
+            [field.onChange]
           );
 
           return (

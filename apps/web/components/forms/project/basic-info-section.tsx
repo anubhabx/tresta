@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Control } from "react-hook-form";
 import {
   Card,
@@ -19,19 +19,23 @@ interface BasicInfoSectionProps {
   setValue: UseFormSetValue<ProjectFormData>;
   getValues: UseFormGetValues<ProjectFormData>;
   watch: (name: keyof ProjectFormData) => any;
+  enableSlugAutoGeneration?: boolean;
 }
 
 export function BasicInfoSection({
   control,
   setValue,
   getValues,
-  watch
+  watch,
+  enableSlugAutoGeneration = true
 }: BasicInfoSectionProps) {
   // Track the last auto-generated slug to know if user has manually edited it
   const [lastAutoSlug, setLastAutoSlug] = useState("");
   const [userEditedSlug, setUserEditedSlug] = useState(false);
 
-  const handleNameChange = (value: string) => {
+  const handleNameChange = useCallback((value: string) => {
+    if (!enableSlugAutoGeneration) return;
+    
     const newSlug = generateSlug(value);
 
     // Only auto-update slug if user hasn't manually edited it
@@ -39,15 +43,16 @@ export function BasicInfoSection({
       setValue("slug", newSlug);
       setLastAutoSlug(newSlug);
     }
-  };
+  }, [userEditedSlug, setValue, enableSlugAutoGeneration]);
 
-  const handleSlugChange = (slug: string) => {
-    setValue("slug", slug);
+  const handleSlugChange = useCallback((slug: string) => {
+    if (!enableSlugAutoGeneration) return;
+    
     // Mark as manually edited if it differs from the auto-generated slug
     if (slug !== lastAutoSlug) {
       setUserEditedSlug(true);
     }
-  };
+  }, [lastAutoSlug, enableSlugAutoGeneration]);
 
   return (
     <Card>
@@ -64,7 +69,7 @@ export function BasicInfoSection({
           placeholder="My Awesome Project"
           description="The display name for your project"
           required
-          onChange={handleNameChange}
+          {...(enableSlugAutoGeneration ? { onChange: handleNameChange } : {})}
         />
 
         <CustomFormField
@@ -73,9 +78,14 @@ export function BasicInfoSection({
           name="slug"
           label="Project Slug"
           placeholder="my-awesome-project"
-          description="A unique identifier for your project URL (auto-generated from name)"
+          description={
+            enableSlugAutoGeneration
+              ? "A unique identifier for your project URL (auto-generated from name)"
+              : "URL slug cannot be changed after project creation to maintain link stability"
+          }
           required
-          onChange={handleSlugChange}
+          disabled={!enableSlugAutoGeneration}
+          {...(enableSlugAutoGeneration ? { onChange: handleSlugChange } : {})}
         />
 
         <CustomFormField
