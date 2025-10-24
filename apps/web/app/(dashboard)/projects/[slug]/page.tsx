@@ -25,6 +25,7 @@ import {
   ProjectStatsCards,
   ProjectOverviewTab,
   ProjectSettingsTab,
+  ProjectWidgetsTab,
 } from "@/components/project-detail";
 
 interface ProjectPageProps {
@@ -115,19 +116,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <LayoutGridIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  No widgets created
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Create your first widget to display testimonials on your site
-                </p>
-                <Button disabled>
-                  <LayoutGridIcon className="h-4 w-4 mr-2" />
-                  Create Widget (Coming Soon)
-                </Button>
-              </div>
+              <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
             </CardContent>
           </Card>
         </TabsContent>

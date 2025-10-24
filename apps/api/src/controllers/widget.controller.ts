@@ -1,4 +1,4 @@
-import { prisma } from "@workspace/database/prisma.ts";
+import { prisma } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
 import {
   BadRequestError,
@@ -8,20 +8,20 @@ import {
   ApiError,
   ForbiddenError,
   InternalServerError,
-  handlePrismaError
+  handlePrismaError,
 } from "../lib/errors.ts";
 import { ResponseHandler } from "../lib/response.ts";
 import type {
   WidgetConfig,
   WidgetData,
   CreateWidgetPayload,
-  UpdateWidgetPayload
+  UpdateWidgetPayload,
 } from "@/types/api-responses.ts";
 
 const createWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { projectId, embedType, config } = req.body;
@@ -39,13 +39,13 @@ const createWidget = async (
     // Type check for config
     if ((config as WidgetConfig).type !== undefined) {
       throw new BadRequestError(
-        "Widget configuration does not match the required structure"
+        "Widget configuration does not match the required structure",
       );
     }
 
     // Check if project exists
     const project = await prisma.project.findUnique({
-      where: { id: projectId }
+      where: { id: projectId },
     });
 
     if (!project) {
@@ -57,30 +57,26 @@ const createWidget = async (
       data: {
         projectId,
         embedType,
-        config
-      }
+        config,
+      },
     });
 
     ResponseHandler.success(res, {
       message: "Widget created successfully",
-      data: widget
+      data: widget,
     });
   } catch (error) {
     next(error);
   }
 };
 
-const listWidgets = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { slug } = req.params;
 
     // Find project by slug
     const project = await prisma.project.findUnique({
-      where: { slug }
+      where: { slug },
     });
 
     if (!project) {
@@ -89,12 +85,12 @@ const listWidgets = async (
 
     // Fetch widgets for the project
     const widgets = await prisma.widget.findMany({
-      where: { projectId: project.id }
+      where: { projectId: project.id },
     });
 
     ResponseHandler.success(res, {
       message: "Widgets fetched successfully",
-      data: widgets
+      data: widgets,
     });
   } catch (error) {
     next(error);
@@ -104,7 +100,7 @@ const listWidgets = async (
 const updateWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
@@ -122,7 +118,7 @@ const updateWidget = async (
 
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
-      where: { id: widgetId }
+      where: { id: widgetId },
     });
 
     if (!existingWidget) {
@@ -134,13 +130,13 @@ const updateWidget = async (
       where: { id: widgetId },
       data: {
         embedType: embedType ?? existingWidget.embedType,
-        config: config ?? existingWidget.config
-      }
+        config: config ?? existingWidget.config,
+      },
     });
 
     ResponseHandler.success(res, {
       message: "Widget updated successfully",
-      data: updatedWidget
+      data: updatedWidget,
     });
   } catch (error) {
     next(error);
@@ -150,7 +146,7 @@ const updateWidget = async (
 const deleteWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
@@ -162,7 +158,7 @@ const deleteWidget = async (
 
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
-      where: { id: widgetId }
+      where: { id: widgetId },
     });
 
     if (!existingWidget) {
@@ -171,23 +167,150 @@ const deleteWidget = async (
 
     // Delete the widget
     await prisma.widget.delete({
-      where: { id: widgetId }
+      where: { id: widgetId },
     });
 
     ResponseHandler.success(res, {
-      message: "Widget deleted successfully"
+      message: "Widget deleted successfully",
     });
   } catch (error) {
     next(error);
   }
 };
 
+/**
+ * Fetch public widget data for embedding
+ * No authentication required - public endpoint
+ * Returns published testimonials for a specific widget
+ */
 const fetchPublicWidgetData = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  
+  try {
+    const { widgetId } = req.params;
+
+    // Validate widget ID
+    if (!widgetId) {
+      throw new BadRequestError("Widget ID is required");
+    }
+
+    // Fetch widget with project data
+    const widget = await prisma.widget.findUnique({
+      where: { id: widgetId },
+      include: {
+        Project: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            logoUrl: true,
+            brandColorPrimary: true,
+            brandColorSecondary: true,
+            isActive: true,
+            visibility: true,
+          },
+        },
+      },
+    });
+
+    // Check if widget exists
+    if (!widget) {
+      throw new NotFoundError("Widget not found");
+    }
+
+    // Security check: Only serve widgets for active public projects
+    if (!widget.Project) {
+      throw new NotFoundError("Project not found");
+    }
+
+    if (!widget.Project.isActive) {
+      throw new BadRequestError("This project is not active");
+    }
+
+    // Only PUBLIC projects can have their widgets embedded
+    if (widget.Project.visibility !== "PUBLIC") {
+      throw new ForbiddenError(
+        "Widgets can only be embedded for public projects",
+      );
+    }
+
+    // Fetch published testimonials for this project
+    const testimonials = await prisma.testimonial.findMany({
+      where: {
+        projectId: widget.Project.id,
+        isPublished: true, // Only published testimonials
+        isApproved: true, // Must be approved
+      },
+      select: {
+        id: true,
+        authorName: true,
+        content: true,
+        rating: true,
+        videoUrl: true,
+        type: true,
+        createdAt: true,
+        // Exclude sensitive data (email, IP, user agent, etc.)
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 100, // Limit to prevent abuse
+    });
+
+    // Prepare response data
+    const widgetData = {
+      widget: {
+        id: widget.id,
+        embedType: widget.embedType,
+        config: widget.config,
+      },
+      project: {
+        name: widget.Project.name,
+        slug: widget.Project.slug,
+        logoUrl: widget.Project.logoUrl,
+        brandColorPrimary: widget.Project.brandColorPrimary,
+        brandColorSecondary: widget.Project.brandColorSecondary,
+      },
+      testimonials: testimonials.map((t) => ({
+        id: t.id,
+        authorName: t.authorName,
+        content: t.content,
+        rating: t.rating,
+        videoUrl: t.videoUrl,
+        type: t.type,
+        createdAt: t.createdAt.toISOString(),
+      })),
+      meta: {
+        total: testimonials.length,
+        fetchedAt: new Date().toISOString(),
+      },
+    };
+
+    // Set aggressive caching headers for CDN and browser caching
+    // Cache for 5 minutes on CDN, 1 minute on browser
+    res.set({
+      "Cache-Control":
+        "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+      "CDN-Cache-Control": "public, max-age=300",
+      Vary: "Accept-Encoding",
+      ETag: `W/"${widgetId}-${testimonials.length}-${Date.now()}"`,
+    });
+
+    return ResponseHandler.success(res, {
+      message: "Widget data fetched successfully",
+      data: widgetData,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export { createWidget, updateWidget };
+export {
+  createWidget,
+  updateWidget,
+  listWidgets,
+  deleteWidget,
+  fetchPublicWidgetData,
+};

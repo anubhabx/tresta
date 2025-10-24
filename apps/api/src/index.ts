@@ -15,6 +15,7 @@ import {
 
 import { projectRouter } from "./routes/project.route.ts";
 import { mediaRouter } from "./routes/media.route.ts";
+import { widgetRouter } from "./routes/widget.route.ts";
 import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
@@ -45,6 +46,7 @@ app.use("/api/public", publicRouter);
 
 app.use("/api/projects", attachUser, projectRouter);
 app.use("/api/media", attachUser, mediaRouter);
+app.use("/api/widgets", widgetRouter);
 
 // 404 handler for unmatched routes
 app.use(notFoundHandler);
