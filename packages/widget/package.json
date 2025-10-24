@@ -1,0 +1,31 @@
+{
+  "name": "@workspace/widget",
+  "version": "1.0.0",
+  "description": "Tresta embeddable testimonial widget - standalone CDN library",
+  "type": "module",
+  "main": "./dist/tresta-widget.js",
+  "module": "./dist/tresta-widget.esm.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "testimonials",
+    "widget",
+    "embed",
+    "reviews",
+    "social-proof"
+  ],
+  "author": "Tresta",
+  "license": "MIT",
+  "devDependencies": {
+    "terser": "^5.44.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11"
+  }
+}

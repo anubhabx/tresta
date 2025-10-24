@@ -39,3 +39,14 @@ npm-debug.log*
 
 *.md
 */**/*.md
+
+# Widget build outputs
+packages/widget/dist
+
+# Test files
+**/test.html
+**/test.js
+**/test.css
+**/demo.html
+**/demo.js
+**/demo.css

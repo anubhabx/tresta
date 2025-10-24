@@ -11,7 +11,7 @@ import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/error.middleware.ts";
-import { restrictiveCors, publicCors } from "./middleware/cors.middleware.ts";
+import { dynamicCors } from "./middleware/cors.middleware.ts";
 
 import { projectRouter } from "./routes/project.route.ts";
 import { mediaRouter } from "./routes/media.route.ts";
@@ -23,6 +23,8 @@ dotenv.config();
 const app = express();
 
 app.use(helmet.hidePoweredBy());
+// Apply dynamic CORS (checks path and applies appropriate policy)
+app.use(dynamicCors);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,13 +35,15 @@ app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-// Public routes with open CORS (for widget embedding on external sites)
+// Webhook routes
 app.use("/api/webhook", webhookRouter);
-app.use("/api/public", publicCors, publicRouter);
 
-// Protected routes with restrictive CORS (dashboard only)
-app.use("/api/projects", restrictiveCors, attachUser, projectRouter);
-app.use("/api/media", restrictiveCors, attachUser, mediaRouter);
+// Public routes (dynamic CORS handles this automatically)
+app.use("/api/public", publicRouter);
+
+// Protected routes (use global restrictive CORS)
+app.use("/api/projects", attachUser, projectRouter);
+app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
 
 // 404 handler for unmatched routes

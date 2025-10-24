@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { attachUser } from "../middleware/auth.middleware.ts";
-import { restrictiveCors, publicCors } from "../middleware/cors.middleware.ts";
 import {
   createWidget,
   updateWidget,
@@ -11,21 +10,21 @@ import {
 
 const router: Router = Router();
 
-// Public route - no authentication required, open CORS for embedding
+// Public route - no authentication required, open CORS handled by dynamic middleware
 // GET /api/widgets/:widgetId/public - Fetch widget data for embedding
-router.get("/:widgetId/public", publicCors, fetchPublicWidgetData);
+router.get("/:widgetId/public", fetchPublicWidgetData);
 
-// Protected routes - require authentication, restrictive CORS
+// Protected routes - require authentication (use global restrictive CORS)
 // POST /api/widgets - Create a new widget
-router.post("/", restrictiveCors, attachUser, createWidget);
+router.post("/", attachUser, createWidget);
 
 // GET /api/widgets/project/:slug - List all widgets for a project
-router.get("/project/:slug", restrictiveCors, attachUser, listWidgets);
+router.get("/project/:slug", attachUser, listWidgets);
 
 // PUT /api/widgets/:widgetId - Update widget configuration
-router.put("/:widgetId", restrictiveCors, attachUser, updateWidget);
+router.put("/:widgetId", attachUser, updateWidget);
 
 // DELETE /api/widgets/:widgetId - Delete a widget
-router.delete("/:widgetId", restrictiveCors, attachUser, deleteWidget);
+router.delete("/:widgetId", attachUser, deleteWidget);
 
 export { router as widgetRouter };

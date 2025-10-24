@@ -7,7 +7,10 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "generate": "prisma generate --schema=./packages/database/prisma/schema.prisma"
+    "generate": "prisma generate --schema=./packages/database/prisma/schema.prisma",
+    "widget:build": "pnpm --filter @workspace/widget build",
+    "widget:dev": "pnpm --filter @workspace/widget dev",
+    "widget:preview": "pnpm --filter @workspace/widget preview"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
