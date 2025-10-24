@@ -9,14 +9,14 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "@workspace/ui/components/tabs";
 import {
   AlertDialog,
@@ -27,7 +27,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@workspace/ui/components/alert-dialog";
 import {
   FolderIcon,
@@ -38,7 +38,7 @@ import {
   EditIcon,
   LinkIcon,
   CopyIcon,
-  ExternalLinkIcon,
+  ExternalLinkIcon
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -46,6 +46,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { TestimonialList } from "@/components/testimonial-list";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "@workspace/ui/components/avatar";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -113,9 +118,18 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
-          <div className="p-3 rounded-lg bg-primary/10">
-            <FolderIcon className="h-8 w-8 text-primary" />
-          </div>
+          <Avatar className="mt-1 rounded-lg w-12 h-12">
+            <AvatarImage
+              src={project.logoUrl!}
+              alt={project.name}
+              className="object-cover"
+
+            />
+
+            <AvatarFallback className="bg-muted text-muted-foreground p-3 rounded-lg">
+              <FolderIcon className="h-6 w-6" />
+            </AvatarFallback>
+          </Avatar>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-3xl font-bold tracking-tight">
@@ -136,7 +150,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
             <p className="text-xs text-muted-foreground mt-2">
               Created{" "}
               {formatDistanceToNow(new Date(project.createdAt), {
-                addSuffix: true,
+                addSuffix: true
               })}
             </p>
           </div>

@@ -126,7 +126,7 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
             </Link>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !formState.isDirty}
+              disabled={isSubmitting}
             >
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

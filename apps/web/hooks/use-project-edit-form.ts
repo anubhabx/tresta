@@ -127,7 +127,7 @@ export function useProjectEditForm(slug: string) {
       toast.success("Project updated successfully!");
       router.push(`/projects/${data.slug}`);
     } catch (error: any) {
-      console.error("Failed to update project:", error);
+      // console.error("Failed to update project:", error);
       toast.error(
         error.message || "Failed to update project. Please try again."
       );

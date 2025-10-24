@@ -89,7 +89,7 @@ export function useProjectForm() {
       toast.success("Project created successfully!");
       router.push(`/projects/${data.slug}`);
     } catch (error: any) {
-      console.error("Failed to create project:", error);
+      // console.error("Failed to create project:", error);
       toast.error(
         error.message || "Failed to create project. Please try again."
       );

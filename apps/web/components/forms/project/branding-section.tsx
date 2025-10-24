@@ -8,7 +8,8 @@ import {
 } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
-import { LogoUploadField } from "@/components/forms/logo-upload-field";
+import { AzureFileUpload } from "@/components/azure-file-upload";
+import { UploadDirectory } from "@/hooks/use-azure-sas";
 import { ProjectFormData } from "@/lib/schemas/project-schema";
 
 interface BrandingSectionProps {
@@ -26,7 +27,19 @@ export function BrandingSection({ control, onLogoUpload }: BrandingSectionProps)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <LogoUploadField control={control} onFileUpload={onLogoUpload} />
+        <AzureFileUpload
+          control={control}
+          name="logoUrl"
+          directory={UploadDirectory.LOGOS}
+          label="Project Logo"
+          description="Upload your project logo (PNG, JPG, SVG, or WebP, max 5MB)"
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+          maxSizeMB={5}
+          preview
+          onUploadComplete={(blobUrl) => {
+            console.log("Logo uploaded to Azure:", blobUrl);
+          }}
+        />
 
         <Separator />
 

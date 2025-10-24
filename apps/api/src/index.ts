@@ -14,6 +14,8 @@ import {
 } from "./middleware/error.middleware.ts";
 
 import { projectRouter } from "./routes/project.route.ts";
+import { mediaRouter } from "./routes/media.route.ts";
+import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
 
@@ -42,6 +44,7 @@ app.use("/api/webhook", webhookRouter);
 app.use("/api/public", publicRouter);
 
 app.use("/api/projects", attachUser, projectRouter);
+app.use("/api/media", attachUser, mediaRouter);
 
 // 404 handler for unmatched routes
 app.use(notFoundHandler);
@@ -50,6 +53,18 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
+
+// Initialize Azure Blob Storage container and CORS
+blobStorageService
+  .ensureContainerExists()
+  .then(async () => {
+    // console.log("✓ Azure Blob Storage container initialized");
+    // Configure CORS for direct browser uploads
+    await blobStorageService.configureCORS();
+  })
+  .catch((error) => {
+    console.error("✗ Failed to initialize Azure Blob Storage:", error);
+  });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
