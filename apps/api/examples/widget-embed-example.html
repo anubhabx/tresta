@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tresta Widget Embed Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .description {
+            color: #666;
+            line-height: 1.6;
+        }
+        .widget-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .widget-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .status {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        #widget-content {
+            min-height: 200px;
+        }
+        .testimonial {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+        .testimonial-content {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .testimonial-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ddd;
+        }
+        .testimonial-info {
+            flex: 1;
+        }
+        .testimonial-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        .testimonial-role {
+            font-size: 14px;
+            color: #666;
+        }
+        .testimonial-rating {
+            color: #ffa726;
+            margin-bottom: 10px;
+        }
+        .code-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Tresta Widget Embed Example</h1>
+        <p class="description">
+            This page demonstrates how to embed Tresta testimonial widgets on external websites.
+            The widget fetches data from the Tresta API using CORS-enabled public endpoints,
+            allowing you to display testimonials on any domain.
+        </p>
+    </div>
+
+    <div class="widget-container">
+        <div class="widget-title">Live Widget Demo</div>
+        <div id="status" class="status loading">Loading widget data...</div>
+        <div id="widget-content"></div>
+    </div>
+
+    <div class="code-section">
+        <h2>Implementation Code</h2>
+
+        <div class="note">
+            <strong>Note:</strong> Replace <code>YOUR_WIDGET_ID</code> with your actual widget ID from the Tresta dashboard.
+            You can find this in the widget settings under "Embed Code".
+        </div>
+
+        <h3>JavaScript Fetch Example</h3>
+        <pre><code>&lt;script&gt;
+// Configuration
+const WIDGET_ID = 'YOUR_WIDGET_ID';
+const API_URL = 'http://localhost:8000'; // or https://api.tresta.io in production
+
+// Fetch widget data
+async function loadWidget() {
+    try {
+        const response = await fetch(`${API_URL}/widgets/${WIDGET_ID}/public`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            renderWidget(result.data);
+        } else {
+            throw new Error(result.error?.message || 'Failed to load widget');
+        }
+    } catch (error) {
+        console.error('Widget load error:', error);
+        showError(error.message);
+    }
+}
+
+// Render testimonials
+function renderWidget(data) {
+    const container = document.getElementById('widget-content');
+    const testimonials = data.testimonials || [];
+
+    if (testimonials.length === 0) {
+        container.innerHTML = '&lt;p&gt;No testimonials yet.&lt;/p&gt;';
+        return;
+    }
+
+    container.innerHTML = testimonials.map(t => `
+        &lt;div class="testimonial"&gt;
+            ${t.rating ? `&lt;div class="testimonial-rating"&gt;${'⭐'.repeat(t.rating)}&lt;/div&gt;` : ''}
+            &lt;div class="testimonial-content"&gt;"${t.content}"&lt;/div&gt;
+            &lt;div class="testimonial-author"&gt;
+                ${t.authorImage ? `&lt;img src="${t.authorImage}" class="testimonial-image"&gt;` : ''}
+                &lt;div class="testimonial-info"&gt;
+                    &lt;div class="testimonial-name"&gt;${t.authorName}&lt;/div&gt;
+                    ${t.authorRole ? `&lt;div class="testimonial-role"&gt;${t.authorRole}&lt;/div&gt;` : ''}
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    `).join('');
+}
+
+// Load widget on page load
+loadWidget();
+&lt;/script&gt;</code></pre>
+
+        <h3>jQuery Example</h3>
+        <pre><code>&lt;script src="https://code.jquery.com/jquery-3.6.0.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+$(document).ready(function() {
+    const WIDGET_ID = 'YOUR_WIDGET_ID';
+    const API_URL = 'http://localhost:8000';
+
+    $.ajax({
+        url: `${API_URL}/widgets/${WIDGET_ID}/public`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(result) {
+            if (result.success && result.data.testimonials) {
+                renderTestimonials(result.data.testimonials);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Widget load failed:', error);
+            $('#widget-content').html('&lt;p&gt;Failed to load testimonials.&lt;/p&gt;');
+        }
+    });
+});
+&lt;/script&gt;</code></pre>
+
+        <h3>React Example</h3>
+        <pre><code>import { useEffect, useState } from 'react';
+
+function TrestaWidget({ widgetId }) {
+    const [testimonials, setTestimonials] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function fetchWidget() {
+            try {
+                const response = await fetch(
+                    `http://localhost:8000/api/widgets/${widgetId}/public`
+                );
+                const result = await response.json();
+
+                if (result.success) {
+                    setTestimonials(result.data.testimonials || []);
+                } else {
+                    throw new Error(result.error?.message);
+                }
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchWidget();
+    }, [widgetId]);
+
+    if (loading) return &lt;div&gt;Loading testimonials...&lt;/div&gt;;
+    if (error) return &lt;div&gt;Error: {error}&lt;/div&gt;;
+
+    return (
+        &lt;div className="tresta-widget"&gt;
+            {testimonials.map((testimonial) => (
+                &lt;div key={testimonial.id} className="testimonial"&gt;
+                    {testimonial.rating && (
+                        &lt;div className="rating"&gt;
+                            {'⭐'.repeat(testimonial.rating)}
+                        &lt;/div&gt;
+                    )}
+                    &lt;p&gt;{testimonial.content}&lt;/p&gt;
+                    &lt;div className="author"&gt;
+                        {testimonial.authorImage && (
+                            &lt;img src={testimonial.authorImage} alt={testimonial.authorName} /&gt;
+                        )}
+                        &lt;div&gt;
+                            &lt;strong&gt;{testimonial.authorName}&lt;/strong&gt;
+                            {testimonial.authorRole && &lt;p&gt;{testimonial.authorRole}&lt;/p&gt;}
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            ))}
+        &lt;/div&gt;
+    );
+}
+
+export default TrestaWidget;</code></pre>
+
+        <h3>CORS Configuration</h3>
+        <p>The Tresta API is configured to allow requests from any origin for public widget endpoints:</p>
+        <pre><code>// Public widget endpoint CORS configuration
+{
+    origin: "*",                    // Allow any origin
+    methods: ["GET", "OPTIONS"],    // Read-only access
+    allowedHeaders: ["Content-Type"],
+    credentials: false,             // No authentication required
+    maxAge: 86400                   // Cache preflight for 24 hours
+}</code></pre>
+
+        <div class="note">
+            <strong>Security Note:</strong> Public widget endpoints are read-only and only return approved testimonials
+            from public projects. No sensitive data or authentication is required, making CORS wildcard safe.
+        </div>
+    </div>
+
+    <script>
+        // Live demo implementation
+        const WIDGET_ID = 'YOUR_WIDGET_ID'; // Replace with actual widget ID
+        const API_URL = 'http://localhost:8000'; // Change in production
+
+        async function loadWidget() {
+            const statusEl = document.getElementById('status');
+            const contentEl = document.getElementById('widget-content');
+
+            try {
+                statusEl.className = 'status loading';
+                statusEl.textContent = 'Fetching widget data from API...';
+
+                const response = await fetch(`${API_URL}/widgets/${WIDGET_ID}/public`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    statusEl.className = 'status success';
+                    statusEl.textContent = `✓ Successfully loaded ${result.data.testimonials?.length || 0} testimonials`;
+                    renderWidget(result.data);
+                } else {
+                    throw new Error(result.error?.message || 'Failed to load widget');
+                }
+            } catch (error) {
+                console.error('Widget load error:', error);
+                statusEl.className = 'status error';
+                statusEl.textContent = `✗ Error: ${error.message}`;
+                contentEl.innerHTML = `
+                    <div class="note">
+                        <strong>Demo Note:</strong> This is a demo page. To see live testimonials:
+                        <ol>
+                            <li>Create a widget in the Tresta dashboard</li>
+                            <li>Replace <code>YOUR_WIDGET_ID</code> in the code with your actual widget ID</li>
+                            <li>Ensure your Tresta API is running on <code>http://localhost:8000</code></li>
+                            <li>Make sure the project is set to PUBLIC and has approved testimonials</li>
+                        </ol>
+                    </div>
+                `;
+            }
+        }
+
+        function renderWidget(data) {
+            const container = document.getElementById('widget-content');
+            const testimonials = data.testimonials || [];
+
+            if (testimonials.length === 0) {
+                container.innerHTML = '<p>No testimonials to display yet.</p>';
+                return;
+            }
+
+            container.innerHTML = testimonials.map(t => `
+                <div class="testimonial">
+                    ${t.rating ? `<div class="testimonial-rating">${'⭐'.repeat(t.rating)}</div>` : ''}
+                    <div class="testimonial-content">"${t.content}"</div>
+                    <div class="testimonial-author">
+                        ${t.authorImage ? `<img src="${t.authorImage}" class="testimonial-image" alt="${t.authorName}">` : '<div class="testimonial-image"></div>'}
+                        <div class="testimonial-info">
+                            <div class="testimonial-name">${t.authorName}</div>
+                            ${t.authorRole ? `<div class="testimonial-role">${t.authorRole}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Auto-load on page ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadWidget);
+        } else {
+            loadWidget();
+        }
+    </script>
+</body>
+</html>
