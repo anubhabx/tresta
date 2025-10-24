@@ -4,16 +4,23 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { projects } from "@/lib/queries";
-import { projectFormSchema, ProjectFormData } from "@/lib/schemas/project-schema";
-import { ProjectType, ProjectVisibility, type SocialLinks, type Project } from "@/types/api";
+import {
+  projectFormSchema,
+  ProjectFormData,
+} from "@/lib/schemas/project-schema";
+import { ProjectType, ProjectVisibility, type SocialLinks } from "@/types/api";
+import { useApi } from "@/hooks/use-api";
 
 export function useProjectEditForm(slug: string) {
   const router = useRouter();
+  const api = useApi();
   const updateProject = projects.mutations.useUpdate(slug);
-  const { data: projectData, isLoading: isLoadingProject } = projects.queries.useDetail(slug);
-  
+  const { data: projectData, isLoading: isLoadingProject } =
+    projects.queries.useDetail(slug);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<File | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
@@ -35,23 +42,32 @@ export function useProjectEditForm(slug: string) {
       facebook: "",
       instagram: "",
       youtube: "",
-      tagsInput: ""
-    }
+      tagsInput: "",
+    },
   });
 
-  const { reset, control, setValue, getValues, watch, register, handleSubmit, formState } = form;
+  const {
+    reset,
+    control,
+    setValue,
+    getValues,
+    watch,
+    register,
+    handleSubmit,
+    formState,
+  } = form;
 
   // Populate form when project data loads
   useEffect(() => {
     if (projectData) {
       const project = projectData;
-      
+
       // Convert tags array to comma-separated string
       const tagsString = project.tags?.join(", ") || "";
-      
+
       // Extract social links
       const socialLinks = project.socialLinks || {};
-      
+
       reset({
         name: project.name,
         shortDescription: project.shortDescription || "",
@@ -70,17 +86,60 @@ export function useProjectEditForm(slug: string) {
         facebook: socialLinks.facebook || "",
         instagram: socialLinks.instagram || "",
         youtube: socialLinks.youtube || "",
-        tagsInput: tagsString
+        tagsInput: tagsString,
       });
     }
   }, [projectData, reset]);
 
-  const handleLogoUpload = (file: File) => {
+  const handleLogoUpload = async (file: File) => {
     setUploadedLogo(file);
-    // TODO: Upload file to storage service and get URL
-    // For now, create a temporary object URL
-    const objectUrl = URL.createObjectURL(file);
-    setValue("logoUrl", objectUrl);
+    setIsUploadingLogo(true);
+
+    try {
+      // Generate upload URL from backend
+      const uploadResponse = await api.post<{
+        success: boolean;
+        data: {
+          uploadUrl: string;
+          blobUrl: string;
+          blobName: string;
+        };
+      }>("/media/generate-upload-url", {
+        filename: file.name,
+        contentType: file.type,
+        directory: "logos",
+        fileSize: file.size,
+      });
+
+      if (!uploadResponse.data.success) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { uploadUrl, blobUrl } = uploadResponse.data.data;
+
+      // Upload file directly to Azure Blob Storage
+      const uploadResult = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "x-ms-blob-type": "BlockBlob",
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadResult.ok) {
+        throw new Error("Failed to upload file");
+      }
+
+      // Set the permanent blob URL
+      setValue("logoUrl", blobUrl);
+      toast.success("Logo uploaded successfully!");
+    } catch (error: any) {
+      console.error("Logo upload failed:", error);
+      toast.error(error?.message || "Failed to upload logo");
+    } finally {
+      setIsUploadingLogo(false);
+    }
   };
 
   const onSubmit = async (data: ProjectFormData) => {
@@ -119,7 +178,7 @@ export function useProjectEditForm(slug: string) {
         socialLinks:
           Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
         tags: tags.length > 0 ? tags : undefined,
-        visibility: data.visibility
+        visibility: data.visibility,
       };
 
       await updateProject.mutateAsync(payload);
@@ -129,7 +188,7 @@ export function useProjectEditForm(slug: string) {
     } catch (error: any) {
       // console.error("Failed to update project:", error);
       toast.error(
-        error.message || "Failed to update project. Please try again."
+        error.message || "Failed to update project. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -146,10 +205,10 @@ export function useProjectEditForm(slug: string) {
     handleSubmit,
     formState,
     isSubmitting,
+    isUploadingLogo,
     isLoadingProject,
-    uploadedLogo,
     project: projectData,
     handleLogoUpload,
-    onSubmit: handleSubmit(onSubmit)
+    onSubmit: form.handleSubmit(onSubmit),
   };
 }

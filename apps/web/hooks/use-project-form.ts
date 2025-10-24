@@ -4,14 +4,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { projects } from "@/lib/queries";
-import { projectFormSchema, ProjectFormData } from "@/lib/schemas/project-schema";
+import {
+  projectFormSchema,
+  ProjectFormData,
+} from "@/lib/schemas/project-schema";
 import { ProjectType, ProjectVisibility, type SocialLinks } from "@/types/api";
+import { useApi } from "@/hooks/use-api";
 
 export function useProjectForm() {
   const router = useRouter();
+  const api = useApi();
   const createProject = projects.mutations.useCreate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedLogo, setUploadedLogo] = useState<File | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
@@ -33,16 +39,60 @@ export function useProjectForm() {
       facebook: "",
       instagram: "",
       youtube: "",
-      tagsInput: ""
-    }
+      tagsInput: "",
+    },
   });
 
-  const handleLogoUpload = (file: File) => {
+  const handleLogoUpload = async (file: File) => {
     setUploadedLogo(file);
-    // TODO: Upload file to storage service and get URL
-    // For now, create a temporary object URL
-    const objectUrl = URL.createObjectURL(file);
-    form.setValue("logoUrl", objectUrl);
+    setIsUploadingLogo(true);
+
+    try {
+      // Generate upload URL from backend
+      const uploadResponse = await api.post<{
+        success: boolean;
+        data: {
+          uploadUrl: string;
+          blobUrl: string;
+          blobName: string;
+        };
+      }>("/media/generate-upload-url", {
+        filename: file.name,
+        contentType: file.type,
+        directory: "logos",
+        fileSize: file.size,
+      });
+
+      if (!uploadResponse.data.success) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { uploadUrl, blobUrl } = uploadResponse.data.data;
+
+      // Upload file directly to Azure Blob Storage
+      const uploadResult = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "x-ms-blob-type": "BlockBlob",
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadResult.ok) {
+        throw new Error("Failed to upload file");
+      }
+
+      // Set the permanent blob URL
+      form.setValue("logoUrl", blobUrl);
+      toast.success("Logo uploaded successfully!");
+    } catch (error: any) {
+      console.error("Logo upload failed:", error);
+      toast.error(error?.message || "Failed to upload logo");
+      form.setValue("logoUrl", "");
+    } finally {
+      setIsUploadingLogo(false);
+    }
   };
 
   const onSubmit = async (data: ProjectFormData) => {
@@ -81,7 +131,7 @@ export function useProjectForm() {
         socialLinks:
           Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
         tags: tags.length > 0 ? tags : undefined,
-        visibility: data.visibility
+        visibility: data.visibility,
       };
 
       await createProject.mutateAsync(payload);
@@ -91,7 +141,7 @@ export function useProjectForm() {
     } catch (error: any) {
       // console.error("Failed to create project:", error);
       toast.error(
-        error.message || "Failed to create project. Please try again."
+        error.message || "Failed to create project. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -101,8 +151,9 @@ export function useProjectForm() {
   return {
     form,
     isSubmitting,
+    isUploadingLogo,
     uploadedLogo,
     handleLogoUpload,
-    onSubmit: form.handleSubmit(onSubmit)
+    onSubmit: form.handleSubmit(onSubmit),
   };
 }

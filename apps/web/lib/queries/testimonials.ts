@@ -22,7 +22,7 @@ export const testimonialKeys = {
 export const useTestimonialList = (
   slug: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
 ) => {
   const api = useApi();
 
@@ -30,7 +30,7 @@ export const useTestimonialList = (
     queryKey: testimonialKeys.list(slug, page, limit),
     queryFn: async () => {
       const response = await api.get<PaginatedResponse<Testimonial>>(
-        `/projects/${slug}/testimonials?page=${page}&limit=${limit}`
+        `/projects/${slug}/testimonials?page=${page}&limit=${limit}`,
       );
       return response.data;
     },
@@ -45,7 +45,7 @@ export const useTestimonialDetail = (slug: string, id: string) => {
     queryKey: testimonialKeys.detail(id),
     queryFn: async () => {
       const response = await api.get<ApiResponse<Testimonial>>(
-        `/projects/${slug}/testimonials/${id}`
+        `/projects/${slug}/testimonials/${id}`,
       );
       return response.data.data;
     },
@@ -62,7 +62,7 @@ export const useCreateTestimonial = (slug: string) => {
     mutationFn: async (data: CreateTestimonialPayload) => {
       const response = await api.post<ApiResponse<Testimonial>>(
         `/projects/${slug}/testimonials`,
-        data
+        data,
       );
       return response.data.data;
     },
@@ -75,38 +75,44 @@ export const useCreateTestimonial = (slug: string) => {
   });
 };
 
-export const useUpdateTestimonial = (slug: string, id: string) => {
+export const useUpdateTestimonial = (slug: string) => {
   const api = useApi();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateTestimonialPayload) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateTestimonialPayload;
+    }) => {
       const response = await api.put<ApiResponse<Testimonial>>(
         `/projects/${slug}/testimonials/${id}`,
-        data
+        data,
       );
       return response.data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       // Invalidate both list and detail queries
       queryClient.invalidateQueries({
         queryKey: testimonialKeys.lists(),
       });
       queryClient.invalidateQueries({
-        queryKey: testimonialKeys.detail(id),
+        queryKey: testimonialKeys.detail(variables.id),
       });
     },
   });
 };
 
-export const useDeleteTestimonial = (slug: string, id: string) => {
+export const useDeleteTestimonial = (slug: string) => {
   const api = useApi();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (id: string) => {
       const response = await api.delete<ApiResponse<void>>(
-        `/projects/${slug}/testimonials/${id}`
+        `/projects/${slug}/testimonials/${id}`,
       );
       return response.data;
     },

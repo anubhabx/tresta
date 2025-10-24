@@ -61,16 +61,13 @@ export function TestimonialCard({
 }: TestimonialCardProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAction = async (
-    action: () => Promise<void>,
-    successMessage: string
-  ) => {
+  const handleAction = async (action: () => Promise<void>) => {
     setIsLoading(true);
     try {
       await action();
-      toast.success(successMessage);
     } catch (error: any) {
-      toast.error(error?.message || "Action failed. Please try again.");
+      // Error handling done by parent component
+      console.error("Action failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -168,8 +165,7 @@ export function TestimonialCard({
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-4">
           <Calendar className="h-3.5 w-3.5" />
           <span>
-            Submitted {formatDistanceToNow(new Date(testimonial.createdAt))}{" "}
-            ago
+            Submitted {formatDistanceToNow(new Date(testimonial.createdAt))} ago
           </span>
         </div>
       </CardContent>
@@ -186,10 +182,7 @@ export function TestimonialCard({
                     variant="outline"
                     className="flex-1 sm:flex-none border-green-500 text-green-600 hover:bg-green-50"
                     onClick={() =>
-                      handleAction(
-                        () => onApprove(testimonial.id),
-                        "Testimonial approved!"
-                      )
+                      handleAction(() => onApprove(testimonial.id))
                     }
                     disabled={isLoading}
                   >
@@ -206,12 +199,7 @@ export function TestimonialCard({
                     size="sm"
                     variant="outline"
                     className="flex-1 sm:flex-none border-red-500 text-red-600 hover:bg-red-50"
-                    onClick={() =>
-                      handleAction(
-                        () => onReject(testimonial.id),
-                        "Testimonial rejected"
-                      )
-                    }
+                    onClick={() => handleAction(() => onReject(testimonial.id))}
                     disabled={isLoading}
                   >
                     <XCircle className="h-4 w-4 mr-1.5" />
@@ -232,10 +220,7 @@ export function TestimonialCard({
                     size="sm"
                     variant="outline"
                     onClick={() =>
-                      handleAction(
-                        () => onUnpublish(testimonial.id),
-                        "Testimonial unpublished"
-                      )
+                      handleAction(() => onUnpublish(testimonial.id))
                     }
                     disabled={isLoading}
                   >
@@ -248,10 +233,7 @@ export function TestimonialCard({
                     variant="outline"
                     className="border-blue-500 text-blue-600 hover:bg-blue-50"
                     onClick={() =>
-                      handleAction(
-                        () => onPublish(testimonial.id),
-                        "Testimonial published!"
-                      )
+                      handleAction(() => onPublish(testimonial.id))
                     }
                     disabled={isLoading}
                   >
@@ -297,12 +279,7 @@ export function TestimonialCard({
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() =>
-                    handleAction(
-                      () => onDelete(testimonial.id),
-                      "Testimonial deleted"
-                    )
-                  }
+                  onClick={() => handleAction(() => onDelete(testimonial.id))}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
                   Delete

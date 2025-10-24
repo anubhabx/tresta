@@ -51,17 +51,12 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
   const { data, isLoading } = testimonials.queries.useList(
     projectSlug,
     page,
-    limit
+    limit,
   );
 
-  const updateTestimonial = testimonials.mutations.useUpdate(
-    projectSlug,
-    "" // ID will be provided in the action
-  );
-  const deleteTestimonial = testimonials.mutations.useDelete(
-    projectSlug,
-    "" // ID will be provided in the action
-  );
+  // Create mutation hooks at component level
+  const updateMutation = testimonials.mutations.useUpdate(projectSlug);
+  const deleteMutation = testimonials.mutations.useDelete(projectSlug);
 
   // Filter testimonials based on status and search
   const filteredTestimonials = data?.data?.filter((t: Testimonial) => {
@@ -83,31 +78,48 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
   });
 
   const handleApprove = async (id: string) => {
-    await testimonials.mutations
-      .useUpdate(projectSlug, id)
-      .mutateAsync({ isApproved: true });
+    try {
+      await updateMutation.mutateAsync({ id, data: { isApproved: true } });
+      toast.success("Testimonial approved!");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to approve testimonial");
+    }
   };
 
   const handleReject = async (id: string) => {
-    await testimonials.mutations
-      .useUpdate(projectSlug, id)
-      .mutateAsync({ isApproved: false });
+    try {
+      await updateMutation.mutateAsync({ id, data: { isApproved: false } });
+      toast.success("Testimonial rejected");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to reject testimonial");
+    }
   };
 
   const handlePublish = async (id: string) => {
-    await testimonials.mutations
-      .useUpdate(projectSlug, id)
-      .mutateAsync({ isPublished: true });
+    try {
+      await updateMutation.mutateAsync({ id, data: { isPublished: true } });
+      toast.success("Testimonial published!");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to publish testimonial");
+    }
   };
 
   const handleUnpublish = async (id: string) => {
-    await testimonials.mutations
-      .useUpdate(projectSlug, id)
-      .mutateAsync({ isPublished: false });
+    try {
+      await updateMutation.mutateAsync({ id, data: { isPublished: false } });
+      toast.success("Testimonial unpublished");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to unpublish testimonial");
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await testimonials.mutations.useDelete(projectSlug, id).mutateAsync();
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success("Testimonial deleted");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete testimonial");
+    }
   };
 
   const getStatusCounts = () => {
@@ -115,7 +127,7 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
     return {
       pending: data.data.filter((t: Testimonial) => !t.isApproved).length,
       approved: data.data.filter(
-        (t: Testimonial) => t.isApproved && !t.isPublished
+        (t: Testimonial) => t.isApproved && !t.isPublished,
       ).length,
       published: data.data.filter((t: Testimonial) => t.isPublished).length,
     };
@@ -142,7 +154,10 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
             Total: {data?.meta?.pagination?.total || 0}
           </Badge>
           {counts.pending > 0 && (
-            <Badge variant="outline" className="text-sm border-yellow-500 text-yellow-600">
+            <Badge
+              variant="outline"
+              className="text-sm border-yellow-500 text-yellow-600"
+            >
               Pending: {counts.pending}
             </Badge>
           )}
