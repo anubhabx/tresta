@@ -25,16 +25,28 @@ import {
 } from "./renderer.ts";
 
 export class TrestaWidget {
-  // Static methods for global widget management
+  // Static methods for global widget management (implemented in index.ts)
   static init: (
     widgetId: string,
     config?: Partial<WidgetConfig>,
-  ) => TrestaWidget;
-  static destroy: (widgetId: string) => void;
-  static refresh: (widgetId: string) => Promise<void>;
-  static refreshAll: () => Promise<void>;
-  static get: (widgetId: string) => TrestaWidget | null;
-  static getAll: () => TrestaWidget[];
+  ) => TrestaWidget = () => {
+    throw new Error('TrestaWidget.init not initialized. Make sure the widget script is loaded.');
+  };
+  static destroy: (widgetId: string) => void = () => {
+    throw new Error('TrestaWidget.destroy not initialized. Make sure the widget script is loaded.');
+  };
+  static refresh: (widgetId: string) => Promise<void> = async () => {
+    throw new Error('TrestaWidget.refresh not initialized. Make sure the widget script is loaded.');
+  };
+  static refreshAll: () => Promise<void> = async () => {
+    throw new Error('TrestaWidget.refreshAll not initialized. Make sure the widget script is loaded.');
+  };
+  static get: (widgetId: string) => TrestaWidget | null = () => {
+    throw new Error('TrestaWidget.get not initialized. Make sure the widget script is loaded.');
+  };
+  static getAll: () => TrestaWidget[] = () => {
+    throw new Error('TrestaWidget.getAll not initialized. Make sure the widget script is loaded.');
+  };
   private config: WidgetConfig;
   private container: HTMLElement | null = null;
   private widget: Widget | null = null;
@@ -44,7 +56,7 @@ export class TrestaWidget {
 
   constructor(config: WidgetConfig) {
     this.config = {
-      apiUrl: "http://localhost:8000", // Default API URL
+      apiUrl: "http://localhost:8000",
       ...config,
     };
 

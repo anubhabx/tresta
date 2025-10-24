@@ -498,6 +498,10 @@ importers:
         version: 5.9.2
 
   packages/widget:
+    dependencies:
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
     devDependencies:
       terser:
         specifier: ^5.44.0

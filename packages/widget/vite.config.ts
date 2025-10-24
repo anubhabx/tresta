@@ -15,8 +15,8 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // Ensure the IIFE is self-executing
-        extend: false,
+        // Extend window object to add TrestaWidget
+        extend: true,
         // Keep it clean for CDN usage
         assetFileNames: 'tresta-widget.[ext]',
       },
@@ -25,7 +25,7 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: false, // Keep console for debugging
         drop_debugger: true,
       },
     },

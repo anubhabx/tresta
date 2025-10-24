@@ -169,3 +169,8 @@ TrestaWidget.get = (widgetId: string) => {
 TrestaWidget.getAll = () => {
   return Array.from(window.trestaWidgets.values());
 };
+
+// Ensure TrestaWidget is properly exposed globally for IIFE builds
+if (typeof window !== 'undefined') {
+  (window as any).TrestaWidget = TrestaWidget;
+}

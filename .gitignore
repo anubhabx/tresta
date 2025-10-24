@@ -44,9 +44,12 @@ npm-debug.log*
 packages/widget/dist
 
 # Test files
-**/test.html
-**/test.js
-**/test.css
-**/demo.html
-**/demo.js
-**/demo.css
+**/test*.html
+**/test*.js
+**/test*.css
+**/demo*.html
+**/demo*.js
+**/demo*.css
+
+**/*index.html
+**/*open-demos.bat
