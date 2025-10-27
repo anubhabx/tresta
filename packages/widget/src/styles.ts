@@ -228,96 +228,238 @@ export function generateStyles(
       }
     }
 
-    /* Layout: Carousel */
+    /* Layout: Carousel - New Enhanced Styles */
     ${prefix}.tresta-layout-carousel .tresta-carousel {
       position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    ${prefix} .tresta-carousel-container {
+      width: 100%;
+    }
+
+    ${prefix} .tresta-carousel-wrapper {
+      position: relative;
+      padding: 0 70px;
+    }
+
+    @media (max-width: 768px) {
+      ${prefix} .tresta-carousel-wrapper {
+        padding: 0 50px;
+      }
+    }
+
+    ${prefix} .tresta-carousel-card {
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 60px 80px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: opacity 0.3s ease-in-out;
+      min-height: 400px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    @media (max-width: 768px) {
+      ${prefix} .tresta-carousel-card {
+        padding: 40px 32px;
+        min-height: 350px;
+      }
+    }
+
+    ${prefix} .tresta-carousel-content {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+    }
+
+    ${prefix} .tresta-carousel-rating {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-start;
+      flex-shrink: 0;
+    }
+
+    ${prefix} .tresta-carousel-star-filled {
+      color: #000000;
+    }
+
+    ${prefix} .tresta-carousel-star-empty {
+      color: #d1d5db;
+    }
+
+    ${prefix} .tresta-carousel-quote-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
       overflow: hidden;
     }
 
-    ${prefix}.tresta-layout-carousel .tresta-carousel-track {
-      display: flex;
-      transition: transform 0.5s ease;
-      gap: 20px;
+    ${prefix} .tresta-carousel-quote {
+      font-size: 22px;
+      line-height: 1.7;
+      color: #1f2937;
+      font-style: normal;
+      margin: 0;
+      font-weight: 400;
+      overflow-y: auto;
+      flex: 1;
     }
 
-    ${prefix}.tresta-layout-carousel .tresta-testimonial {
-      flex: 0 0 100%;
-      max-width: 100%;
-      margin-bottom: 0;
-    }
-
-    @media (min-width: 768px) {
-      ${prefix}.tresta-layout-carousel .tresta-testimonial {
-        flex: 0 0 calc(50% - 10px);
-        max-width: calc(50% - 10px);
+    @media (max-width: 768px) {
+      ${prefix} .tresta-carousel-quote {
+        font-size: 18px;
       }
     }
 
-    @media (min-width: 1024px) {
-      ${prefix}.tresta-layout-carousel .tresta-testimonial {
-        flex: 0 0 calc(33.333% - 14px);
-        max-width: calc(33.333% - 14px);
-      }
-    }
-
-    /* Carousel Controls */
-    ${prefix} .tresta-carousel-controls {
+    ${prefix} .tresta-carousel-author {
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 12px;
-      margin-top: 24px;
+      gap: 16px;
+      padding-top: 8px;
+      flex-shrink: 0;
     }
 
-    ${prefix} .tresta-carousel-button {
-      background-color: ${t.primaryColor};
+    ${prefix} .tresta-carousel-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: #e5e7eb;
+    }
+
+    ${prefix} .tresta-carousel-author-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    ${prefix} .tresta-carousel-author-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #1f2937;
+      margin: 0 0 4px 0;
+    }
+
+    ${prefix} .tresta-carousel-author-role {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    /* Carousel Navigation Buttons */
+    ${prefix} .tresta-carousel-nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #1f2937;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      font-size: 20px;
-      line-height: 1;
+      transition: all 0.2s ease;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
-    ${prefix} .tresta-carousel-button:hover:not(:disabled) {
-      opacity: 0.9;
-      transform: scale(1.05);
+    ${prefix} .tresta-carousel-nav-button:hover {
+      background-color: #374151;
+      transform: translateY(-50%) scale(1.05);
     }
 
-    ${prefix} .tresta-carousel-button:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+    ${prefix} .tresta-carousel-nav-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.2);
     }
 
-    ${prefix} .tresta-carousel-dots {
+    ${prefix} .tresta-carousel-nav-prev {
+      left: 16px;
+    }
+
+    ${prefix} .tresta-carousel-nav-next {
+      right: 16px;
+    }
+
+    @media (max-width: 768px) {
+      ${prefix} .tresta-carousel-nav-button {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    /* Carousel Indicators */
+    ${prefix} .tresta-carousel-indicators {
       display: flex;
+      justify-content: center;
+      align-items: center;
       gap: 8px;
+      margin-top: 32px;
     }
 
-    ${prefix} .tresta-carousel-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+    ${prefix} .tresta-carousel-indicator {
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
       background-color: #d1d5db;
       border: none;
       padding: 0;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: all 0.3s ease;
     }
 
-    ${prefix} .tresta-carousel-dot:hover {
+    ${prefix} .tresta-carousel-indicator:hover {
       background-color: #9ca3af;
     }
 
-    ${prefix} .tresta-carousel-dot.active {
-      background-color: ${t.primaryColor};
-      transform: scale(1.2);
+    ${prefix} .tresta-carousel-indicator-active {
+      width: 48px;
+      background-color: #1f2937;
+    }
+
+    /* Carousel Autoplay Toggle */
+    ${prefix} .tresta-carousel-autoplay-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    ${prefix} .tresta-carousel-autoplay-toggle {
+      background: none;
+      border: none;
+      color: #6b7280;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 16px;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    ${prefix} .tresta-carousel-autoplay-toggle:hover {
+      color: #1f2937;
+    }
+
+    /* Carousel Empty State */
+    ${prefix} .tresta-carousel-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      color: #6b7280;
+      text-align: center;
     }
 
     /* Layout: Wall (Minimal) */

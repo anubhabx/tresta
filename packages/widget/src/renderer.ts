@@ -118,45 +118,15 @@ export function renderMasonryLayout(
 
 /**
  * Renders testimonials in carousel layout
+ * Note: The actual carousel content is rendered by the Carousel class
  */
 export function renderCarouselLayout(
   testimonials: Testimonial[],
   settings: WidgetSettings,
   widgetId: string,
 ): string {
-  const items = testimonials
-    .map((t) => renderTestimonial(t, settings))
-    .join("");
-
-  const itemsPerPage = settings.itemsPerPage || 1;
-  const totalPages = Math.ceil(testimonials.length / itemsPerPage);
-
-  // Generate dots
-  const dots = Array.from({ length: totalPages })
-    .map(
-      (_, i) =>
-        `<button class="tresta-carousel-dot ${i === 0 ? "active" : ""}" data-index="${i}" aria-label="Go to slide ${i + 1}"></button>`,
-    )
-    .join("");
-
-  return `
-    <div class="tresta-carousel" data-widget-id="${widgetId}">
-      <div class="tresta-carousel-track" data-current-index="0">
-        ${items}
-      </div>
-      <div class="tresta-carousel-controls">
-        <button class="tresta-carousel-button" data-action="prev" aria-label="Previous" ${testimonials.length <= itemsPerPage ? "disabled" : ""}>
-          ‹
-        </button>
-        <div class="tresta-carousel-dots">
-          ${dots}
-        </div>
-        <button class="tresta-carousel-button" data-action="next" aria-label="Next" ${testimonials.length <= itemsPerPage ? "disabled" : ""}>
-          ›
-        </button>
-      </div>
-    </div>
-  `;
+  // Return an empty container that the Carousel class will populate
+  return `<div class="tresta-carousel" data-widget-id="${widgetId}"></div>`;
 }
 
 /**

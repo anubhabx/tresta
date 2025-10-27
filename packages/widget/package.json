@@ -24,6 +24,9 @@
   ],
   "author": "Tresta",
   "license": "MIT",
+  "dependencies": {
+    "@workspace/ui": "workspace:*"
+  },
   "devDependencies": {
     "terser": "^5.44.0",
     "typescript": "^5.3.3",

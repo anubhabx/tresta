@@ -259,12 +259,19 @@ const fetchPublicWidgetData = async (
       take: 100, // Limit to prevent abuse
     });
 
-    // Prepare response data
+    // Parse widget config (it's stored as JSON)
+    const widgetConfig = widget.config as any;
+    
+    // Prepare response data - flatten config for widget consumption
     const widgetData = {
       widget: {
         id: widget.id,
+        name: widgetConfig.name || widget.Project.name,
+        type: widgetConfig.type || 'testimonial',
+        layout: widgetConfig.layout || 'list',
+        theme: widgetConfig.theme || {},
+        settings: widgetConfig.settings || {},
         embedType: widget.embedType,
-        config: widget.config,
       },
       project: {
         name: widget.Project.name,

@@ -23,6 +23,7 @@ import {
   renderError,
   renderBranding,
 } from "./renderer.ts";
+import { Carousel } from "./carousel.ts";
 
 export class TrestaWidget {
   // Static methods for global widget management (implemented in index.ts)
@@ -228,122 +229,43 @@ export class TrestaWidget {
     if (!this.container || !this.widget) return;
 
     const settings = this.widget.settings;
-    const itemsPerPage = settings.itemsPerPage || 1;
 
-    // Find carousel elements
-    const track = this.container.querySelector(
-      ".tresta-carousel-track",
+    // Find carousel container
+    const carouselContainer = this.container.querySelector(
+      ".tresta-carousel",
     ) as HTMLElement;
-    const prevButton = this.container.querySelector(
-      '[data-action="prev"]',
-    ) as HTMLButtonElement;
-    const nextButton = this.container.querySelector(
-      '[data-action="next"]',
-    ) as HTMLButtonElement;
-    const dots = this.container.querySelectorAll(".tresta-carousel-dot");
 
-    if (!track) return;
+    if (!carouselContainer) return;
 
-    const totalSlides = Math.ceil(this.testimonials.length / itemsPerPage);
+    // Map testimonials to carousel format
+    const carouselTestimonials = this.testimonials.map(t => ({
+      id: t.id,
+      name: t.authorName || 'Anonymous',
+      role: t.authorRole || '',
+      company: t.authorCompany,
+      content: t.content,
+      avatar: t.authorImage,
+      rating: t.rating,
+    }));
 
-    // Previous button handler
-    prevButton?.addEventListener("click", () => {
-      this.goToSlide(Math.max(0, this.currentSlide - 1));
+    // Use enhanced Carousel class
+    const carousel = new Carousel({
+      container: carouselContainer,
+      testimonials: carouselTestimonials,
+      autoplay: settings.autoplay ?? false,
+      autoplaySpeed: settings.autoplaySpeed ?? 5000,
+      showRating: settings.showRating ?? true,
+      showCompany: settings.showAuthorCompany ?? true,
+      onSlideChange: (index) => {
+        this.currentSlide = index;
+      },
     });
 
-    // Next button handler
-    nextButton?.addEventListener("click", () => {
-      this.goToSlide(Math.min(totalSlides - 1, this.currentSlide + 1));
-    });
-
-    // Dot handlers
-    dots.forEach((dot, index) => {
-      dot.addEventListener("click", () => {
-        this.goToSlide(index);
-      });
-    });
-
-    // Autoplay
-    if (settings.autoplay) {
-      const speed = settings.autoplaySpeed || 5000;
-      this.startAutoplay(speed, totalSlides);
-
-      // Pause on hover
-      track.addEventListener("mouseenter", () => this.stopAutoplay());
-      track.addEventListener("mouseleave", () =>
-        this.startAutoplay(speed, totalSlides),
-      );
-    }
+    // Store carousel instance for cleanup
+    (this as any).carouselInstance = carousel;
   }
 
-  /**
-   * Go to specific carousel slide
-   */
-  private goToSlide(index: number): void {
-    if (!this.container) return;
 
-    this.currentSlide = index;
-
-    const track = this.container.querySelector(
-      ".tresta-carousel-track",
-    ) as HTMLElement;
-    const dots = this.container.querySelectorAll(".tresta-carousel-dot");
-    const prevButton = this.container.querySelector(
-      '[data-action="prev"]',
-    ) as HTMLButtonElement;
-    const nextButton = this.container.querySelector(
-      '[data-action="next"]',
-    ) as HTMLButtonElement;
-
-    if (!track) return;
-
-    const itemsPerPage = this.widget?.settings.itemsPerPage || 1;
-    const totalSlides = Math.ceil(this.testimonials.length / itemsPerPage);
-
-    // Update track position
-    const offset = -index * 100;
-    track.style.transform = `translateX(${offset}%)`;
-    track.setAttribute("data-current-index", String(index));
-
-    // Update dots
-    dots.forEach((dot, i) => {
-      if (i === index) {
-        dot.classList.add("active");
-      } else {
-        dot.classList.remove("active");
-      }
-    });
-
-    // Update button states
-    if (prevButton) {
-      prevButton.disabled = index === 0;
-    }
-    if (nextButton) {
-      nextButton.disabled = index === totalSlides - 1;
-    }
-  }
-
-  /**
-   * Start carousel autoplay
-   */
-  private startAutoplay(speed: number, totalSlides: number): void {
-    this.stopAutoplay(); // Clear any existing interval
-
-    this.carouselInterval = window.setInterval(() => {
-      const nextSlide = (this.currentSlide + 1) % totalSlides;
-      this.goToSlide(nextSlide);
-    }, speed);
-  }
-
-  /**
-   * Stop carousel autoplay
-   */
-  private stopAutoplay(): void {
-    if (this.carouselInterval) {
-      clearInterval(this.carouselInterval);
-      this.carouselInterval = null;
-    }
-  }
 
   /**
    * Render HTML content to container
@@ -378,7 +300,12 @@ export class TrestaWidget {
    * Destroy the widget and clean up
    */
   public destroy(): void {
-    this.stopAutoplay();
+    // Destroy carousel instance if it exists
+    if ((this as any).carouselInstance) {
+      (this as any).carouselInstance.destroy();
+      (this as any).carouselInstance = null;
+    }
+
     removeStyles(this.config.widgetId);
 
     if (this.container) {
