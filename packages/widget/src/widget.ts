@@ -172,6 +172,12 @@ export class TrestaWidget {
 
     this.widget = result.data.widget;
     this.testimonials = result.data.testimonials || [];
+
+    // Debug logging
+    console.log('API Response:', {
+      widget: this.widget,
+      testimonials: this.testimonials,
+    });
   }
 
   /**
@@ -186,7 +192,12 @@ export class TrestaWidget {
       ...this.config.theme,
     };
 
-    const css = generateStyles(theme, this.widget.layout, this.config.widgetId);
+    const settings = {
+      ...this.widget.settings,
+      ...this.config.settings,
+    };
+
+    const css = generateStyles(theme, this.widget.layout, this.config.widgetId, settings);
     injectStyles(css, this.config.widgetId);
   }
 
@@ -200,6 +211,13 @@ export class TrestaWidget {
       ...this.widget.settings,
       ...this.config.settings,
     };
+
+    // Debug logging
+    console.log('Widget Settings:', {
+      fromAPI: this.widget.settings,
+      fromConfig: this.config.settings,
+      merged: settings,
+    });
 
     const widgetHtml = renderWidget(
       this.testimonials,
@@ -252,8 +270,8 @@ export class TrestaWidget {
     const carousel = new Carousel({
       container: carouselContainer,
       testimonials: carouselTestimonials,
-      autoplay: settings.autoplay ?? false,
-      autoplaySpeed: settings.autoplaySpeed ?? 5000,
+      autoplay: settings.autoRotate ?? false,
+      autoplaySpeed: settings.rotateInterval ?? 5000,
       showRating: settings.showRating ?? true,
       showCompany: settings.showAuthorCompany ?? true,
       onSlideChange: (index) => {

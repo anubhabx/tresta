@@ -12,11 +12,11 @@ export const DEFAULT_THEME: WidgetTheme = {
   primaryColor: "#3b82f6",
   backgroundColor: "#ffffff",
   textColor: "#1f2937",
-  cardBackgroundColor: "#f9fafb",
+  cardBackgroundColor: "#ffffff",
   borderRadius: 8,
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  starColor: "#fbbf24",
+  starColor: "#000000",
 };
 
 /**
@@ -26,9 +26,12 @@ export function generateStyles(
   theme: WidgetTheme,
   _layout: WidgetLayout,
   widgetId: string,
+  settings?: any,
 ): string {
   const t = { ...DEFAULT_THEME, ...theme };
   const prefix = `.tresta-widget-${widgetId}`;
+  const gap = settings?.gap || 24;
+  const columns = settings?.columns || 2;
 
   return `
     /* Base Widget Container */
@@ -95,41 +98,62 @@ export function generateStyles(
     /* Testimonial Card - Base */
     ${prefix} .tresta-testimonial {
       background-color: ${t.cardBackgroundColor};
-      border-radius: ${t.borderRadius}px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
       padding: 24px;
       margin-bottom: 16px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.2s ease;
       height: 100%;
       display: flex;
       flex-direction: column;
     }
 
     ${prefix} .tresta-testimonial:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border-color: ${t.primaryColor}80;
+    }
+
+    ${prefix}.tresta-layout-grid .tresta-testimonial {
+      margin-bottom: 0;
     }
 
     /* Rating Stars */
     ${prefix} .tresta-rating {
-      color: ${t.starColor};
-      font-size: 18px;
-      margin-bottom: 12px;
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
       line-height: 1;
     }
 
     ${prefix} .tresta-star {
       display: inline-block;
-      margin-right: 2px;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      min-height: 16px;
+      max-width: 16px;
+      max-height: 16px;
+      color: ${t.starColor};
+      fill: ${t.starColor};
+      flex-shrink: 0;
+    }
+
+    ${prefix} .tresta-star-empty {
+      color: #d1d5db;
+      fill: #d1d5db;
     }
 
     /* Testimonial Content */
     ${prefix} .tresta-content {
-      font-size: 16px;
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.625;
       color: ${t.textColor};
       margin-bottom: 16px;
       flex: 1;
-      font-style: italic;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     /* Author Section */
@@ -138,11 +162,13 @@ export function generateStyles(
       align-items: center;
       gap: 12px;
       margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
     }
 
     ${prefix} .tresta-author-image {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -152,7 +178,7 @@ export function generateStyles(
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     ${prefix} .tresta-author-info {
@@ -162,19 +188,25 @@ export function generateStyles(
 
     ${prefix} .tresta-author-name {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       color: ${t.textColor};
-      margin: 0 0 4px 0;
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     ${prefix} .tresta-author-role {
-      font-size: 13px;
+      font-size: 12px;
       color: #6b7280;
       margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     ${prefix} .tresta-author-company {
-      font-size: 13px;
+      font-size: 12px;
       color: #9ca3af;
     }
 
@@ -196,10 +228,29 @@ export function generateStyles(
     ${prefix}.tresta-layout-grid .tresta-testimonials {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      gap: ${gap}px;
+      align-items: stretch;
     }
 
-    @media (max-width: 768px) {
+    ${prefix}.tresta-layout-grid .tresta-testimonial {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    @media (min-width: 768px) {
+      ${prefix}.tresta-layout-grid .tresta-testimonials {
+        grid-template-columns: repeat(${Math.min(columns, 2)}, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      ${prefix}.tresta-layout-grid .tresta-testimonials {
+        grid-template-columns: repeat(${columns}, 1fr);
+      }
+    }
+
+    @media (max-width: 767px) {
       ${prefix}.tresta-layout-grid .tresta-testimonials {
         grid-template-columns: 1fr;
       }
