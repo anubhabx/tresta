@@ -11,12 +11,8 @@ import {
   handlePrismaError,
 } from "../lib/errors.ts";
 import { ResponseHandler } from "../lib/response.ts";
-import type {
-  WidgetConfig,
-  CreateWidgetPayload,
-  UpdateWidgetPayload,
-  DEFAULT_WIDGET_CONFIG,
-} from "@workspace/types";
+import type { WidgetConfig } from "@workspace/types";
+import { validateWidgetConfig } from "../validators/widget.validator.ts";
 import type { WidgetData } from "@/types/api-responses.ts";
 
 const createWidget = async (
@@ -32,15 +28,17 @@ const createWidget = async (
       throw new BadRequestError("Project ID and embed type are required");
     }
 
-    // Validate the config
+    // Validate the config using Zod schema
     if (!config || typeof config !== "object") {
       throw new BadRequestError("Invalid widget configuration");
     }
 
-    // Type check for config
-    if ((config as WidgetConfig).type !== undefined) {
+    let validatedConfig: WidgetConfig;
+    try {
+      validatedConfig = validateWidgetConfig(config);
+    } catch (error: any) {
       throw new BadRequestError(
-        "Widget configuration does not match the required structure",
+        `Invalid widget configuration: ${error.message}`,
       );
     }
 
@@ -53,12 +51,12 @@ const createWidget = async (
       throw new NotFoundError("Project not found");
     }
 
-    // Create the widget
+    // Create the widget with validated config
     const widget = await prisma.widget.create({
       data: {
         projectId,
         embedType,
-        config,
+        config: validatedConfig as any,
       },
     });
 
@@ -112,11 +110,6 @@ const updateWidget = async (
       throw new BadRequestError("Widget ID is required");
     }
 
-    // Validate the config
-    if (config && typeof config !== "object") {
-      throw new BadRequestError("Invalid widget configuration");
-    }
-
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
       where: { id: widgetId },
@@ -126,12 +119,27 @@ const updateWidget = async (
       throw new NotFoundError("Widget not found");
     }
 
+    // Validate the config if provided
+    let validatedConfig: WidgetConfig | undefined;
+    if (config) {
+      if (typeof config !== "object") {
+        throw new BadRequestError("Invalid widget configuration");
+      }
+      try {
+        validatedConfig = validateWidgetConfig(config);
+      } catch (error: any) {
+        throw new BadRequestError(
+          `Invalid widget configuration: ${error.message}`,
+        );
+      }
+    }
+
     // Update the widget
     const updatedWidget = await prisma.widget.update({
       where: { id: widgetId },
       data: {
         embedType: embedType ?? existingWidget.embedType,
-        config: config ?? existingWidget.config,
+        config: (validatedConfig ?? existingWidget.config) as any,
       },
     });
 
