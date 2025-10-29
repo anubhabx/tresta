@@ -25,6 +25,7 @@
   "author": "Tresta",
   "license": "MIT",
   "dependencies": {
+    "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*"
   },
   "devDependencies": {

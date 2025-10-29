@@ -13,10 +13,11 @@ import {
 import { ResponseHandler } from "../lib/response.ts";
 import type {
   WidgetConfig,
-  WidgetData,
   CreateWidgetPayload,
   UpdateWidgetPayload,
-} from "@/types/api-responses.ts";
+  DEFAULT_WIDGET_CONFIG,
+} from "@workspace/types";
+import type { WidgetData } from "@/types/api-responses.ts";
 
 const createWidget = async (
   req: Request,

@@ -1,6 +1,8 @@
 /**
  * Tresta Widget Types
  * Type definitions for the embeddable testimonial widget
+ * 
+ * Note: These types are synced with @workspace/types
  */
 
 export interface Testimonial {
@@ -39,18 +41,37 @@ export interface WidgetTheme {
   starColor?: string;
 }
 
+/**
+ * Widget Settings (synced with WidgetConfig from @workspace/types)
+ */
 export interface WidgetSettings {
+  // Layout & Theme
+  layout?: WidgetLayout;
+  theme?: 'light' | 'dark' | 'auto';
+
+  // Colors
+  primaryColor?: string;
+  secondaryColor?: string;
+
+  // Content Visibility
   showRating?: boolean;
   showDate?: boolean;
-  showAuthorImage?: boolean;
+  showAvatar?: boolean;
   showAuthorRole?: boolean;
   showAuthorCompany?: boolean;
-  autoplay?: boolean;
-  autoplaySpeed?: number;
-  itemsPerPage?: number;
+
+  // Display Settings
+  maxTestimonials?: number;
   columns?: number;
-  maxItems?: number;
+  gap?: number;
+
+  // Styling
+  cardStyle?: 'default' | 'minimal' | 'bordered';
   animation?: 'fade' | 'slide' | 'none';
+
+  // Carousel Behavior
+  autoRotate?: boolean;
+  rotateInterval?: number;
 }
 
 export interface WidgetConfig {

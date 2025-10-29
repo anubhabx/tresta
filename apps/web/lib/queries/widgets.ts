@@ -2,31 +2,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse } from "@/types/api";
 
-// Widget types
-export interface Widget {
-  id: string;
-  projectId: string;
-  embedType: string;
-  config: WidgetConfig;
-  createdAt: string;
-  updatedAt: string;
-}
+// Re-export shared types
+export type {
+  Widget,
+  WidgetConfig,
+  WidgetLayout,
+  WidgetTheme,
+  CardStyle,
+  AnimationType,
+  CreateWidgetPayload,
+  UpdateWidgetPayload,
+} from "@workspace/types";
 
-export interface WidgetConfig {
-  layout?: "carousel" | "grid" | "masonry" | "wall";
-  theme?: "light" | "dark" | "auto";
-  primaryColor?: string;
-  secondaryColor?: string;
-  showRating?: boolean;
-  showDate?: boolean;
-  showAvatar?: boolean;
-  maxTestimonials?: number;
-  autoRotate?: boolean;
-  rotateInterval?: number;
-  columns?: number;
-  cardStyle?: "default" | "minimal" | "bordered";
-  animation?: "fade" | "slide" | "none";
-}
+export { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
 
 export interface PublicWidgetData {
   widget: {

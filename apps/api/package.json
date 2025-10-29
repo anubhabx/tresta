@@ -18,6 +18,7 @@
     "@azure/storage-blob": "^12.29.1",
     "@clerk/express": "^1.7.31",
     "@workspace/database": "workspace:*",
+    "@workspace/types": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
