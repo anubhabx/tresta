@@ -22,13 +22,7 @@ export default defineConfig({
       },
     },
     // Optimize for production
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: false, // Keep console for debugging
-        drop_debugger: true,
-      },
-    },
+    minify: false, // Temporarily disabled for debugging
     // Generate sourcemaps for debugging
     sourcemap: true,
     // Clear output dir before build

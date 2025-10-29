@@ -1,7 +1,16 @@
 {
   "extends": "@workspace/typescript-config/base.json",
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/carousel_v0.tsx"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/grid-v0.tsx",
+    "src/list-v0.tsx",
+    "src/masonry-v0.tsx",
+    "src/single-v0.tsx",
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "allowImportingTsExtensions": true,
