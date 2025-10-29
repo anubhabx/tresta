@@ -262,16 +262,38 @@ const fetchPublicWidgetData = async (
 
     // Parse widget config (it's stored as JSON)
     const widgetConfig = widget.config as any;
-    
+
+    console.log(widgetConfig)
+
+    // Use shared default settings
+    const defaultSettings: WidgetConfig = {
+      showRating: true,
+      showDate: true,
+      showAvatar: false,
+      showAuthorRole: true,
+      showAuthorCompany: true,
+      maxTestimonials: 10,
+      autoRotate: false,
+      rotateInterval: 5000,
+      columns: 3,
+      gap: 24,
+      cardStyle: 'default',
+      animation: 'fade',
+      layout: 'grid',
+      theme: 'light',
+      primaryColor: '#0066FF',
+      secondaryColor: '#00CC99',
+    };
+
     // Prepare response data - flatten config for widget consumption
     const widgetData = {
       widget: {
         id: widget.id,
         name: widgetConfig.name || widget.Project.name,
         type: widgetConfig.type || 'testimonial',
-        layout: widgetConfig.layout || 'list',
+        layout: widgetConfig.layout || 'grid',
         theme: widgetConfig.theme || {},
-        settings: widgetConfig.settings || {},
+        settings: { ...defaultSettings, ...(widgetConfig.settings || {}) },
         embedType: widget.embedType,
       },
       project: {
