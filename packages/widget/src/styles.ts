@@ -515,14 +515,13 @@ export function generateStyles(
 
     /* Layout: Wall (Minimal) */
     ${prefix}.tresta-layout-wall .tresta-testimonials {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 12px;
+      width: 100%;
     }
 
     ${prefix}.tresta-layout-wall .tresta-testimonial {
-      flex: 0 0 auto;
-      max-width: 400px;
       padding: 16px;
       margin-bottom: 0;
     }

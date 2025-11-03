@@ -514,9 +514,6 @@ importers:
       '@workspace/types':
         specifier: workspace:*
         version: link:../types
-      '@workspace/ui':
-        specifier: workspace:*
-        version: link:../ui
     devDependencies:
       terser:
         specifier: ^5.44.0

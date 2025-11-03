@@ -54,6 +54,7 @@ export class TrestaWidget {
   private testimonials: Testimonial[] = [];
   private carouselInterval: number | null = null;
   private currentSlide: number = 0;
+  private effectiveLayout: string | null = null; // Store the effective layout being used
 
   constructor(config: WidgetConfig) {
     this.config = {
@@ -87,8 +88,9 @@ export class TrestaWidget {
       // Render widget
       this.renderWidget();
 
-      // Initialize carousel if needed
-      if (this.widget?.layout === "carousel") {
+      // Initialize carousel if needed (check config first, then widget.layout)
+      const layout = this.config.settings?.layout || this.widget?.layout;
+      if (layout === "carousel") {
         this.initCarousel();
       }
 
@@ -197,7 +199,10 @@ export class TrestaWidget {
       ...this.config.settings,
     };
 
-    const css = generateStyles(theme, this.widget.layout, this.config.widgetId, settings);
+    // Allow config to override layout
+    const layout = this.config.settings?.layout || this.widget.layout;
+
+    const css = generateStyles(theme, layout, this.config.widgetId, settings);
     injectStyles(css, this.config.widgetId);
   }
 
@@ -212,16 +217,23 @@ export class TrestaWidget {
       ...this.config.settings,
     };
 
+    // Allow config to override layout from database (useful for testing)
+    const layout = this.config.settings?.layout || this.widget.layout;
+    
+    // Store effective layout for use in render()
+    this.effectiveLayout = layout;
+
     // Debug logging
     console.log('Widget Settings:', {
       fromAPI: this.widget.settings,
       fromConfig: this.config.settings,
       merged: settings,
+      layout: layout,
     });
 
     const widgetHtml = renderWidget(
       this.testimonials,
-      this.widget.layout,
+      layout,
       settings,
       this.config.widgetId,
     );
@@ -245,6 +257,12 @@ export class TrestaWidget {
    */
   private initCarousel(): void {
     if (!this.container || !this.widget) return;
+
+    // Allow config to override layout
+    const layout = this.config.settings?.layout || this.widget.layout;
+    
+    // Only initialize carousel if the layout is actually carousel
+    if (layout !== 'carousel') return;
 
     const settings = this.widget.settings;
 
@@ -293,9 +311,10 @@ export class TrestaWidget {
 
     this.container.innerHTML = html;
 
-    // Add layout class to container
+    // Add layout class to container - use effective layout if available
     if (this.widget) {
-      this.container.className = `tresta-widget-${this.config.widgetId} tresta-layout-${this.widget.layout}`;
+      const layoutClass = this.effectiveLayout || this.widget.layout;
+      this.container.className = `tresta-widget-${this.config.widgetId} tresta-layout-${layoutClass}`;
     }
   }
 
