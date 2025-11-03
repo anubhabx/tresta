@@ -20,13 +20,26 @@ export default defineConfig({
         // Keep it clean for CDN usage
         assetFileNames: 'tresta-widget.[ext]',
       },
+      treeshake: true, // Enable tree-shaking for smaller bundle
     },
     // Optimize for production
-    minify: false, // Temporarily disabled for debugging
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.log statements
+        drop_debugger: true, // Remove debugger statements
+        pure_funcs: ['console.log', 'console.debug', 'console.info'],
+      },
+      mangle: {
+        properties: false, // Don't mangle property names for API stability
+      },
+    },
     // Generate sourcemaps for debugging
     sourcemap: true,
     // Clear output dir before build
     emptyOutDir: true,
+    // Target modern browsers for smaller output
+    target: 'es2015',
   },
   // For development preview
   server: {
