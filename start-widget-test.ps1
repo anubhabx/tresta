@@ -12,7 +12,7 @@ Write-Host ""
 # Check if API is running
 Write-Host "🔍 Checking if API is running..." -ForegroundColor Yellow
 try {
-    $apiResponse = Invoke-WebRequest -Uri "http://localhost:8000/health" -Method Get -TimeoutSec 2 -ErrorAction SilentlyContinue
+    $null = Invoke-WebRequest -Uri "http://localhost:8000/health" -Method Get -TimeoutSec 2 -ErrorAction SilentlyContinue
     Write-Host "✅ API is running on http://localhost:8000`n" -ForegroundColor Green
 } catch {
     Write-Host "❌ API is NOT running`n" -ForegroundColor Red
