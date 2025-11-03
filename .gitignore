@@ -35,21 +35,35 @@ npm-debug.log*
 .DS_Store
 *.pem
 
+# Copilot instructions
 .github/copilot-instructions.md
 
-*.md
-*/**/*.md
+# Documentation - keep essential docs, ignore implementation/status docs
+ANALYSIS_SUMMARY.md
+MERGE_SUMMARY.md
+WIDGET_ACTION_PLAN.md
+WIDGET_COMPLETION_REPORT.md
+WIDGET_OPTIMIZATION.md
+WIDGET_QUICK_REF.md
+WIDGET_STATUS.md
+WIDGET_TESTING_QUERIES.md
+**/LAYOUT_TESTING.md
+
+# Helper scripts - local development only
+start-widget-test.ps1
+test-widget-layouts.ps1
+**/start-*.ps1
+**/test-*.ps1
 
 # Widget build outputs
 packages/widget/dist
 
-# Test files
+# Test and demo files - keep locally for development
 **/test*.html
 **/test*.js
 **/test*.css
 **/demo*.html
 **/demo*.js
 **/demo*.css
-
-**/*index.html
-**/*open-demos.bat
+**/index.html
+packages/widget/.env
