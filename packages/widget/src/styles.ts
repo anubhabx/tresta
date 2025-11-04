@@ -220,7 +220,8 @@ export function generateStyles(
     ${prefix} .tresta-date {
       font-size: 12px;
       color: #9ca3af;
-      margin-top: 8px;
+      margin-top: 12px;
+      text-align: left;
     }
 
     /* Layout: List */
@@ -393,6 +394,16 @@ export function generateStyles(
       background-color: #e5e7eb;
     }
 
+    ${prefix} .tresta-carousel-avatar-initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: white;
+      text-transform: uppercase;
+    }
+
     ${prefix} .tresta-carousel-author-info {
       flex: 1;
       min-width: 0;
@@ -409,6 +420,13 @@ export function generateStyles(
       font-size: 14px;
       color: #6b7280;
       margin: 0;
+    }
+
+    ${prefix} .tresta-carousel-date {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 12px;
+      text-align: left;
     }
 
     /* Carousel Navigation Buttons */

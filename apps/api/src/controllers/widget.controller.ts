@@ -200,6 +200,8 @@ const fetchPublicWidgetData = async (
   try {
     const { widgetId } = req.params;
 
+    console.log('🔍 Fetching widget with ID:', widgetId);
+
     // Validate widget ID
     if (!widgetId) {
       throw new BadRequestError("Widget ID is required");
@@ -223,6 +225,17 @@ const fetchPublicWidgetData = async (
         },
       },
     });
+
+    console.log('📦 Widget found:', widget ? 'YES' : 'NO');
+    if (widget) {
+      console.log('📋 Widget details:', {
+        id: widget.id,
+        embedType: widget.embedType,
+        hasProject: !!widget.Project,
+        projectName: widget.Project?.name,
+        projectVisibility: widget.Project?.visibility,
+      });
+    }
 
     // Check if widget exists
     if (!widget) {
@@ -255,6 +268,9 @@ const fetchPublicWidgetData = async (
       select: {
         id: true,
         authorName: true,
+        authorAvatar: true,
+        authorRole: true,
+        authorCompany: true,
         content: true,
         rating: true,
         videoUrl: true,
@@ -277,7 +293,7 @@ const fetchPublicWidgetData = async (
     const defaultSettings: WidgetConfig = {
       showRating: true,
       showDate: true,
-      showAvatar: false,
+      showAvatar: true,
       showAuthorRole: true,
       showAuthorCompany: true,
       maxTestimonials: 10,
@@ -314,6 +330,9 @@ const fetchPublicWidgetData = async (
       testimonials: testimonials.map((t) => ({
         id: t.id,
         authorName: t.authorName,
+        authorAvatar: t.authorAvatar,
+        authorRole: t.authorRole,
+        authorCompany: t.authorCompany,
         content: t.content,
         rating: t.rating,
         videoUrl: t.videoUrl,

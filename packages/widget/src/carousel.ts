@@ -12,6 +12,7 @@ export interface Testimonial {
     content: string;
     avatar?: string;
     rating?: number;
+    createdAt: string;
 }
 
 export interface CarouselOptions {
@@ -21,6 +22,8 @@ export interface CarouselOptions {
     autoplaySpeed?: number;
     showRating?: boolean;
     showCompany?: boolean;
+    showAvatar?: boolean;
+    showDate?: boolean;
     onSlideChange?: (index: number) => void;
 }
 
@@ -33,6 +36,8 @@ export class Carousel {
     private autoplaySpeed: number;
     private showRating: boolean;
     private showCompany: boolean;
+    private showAvatar: boolean;
+    private showDate: boolean;
     private onSlideChange?: (index: number) => void;
     private isAutoPlayActive: boolean;
 
@@ -56,6 +61,8 @@ export class Carousel {
         this.autoplaySpeed = options.autoplaySpeed ?? 5000;
         this.showRating = options.showRating ?? true;
         this.showCompany = options.showCompany ?? true;
+        this.showAvatar = options.showAvatar ?? true;
+        this.showDate = options.showDate ?? true;
         this.onSlideChange = options.onSlideChange;
         this.isAutoPlayActive = this.autoplay;
 
@@ -226,8 +233,34 @@ export class Carousel {
         const authorContainer = document.createElement('div');
         authorContainer.className = 'tresta-carousel-author';
 
-        // Only show avatar if available (skip for now as per requirements)
-        // Avatar support can be added later when needed
+        // Avatar with fallback to colored initials
+        if (this.showAvatar) {
+            let avatarElement: HTMLElement;
+            
+            if (testimonial.avatar) {
+                // Show actual avatar image
+                avatarElement = document.createElement('img');
+                avatarElement.className = 'tresta-carousel-avatar';
+                (avatarElement as HTMLImageElement).src = testimonial.avatar;
+                (avatarElement as HTMLImageElement).alt = testimonial.name;
+            } else {
+                // Show colored initials
+                avatarElement = document.createElement('div');
+                avatarElement.className = 'tresta-carousel-avatar tresta-carousel-avatar-initials';
+                const initials = this.getInitials(testimonial.name);
+                const backgroundColor = this.getColorFromName(testimonial.name);
+                avatarElement.style.backgroundColor = backgroundColor;
+                avatarElement.style.color = 'white';
+                avatarElement.style.display = 'flex';
+                avatarElement.style.alignItems = 'center';
+                avatarElement.style.justifyContent = 'center';
+                avatarElement.style.fontWeight = '600';
+                avatarElement.style.fontSize = '18px';
+                avatarElement.textContent = initials;
+            }
+            
+            authorContainer.appendChild(avatarElement);
+        }
 
         const authorInfo = document.createElement('div');
         authorInfo.className = 'tresta-carousel-author-info';
@@ -248,6 +281,14 @@ export class Carousel {
 
         authorContainer.appendChild(authorInfo);
         this.contentContainer.appendChild(authorContainer);
+
+        // Date (relative format)
+        if (this.showDate) {
+            const dateElement = document.createElement('div');
+            dateElement.className = 'tresta-carousel-date';
+            dateElement.textContent = this.formatRelativeDate(testimonial.createdAt);
+            this.contentContainer.appendChild(dateElement);
+        }
 
         // Update autoplay toggle
         this.updateAutoplayToggle();
@@ -555,5 +596,67 @@ export class Carousel {
         this.testimonials = testimonials;
         this.currentIndex = 0;
         this.init();
+    }
+
+    /**
+     * Get initials from name for avatar fallback
+     */
+    private getInitials(name: string): string {
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0]?.charAt(0).toUpperCase() ?? "";
+        }
+        const first = parts[0]?.charAt(0) ?? "";
+        const last = parts[parts.length - 1]?.charAt(0) ?? "";
+        return (first + last).toUpperCase();
+    }
+
+    /**
+     * Generate a consistent color based on name for avatar background
+     */
+    private getColorFromName(name: string): string {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        
+        const hue = hash % 360;
+        return `hsl(${hue}, 65%, 50%)`;
+    }
+
+    /**
+     * Format date to relative time (e.g., "2 days ago")
+     */
+    private formatRelativeDate(dateString: string): string {
+        try {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            const diffSec = Math.floor(diffMs / 1000);
+            const diffMin = Math.floor(diffSec / 60);
+            const diffHour = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHour / 24);
+            const diffWeek = Math.floor(diffDay / 7);
+            const diffMonth = Math.floor(diffDay / 30);
+            const diffYear = Math.floor(diffDay / 365);
+
+            if (diffSec < 60) {
+                return "just now";
+            } else if (diffMin < 60) {
+                return `${diffMin} ${diffMin === 1 ? "minute" : "minutes"} ago`;
+            } else if (diffHour < 24) {
+                return `${diffHour} ${diffHour === 1 ? "hour" : "hours"} ago`;
+            } else if (diffDay < 7) {
+                return `${diffDay} ${diffDay === 1 ? "day" : "days"} ago`;
+            } else if (diffWeek < 4) {
+                return `${diffWeek} ${diffWeek === 1 ? "week" : "weeks"} ago`;
+            } else if (diffMonth < 12) {
+                return `${diffMonth} ${diffMonth === 1 ? "month" : "months"} ago`;
+            } else {
+                return `${diffYear} ${diffYear === 1 ? "year" : "years"} ago`;
+            }
+        } catch {
+            return dateString;
+        }
     }
 }
