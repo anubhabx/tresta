@@ -181,6 +181,12 @@ export function generateStyles(
       font-size: 16px;
     }
 
+    ${prefix} .tresta-author-image.tresta-author-initials {
+      /* Initials fallback - background color is set inline for unique colors */
+      color: white;
+      text-transform: uppercase;
+    }
+
     ${prefix} .tresta-author-info {
       flex: 1;
       min-width: 0;

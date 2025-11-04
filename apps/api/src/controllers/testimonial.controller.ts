@@ -20,7 +20,17 @@ const createTestimonial = async (
 ) => {
   try {
     const { slug } = req.params;
-    const { authorName, authorEmail, content, type, rating, videoUrl } = req.body;
+    const { 
+      authorName, 
+      authorEmail, 
+      authorRole,
+      authorCompany,
+      authorAvatar,
+      content, 
+      type, 
+      rating, 
+      videoUrl 
+    } = req.body;
 
     // Validate required fields
     if (!authorName || !content) {
@@ -40,6 +50,15 @@ const createTestimonial = async (
     // Validate rating if provided
     if (rating !== undefined && (rating < 1 || rating > 5)) {
       throw new BadRequestError("Rating must be between 1 and 5");
+    }
+
+    // Validate optional fields length
+    if (authorRole && authorRole.length > 255) {
+      throw new BadRequestError("Author role must be less than 255 characters");
+    }
+
+    if (authorCompany && authorCompany.length > 255) {
+      throw new BadRequestError("Author company must be less than 255 characters");
     }
 
     // Find project by slug
@@ -64,11 +83,26 @@ const createTestimonial = async (
       type: type || "TEXT",
       isApproved: false,
       isPublished: false,
+      source: "web_form", // Track source as web form submission
+      ipAddress: req.ip, // Capture IP address for analytics
+      userAgent: req.get("user-agent"), // Capture user agent
     };
 
     // Add optional fields if provided
     if (authorEmail) {
       testimonialData.authorEmail = authorEmail;
+    }
+
+    if (authorRole) {
+      testimonialData.authorRole = authorRole;
+    }
+
+    if (authorCompany) {
+      testimonialData.authorCompany = authorCompany;
+    }
+
+    if (authorAvatar) {
+      testimonialData.authorAvatar = authorAvatar;
     }
 
     if (rating) {

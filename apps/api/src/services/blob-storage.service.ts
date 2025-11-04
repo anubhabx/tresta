@@ -405,6 +405,57 @@ class BlobStorageService {
       throw new InternalServerError("Failed to get blob metadata");
     }
   }
+
+  /**
+   * Upload an image from a URL to Azure Blob Storage
+   * Useful for syncing avatars from third-party services (e.g., Clerk)
+   */
+  async uploadFromUrl(
+    imageUrl: string,
+    directory: StorageDirectory,
+    userId?: string
+  ): Promise<string> {
+    try {
+      // Fetch the image from the URL
+      const response = await fetch(imageUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image from URL: ${response.statusText}`);
+      }
+
+      // Get the content type and buffer
+      const contentType = response.headers.get("content-type") || "image/jpeg";
+      const buffer = Buffer.from(await response.arrayBuffer());
+
+      // Validate file type
+      this.validateFileType(directory, contentType);
+      this.validateFileSize(directory, buffer.length);
+
+      // Generate filename from URL or use a default
+      const urlParts = new URL(imageUrl).pathname.split("/");
+      const originalFilename = urlParts[urlParts.length - 1] || "avatar.jpg";
+      
+      // Generate unique blob name
+      const blobName = this.generateBlobName(directory, originalFilename, userId);
+
+      // Upload to Azure Blob Storage
+      const containerClient = getContainerClient();
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+      await blockBlobClient.upload(buffer, buffer.length, {
+        blobHTTPHeaders: {
+          blobContentType: contentType
+        }
+      });
+
+      // Return the public blob URL (without SAS token for public read)
+      const { accountName, containerName } = getStorageConfig();
+      return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}`;
+    } catch (error) {
+      console.error("Error uploading from URL:", error);
+      throw new InternalServerError("Failed to upload image from URL");
+    }
+  }
 }
 
 // Export singleton instance

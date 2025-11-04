@@ -19,6 +19,7 @@ model User {
   email     String  @unique
   firstName String?
   lastName  String?
+  avatar    String? @db.VarChar(1000) // Avatar URL from Azure Blob Storage
 
   plan         UserPlan      @default(FREE)
   projects     Project[]
@@ -88,6 +89,9 @@ model Testimonial {
   projectId   String?
   authorName  String          @db.VarChar(255)
   authorEmail String?         @db.VarChar(255)
+  authorRole  String?         @db.VarChar(255) // e.g., "CEO", "Marketing Manager"
+  authorCompany String?       @db.VarChar(255) // e.g., "Acme Inc."
+  authorAvatar String?        @db.VarChar(1000) // Avatar URL from Azure Blob Storage
   content     String          @db.Text
   type        TestimonialType @default(TEXT)
   videoUrl    String?

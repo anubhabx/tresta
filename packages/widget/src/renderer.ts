@@ -36,11 +36,12 @@ export function renderTestimonial(
   // Generate author image or initials
   let authorImageHtml = "";
   if (showAvatar) {
-    if (testimonial.authorImage) {
-      authorImageHtml = `<img src="${escapeHtml(testimonial.authorImage)}" alt="${escapeHtml(testimonial.authorName)}" class="tresta-author-image" />`;
+    if (testimonial.authorAvatar) {
+      authorImageHtml = `<img src="${escapeHtml(testimonial.authorAvatar)}" alt="${escapeHtml(testimonial.authorName)}" class="tresta-author-image" />`;
     } else {
       const initials = getInitials(testimonial.authorName);
-      authorImageHtml = `<div class="tresta-author-image">${initials}</div>`;
+      const backgroundColor = getColorFromName(testimonial.authorName);
+      authorImageHtml = `<div class="tresta-author-image tresta-author-initials" style="background-color: ${backgroundColor}">${initials}</div>`;
     }
   }
 
@@ -239,6 +240,20 @@ function getInitials(name: string): string {
   const first = parts[0]?.charAt(0) ?? "";
   const last = parts[parts.length - 1]?.charAt(0) ?? "";
   return (first + last).toUpperCase();
+}
+
+/**
+ * Generate a consistent color based on name
+ * Uses a simple hash function to generate a hue value
+ */
+function getColorFromName(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  const hue = hash % 360;
+  return `hsl(${hue}, 65%, 50%)`;
 }
 
 /**

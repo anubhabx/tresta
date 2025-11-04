@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { CheckCircle2, MessageSquare } from "lucide-react";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse, CreateTestimonialPayload } from "@/types/api";
+import { AzureFileUpload } from "@/components/azure-file-upload";
 
 import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
@@ -29,6 +30,21 @@ const testimonialFormSchema = z.object({
   authorEmail: z
     .string()
     .email({ message: "Please enter a valid email address" })
+    .optional()
+    .or(z.literal("")),
+  authorRole: z
+    .string()
+    .max(255, { message: "Role must be less than 255 characters" })
+    .optional()
+    .or(z.literal("")),
+  authorCompany: z
+    .string()
+    .max(255, { message: "Company must be less than 255 characters" })
+    .optional()
+    .or(z.literal("")),
+  authorAvatar: z
+    .string()
+    .url({ message: "Please enter a valid URL" })
     .optional()
     .or(z.literal("")),
   content: z
@@ -64,6 +80,9 @@ export default function TestimonialSubmissionPage({
     defaultValues: {
       authorName: "",
       authorEmail: "",
+      authorRole: "",
+      authorCompany: "",
+      authorAvatar: "",
       content: "",
       rating: 0,
       videoUrl: "",
@@ -81,6 +100,18 @@ export default function TestimonialSubmissionPage({
 
       if (data.authorEmail) {
         payload.authorEmail = data.authorEmail;
+      }
+
+      if (data.authorRole) {
+        payload.authorRole = data.authorRole;
+      }
+
+      if (data.authorCompany) {
+        payload.authorCompany = data.authorCompany;
+      }
+
+      if (data.authorAvatar) {
+        payload.authorAvatar = data.authorAvatar;
       }
 
       if (data.rating) {
@@ -176,6 +207,43 @@ export default function TestimonialSubmissionPage({
                 description="We'll never share your email or send spam"
                 optional
               />
+
+              {/* Role Field */}
+              <CustomFormField
+                type="text"
+                control={form.control}
+                name="authorRole"
+                label="Your Role"
+                placeholder="e.g., CEO, Marketing Manager, Developer"
+                description="Your job title or role"
+                optional
+              />
+
+              {/* Company Field */}
+              <CustomFormField
+                type="text"
+                control={form.control}
+                name="authorCompany"
+                label="Company Name"
+                placeholder="e.g., Acme Inc."
+                description="The company or organization you represent"
+                optional
+              />
+
+              {/* Avatar Upload */}
+              <div className="space-y-2">
+                <AzureFileUpload
+                  control={form.control}
+                  name="authorAvatar"
+                  label="Profile Picture (Optional)"
+                  directory="avatars"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  maxSizeMB={2}
+                  description="JPG, PNG, or WebP (max 2MB)"
+                />
+              </div>
+
+              <Separator className="my-6" />
 
               {/* Rating Field */}
               <CustomFormField
