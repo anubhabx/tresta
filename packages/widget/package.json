@@ -10,10 +10,9 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite --open /test-all-layouts.html",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "demo": "vite preview --open /index.html",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
