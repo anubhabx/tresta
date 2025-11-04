@@ -280,7 +280,7 @@ export class TrestaWidget {
       role: t.authorRole || '',
       company: t.authorCompany,
       content: t.content,
-      avatar: t.authorImage,
+      avatar: t.authorAvatar,
       rating: t.rating,
     }));
 
