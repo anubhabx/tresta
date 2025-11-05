@@ -5,10 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { CheckCircle2, MessageSquare } from "lucide-react";
+import { CheckCircle2, MessageSquare, ShieldCheck } from "lucide-react";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse, CreateTestimonialPayload } from "@/types/api";
 import { AzureFileUpload } from "@/components/azure-file-upload";
+import { GoogleOAuthProvider } from "@/components/google-oauth-provider";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
@@ -21,6 +23,7 @@ import {
 } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
+import { Badge } from "@workspace/ui/components/badge";
 
 const testimonialFormSchema = z.object({
   authorName: z
@@ -74,6 +77,8 @@ export default function TestimonialSubmissionPage({
   const api = useApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
+  const [isGoogleVerified, setIsGoogleVerified] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(testimonialFormSchema),
@@ -88,6 +93,56 @@ export default function TestimonialSubmissionPage({
       videoUrl: "",
     },
   });
+
+  // Handle Google Sign-In success
+  const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
+    try {
+      if (!credentialResponse.credential) {
+        toast.error("Failed to get Google credentials");
+        return;
+      }
+
+      // Decode the JWT token to get user info
+      const tokenParts = credentialResponse.credential.split(".");
+      if (tokenParts.length !== 3) {
+        throw new Error("Invalid token format");
+      }
+
+      const base64Url = tokenParts[1];
+      if (!base64Url) {
+        throw new Error("Invalid token payload");
+      }
+
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+
+      const payload = JSON.parse(jsonPayload);
+
+      // Auto-fill form fields from Google profile
+      form.setValue("authorName", payload.name || "");
+      form.setValue("authorEmail", payload.email || "");
+      form.setValue("authorAvatar", payload.picture || "");
+
+      // Store the ID token for backend verification
+      setGoogleIdToken(credentialResponse.credential);
+      setIsGoogleVerified(true);
+
+      toast.success("Verified with Google! Your info has been auto-filled.");
+    } catch (error) {
+      console.error("Failed to decode Google token:", error);
+      toast.error("Failed to verify with Google. Please try again.");
+    }
+  };
+
+  // Handle Google Sign-In error
+  const handleGoogleError = () => {
+    toast.error("Google Sign-In was unsuccessful. Please try again.");
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -123,6 +178,11 @@ export default function TestimonialSubmissionPage({
         payload.type = "VIDEO";
       }
 
+      // Include Google ID token if user signed in with Google
+      if (googleIdToken) {
+        (payload as any).googleIdToken = googleIdToken;
+      }
+
       await api.post<ApiResponse<unknown>>(
         `/projects/${slug}/testimonials`,
         payload
@@ -130,6 +190,8 @@ export default function TestimonialSubmissionPage({
 
       setIsSuccess(true);
       form.reset();
+      setGoogleIdToken(null);
+      setIsGoogleVerified(false);
       toast.success("Thank you! Your testimonial has been submitted.");
     } catch (error: any) {
       console.error("Failed to submit testimonial:", error);
@@ -164,38 +226,81 @@ export default function TestimonialSubmissionPage({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 w-full">
-      <Card className="max-w-2xl w-full">
-        <CardHeader className="space-y-1 pb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <MessageSquare className="h-6 w-6 text-primary" />
+    <GoogleOAuthProvider>
+      <div className="min-h-screen flex items-center justify-center p-4 w-full">
+        <Card className="max-w-2xl w-full">
+          <CardHeader className="space-y-1 pb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <MessageSquare className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-bold">
+                  Share Your Experience
+                </CardTitle>
+                <CardDescription className="text-base mt-1">
+                  Your feedback helps us improve and inspires others
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Share Your Experience
-              </CardTitle>
-              <CardDescription className="text-base mt-1">
-                Your feedback helps us improve and inspires others
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
 
-        <Separator />
+          <Separator />
 
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Name Field */}
-              <CustomFormField
-                type="text"
-                control={form.control}
-                name="authorName"
-                label="Your Name"
-                placeholder="John Doe"
-                required
-              />
+          <CardContent className="pt-6">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                {/* Google Sign-In Section */}
+                {!isGoogleVerified && (
+                  <div className="bg-muted/50 rounded-lg p-6 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-5 w-5 text-primary" />
+                      <h3 className="font-semibold">Verify with Google (Recommended)</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Sign in with Google to auto-fill your information and add a verified badge to your testimonial
+                    </p>
+                    <div className="flex justify-center">
+                      <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                        useOneTap
+                        size="large"
+                        text="continue_with"
+                        shape="rectangular"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Verified Badge */}
+                {isGoogleVerified && (
+                  <div className="bg-slate-950 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+                    <ShieldCheck className="h-5 w-5 text-white" />
+                    <div className="flex-1">
+                      <p className="font-medium text-white">Verified with Google</p>
+                      <p className="text-sm text-slate-300">Your testimonial will display a verified badge</p>
+                    </div>
+                    <Badge variant="secondary" className="bg-slate-300 text-primary-foreground hover:bg-green-100">
+                      Verified
+                    </Badge>
+                  </div>
+                )}
+
+                {isGoogleVerified && <Separator />}
+
+                {/* Name Field */}
+                <CustomFormField
+                  type="text"
+                  control={form.control}
+                  name="authorName"
+                  label="Your Name"
+                  placeholder="John Doe"
+                  required
+                />
 
               {/* Email Field */}
               <CustomFormField
@@ -230,18 +335,20 @@ export default function TestimonialSubmissionPage({
                 optional
               />
 
-              {/* Avatar Upload */}
-              <div className="space-y-2">
-                <AzureFileUpload
-                  control={form.control}
-                  name="authorAvatar"
-                  label="Profile Picture (Optional)"
-                  directory="avatars"
-                  accept="image/png,image/jpeg,image/jpg,image/webp"
-                  maxSizeMB={2}
-                  description="JPG, PNG, or WebP (max 2MB)"
-                />
-              </div>
+              {/* Avatar Upload - only show if not using Google */}
+              {!isGoogleVerified && (
+                <div className="space-y-2">
+                  <AzureFileUpload
+                    control={form.control}
+                    name="authorAvatar"
+                    label="Profile Picture (Optional)"
+                    directory="avatars"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    maxSizeMB={2}
+                    description="JPG, PNG, or WebP (max 2MB)"
+                  />
+                </div>
+              )}
 
               <Separator className="my-6" />
 
@@ -299,5 +406,6 @@ export default function TestimonialSubmissionPage({
         </CardContent>
       </Card>
     </div>
+    </GoogleOAuthProvider>
   );
 }

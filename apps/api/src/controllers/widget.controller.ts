@@ -276,7 +276,9 @@ const fetchPublicWidgetData = async (
         videoUrl: true,
         type: true,
         createdAt: true,
-        // Exclude sensitive data (email, IP, user agent, etc.)
+        isOAuthVerified: true,
+        oauthProvider: true,
+        // Exclude sensitive data (email, IP, user agent, OAuth subject, etc.)
       },
       orderBy: {
         createdAt: "desc",
@@ -338,6 +340,8 @@ const fetchPublicWidgetData = async (
         videoUrl: t.videoUrl,
         type: t.type,
         createdAt: t.createdAt.toISOString(),
+        isOAuthVerified: t.isOAuthVerified,
+        oauthProvider: t.oauthProvider,
       })),
       meta: {
         total: testimonials.length,

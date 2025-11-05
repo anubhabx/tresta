@@ -100,6 +100,8 @@ export interface Testimonial {
   rating: number | null;
   isApproved: boolean;
   isPublished: boolean;
+  isOAuthVerified: boolean;
+  oauthProvider: string | null;
   projectId: string | null;
   Project?: {
     id: string;

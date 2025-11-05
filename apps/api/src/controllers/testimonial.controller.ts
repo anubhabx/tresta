@@ -12,6 +12,7 @@ import {
   extractPaginationParams,
   calculateSkip
 } from "../lib/response.ts";
+import { verifyGoogleIdToken } from "../lib/google-oauth.ts";
 
 const createTestimonial = async (
   req: Request,
@@ -29,7 +30,8 @@ const createTestimonial = async (
       content, 
       type, 
       rating, 
-      videoUrl 
+      videoUrl,
+      googleIdToken // Google OAuth ID token
     } = req.body;
 
     // Validate required fields
@@ -61,6 +63,33 @@ const createTestimonial = async (
       throw new BadRequestError("Author company must be less than 255 characters");
     }
 
+    // Verify Google OAuth token if provided
+    let googleProfile = null;
+    let isOAuthVerified = false;
+    let oauthSubject = null;
+
+    if (googleIdToken) {
+      googleProfile = await verifyGoogleIdToken(googleIdToken);
+      
+      if (!googleProfile) {
+        throw new BadRequestError("Invalid Google authentication token");
+      }
+
+      // Email verification check
+      if (!googleProfile.email_verified) {
+        throw new BadRequestError("Google email must be verified");
+      }
+
+      isOAuthVerified = true;
+      oauthSubject = googleProfile.sub;
+      
+      console.log("✅ Google OAuth verified:", {
+        email: googleProfile.email,
+        name: googleProfile.name,
+        verified: googleProfile.email_verified
+      });
+    }
+
     // Find project by slug
     const project = await prisma.project.findUnique({
       where: { slug }
@@ -86,6 +115,9 @@ const createTestimonial = async (
       source: "web_form", // Track source as web form submission
       ipAddress: req.ip, // Capture IP address for analytics
       userAgent: req.get("user-agent"), // Capture user agent
+      isOAuthVerified, // Mark as OAuth verified
+      oauthProvider: isOAuthVerified ? "google" : null,
+      oauthSubject: oauthSubject,
     };
 
     // Add optional fields if provided

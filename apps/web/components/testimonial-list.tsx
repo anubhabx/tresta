@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Inbox,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { Badge } from "@workspace/ui/components/badge";
 
@@ -35,6 +36,7 @@ type FilterStatus = "all" | "pending" | "approved" | "published";
 export function TestimonialList({ projectSlug }: TestimonialListProps) {
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [filterVerified, setFilterVerified] = useState<"all" | "verified" | "unverified">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const limit = 10;
 
@@ -67,6 +69,12 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
       (filterStatus === "approved" && t.isApproved && !t.isPublished) ||
       (filterStatus === "published" && t.isPublished);
 
+    // Verification filter
+    const matchesVerified =
+      filterVerified === "all" ||
+      (filterVerified === "verified" && t.isOAuthVerified) ||
+      (filterVerified === "unverified" && !t.isOAuthVerified);
+
     // Search filter
     const matchesSearch =
       searchQuery === "" ||
@@ -74,7 +82,7 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
       t.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.authorEmail?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesStatus && matchesSearch;
+    return matchesStatus && matchesVerified && matchesSearch;
   });
 
   const handleApprove = async (id: string) => {
@@ -199,6 +207,20 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
               <SelectItem value="pending">Pending Review</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="published">Published</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterVerified}
+            onValueChange={(value) => setFilterVerified(value as "all" | "verified" | "unverified")}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <ShieldCheck className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filter by verification" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Verification</SelectItem>
+              <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="unverified">Unverified</SelectItem>
             </SelectContent>
           </Select>
         </div>

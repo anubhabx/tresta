@@ -104,6 +104,11 @@ model Testimonial {
   isApproved  Boolean         @default(false) // For moderation purposes
   ipAddress   String?         @db.VarChar(45) // To store IPv6 addresses if needed
   userAgent   String?         @db.Text // To store user agent string if needed
+  
+  // OAuth Verification
+  isOAuthVerified Boolean       @default(false) // True if verified via OAuth
+  oauthProvider   String?       @db.VarChar(50) // e.g., "google", "github"
+  oauthSubject    String?       @db.VarChar(255) // OAuth subject/user ID for verification
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,6 +121,7 @@ model Testimonial {
   @@index([projectId])
   @@index([isPublished])
   @@index([createdAt])
+  @@index([isOAuthVerified])
 }
 
 enum TestimonialType {

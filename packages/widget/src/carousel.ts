@@ -13,6 +13,8 @@ export interface Testimonial {
     avatar?: string;
     rating?: number;
     createdAt: string;
+    isOAuthVerified?: boolean;
+    oauthProvider?: string | null;
 }
 
 export interface CarouselOptions {
@@ -265,10 +267,23 @@ export class Carousel {
         const authorInfo = document.createElement('div');
         authorInfo.className = 'tresta-carousel-author-info';
 
-        const name = document.createElement('p');
-        name.className = 'tresta-carousel-author-name';
-        name.textContent = testimonial.name;
-        authorInfo.appendChild(name);
+        const nameContainer = document.createElement('p');
+        nameContainer.className = 'tresta-carousel-author-name';
+        nameContainer.textContent = testimonial.name;
+        
+        // Add verified badge if OAuth verified
+        if (testimonial.isOAuthVerified) {
+            const badge = document.createElement('span');
+            badge.className = 'tresta-verified-badge';
+            badge.title = `Verified via ${testimonial.oauthProvider || 'OAuth'}`;
+            badge.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>`;
+            nameContainer.appendChild(badge);
+        }
+        
+        authorInfo.appendChild(nameContainer);
 
         const role = document.createElement('p');
         role.className = 'tresta-carousel-author-role';

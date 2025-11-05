@@ -14,6 +14,7 @@ import {
   Video,
   Briefcase,
   Building2,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
@@ -152,6 +153,21 @@ export function TestimonialCard({
           {/* Status Badges */}
           <div className="flex flex-col items-end gap-2">
             {getStatusBadge()}
+            {testimonial.isOAuthVerified && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline" className="bg-slate-950 border-slate-300 text-white hover:bg-slate-800 transition-colors duration-200">
+                      <ShieldCheck className="h-3 w-3 mr-1" />
+                      Verified
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Verified via {testimonial.oauthProvider || 'OAuth'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             {testimonial.type === "VIDEO" && (
               <Badge variant="outline" className="text-xs">
                 <Video className="h-3 w-3 mr-1" />

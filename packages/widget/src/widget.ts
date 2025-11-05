@@ -283,6 +283,8 @@ export class TrestaWidget {
       avatar: t.authorAvatar,
       rating: t.rating,
       createdAt: t.createdAt,
+      isOAuthVerified: t.isOAuthVerified,
+      oauthProvider: t.oauthProvider,
     }));
 
     // Use enhanced Carousel class

@@ -200,6 +200,26 @@ export function generateStyles(
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    ${prefix} .tresta-verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #10b981;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      padding: 2px;
+    }
+
+    ${prefix} .tresta-verified-badge svg {
+      width: 100%;
+      height: 100%;
     }
 
     ${prefix} .tresta-author-role {
@@ -414,6 +434,9 @@ export function generateStyles(
       font-size: 16px;
       color: #1f2937;
       margin: 0 0 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     ${prefix} .tresta-carousel-author-role {
