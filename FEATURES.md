@@ -1,8 +1,8 @@
 # Tresta - Feature Implementation Status
 
-**Last Updated:** November 2025  
+**Last Updated:** November 5, 2025  
 **Version:** MVP v1.0  
-**Status:** 🟢 90% Complete - Widget System Near Completion
+**Status:** 🟢 92% Complete - OAuth Verification Added, Widget System Enhanced
 
 ---
 
@@ -10,13 +10,21 @@
 
 | Category | Completed | In Progress | Not Started | Total |
 |----------|-----------|-------------|-------------|-------|
-| **Core Features** | 21 | 0 | 0 | 21 |
+| **Core Features** | 22 | 0 | 0 | 22 |
 | **Widget System** | 6 | 1 | 1 | 8 |
 | **Enhancement Features** | 0 | 0 | 11 | 11 |
 | **Post-MVP Features** | 0 | 0 | 15 | 15 |
-| **Total** | **27** | **1** | **27** | **55** |
+| **Total** | **28** | **1** | **27** | **56** |
 
-**Overall Completion:** 90% of MVP features complete (widget rendering library at 85%)
+**Overall Completion:** 92% of MVP features complete (widget rendering library at 90%)
+
+**Recent Updates (November 5, 2025):**
+- ✅ Google OAuth verification for testimonials
+- ✅ Verified badge system in widgets and management UI
+- ✅ Verification filter for testimonial management
+- ✅ Widget branding footer ("Powered by Tresta")
+- ✅ Avatar support with initials fallback
+- ✅ Relative date formatting in widgets
 
 ---
 
@@ -209,7 +217,45 @@
   - `apps/api/src/controllers/testimonial.controller.ts`
   - `apps/api/src/routes/testimonial.route.ts`
 
-#### 3.4 Submission Confirmation ✅
+#### 3.4 Google OAuth Verification ✅
+- **Status:** ✅ Complete (November 2025)
+- **Description:** Verify testimonial authors via Google OAuth for increased credibility
+- **Implementation:**
+  - **Frontend OAuth integration:**
+    - Google Sign-In button in testimonial form
+    - Auto-fill name, email, and avatar from Google profile
+    - Store ID token for server verification
+    - `@react-oauth/google` package integration
+    - `GoogleOAuthProvider` wrapper component
+  - **Backend verification:**
+    - Server-side ID token validation using `google-auth-library`
+    - Verify email is confirmed by Google
+    - Store verification status and OAuth provider
+    - `verifyGoogleIdToken()` utility function
+  - **Database schema:**
+    - `isOAuthVerified` (Boolean) field on Testimonial
+    - `oauthProvider` (String?) stores provider name
+    - `oauthSubject` (String?) stores unique OAuth ID
+    - Index on `isOAuthVerified` for filtering
+  - **Verified badge display:**
+    - Green checkmark badge on verified testimonials
+    - Shows in all widget layouts and management UI
+    - Tooltip displays OAuth provider
+    - SVG shield icon for visual clarity
+  - **Management features:**
+    - Filter testimonials by verification status
+    - Verified badge on testimonial cards
+    - Combined filtering (status + verification)
+- **Files:**
+  - `apps/api/src/lib/google-oauth.ts` - Token verification
+  - `apps/web/components/google-oauth-provider.tsx` - OAuth wrapper
+  - `apps/web/app/(public)/testimonials/[slug]/page.tsx` - Sign-In button
+  - `apps/web/components/testimonial-card.tsx` - Verified badge
+  - `apps/web/components/testimonial-list.tsx` - Verification filter
+  - `packages/database/prisma/schema.prisma` - OAuth fields
+  - `packages/widget/src/*` - Widget verified badge support
+
+#### 3.5 Submission Confirmation ✅
 - **Status:** ✅ Complete
 - **Description:** Thank you page after submission
 - **Implementation:**
@@ -242,12 +288,19 @@
 
 #### 4.2 Filter Testimonials ✅
 - **Status:** ✅ Complete
-- **Description:** Filter by approval status
+- **Description:** Filter by approval status and verification
 - **Implementation:**
-  - Filter options:
+  - **Status filter options:**
     - All Testimonials
     - Pending Review
     - Approved
+    - Published
+  - **Verification filter options:** (Added November 2025)
+    - All Verification
+    - Verified (OAuth-authenticated)
+    - Unverified (no OAuth verification)
+  - Combined filtering (status + verification)
+  - Real-time filter updates
     - Published
   - Real-time filtering (client-side)
   - Status count badges
@@ -564,7 +617,7 @@
   - `apps/web/components/widgets/embed-code-dialog.tsx`
 
 #### 8.6 Widget Rendering Library 🚧
-- **Status:** 🟡 85% Complete
+- **Status:** 🟡 90% Complete (Updated November 2025)
 - **Description:** Standalone vanilla TypeScript widget for CDN embedding
 - **Implementation:**
   - ✅ Core widget class (`TrestaWidget`)
@@ -579,20 +632,25 @@
   - ✅ Error handling and loading states
   - ✅ Responsive design utilities
   - ✅ Vite build configuration (IIFE + ESM)
-  - ⚠️ Build configuration needs optimization
-  - ❌ React-based layout files need removal (`single-v0.tsx`, `grid-v0.tsx`, etc.)
-  - ❌ Production bundle size optimization (<50kb target)
-  - ❌ Demo HTML pages need updating with latest build
+  - ✅ OAuth verification badge support (green checkmark)
+  - ✅ Verified badge in all layouts (carousel, grid, list, masonry, wall)
+  - ✅ Relative date formatting ("2 days ago")
+  - ✅ Avatar support (images + initials fallback)
+  - ✅ "Powered by Tresta" branding footer
+  - ✅ Demo HTML pages updated with branding
+  - ✅ Production build: 42.39 KB (IIFE), 58.61 KB (ESM)
   - ❌ Live preview in dashboard
+  - ❌ CDN deployment configuration
 - **Files:**
   - `packages/widget/src/widget.ts` (main class)
   - `packages/widget/src/index.ts` (entry point)
   - `packages/widget/src/types.ts` (type definitions)
-  - `packages/widget/src/styles.ts` (style generation)
-  - `packages/widget/src/renderer.ts` (layout rendering)
-  - `packages/widget/src/carousel.ts` (carousel module)
+  - `packages/widget/src/styles.ts` (style generation + verified badge styles)
+  - `packages/widget/src/renderer.ts` (layout rendering + branding)
+  - `packages/widget/src/carousel.ts` (carousel module + verified badge)
   - `packages/widget/vite.config.ts` (build config)
   - `packages/widget/demo.html` (demo page)
+  - `packages/widget/index.html` (comprehensive demo)
 
 #### 8.7 Widget Analytics ❌
 - **Status:** ❌ Not Started
