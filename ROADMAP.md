@@ -1,7 +1,7 @@
 # Tresta - Product Roadmap to Launch
 
-**Last Updated:** November 2025  
-**Current Version:** MVP v1.0 (90% Complete)  
+**Last Updated:** November 7, 2025  
+**Current Version:** MVP v1.0 (95% Complete)  
 **Target Launch:** Q1 2025
 
 ---
@@ -17,13 +17,15 @@
 ## 📊 Current Status Overview
 
 ```
-█████████████████████░░░  90% Complete
+█████████████████████░░  95% Complete
 
 Core Features:        ████████████████████  100% ✅
+Auto-Moderation:      ████████████████████  100% ✅
+OAuth Verification:   ████████████████████  100% ✅
 Widget System:        ██████████████████░░   90% 🚧
-Polish & Enhancement: ████░░░░░░░░░░░░░░░░   20% 🚧
+Polish & Enhancement: ████████░░░░░░░░░░░░   40% 🚧
 Testing:              ░░░░░░░░░░░░░░░░░░░░    0% ⚪
-Documentation:        ████░░░░░░░░░░░░░░░░   20% 🚧
+Documentation:        ██████░░░░░░░░░░░░░░   30% 🚧
 ```
 
 ---
@@ -73,19 +75,46 @@ Documentation:        ████░░░░░░░░░░░░░░░�
 
 #### Epic 4: Testimonial Moderation ✅
 - [x] View all testimonials
-- [x] Filter by status (pending/approved/published)
+- [x] Filter by status (pending/approved/published/flagged/rejected)
+- [x] Filter by verification status (verified/unverified)
 - [x] Search testimonials
 - [x] Approve/reject testimonials
 - [x] Publish/unpublish testimonials
 - [x] Delete testimonials
 - [x] Testimonial cards with full details
+- [x] Auto-moderation system with sentiment analysis ✨ (November 2025)
+- [x] Profanity detection and filtering ✨ (November 2025)
+- [x] Spam pattern detection ✨ (November 2025)
+- [x] Risk scoring and moderation flags ✨ (November 2025)
+- [x] Bulk moderation actions (Approve/Flag/Reject) ✨ (November 2025)
+- [x] Integrated moderation UI with badges ✨ (November 2025)
+- [x] Migration script for existing testimonials ✨ (November 2025)
 
-#### Epic 5: Dashboard ✅
+#### Epic 5: OAuth Verification & Trust ✅ (November 2025)
+- [x] Google OAuth integration for testimonials ✨
+- [x] Server-side ID token verification ✨
+- [x] Auto-fill form from OAuth profile ✨
+- [x] Avatar sync from Google profile ✨
+- [x] Verified badge display in all widgets ✨
+- [x] Verification filter in testimonial list ✨
+- [x] Project-level auto-approve for verified users ✨
+
+#### Epic 6: Dashboard ✅
 - [x] Overview dashboard with stats
 - [x] Recent projects list
 - [x] Quick actions
 - [x] Getting started guide
 - [x] Empty state for new users
+
+#### Epic 7: Account Management ✅ (November 2025)
+- [x] Custom account settings page ✨
+- [x] Profile image upload with 5MB validation ✨
+- [x] Password management (conditional for OAuth users) ✨
+- [x] Connected accounts display ✨
+- [x] Data export (JSON with all user data) ✨
+- [x] Account deletion with confirmation ✨
+- [x] Privacy transparency page ✨
+- [x] GDPR-compliant data portability ✨
 
 ---
 

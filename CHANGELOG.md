@@ -4,6 +4,190 @@ All notable changes to the Tresta project will be documented in this file.
 
 ## [Unreleased]
 
+### Added - 2024-11-07 (Evening) - Moderation UX Overhaul
+
+#### Complete Design System Transformation
+
+**Feature:** Minimal aesthetic overhaul of moderation system with strategic color usage and granular loading states.
+
+**UI/UX Changes:**
+
+**1. Design System Principles:**
+- **Minimal aesthetic**: Removed all bright backgrounds (yellow/orange/green/red/blue)
+- **Strategic colors**: 
+  - Primary (teal): Positive actions, verification, published states
+  - Destructive (red): Warnings, risks, flagged/rejected content
+  - Muted/neutral: All other elements
+- **Compact layouts**: Horizontal flex rows instead of grids (90% space reduction)
+- **Subtle accents**: 5-10% opacity backgrounds, 10-30% opacity borders
+
+**2. Component Updates:**
+
+- **Moderation Stats Dashboard** (`apps/web/components/moderation/moderation-stats-dashboard.tsx`):
+  - Single horizontal flex row (was 2x4 grid)
+  - Total count in bordered box
+  - Small dots (h-2 w-2) for neutral states
+  - Icons only for warnings (AlertTriangle, XCircle)
+  - Conditional rendering (only shows when count > 0)
+  - Removed percentages and verbose labels
+
+- **Moderation Testimonial Card** (`apps/web/components/moderation/moderation-testimonial-card.tsx`):
+  - Clean p-6 padding throughout
+  - Avatar fallback with primary accent (bg-primary/5)
+  - Verified badge with subtle primary styling
+  - Risk badges use destructive for high risk (≥70%)
+  - Granular per-action loading states
+  - Only clicked button shows spinner
+
+- **Filter Presets** (`apps/web/components/moderation/filter-presets.tsx`):
+  - Removed colored variants (warning/destructive/info)
+  - Active state uses subtle primary
+  - Clean outline buttons only
+
+- **Regular Testimonial Cards** (`apps/web/components/testimonial-card.tsx`):
+  - Matched moderation card layout
+  - Single CardContent (removed CardHeader/CardFooter)
+  - Status badges: Published (primary), Pending (muted)
+  - Star ratings use primary instead of yellow
+  - Moderation flags shown inline (no tooltips)
+
+- **Testimonial List Header** (`apps/web/components/testimonial-list.tsx`):
+  - Compact horizontal stats layout
+  - Small dots for status indicators
+  - Icons only for warnings
+  - Removed dividers and badge groups
+
+**3. Loading State System:**
+
+- **Granular Per-Action Loading** (`apps/web/components/testimonial-list.tsx`):
+  - State structure: `{ id: string; action: string } | null`
+  - Action types: 'approve', 'reject', 'publish', 'unpublish', 'delete'
+  - Button-specific spinners (only clicked button loads)
+  - Other buttons remain interactive during action
+  - Loading state cleared in `finally` blocks
+
+**4. Backend Support:**
+
+- **Update Testimonial Endpoint** (`apps/api/src/controllers/testimonial.controller.ts`):
+  - Added `moderationStatus` to accepted fields
+  - Now updates moderationStatus alongside isApproved/isPublished
+  - Ensures frontend button visibility logic works correctly
+
+**5. Type System:**
+
+- **Frontend Types** (`apps/web/types/api.ts`):
+  - Added `moderationStatus?: ModerationStatus` to `UpdateTestimonialPayload`
+
+**6. Cache Management:**
+
+- **TanStack Query Mutations** (`apps/web/lib/queries/testimonials.ts`):
+  - Added `refetchType: 'active'` to invalidation
+  - Forces immediate refetch after mutations
+  - Ensures instant UI updates after actions
+
+**7. Cleanup:**
+- Removed corrupted `moderation-queue.tsx` file (1168 lines of broken code)
+- Component was not being used anywhere
+- Functionality already implemented in `TestimonialList` with `moderationMode` prop
+
+**Before/After Examples:**
+
+```tsx
+// BEFORE: Large grid with colored backgrounds
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  <Card className="bg-yellow-100 border-yellow-500">
+    <CardContent className="p-6">
+      <div className="flex items-center gap-3">
+        <Clock className="h-8 w-8 text-yellow-600" />
+        <div>
+          <p className="text-sm text-yellow-600">Pending</p>
+          <p className="text-2xl font-bold">12</p>
+          <p className="text-xs text-yellow-600">(30%)</p>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+
+// AFTER: Compact horizontal row with subtle accents
+<div className="flex items-center gap-4 pb-4 border-b flex-wrap">
+  <div className="px-3 py-1 rounded-md border bg-muted/30">
+    <span className="text-sm font-medium">4 Total</span>
+  </div>
+  {pending > 0 && (
+    <div className="flex items-center gap-2 text-sm">
+      <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+      <span className="text-muted-foreground">{pending} Pending</span>
+    </div>
+  )}
+</div>
+```
+
+### Added - 2024-11-07 (Morning) - Auto-Moderation System
+
+#### Auto-Moderation System with Advanced Sentiment Analysis
+
+**Feature:** AI-powered content moderation system to automatically filter spam, profanity, and inappropriate testimonials with sentiment analysis.
+
+**Implementation:**
+- **Auto-Moderation Service** (`apps/api/src/services/moderation.service.ts`):
+  - Multi-category profanity detection (severe, mild, offensive)
+  - Advanced sentiment analysis with weighted keywords
+  - Sentiment scoring from -1 (very negative) to +1 (very positive)
+  - Five sentiment categories: very_negative, negative, neutral, positive, very_positive
+  - Spam pattern detection (excessive caps, repeated characters, URLs)
+  - Risk score calculation (0-1, higher = more problematic)
+  - Detailed moderation flags with reasons
+  
+- **Database Schema** (Migration: `20251106144930_add_auto_moderation`):
+  - Added `ModerationStatus` enum: PENDING, APPROVED, REJECTED, FLAGGED
+  - Added `moderationStatus`, `moderationScore`, `moderationFlags`, `autoPublished` to Testimonial model
+  - Project-level moderation settings: `autoModeration`, `autoApproveVerified`, `profanityFilterLevel`
+  
+- **Migration Script for Existing Data**:
+  - Created `apps/api/src/scripts/migrate-existing-testimonials.ts`
+  - Batch processes existing PENDING testimonials (50 at a time)
+  - Respects project-level auto-moderation settings
+  - Run via `pnpm migrate:testimonials` command
+  - Outputs detailed statistics (approved/flagged/rejected counts)
+  
+- **Integrated Moderation UI** (`apps/web/components/testimonial-list.tsx`):
+  - Replaced separate moderation page with inline moderation
+  - Select All checkbox for bulk operations
+  - Moderation status filter dropdown (PENDING/APPROVED/FLAGGED/REJECTED)
+  - Individual checkboxes per testimonial card
+  - Fixed bottom bulk actions bar (Approve/Flag/Reject buttons)
+  - Moderation stats badges in header
+  
+- **Enhanced Testimonial Cards** (`apps/web/components/testimonial-card.tsx`):
+  - Color-coded moderation badges (Green Shield, Red AlertTriangle, Red XCircle)
+  - Detailed tooltips showing risk score and moderation flags
+  - Visual integration with status and verification badges
+  - Truncated flag display (first 3 + count of remaining)
+
+**UX Improvements:**
+- No separate moderation page needed - all inline
+- Quick bulk moderation actions
+- Fixed action bar prevents layout shift
+- Clear visual indicators for flagged/rejected content
+- Transparent moderation reasons via tooltips
+
+**Files Added:**
+- `apps/api/src/services/moderation.service.ts` - Core moderation logic (450+ lines)
+- `apps/api/src/scripts/migrate-existing-testimonials.ts` - Data migration script
+- `packages/database/prisma/migrations/20251106144930_add_auto_moderation/` - Schema migration
+
+**Files Modified:**
+- `apps/api/src/controllers/testimonial.controller.ts` - Integrated moderation on create
+- `apps/web/components/testimonial-list.tsx` - Bulk actions and filters
+- `apps/web/components/testimonial-card.tsx` - Moderation badges
+- `apps/api/package.json` - Added `migrate:testimonials` script
+
+**Dependencies:**
+- No new external dependencies (uses built-in string matching)
+
+---
+
 ### Added - 2024-11-06
 
 #### Custom Account Settings with Privacy Transparency

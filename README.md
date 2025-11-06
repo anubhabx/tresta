@@ -5,7 +5,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.x-green)](https://www.prisma.io/)
+[![MVP Progress](https://img.shields.io/badge/MVP-95%25-brightgreen)](PROJECT_STATUS.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+> **📊 Project Status:** 95% complete - [View detailed status report](PROJECT_STATUS.md)
 
 ---
 
@@ -27,11 +30,18 @@
 
 Tresta is a comprehensive testimonial management platform that enables businesses to:
 - 🎯 Collect verified testimonials from customers via customizable forms
-- ✅ Manage and moderate testimonials with OAuth verification
+- 🛡️ Automatically moderate content with advanced sentiment analysis
+- ✅ Manage and moderate testimonials with OAuth verification and bulk actions
 - 🎨 Display testimonials on any website using embeddable widgets
 - 📊 Track testimonial performance and analytics
 
 Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provides a seamless experience for both platform owners and end-users.
+
+**Recent Updates (November 2025):**
+- ✅ Auto-moderation system with sentiment analysis
+- ✅ Google OAuth verification with trust badges
+- ✅ Custom account settings with GDPR compliance
+- ✅ Integrated moderation UI with bulk actions
 
 ---
 
@@ -39,12 +49,25 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 
 ### Core Features (MVP - Completed)
 - ✅ **OAuth Verification** - Google Sign-In for verified testimonials with trust badges
+- ✅ **Auto-Moderation** - AI-powered spam and profanity filtering with sentiment analysis
 - ✅ **Avatar Support** - Auto-sync from OAuth providers, Azure Blob Storage integration
 - ✅ **Embeddable Widgets** - Standalone JavaScript widgets (carousel, grid, masonry, wall, list)
 - ✅ **Project Management** - Create and manage multiple testimonial projects
 - ✅ **Testimonial Forms** - Public-facing forms with customizable branding
-- ✅ **Admin Dashboard** - Full-featured management interface
+- ✅ **Admin Dashboard** - Full-featured management interface with bulk moderation
 - ✅ **Source Tracking** - IP address, user agent, and source metadata capture
+- ✅ **Custom Account Settings** - Profile management with privacy transparency page
+- ✅ **Data Export & Deletion** - GDPR-compliant data portability and account deletion
+
+### Moderation Features
+- 🛡️ **Advanced Sentiment Analysis** - Weighted keyword detection with 5-category sentiment scoring
+- 🤖 **Profanity Detection** - Multi-category filtering (severe, mild, offensive)
+- 🚫 **Spam Detection** - Pattern matching for excessive caps, repetition, and URLs
+- 📊 **Risk Scoring** - 0-1 scale for problematic content identification
+- ⚙️ **Project-Level Settings** - Configurable moderation rules and auto-approval
+- 🔍 **Inline Moderation UI** - Integrated filters, badges, and bulk actions
+- 📦 **Batch Processing** - Bulk approve/flag/reject with fixed action bar
+- 🔄 **Migration Tools** - Scripts to moderate existing testimonials
 
 ### Widget Features
 - 🎨 **5 Layout Types**: Carousel, Grid, Masonry, Wall, List
@@ -53,19 +76,21 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - 📦 **Zero Dependencies**: Pure vanilla JavaScript, CDN-ready
 - ⚡ **Auto-initialization**: Detects and initializes from script tags
 - 🎯 **Performance**: Optimized bundle (42.39 KB IIFE, 58.61 KB ESM)
+- ✅ **Verified Badges**: Display OAuth verification status in all layouts
 
 ### Authentication & Security
 - 🔐 **Clerk Authentication** - Secure user management and OAuth
 - 🛡️ **CORS Protection** - Configured for secure cross-origin requests
 - 🔒 **JWT Tokens** - Bearer token authentication for API
+- 🔑 **OAuth Providers** - Google, GitHub integration
 - 🚫 **Rate Limiting** - Protection against abuse (planned)
 
 ### Coming Soon (In Development)
-- 🤖 **Auto-Moderation** - AI-powered spam and content filtering
 - 📊 **Analytics Dashboard** - Detailed source tracking and performance metrics
-- 🎬 **Rich Media** - Video and audio testimonial support
+- 🎬 **Rich Media** - Video and audio testimonial support (routes implemented)
 - 🌐 **Multi-Language** - Internationalization support
 - 🔗 **Webhooks** - Integration with external services
+- 🧠 **Smart AI Selection** - Intelligent testimonial optimization
 
 ---
 
@@ -320,11 +345,27 @@ pnpm prisma migrate deploy
 
 ## 📚 Documentation
 
-- [Feature Plan](FEATURE_PLAN.md) - Planned features and architecture
-- [Changelog](CHANGELOG.md) - Version history and updates
-- [Widget API](WIDGET_API.md) - Widget integration guide
-- [Testing Guide](TESTING_GUIDE.md) - Testing strategies
-- [Roadmap](ROADMAP.md) - Future development plans
+Comprehensive documentation is available in the repository:
+
+### Project Documentation
+- **[Project Status](PROJECT_STATUS.md)** - Detailed completion status and accomplishments (95% complete)
+- **[Features](FEATURES.md)** - Complete feature implementation status and details
+- **[Roadmap](ROADMAP.md)** - Development timeline and future plans
+- **[Changelog](CHANGELOG.md)** - Version history and recent changes
+- **[PRD](PRD.MD)** - Product Requirements Document
+
+### Technical Documentation
+- **[Feature Plan](FEATURE_PLAN.md)** - Planned enhancements and architecture improvements
+- **[Widget API](WIDGET_API.md)** - Widget integration guide and API reference
+- **[Testing Guide](TESTING_GUIDE.md)** - Testing strategies and guidelines
+- **[Moderation UX](MODERATION_UX_IMPROVEMENTS.md)** - Auto-moderation implementation details
+- **[Copilot Instructions](.github/copilot-instructions.md)** - Development patterns and conventions
+
+### Quick Links
+- 🚀 **[Getting Started](#getting-started)** - Setup and development
+- 🎨 **[Widget Layouts](packages/widget/README.md)** - Widget customization
+- 🔐 **[Authentication](apps/api/src/middleware/auth.middleware.ts)** - Auth implementation
+- 📊 **[Database Schema](packages/database/prisma/schema.prisma)** - Data models
 
 ---
 
