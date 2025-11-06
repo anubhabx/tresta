@@ -11,14 +11,23 @@ import {
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage
-} from "@workspace/ui/components/avatar";
+import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Label } from "@workspace/ui/components/label";
 import { Input } from "@workspace/ui/components/input";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@workspace/ui/components/alert-dialog";
 import { InlineLoader } from "./loader";
 import {
   UserIcon,
@@ -28,7 +37,11 @@ import {
   CameraIcon,
   ShieldCheckIcon,
   LinkIcon,
-  CheckCircle2Icon
+  CheckCircle2Icon,
+  DownloadIcon,
+  TrashIcon,
+  DatabaseIcon,
+  ShieldAlertIcon
 } from "lucide-react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 import { Badge } from "@workspace/ui/components/badge";
@@ -41,10 +54,12 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
   const { user: currentUser } = useUser();
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Check if user has password authentication (not OAuth-only)
   const hasPassword = user.passwordEnabled;
-  
+
   // Get external accounts (OAuth connections)
   const externalAccounts = user.externalAccounts || [];
   const hasGoogleAccount = externalAccounts.some(
@@ -76,7 +91,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
       await currentUser.update({
         firstName: firstName || undefined,
-        lastName: lastName || undefined,
+        lastName: lastName || undefined
       });
 
       toast.success("Profile updated successfully!");
@@ -182,6 +197,85 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
     }
   };
 
+  const handleExportData = async () => {
+    if (!currentUser) {
+      toast.error("User not found");
+      return;
+    }
+
+    try {
+      setExportLoading(true);
+      
+      // Collect user data
+      const userData = {
+        account: {
+          id: user.id,
+          email: user.primaryEmailAddress?.emailAddress,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          imageUrl: user.imageUrl,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        emailAddresses: user.emailAddresses.map(email => ({
+          email: email.emailAddress,
+          verified: email.verification?.status === "verified",
+        })),
+        externalAccounts: user.externalAccounts.map(account => ({
+          provider: account.provider,
+          email: account.emailAddress,
+          username: account.username,
+        })),
+        exportedAt: new Date().toISOString(),
+      };
+
+      // Create downloadable JSON file
+      const dataStr = JSON.stringify(userData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `tresta-account-data-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Account data exported successfully!");
+    } catch (error: any) {
+      console.error("Export data error:", error);
+      toast.error("Failed to export data");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!currentUser) {
+      toast.error("User not found");
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      
+      // Note: Clerk's delete method will sign out the user and delete their account
+      await currentUser.delete();
+      
+      toast.success("Account deleted successfully. Redirecting...");
+      
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    } catch (error: any) {
+      console.error("Delete account error:", error);
+      toast.error(error?.errors?.[0]?.message || "Failed to delete account");
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Profile Image Section */}
@@ -196,15 +290,11 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
         <CardContent>
           <div className="flex items-center gap-6">
             <div className="relative">
-              <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src={user.imageUrl}
-                  alt={user.firstName || "User"}
-                />
-                <AvatarFallback>
-                  <UserIcon className="h-12 w-12" />
-                </AvatarFallback>
-              </Avatar>
+              <CustomAvatar
+                src={user.imageUrl}
+                name={user.firstName || "User"}
+                size="lg"
+              />
               {imageLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
                   <InlineLoader />
@@ -406,10 +496,13 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
             <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
               <ShieldCheckIcon className="h-5 w-5 text-blue-500 mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm font-medium">OAuth Authentication Active</p>
+                <p className="text-sm font-medium">
+                  OAuth Authentication Active
+                </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Your account uses social sign-in (Google/GitHub) for authentication. 
-                  Password management is not available for OAuth-only accounts.
+                  Your account uses social sign-in (Google/GitHub) for
+                  authentication. Password management is not available for
+                  OAuth-only accounts.
                 </p>
               </div>
             </div>
@@ -432,8 +525,8 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           {/* Google Account */}
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <FaGoogle className="h-5 w-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <FaGoogle className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-medium">Google</p>
@@ -458,8 +551,8 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           {/* GitHub Account */}
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gray-500/10">
-                <FaGithub className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <FaGithub className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-medium">GitHub</p>
@@ -517,6 +610,183 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 ? new Date(user.updatedAt).toLocaleDateString()
                 : "N/A"}
             </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data & Privacy */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DatabaseIcon className="h-5 w-5" />
+            Data & Privacy
+          </CardTitle>
+          <CardDescription>
+            Manage your data and privacy settings
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Export Data Section */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <DownloadIcon className="h-5 w-5 text-blue-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">Export Your Data</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Download a copy of your account information, including profile
+                  details and connected accounts.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportData}
+                disabled={exportLoading}
+              >
+                {exportLoading ? (
+                  <>
+                    <InlineLoader />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <DownloadIcon className="h-4 w-4 mr-2" />
+                    Export Data (JSON)
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Data Information */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium">What data do we store?</h4>
+            <ul className="space-y-2 text-xs text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Account information (name, email, profile picture)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Projects you create and manage</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Testimonials submitted to your projects</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Widget configurations and settings</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Usage analytics (anonymized)</span>
+              </li>
+            </ul>
+          </div>
+
+          <Separator />
+
+          {/* Delete Account Section */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <ShieldAlertIcon className="h-5 w-5 text-red-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  Delete Account
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Permanently delete your account and all associated data. This
+                  action cannot be undone and will remove:
+                </p>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <TrashIcon className="h-3 w-3 text-red-500 mt-0.5 flex-shrink-0" />
+                    <span>All your projects and testimonials</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TrashIcon className="h-3 w-3 text-red-500 mt-0.5 flex-shrink-0" />
+                    <span>All widget configurations</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TrashIcon className="h-3 w-3 text-red-500 mt-0.5 flex-shrink-0" />
+                    <span>Your profile and account information</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TrashIcon className="h-3 w-3 text-red-500 mt-0.5 flex-shrink-0" />
+                    <span>All connected social accounts</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={deleteLoading}>
+                    <TrashIcon className="h-4 w-4 mr-2" />
+                    Delete My Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogPortal>
+                  <AlertDialogOverlay />
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-red-600 dark:text-red-400">
+                        Delete Account Permanently?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-3">
+                        <p>
+                          This action is <strong>irreversible</strong>. All your
+                          data will be permanently deleted, including:
+                        </p>
+                        <ul className="space-y-1 text-sm">
+                          <li>• All projects and testimonials</li>
+                          <li>• All widget configurations</li>
+                          <li>• Your profile and account information</li>
+                          <li>• All connected social accounts</li>
+                        </ul>
+                        <p className="text-sm font-medium pt-2">
+                          Are you absolutely sure you want to continue?
+                        </p>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={deleteLoading}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction asChild>
+                        <Button
+                          variant="destructive"
+                          className="text-white"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDeleteAccount();
+                          }}
+                          disabled={deleteLoading}
+                        >
+                          {deleteLoading ? (
+                            <>
+                              <InlineLoader />
+                              Deleting...
+                            </>
+                          ) : (
+                            <>
+                              <TrashIcon className="h-4 w-4 mr-2" />
+                              Yes, Delete My Account
+                            </>
+                          )}
+                        </Button>
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialogPortal>
+              </AlertDialog>
+            </div>
           </div>
         </CardContent>
       </Card>
