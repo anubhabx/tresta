@@ -17,7 +17,7 @@ import {
   ShieldCheck,
   AlertTriangle,
   Shield,
-  Info,
+  Info
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
@@ -27,7 +27,7 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
+  CardHeader
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -40,13 +40,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@workspace/ui/components/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from "@workspace/ui/components/tooltip";
 
 interface TestimonialCardProps {
@@ -64,7 +64,7 @@ export function TestimonialCard({
   onReject,
   onPublish,
   onUnpublish,
-  onDelete,
+  onDelete
 }: TestimonialCardProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -108,26 +108,32 @@ export function TestimonialCard({
     if (!testimonial.moderationStatus) return null;
 
     switch (testimonial.moderationStatus) {
-      case 'APPROVED':
+      case "APPROVED":
         return (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="border-green-500 text-green-600">
+                <Badge
+                  variant="outline"
+                  className="border-green-500 text-green-600"
+                >
                   <Shield className="h-3 w-3 mr-1" />
                   Moderated
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Auto-moderation: Approved</p>
-                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
-                  <p className="text-xs">Score: {testimonial.moderationScore.toFixed(2)}</p>
-                )}
+                {testimonial.moderationScore !== null &&
+                  testimonial.moderationScore !== undefined && (
+                    <p className="text-xs">
+                      Score: {testimonial.moderationScore.toFixed(2)}
+                    </p>
+                  )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         );
-      case 'FLAGGED':
+      case "FLAGGED":
         return (
           <TooltipProvider>
             <Tooltip>
@@ -139,57 +145,76 @@ export function TestimonialCard({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="font-semibold mb-1">Flagged for Review</p>
-                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
-                  <p className="text-xs mb-1">Risk Score: {testimonial.moderationScore.toFixed(2)}</p>
-                )}
-                {testimonial.moderationFlags && Array.isArray(testimonial.moderationFlags) && testimonial.moderationFlags.length > 0 && (
-                  <ul className="text-xs space-y-0.5">
-                    {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
-                      <li key={i}>• {flag}</li>
-                    ))}
-                    {testimonial.moderationFlags.length > 3 && (
-                      <li className="text-muted-foreground">+{testimonial.moderationFlags.length - 3} more</li>
-                    )}
-                  </ul>
-                )}
+                {testimonial.moderationScore !== null &&
+                  testimonial.moderationScore !== undefined && (
+                    <p className="text-xs mb-1">
+                      Risk Score: {testimonial.moderationScore.toFixed(2)}
+                    </p>
+                  )}
+                {testimonial.moderationFlags &&
+                  Array.isArray(testimonial.moderationFlags) &&
+                  testimonial.moderationFlags.length > 0 && (
+                    <ul className="text-xs space-y-0.5">
+                      {testimonial.moderationFlags
+                        .slice(0, 3)
+                        .map((flag: string, i: number) => (
+                          <li key={i}>• {flag}</li>
+                        ))}
+                      {testimonial.moderationFlags.length > 3 && (
+                        <li className="text-muted-foreground">
+                          +{testimonial.moderationFlags.length - 3} more
+                        </li>
+                      )}
+                    </ul>
+                  )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         );
-      case 'REJECTED':
+      case "REJECTED":
         return (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="border-red-500 text-red-600">
+                <Badge
+                  variant="outline"
+                  className="border-red-500 text-red-600"
+                >
                   <XCircle className="h-3 w-3 mr-1" />
                   Rejected
                 </Badge>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="font-semibold mb-1">Auto-Rejected</p>
-                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
-                  <p className="text-xs mb-1">Risk Score: {testimonial.moderationScore.toFixed(2)}</p>
-                )}
-                {testimonial.moderationFlags && Array.isArray(testimonial.moderationFlags) && testimonial.moderationFlags.length > 0 && (
-                  <ul className="text-xs space-y-0.5">
-                    {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
-                      <li key={i}>• {flag}</li>
-                    ))}
-                  </ul>
-                )}
+                {testimonial.moderationScore !== null &&
+                  testimonial.moderationScore !== undefined && (
+                    <p className="text-xs mb-1">
+                      Risk Score: {testimonial.moderationScore.toFixed(2)}
+                    </p>
+                  )}
+                {testimonial.moderationFlags &&
+                  Array.isArray(testimonial.moderationFlags) &&
+                  testimonial.moderationFlags.length > 0 && (
+                    <ul className="text-xs space-y-0.5">
+                      {testimonial.moderationFlags
+                        .slice(0, 3)
+                        .map((flag: string, i: number) => (
+                          <li key={i}>• {flag}</li>
+                        ))}
+                    </ul>
+                  )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         );
-      case 'PENDING':
+      case "PENDING":
       default:
         return null;
     }
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow h-full">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -199,44 +224,36 @@ export function TestimonialCard({
               name={testimonial.authorName}
               size="lg"
             />
-            
+
             {/* Author Info */}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-lg truncate">
                 {testimonial.authorName}
               </h3>
-              
-              {/* Role & Company */}
-              {(testimonial.authorRole || testimonial.authorCompany) && (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
-                  {testimonial.authorRole && (
-                    <>
-                      <Briefcase className="h-3.5 w-3.5" />
-                      <span className="truncate">{testimonial.authorRole}</span>
-                    </>
-                  )}
-                  {testimonial.authorRole && testimonial.authorCompany && (
-                    <span>•</span>
-                  )}
-                  {testimonial.authorCompany && (
-                    <>
-                      <Building2 className="h-3.5 w-3.5" />
-                      <span className="truncate">{testimonial.authorCompany}</span>
-                    </>
-                  )}
-                </div>
-              )}
-              
-              {/* Email */}
-              {testimonial.authorEmail && (
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                  <Mail className="h-3.5 w-3.5" />
-                  <span className="truncate">{testimonial.authorEmail}</span>
-                </div>
-              )}
+
+              {/* Role & Company - Always shown */}
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+                <Briefcase className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">
+                  {testimonial.authorRole || "Not provided"}
+                </span>
+                <span>•</span>
+                <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">
+                  {testimonial.authorCompany || "Not provided"}
+                </span>
+              </div>
+
+              {/* Email - Always shown */}
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">
+                  {testimonial.authorEmail || "Not provided"}
+                </span>
+              </div>
             </div>
           </div>
-          
+
           {/* Status Badges */}
           <div className="flex flex-col items-end gap-2">
             {getStatusBadge()}
@@ -245,13 +262,16 @@ export function TestimonialCard({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge variant="outline" className="bg-slate-950 border-slate-300 text-white hover:bg-slate-800 transition-colors duration-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-slate-950 border-slate-300 text-white hover:bg-slate-800 transition-colors duration-200"
+                    >
                       <ShieldCheck className="h-3 w-3 mr-1" />
                       Verified
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Verified via {testimonial.oauthProvider || 'OAuth'}</p>
+                    <p>Verified via {testimonial.oauthProvider || "OAuth"}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -285,7 +305,7 @@ export function TestimonialCard({
         )}
       </CardHeader>
 
-      <CardContent className="pb-4">
+      <CardContent className="pb-4 flex-1">
         <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
           {testimonial.content}
         </p>

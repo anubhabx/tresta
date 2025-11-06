@@ -307,12 +307,12 @@ export function TestimonialList({ projectSlug }: TestimonialListProps) {
             />
             <label
               htmlFor="select-all"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               Select All ({filteredTestimonials?.length || 0})
             </label>
             {selectedIds.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="secondary" className="ml-2 text-xs h-4">
                 {selectedIds.length} selected
               </Badge>
             )}

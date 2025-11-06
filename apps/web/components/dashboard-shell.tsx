@@ -46,8 +46,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <div className="flex items-center justify-center min-h-svh w-full">
           <UISidebar />
           <div className="flex-1 h-full p-2">
-            <div className="w-full h-full flex flex-col bg-background rounded-md px-4 p-6 shadow-lg">
-              <div className="fixed top-0 w-full max-w-[calc(100%-250px)] bg-background z-10">
+            <div className="w-full h-full flex flex-col bg-background rounded-md px-4 p-6 shadow-lg relative">
+              <div className="fixed top-0 w-full bg-background z-10">
                 <div className="border-b border-border py-2 flex gap-2 items-center text-sm relative">
                   <SidebarTrigger />
                   <UIBreadcrumb />
