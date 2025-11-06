@@ -14,7 +14,6 @@ import { ModerationStatsWidget } from "./moderation-stats-widget";
 import { ModerationFilters } from "./moderation-filters";
 import { ModerationBulkActions } from "./moderation-bulk-actions";
 import { ModerationTestimonialCard } from "./moderation-testimonial-card";
-import type { ModerationStatus } from "@/types/api";
 
 interface ModerationQueueProps {
   slug: string;
@@ -39,7 +38,6 @@ export function ModerationQueue({ slug }: ModerationQueueProps) {
 
   // Mutations
   const bulkActionMutation = moderation.mutations.useBulkAction(slug);
-  const updateStatusMutation = moderation.mutations.useUpdateStatus(slug, "");
 
   // Handlers
   const handleSelect = (id: string, selected: boolean) => {
@@ -74,14 +72,11 @@ export function ModerationQueue({ slug }: ModerationQueueProps) {
     action: "approve" | "reject" | "flag"
   ) => {
     try {
-      const payload =
-        action === "approve"
-          ? { status: "APPROVED" as ModerationStatus, isApproved: true, isPublished: true }
-          : action === "reject"
-          ? { status: "REJECTED" as ModerationStatus, isApproved: false, isPublished: false }
-          : { status: "FLAGGED" as ModerationStatus };
-
-      await updateStatusMutation.mutateAsync(payload);
+      // Use bulk action mutation for single items too
+      await bulkActionMutation.mutateAsync({
+        testimonialIds: [id],
+        action,
+      });
 
       toast.success(`Testimonial ${action}d successfully`);
     } catch (error) {
@@ -145,7 +140,7 @@ export function ModerationQueue({ slug }: ModerationQueueProps) {
         onRejectAll={() => handleBulkAction("reject")}
         onFlagAll={() => handleBulkAction("flag")}
         onClearSelection={handleClearSelection}
-        isLoading={bulkActionMutation.isPending || updateStatusMutation.isPending}
+        isLoading={bulkActionMutation.isPending}
       />
 
       {/* Testimonials List */}
