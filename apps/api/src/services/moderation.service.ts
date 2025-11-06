@@ -44,11 +44,27 @@ const SPAM_PHRASES = [
   'lose weight fast', 'get paid', 'cash bonus'
 ];
 
-// Negative sentiment keywords
-const NEGATIVE_KEYWORDS = [
-  'terrible', 'awful', 'horrible', 'worst', 'scam', 'fraud',
-  'ripoff', 'rip-off', 'waste', 'useless', 'pathetic', 'disgusting',
-  'garbage', 'trash', 'sucks', 'hate', 'never again'
+// Negative sentiment keywords (weighted by severity)
+const NEGATIVE_KEYWORDS_SEVERE = [
+  'scam', 'fraud', 'ripoff', 'rip-off', 'theft', 'steal', 'stolen',
+  'illegal', 'lawsuit', 'sue', 'lawyer'
+];
+
+const NEGATIVE_KEYWORDS_STRONG = [
+  'terrible', 'awful', 'horrible', 'worst', 'disgusting', 'pathetic',
+  'garbage', 'trash', 'hate', 'never again', 'avoid', 'waste of money'
+];
+
+const NEGATIVE_KEYWORDS_MODERATE = [
+  'bad', 'poor', 'disappointing', 'disappointed', 'unhappy', 'unsatisfied',
+  'mediocre', 'subpar', 'inadequate', 'lacking'
+];
+
+// Positive sentiment keywords for balance
+const POSITIVE_KEYWORDS = [
+  'excellent', 'amazing', 'outstanding', 'fantastic', 'wonderful',
+  'great', 'awesome', 'perfect', 'love', 'highly recommend',
+  'best', 'brilliant', 'superb', 'exceptional', 'impressed'
 ];
 
 // Disposable email domains
@@ -151,20 +167,71 @@ function checkSpamIndicators(text: string, email?: string): {
 }
 
 /**
- * Check for negative sentiment
+ * Advanced sentiment analysis with weighted scoring
+ */
+function analyzeSentiment(text: string): {
+  score: number; // -1 to 1 (negative to positive)
+  sentiment: 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive';
+  negativeKeywords: string[];
+  positiveKeywords: string[];
+} {
+  const lowerText = text.toLowerCase();
+  let score = 0;
+  
+  // Find negative keywords with weights
+  const severeNegative = NEGATIVE_KEYWORDS_SEVERE.filter(keyword =>
+    new RegExp(`\\b${keyword}\\b`, 'i').test(lowerText)
+  );
+  const strongNegative = NEGATIVE_KEYWORDS_STRONG.filter(keyword =>
+    new RegExp(`\\b${keyword}\\b`, 'i').test(lowerText)
+  );
+  const moderateNegative = NEGATIVE_KEYWORDS_MODERATE.filter(keyword =>
+    new RegExp(`\\b${keyword}\\b`, 'i').test(lowerText)
+  );
+  
+  // Find positive keywords
+  const positiveFound = POSITIVE_KEYWORDS.filter(keyword =>
+    new RegExp(`\\b${keyword}\\b`, 'i').test(lowerText)
+  );
+  
+  // Calculate weighted score
+  score -= severeNegative.length * 0.4;
+  score -= strongNegative.length * 0.25;
+  score -= moderateNegative.length * 0.15;
+  score += positiveFound.length * 0.2;
+  
+  // Normalize to -1 to 1 range
+  score = Math.max(-1, Math.min(1, score));
+  
+  // Determine sentiment category
+  let sentiment: 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive';
+  if (score <= -0.6) sentiment = 'very_negative';
+  else if (score <= -0.2) sentiment = 'negative';
+  else if (score >= 0.4) sentiment = 'very_positive';
+  else if (score >= 0.1) sentiment = 'positive';
+  else sentiment = 'neutral';
+  
+  const allNegative = [...severeNegative, ...strongNegative, ...moderateNegative];
+  
+  return {
+    score,
+    sentiment,
+    negativeKeywords: allNegative,
+    positiveKeywords: positiveFound
+  };
+}
+
+/**
+ * Check for negative sentiment (deprecated - use analyzeSentiment instead)
  */
 function checkNegativeSentiment(text: string): {
   isNegative: boolean;
   keywords: string[];
 } {
-  const lowerText = text.toLowerCase();
-  const foundKeywords = NEGATIVE_KEYWORDS.filter(keyword =>
-    new RegExp(`\\b${keyword}\\b`, 'i').test(lowerText)
-  );
-
+  const analysis = analyzeSentiment(text);
   return {
-    isNegative: foundKeywords.length >= 2, // Flag if 2+ negative keywords
-    keywords: foundKeywords
+    isNegative: analysis.sentiment === 'very_negative' || analysis.sentiment === 'negative',
+    keywords: analysis.negativeKeywords
   };
 }
 
@@ -266,11 +333,19 @@ export async function moderateTestimonial(
     status = status === 'PENDING' ? 'FLAGGED' : status;
   }
 
-  // Check negative sentiment
-  const sentimentCheck = checkNegativeSentiment(content);
-  if (sentimentCheck.isNegative) {
-    flags.push(`Negative sentiment: ${sentimentCheck.keywords.join(', ')}`);
+  // Advanced sentiment analysis
+  const sentimentAnalysis = analyzeSentiment(content);
+  if (sentimentAnalysis.sentiment === 'very_negative') {
+    flags.push(`Very negative sentiment detected: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
+    status = 'REJECTED';
+  } else if (sentimentAnalysis.sentiment === 'negative') {
+    flags.push(`Negative sentiment: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
     status = status === 'PENDING' ? 'FLAGGED' : status;
+  }
+  
+  // Bonus for positive sentiment
+  if (sentimentAnalysis.sentiment === 'very_positive' || sentimentAnalysis.sentiment === 'positive') {
+    flags.push(`Positive sentiment detected (${sentimentAnalysis.positiveKeywords.length} positive indicators)`);
   }
 
   // Check blocked domains

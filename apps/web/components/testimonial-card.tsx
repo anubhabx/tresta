@@ -15,6 +15,9 @@ import {
   Briefcase,
   Building2,
   ShieldCheck,
+  AlertTriangle,
+  Shield,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
@@ -101,6 +104,90 @@ export function TestimonialCard({
     );
   };
 
+  const getModerationBadge = () => {
+    if (!testimonial.moderationStatus) return null;
+
+    switch (testimonial.moderationStatus) {
+      case 'APPROVED':
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="border-green-500 text-green-600">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Moderated
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Auto-moderation: Approved</p>
+                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
+                  <p className="text-xs">Score: {testimonial.moderationScore.toFixed(2)}</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      case 'FLAGGED':
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="destructive">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Flagged
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="font-semibold mb-1">Flagged for Review</p>
+                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
+                  <p className="text-xs mb-1">Risk Score: {testimonial.moderationScore.toFixed(2)}</p>
+                )}
+                {testimonial.moderationFlags && Array.isArray(testimonial.moderationFlags) && testimonial.moderationFlags.length > 0 && (
+                  <ul className="text-xs space-y-0.5">
+                    {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
+                      <li key={i}>• {flag}</li>
+                    ))}
+                    {testimonial.moderationFlags.length > 3 && (
+                      <li className="text-muted-foreground">+{testimonial.moderationFlags.length - 3} more</li>
+                    )}
+                  </ul>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      case 'REJECTED':
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="border-red-500 text-red-600">
+                  <XCircle className="h-3 w-3 mr-1" />
+                  Rejected
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="font-semibold mb-1">Auto-Rejected</p>
+                {testimonial.moderationScore !== null && testimonial.moderationScore !== undefined && (
+                  <p className="text-xs mb-1">Risk Score: {testimonial.moderationScore.toFixed(2)}</p>
+                )}
+                {testimonial.moderationFlags && Array.isArray(testimonial.moderationFlags) && testimonial.moderationFlags.length > 0 && (
+                  <ul className="text-xs space-y-0.5">
+                    {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
+                      <li key={i}>• {flag}</li>
+                    ))}
+                  </ul>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      case 'PENDING':
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="space-y-3 pb-4">
@@ -153,6 +240,7 @@ export function TestimonialCard({
           {/* Status Badges */}
           <div className="flex flex-col items-end gap-2">
             {getStatusBadge()}
+            {getModerationBadge()}
             {testimonial.isOAuthVerified && (
               <TooltipProvider>
                 <Tooltip>
