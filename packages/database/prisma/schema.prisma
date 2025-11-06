@@ -47,6 +47,13 @@ model Project {
   tags                 String[] // Array of tags for internal categorization
   visibility           ProjectVisibility  @default(PRIVATE)
   isActive             Boolean            @default(true)
+  
+  // Auto-Moderation Settings
+  autoModeration       Boolean            @default(true) // Enable auto-moderation
+  autoApproveVerified  Boolean            @default(false) // Auto-approve verified users
+  profanityFilterLevel String?            @default("MODERATE") // STRICT, MODERATE, LENIENT
+  moderationSettings   Json?              // Custom moderation rules
+  
   testimonials         Testimonial[]
   widgets              Widget[]
 
@@ -110,6 +117,12 @@ model Testimonial {
   oauthProvider   String?       @db.VarChar(50) // e.g., "google", "github"
   oauthSubject    String?       @db.VarChar(255) // OAuth subject/user ID for verification
 
+  // Auto-Moderation
+  moderationStatus  ModerationStatus @default(PENDING)
+  moderationScore   Float?           // 0-1, higher = more likely spam
+  moderationFlags   Json?            // Array of detected issues
+  autoPublished     Boolean          @default(false) // True if auto-approved by moderation
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -128,6 +141,13 @@ enum TestimonialType {
   TEXT
   VIDEO
   AUDIO
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
 }
 
 model Widget {
