@@ -280,8 +280,11 @@ export class TrestaWidget {
       role: t.authorRole || '',
       company: t.authorCompany,
       content: t.content,
-      avatar: t.authorImage,
+      avatar: t.authorAvatar,
       rating: t.rating,
+      createdAt: t.createdAt,
+      isOAuthVerified: t.isOAuthVerified,
+      oauthProvider: t.oauthProvider,
     }));
 
     // Use enhanced Carousel class
@@ -292,6 +295,8 @@ export class TrestaWidget {
       autoplaySpeed: settings.rotateInterval ?? 5000,
       showRating: settings.showRating ?? true,
       showCompany: settings.showAuthorCompany ?? true,
+      showAvatar: settings.showAvatar ?? true,
+      showDate: settings.showDate ?? true,
       onSlideChange: (index) => {
         this.currentSlide = index;
       },

@@ -2,6 +2,10 @@ import { verifyWebhook } from "@clerk/express/webhooks";
 import type { NextFunction, Request, Response } from "express";
 
 import { prisma } from "@workspace/database/prisma";
+import {
+  blobStorageService,
+  StorageDirectory,
+} from "../services/blob-storage.service.ts";
 
 export const syncUserToDB = async (
   req: Request,
@@ -25,7 +29,7 @@ export const syncUserToDB = async (
     console.log("Clerk Webhook Event:", evt.type);
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
-      const { id, email_addresses, first_name, last_name } = evt.data;
+      const { id, email_addresses, first_name, last_name, image_url } = evt.data;
 
       const email = email_addresses.find(
         (email) => email.id === evt.data.primary_email_address_id
@@ -36,6 +40,22 @@ export const syncUserToDB = async (
         return;
       }
 
+      // Sync avatar from Clerk to Azure Blob Storage
+      let avatarUrl: string | null = null;
+      if (image_url) {
+        try {
+          avatarUrl = await blobStorageService.uploadFromUrl(
+            image_url,
+            StorageDirectory.AVATARS,
+            id
+          );
+          console.log(`Avatar synced for user ${id}: ${avatarUrl}`);
+        } catch (error) {
+          console.error("Error syncing avatar:", error);
+          // Continue even if avatar sync fails
+        }
+      }
+
       try {
         await prisma.user.upsert({
           where: { id },
@@ -43,13 +63,15 @@ export const syncUserToDB = async (
             email,
             firstName: first_name || null,
             lastName: last_name || null,
+            avatar: avatarUrl || undefined,
             updatedAt: new Date()
           },
           create: {
             id,
             email,
             firstName: first_name || null,
-            lastName: last_name || null
+            lastName: last_name || null,
+            avatar: avatarUrl || null
           }
         });
       } catch (error) {

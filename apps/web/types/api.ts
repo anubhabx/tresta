@@ -90,6 +90,9 @@ export interface Testimonial {
   id: string;
   authorName: string;
   authorEmail: string | null;
+  authorRole: string | null;
+  authorCompany: string | null;
+  authorAvatar: string | null;
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
   videoUrl: string | null;
@@ -97,6 +100,8 @@ export interface Testimonial {
   rating: number | null;
   isApproved: boolean;
   isPublished: boolean;
+  isOAuthVerified: boolean;
+  oauthProvider: string | null;
   projectId: string | null;
   Project?: {
     id: string;
@@ -170,6 +175,9 @@ export interface UpdateProjectPayload {
 export interface CreateTestimonialPayload {
   authorName: string;
   authorEmail?: string;
+  authorRole?: string;
+  authorCompany?: string;
+  authorAvatar?: string;
   content: string;
   rating?: number;
   type?: "TEXT" | "VIDEO" | "AUDIO";

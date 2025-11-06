@@ -12,9 +12,11 @@ export interface Testimonial {
   authorName: string;
   authorRole?: string;
   authorCompany?: string;
-  authorImage?: string;
+  authorAvatar?: string;  // Changed from authorImage to match database
   authorEmail?: string;
   createdAt: string;
+  isOAuthVerified?: boolean;
+  oauthProvider?: string | null;
 }
 
 export interface Widget {

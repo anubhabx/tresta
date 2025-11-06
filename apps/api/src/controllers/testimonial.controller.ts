@@ -12,6 +12,7 @@ import {
   extractPaginationParams,
   calculateSkip
 } from "../lib/response.ts";
+import { verifyGoogleIdToken } from "../lib/google-oauth.ts";
 
 const createTestimonial = async (
   req: Request,
@@ -20,7 +21,18 @@ const createTestimonial = async (
 ) => {
   try {
     const { slug } = req.params;
-    const { authorName, authorEmail, content, type, rating, videoUrl } = req.body;
+    const { 
+      authorName, 
+      authorEmail, 
+      authorRole,
+      authorCompany,
+      authorAvatar,
+      content, 
+      type, 
+      rating, 
+      videoUrl,
+      googleIdToken // Google OAuth ID token
+    } = req.body;
 
     // Validate required fields
     if (!authorName || !content) {
@@ -40,6 +52,42 @@ const createTestimonial = async (
     // Validate rating if provided
     if (rating !== undefined && (rating < 1 || rating > 5)) {
       throw new BadRequestError("Rating must be between 1 and 5");
+    }
+
+    // Validate optional fields length
+    if (authorRole && authorRole.length > 255) {
+      throw new BadRequestError("Author role must be less than 255 characters");
+    }
+
+    if (authorCompany && authorCompany.length > 255) {
+      throw new BadRequestError("Author company must be less than 255 characters");
+    }
+
+    // Verify Google OAuth token if provided
+    let googleProfile = null;
+    let isOAuthVerified = false;
+    let oauthSubject = null;
+
+    if (googleIdToken) {
+      googleProfile = await verifyGoogleIdToken(googleIdToken);
+      
+      if (!googleProfile) {
+        throw new BadRequestError("Invalid Google authentication token");
+      }
+
+      // Email verification check
+      if (!googleProfile.email_verified) {
+        throw new BadRequestError("Google email must be verified");
+      }
+
+      isOAuthVerified = true;
+      oauthSubject = googleProfile.sub;
+      
+      console.log("✅ Google OAuth verified:", {
+        email: googleProfile.email,
+        name: googleProfile.name,
+        verified: googleProfile.email_verified
+      });
     }
 
     // Find project by slug
@@ -64,11 +112,29 @@ const createTestimonial = async (
       type: type || "TEXT",
       isApproved: false,
       isPublished: false,
+      source: "web_form", // Track source as web form submission
+      ipAddress: req.ip, // Capture IP address for analytics
+      userAgent: req.get("user-agent"), // Capture user agent
+      isOAuthVerified, // Mark as OAuth verified
+      oauthProvider: isOAuthVerified ? "google" : null,
+      oauthSubject: oauthSubject,
     };
 
     // Add optional fields if provided
     if (authorEmail) {
       testimonialData.authorEmail = authorEmail;
+    }
+
+    if (authorRole) {
+      testimonialData.authorRole = authorRole;
+    }
+
+    if (authorCompany) {
+      testimonialData.authorCompany = authorCompany;
+    }
+
+    if (authorAvatar) {
+      testimonialData.authorAvatar = authorAvatar;
     }
 
     if (rating) {

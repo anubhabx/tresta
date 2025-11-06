@@ -181,6 +181,12 @@ export function generateStyles(
       font-size: 16px;
     }
 
+    ${prefix} .tresta-author-image.tresta-author-initials {
+      /* Initials fallback - background color is set inline for unique colors */
+      color: white;
+      text-transform: uppercase;
+    }
+
     ${prefix} .tresta-author-info {
       flex: 1;
       min-width: 0;
@@ -194,6 +200,26 @@ export function generateStyles(
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    ${prefix} .tresta-verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #10b981;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      padding: 2px;
+    }
+
+    ${prefix} .tresta-verified-badge svg {
+      width: 100%;
+      height: 100%;
     }
 
     ${prefix} .tresta-author-role {
@@ -214,7 +240,8 @@ export function generateStyles(
     ${prefix} .tresta-date {
       font-size: 12px;
       color: #9ca3af;
-      margin-top: 8px;
+      margin-top: 12px;
+      text-align: left;
     }
 
     /* Layout: List */
@@ -387,6 +414,16 @@ export function generateStyles(
       background-color: #e5e7eb;
     }
 
+    ${prefix} .tresta-carousel-avatar-initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: white;
+      text-transform: uppercase;
+    }
+
     ${prefix} .tresta-carousel-author-info {
       flex: 1;
       min-width: 0;
@@ -397,12 +434,22 @@ export function generateStyles(
       font-size: 16px;
       color: #1f2937;
       margin: 0 0 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     ${prefix} .tresta-carousel-author-role {
       font-size: 14px;
       color: #6b7280;
       margin: 0;
+    }
+
+    ${prefix} .tresta-carousel-date {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 12px;
+      text-align: left;
     }
 
     /* Carousel Navigation Buttons */

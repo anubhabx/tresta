@@ -14,14 +14,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarMenuSkeleton,
+  SidebarMenuSkeleton
 } from "@workspace/ui/components/sidebar";
 import {
   ChevronUp,
   Layers2Icon,
   LayoutDashboardIcon,
   UserIcon,
-  PlusIcon,
+  PlusIcon
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { usePathname } from "next/navigation";
@@ -30,13 +30,9 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@workspace/ui/components/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
+import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
 import { projects } from "@/lib/queries";
@@ -154,15 +150,12 @@ const UISidebar = () => {
                   className="justify-start w-full truncate overflow-ellipsis"
                   variant="ghost"
                 >
-                  <Avatar className="h-5 w-5 mr-2">
-                    <AvatarImage
-                      src={user.imageUrl}
-                      alt={user.firstName || "User Avatar"}
-                    />
-                    <AvatarFallback>
-                      <UserIcon className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
+                  <CustomAvatar
+                    src={user.imageUrl}
+                    name={user.firstName || "User"}
+                    alt="sidebar-profile-image"
+                    className="size-6"
+                  />
                   <span className="truncate overflow-ellipsis flex-1 text-left">
                     {user.firstName ||
                       user.username ||

@@ -4,6 +4,153 @@ All notable changes to the Tresta project will be documented in this file.
 
 ## [Unreleased]
 
+### Added - 2024-11-06
+
+#### Custom Account Settings with Privacy Transparency
+
+**Feature:** Comprehensive custom account settings page matching authentication UI design with modular components and dedicated privacy transparency.
+
+**Implementation:**
+- **Account Settings Refactoring**:
+  - Refactored monolithic `account-settings-form.tsx` into 6 modular components
+  - `ProfileImageSection`: Avatar upload/removal with 5MB validation
+  - `ProfileInformationSection`: Name editing with react-hook-form
+  - `PasswordSection`: Conditional password management (OAuth users can't change)
+  - `ConnectedAccountsSection`: Display OAuth provider status with badges
+  - `AccountInformationSection`: Member since and last updated dates
+  - `DataPrivacySection`: Enhanced data export + account deletion
+  
+- **Enhanced Data Export**:
+  - Export includes user profile, projects, widgets, and testimonials in single JSON file
+  - Timestamped filename: `tresta-data-export-YYYY-MM-DD-HHmmss.json`
+  - Complete data portability for GDPR compliance
+  
+- **Account Deletion**:
+  - AlertDialog confirmation before deletion
+  - Clear warning about permanent data loss
+  - Redirects to sign-in after successful deletion
+  
+- **Privacy Transparency Page**:
+  - Created dedicated `/privacy` route for data collection disclosure
+  - Structured data with TypeScript interfaces (DataItem, DataCategory, etc.)
+  - 30+ Lucide icons for visual clarity (User, Mail, MapPin, Activity, etc.)
+  - Four main sections: Data Categories, Data Usage, Storage & Security, Your Rights
+  - Data-driven rendering via constant arrays (DATA_CATEGORIES, DATA_USAGE, STORAGE_INFO, DATA_RIGHTS)
+  - 383 lines of comprehensive privacy information
+  
+- **Layout Consistency**:
+  - Applied `container mx-auto max-w-4xl py-8 px-4` to all form pages
+  - Center-aligned forms: account settings, privacy, new project, edit project
+  - Consistent spacing and visual hierarchy
+  
+- **UX Improvements**:
+  - Removed user ID exposure from account information display
+  - Better data collection info formatting with structured components
+  - Icon-driven UI for better scannability
+  - Modular component architecture for maintainability
+
+**Files Modified:**
+- `apps/web/components/account-settings-form.tsx` - Refactored to 65 lines
+- `apps/web/components/account-settings/profile-image-section.tsx` - NEW
+- `apps/web/components/account-settings/profile-information-section.tsx` - NEW
+- `apps/web/components/account-settings/password-section.tsx` - NEW
+- `apps/web/components/account-settings/connected-accounts-section.tsx` - NEW
+- `apps/web/components/account-settings/account-information-section.tsx` - NEW
+- `apps/web/components/account-settings/data-privacy-section.tsx` - NEW
+- `apps/web/components/account-settings/data-collection-info.tsx` - NEW: 383 lines with structured data
+- `apps/web/components/account-settings/index.ts` - NEW: Barrel export
+- `apps/web/app/(dashboard)/privacy/page.tsx` - NEW: Dedicated privacy page
+- `apps/web/app/(dashboard)/projects/new/page.tsx` - Updated layout alignment
+- `apps/web/app/(dashboard)/projects/[slug]/edit/page.tsx` - Updated layout alignment
+- `apps/web/middleware.ts` - Added `/privacy` to protected routes
+
+**Dependencies:**
+- No new dependencies (uses existing Lucide React icons)
+
+---
+
+### Added - 2024-11-05
+
+#### Google OAuth Verification for Testimonials
+
+**Feature:** Integrated Google OAuth authentication to verify testimonial authors and increase credibility.
+
+**Implementation:**
+- **Frontend OAuth integration**: 
+  - Added `@react-oauth/google` package for Google Sign-In button
+  - Created `GoogleOAuthProvider` wrapper component
+  - Auto-fill testimonial form (name, email, avatar) from Google profile
+  - Store Google ID token for server-side verification
+  
+- **Backend verification**:
+  - Added `google-auth-library` package for token verification
+  - Created `verifyGoogleIdToken()` utility for server-side validation
+  - Updated testimonial controller to accept and verify `googleIdToken` parameter
+  - Store verification status with `isOAuthVerified`, `oauthProvider`, `oauthSubject` fields
+  
+- **Database schema updates**:
+  - Added `isOAuthVerified` (Boolean, default false) to Testimonial model
+  - Added `oauthProvider` (String?, nullable) to store provider name
+  - Added `oauthSubject` (String?, nullable) to store unique OAuth subject ID
+  - Created migration: `20251105044214_add_oauth_verification`
+  - Added index on `isOAuthVerified` for efficient filtering
+  
+- **Verified badge display**:
+  - Added green checkmark badge to verified testimonials in all widget layouts
+  - Badge shows OAuth provider in tooltip (e.g., "Verified via google")
+  - Styled with green background (#d1fae5), circular shape, 16px size
+  - SVG shield check icon for visual clarity
+  
+- **Management UI enhancements**:
+  - Display verified badge on testimonial cards with `ShieldCheck` icon
+  - Added verification filter dropdown (All Verification / Verified / Unverified)
+  - Combined filtering: status (pending/approved/published) + verification
+  - Show OAuth provider in badge tooltip for owner reference
+  
+**Files Modified:**
+- `packages/database/prisma/schema.prisma` - Added OAuth fields
+- `apps/api/src/lib/google-oauth.ts` - NEW: Token verification utility
+- `apps/api/src/controllers/testimonial.controller.ts` - Accept and verify tokens
+- `apps/api/src/controllers/widget.controller.ts` - Return OAuth fields
+- `apps/web/components/google-oauth-provider.tsx` - NEW: OAuth wrapper
+- `apps/web/app/(public)/testimonials/[slug]/page.tsx` - Google Sign-In integration
+- `apps/web/components/testimonial-card.tsx` - Verified badge display
+- `apps/web/components/testimonial-list.tsx` - Verification filter
+- `apps/web/types/api.ts` - Added OAuth fields to Testimonial interface
+- `packages/widget/src/types.ts` - Added OAuth fields to widget types
+- `packages/widget/src/renderer.ts` - Verified badge in testimonials
+- `packages/widget/src/carousel.ts` - Verified badge in carousel
+- `packages/widget/src/styles.ts` - Verified badge styles
+- `packages/widget/src/widget.ts` - Pass OAuth fields to carousel
+
+**Environment Variables:**
+- `NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID` - Frontend client ID
+- `GOOGLE_OAUTH_CLIENT_ID` - Backend client ID (same as frontend)
+- `GOOGLE_OAUTH_CLIENT_SECRET` - Backend client secret
+
+**Widget Build:**
+- Rebuilt widget: 42.39 KB (IIFE), 58.61 KB (ESM)
+- Includes verified badge support in all layouts
+
+#### Widget Branding Footer
+
+**Feature:** Added "Powered by Tresta" watermark to all widgets for brand visibility.
+
+**Implementation:**
+- Created `renderBranding()` function in renderer
+- Always displays at bottom of widget with top border separator
+- Small gray text (12px) with branded link to tresta.io
+- Link styled with primary theme color and hover effect
+- Fixed demo files to properly render branding footer
+
+**Files Modified:**
+- `packages/widget/src/renderer.ts` - `renderBranding()` function
+- `packages/widget/src/widget.ts` - Call branding in render pipeline
+- `packages/widget/index.html` - Include branding in demo
+- `packages/widget/src/styles.ts` - Branding styles
+
+---
+
 ### Added - 2024-01-XX
 
 #### Standalone Widget Library for CDN Embedding

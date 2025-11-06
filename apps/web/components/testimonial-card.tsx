@@ -12,9 +12,13 @@ import {
   Mail,
   Calendar,
   Video,
+  Briefcase,
+  Building2,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
+import { CustomAvatar } from "@workspace/ui/components/avatar";
 
 import {
   Card,
@@ -101,19 +105,69 @@ export function TestimonialCard({
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg truncate">
-              {testimonial.authorName}
-            </h3>
-            {testimonial.authorEmail && (
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                <Mail className="h-3.5 w-3.5" />
-                <span className="truncate">{testimonial.authorEmail}</span>
-              </div>
-            )}
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            {/* Avatar */}
+            <CustomAvatar
+              src={testimonial.authorAvatar}
+              name={testimonial.authorName}
+              size="lg"
+            />
+            
+            {/* Author Info */}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-lg truncate">
+                {testimonial.authorName}
+              </h3>
+              
+              {/* Role & Company */}
+              {(testimonial.authorRole || testimonial.authorCompany) && (
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+                  {testimonial.authorRole && (
+                    <>
+                      <Briefcase className="h-3.5 w-3.5" />
+                      <span className="truncate">{testimonial.authorRole}</span>
+                    </>
+                  )}
+                  {testimonial.authorRole && testimonial.authorCompany && (
+                    <span>•</span>
+                  )}
+                  {testimonial.authorCompany && (
+                    <>
+                      <Building2 className="h-3.5 w-3.5" />
+                      <span className="truncate">{testimonial.authorCompany}</span>
+                    </>
+                  )}
+                </div>
+              )}
+              
+              {/* Email */}
+              {testimonial.authorEmail && (
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                  <Mail className="h-3.5 w-3.5" />
+                  <span className="truncate">{testimonial.authorEmail}</span>
+                </div>
+              )}
+            </div>
           </div>
+          
+          {/* Status Badges */}
           <div className="flex flex-col items-end gap-2">
             {getStatusBadge()}
+            {testimonial.isOAuthVerified && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline" className="bg-slate-950 border-slate-300 text-white hover:bg-slate-800 transition-colors duration-200">
+                      <ShieldCheck className="h-3 w-3 mr-1" />
+                      Verified
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Verified via {testimonial.oauthProvider || 'OAuth'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             {testimonial.type === "VIDEO" && (
               <Badge variant="outline" className="text-xs">
                 <Video className="h-3 w-3 mr-1" />
