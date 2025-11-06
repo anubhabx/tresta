@@ -1,9 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse } from "@/types/api";
-
-// Re-export shared types
-export type {
+import type {
   Widget,
   WidgetConfig,
   WidgetLayout,
@@ -15,6 +13,18 @@ export type {
 } from "@workspace/types";
 
 export { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
+
+// Re-export types for convenience
+export type {
+  Widget,
+  WidgetConfig,
+  WidgetLayout,
+  WidgetTheme,
+  CardStyle,
+  AnimationType,
+  CreateWidgetPayload,
+  UpdateWidgetPayload,
+};
 
 export interface PublicWidgetData {
   widget: {
@@ -42,17 +52,6 @@ export interface PublicWidgetData {
     total: number;
     fetchedAt: string;
   };
-}
-
-export interface CreateWidgetPayload {
-  projectId: string;
-  embedType: string;
-  config: WidgetConfig;
-}
-
-export interface UpdateWidgetPayload {
-  embedType?: string;
-  config?: WidgetConfig;
 }
 
 // Query Keys Factory
