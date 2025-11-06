@@ -165,6 +165,7 @@ export interface Widget {
 export interface UpdateTestimonialPayload {
   isApproved?: boolean;
   isPublished?: boolean;
+  moderationStatus?: ModerationStatus;
 }
 
 export interface CreateProjectPayload {

@@ -375,6 +375,62 @@
   - `apps/web/components/testimonial-card.tsx`
   - `apps/web/lib/queries/testimonials.ts`
 
+#### 4.8 Auto-Moderation System ✅
+- **Status:** ✅ Complete (November 2025)
+- **Description:** AI-powered spam and content filtering with sentiment analysis
+- **Implementation:**
+  - **Advanced Sentiment Analysis:**
+    - Weighted keyword categories (severe/strong/moderate negative, positive)
+    - Sentiment scoring from -1 (very negative) to +1 (very positive)
+    - Five sentiment categories: very_negative, negative, neutral, positive, very_positive
+    - Detected keywords returned for transparency
+  - **Profanity Detection:**
+    - Multi-category profanity list (severe, mild, offensive)
+    - Case-insensitive pattern matching
+    - Word boundary detection
+  - **Spam Detection:**
+    - Excessive capitalization check (>50%)
+    - Repeated character patterns (3+ consecutive)
+    - URL detection
+  - **Moderation Status:**
+    - PENDING - awaiting review
+    - APPROVED - passed moderation
+    - FLAGGED - requires manual review
+    - REJECTED - failed moderation
+  - **Risk Scoring:**
+    - 0-1 scale (higher = more problematic)
+    - Weighted scoring based on issue severity
+    - Profanity: 0.5 per severe, 0.3 per mild
+    - Spam: 0.4 for caps, 0.3 for repetition, 0.2 for URLs
+    - Negative sentiment: 0.2-0.5 based on score
+  - **Project-Level Settings:**
+    - `autoModeration` - enable/disable feature
+    - `autoApproveVerified` - auto-approve OAuth-verified submissions
+    - `profanityFilterLevel` - STRICT, MODERATE, LENIENT
+    - `moderationSettings` - custom JSON rules
+  - **Integrated UI:**
+    - Moderation status badges on testimonial cards
+    - Color-coded: Green (APPROVED), Red (FLAGGED/REJECTED)
+    - Detailed tooltips with risk score and flags
+    - Moderation filter dropdown in testimonial list
+    - Bulk moderation actions (Approve/Flag/Reject)
+    - Select All checkbox for batch operations
+    - Fixed bottom action bar (no layout shift)
+    - Moderation stats in header badges
+  - **Migration Tools:**
+    - Script to moderate existing PENDING testimonials
+    - Batch processing (50 at a time)
+    - Detailed output with statistics
+    - Run via `pnpm migrate:testimonials`
+- **Files:**
+  - `apps/api/src/services/moderation.service.ts` - Core logic (450+ lines)
+  - `apps/api/src/scripts/migrate-existing-testimonials.ts` - Data migration
+  - `apps/api/src/controllers/testimonial.controller.ts` - Integration
+  - `apps/web/components/testimonial-list.tsx` - UI integration
+  - `apps/web/components/testimonial-card.tsx` - Moderation badges
+  - `packages/database/prisma/schema.prisma` - Schema fields
+  - Migration: `20251106144930_add_auto_moderation`
+
 ---
 
 ### 🏠 Epic 5: Dashboard & Analytics (100% Complete)

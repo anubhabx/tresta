@@ -294,7 +294,7 @@ const updateTestimonial = async (
 ) => {
   try {
     const { slug, id } = req.params;
-    const { isPublished, isApproved } = req.body;
+    const { isPublished, isApproved, moderationStatus } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -326,6 +326,7 @@ const updateTestimonial = async (
     const updateData: any = {};
     if (isPublished !== undefined) updateData.isPublished = isPublished;
     if (isApproved !== undefined) updateData.isApproved = isApproved;
+    if (moderationStatus !== undefined) updateData.moderationStatus = moderationStatus;
 
     // If no fields to update
     if (Object.keys(updateData).length === 0) {
