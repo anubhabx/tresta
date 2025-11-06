@@ -1,10 +1,3 @@
-/**
- * Moderation Components
- * Barrel export for all moderation-related components
- */
-
-export { ModerationQueue } from "./moderation-queue";
-export { ModerationStatsWidget } from "./moderation-stats-widget";
-export { ModerationFilters } from "./moderation-filters";
-export { ModerationBulkActions } from "./moderation-bulk-actions";
+export { ModerationStatsDashboard } from "./moderation-stats-dashboard";
 export { ModerationTestimonialCard } from "./moderation-testimonial-card";
+export { FilterPresets, type FilterPreset } from "./filter-presets";

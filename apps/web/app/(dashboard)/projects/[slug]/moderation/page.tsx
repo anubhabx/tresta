@@ -3,7 +3,7 @@
  * Server component for the moderation queue route
  */
 
-import { ModerationQueue } from "@/components/moderation/moderation-queue";
+import { TestimonialList } from "@/components/testimonial-list";
 
 interface ModerationPageProps {
   params: Promise<{
@@ -15,15 +15,15 @@ export default async function ModerationPage({ params }: ModerationPageProps) {
   const { slug } = await params;
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Moderation Queue</h1>
-        <p className="text-muted-foreground">
-          Review and moderate testimonials with auto-moderation insights
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Moderation Queue</h2>
+        <p className="text-muted-foreground mt-1">
+          Review, approve, and manage testimonials with advanced moderation tools and insights.
         </p>
       </div>
 
-      <ModerationQueue slug={slug} />
+      <TestimonialList projectSlug={slug} moderationMode={true} />
     </div>
   );
 }

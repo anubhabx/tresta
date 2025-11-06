@@ -10,24 +10,20 @@ import {
   Eye,
   EyeOff,
   Mail,
-  Calendar,
+  User,
   Video,
   Briefcase,
   Building2,
   ShieldCheck,
   AlertTriangle,
-  Shield,
-  Info
+  Shield
 } from "lucide-react";
-import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 
 import {
   Card,
-  CardContent,
-  CardFooter,
-  CardHeader
+  CardContent
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -48,6 +44,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@workspace/ui/components/tooltip";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -83,7 +80,7 @@ export function TestimonialCard({
   const getStatusBadge = () => {
     if (testimonial.isPublished) {
       return (
-        <Badge variant="default" className="bg-green-500">
+        <Badge variant="outline" className="border-primary/20 text-primary">
           <Eye className="h-3 w-3 mr-1" />
           Published
         </Badge>
@@ -91,14 +88,14 @@ export function TestimonialCard({
     }
     if (testimonial.isApproved) {
       return (
-        <Badge variant="secondary">
+        <Badge variant="outline">
           <CheckCircle className="h-3 w-3 mr-1" />
           Approved
         </Badge>
       );
     }
     return (
-      <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+      <Badge variant="outline" className="text-muted-foreground">
         Pending
       </Badge>
     );
@@ -110,102 +107,57 @@ export function TestimonialCard({
     switch (testimonial.moderationStatus) {
       case "APPROVED":
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="border-green-500 text-green-600"
-                >
-                  <Shield className="h-3 w-3 mr-1" />
-                  Moderated
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Auto-moderation: Approved</p>
-                {testimonial.moderationScore !== null &&
-                  testimonial.moderationScore !== undefined && (
-                    <p className="text-xs">
-                      Score: {testimonial.moderationScore.toFixed(2)}
-                    </p>
-                  )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Badge variant="outline">
+            <Shield className="h-3 w-3 mr-1" />
+            Moderated
+          </Badge>
         );
       case "FLAGGED":
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge variant="destructive">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Flagged
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Flagged for Review</p>
-                {testimonial.moderationScore !== null &&
-                  testimonial.moderationScore !== undefined && (
-                    <p className="text-xs mb-1">
-                      Risk Score: {testimonial.moderationScore.toFixed(2)}
-                    </p>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="border-destructive/30 text-destructive">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Flagged
+            </Badge>
+            {testimonial.moderationFlags && 
+             Array.isArray(testimonial.moderationFlags) && 
+             testimonial.moderationFlags.length > 0 && (
+              <div className="p-2 rounded-md bg-muted/50 border text-xs">
+                <p className="font-medium mb-1">Issues:</p>
+                <ul className="space-y-0.5">
+                  {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
+                    <li key={i} className="text-muted-foreground">• {flag}</li>
+                  ))}
+                  {testimonial.moderationFlags.length > 3 && (
+                    <li className="text-muted-foreground">
+                      +{testimonial.moderationFlags.length - 3} more
+                    </li>
                   )}
-                {testimonial.moderationFlags &&
-                  Array.isArray(testimonial.moderationFlags) &&
-                  testimonial.moderationFlags.length > 0 && (
-                    <ul className="text-xs space-y-0.5">
-                      {testimonial.moderationFlags
-                        .slice(0, 3)
-                        .map((flag: string, i: number) => (
-                          <li key={i}>• {flag}</li>
-                        ))}
-                      {testimonial.moderationFlags.length > 3 && (
-                        <li className="text-muted-foreground">
-                          +{testimonial.moderationFlags.length - 3} more
-                        </li>
-                      )}
-                    </ul>
-                  )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                </ul>
+              </div>
+            )}
+          </div>
         );
       case "REJECTED":
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="border-red-500 text-red-600"
-                >
-                  <XCircle className="h-3 w-3 mr-1" />
-                  Rejected
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="font-semibold mb-1">Auto-Rejected</p>
-                {testimonial.moderationScore !== null &&
-                  testimonial.moderationScore !== undefined && (
-                    <p className="text-xs mb-1">
-                      Risk Score: {testimonial.moderationScore.toFixed(2)}
-                    </p>
-                  )}
-                {testimonial.moderationFlags &&
-                  Array.isArray(testimonial.moderationFlags) &&
-                  testimonial.moderationFlags.length > 0 && (
-                    <ul className="text-xs space-y-0.5">
-                      {testimonial.moderationFlags
-                        .slice(0, 3)
-                        .map((flag: string, i: number) => (
-                          <li key={i}>• {flag}</li>
-                        ))}
-                    </ul>
-                  )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="border-destructive/30 text-destructive">
+              <XCircle className="h-3 w-3 mr-1" />
+              Rejected
+            </Badge>
+            {testimonial.moderationFlags && 
+             Array.isArray(testimonial.moderationFlags) && 
+             testimonial.moderationFlags.length > 0 && (
+              <div className="p-2 rounded-md bg-muted/50 border text-xs">
+                <p className="font-medium mb-1">Reasons:</p>
+                <ul className="space-y-0.5">
+                  {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
+                    <li key={i} className="text-muted-foreground">• {flag}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         );
       case "PENDING":
       default:
@@ -214,109 +166,98 @@ export function TestimonialCard({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow h-full">
-      <CardHeader className="space-y-3 pb-4">
-        <div className="flex items-start justify-between gap-3">
+    <Card className="hover:shadow-md transition-all">
+      <CardContent className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* Avatar */}
-            <CustomAvatar
-              src={testimonial.authorAvatar}
-              name={testimonial.authorName}
-              size="lg"
-            />
-
-            {/* Author Info */}
+            {testimonial.authorAvatar ? (
+              <img
+                src={testimonial.authorAvatar}
+                alt={testimonial.authorName}
+                className="h-10 w-10 rounded-full object-cover flex-shrink-0 ring-1 ring-border"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg truncate">
-                {testimonial.authorName}
-              </h3>
-
-              {/* Role & Company - Always shown */}
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
-                <Briefcase className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="truncate">
-                  {testimonial.authorRole || "Not provided"}
-                </span>
-                <span>•</span>
-                <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="truncate">
-                  {testimonial.authorCompany || "Not provided"}
-                </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-semibold truncate">
+                  {testimonial.authorName}
+                </h3>
+                {testimonial.isOAuthVerified && (
+                  <Badge variant="secondary" className="text-xs bg-primary/5 border-primary/20">
+                    <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                    Verified
+                  </Badge>
+                )}
               </div>
-
-              {/* Email - Always shown */}
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="truncate">
-                  {testimonial.authorEmail || "Not provided"}
-                </span>
-              </div>
+              {testimonial.authorEmail && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                  <Mail className="h-3 w-3" />
+                  <span className="truncate">{testimonial.authorEmail}</span>
+                </div>
+              )}
+              {(testimonial.authorRole || testimonial.authorCompany) && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {testimonial.authorRole}
+                  {testimonial.authorRole && testimonial.authorCompany && " · "}
+                  {testimonial.authorCompany}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Status Badges */}
-          <div className="flex flex-col items-end gap-2">
+          {/* Status Badge */}
+          <div className="ml-2 flex-shrink-0">
             {getStatusBadge()}
-            {getModerationBadge()}
-            {testimonial.isOAuthVerified && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className="bg-slate-950 border-slate-300 text-white hover:bg-slate-800 transition-colors duration-200"
-                    >
-                      <ShieldCheck className="h-3 w-3 mr-1" />
-                      Verified
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Verified via {testimonial.oauthProvider || "OAuth"}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {testimonial.type === "VIDEO" && (
-              <Badge variant="outline" className="text-xs">
-                <Video className="h-3 w-3 mr-1" />
-                Video
-              </Badge>
-            )}
           </div>
         </div>
 
-        {/* Rating */}
-        {testimonial.rating && (
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, index) => (
-              <Star
-                key={index}
-                className={`h-4 w-4 ${
-                  index < testimonial.rating!
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-gray-300"
-                }`}
-              />
-            ))}
-            <span className="text-sm text-muted-foreground ml-1">
-              {testimonial.rating}/5
-            </span>
-          </div>
-        )}
-      </CardHeader>
-
-      <CardContent className="pb-4 flex-1">
-        <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+        {/* Content */}
+        <p className="text-sm mb-4 whitespace-pre-wrap">
           {testimonial.content}
         </p>
 
+        {/* Metadata */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+          {testimonial.rating && (
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, index) => (
+                <Star
+                  key={index}
+                  className={cn(
+                    "h-3 w-3",
+                    index < testimonial.rating!
+                      ? "fill-primary text-primary"
+                      : "text-muted-foreground/30"
+                  )}
+                />
+              ))}
+              <span className="ml-1">{testimonial.rating}/5</span>
+            </div>
+          )}
+          <span>
+            {formatDistanceToNow(new Date(testimonial.createdAt), { addSuffix: true })}
+          </span>
+          {testimonial.type === "VIDEO" && (
+            <div className="flex items-center gap-1">
+              <Video className="h-3 w-3" />
+              <span>Video</span>
+            </div>
+          )}
+        </div>
+
+        {/* Video Link */}
         {testimonial.videoUrl && (
-          <div className="mt-3 p-3 bg-muted rounded-lg">
+          <div className="mb-4 p-3 rounded-md bg-muted/50 border">
             <a
               href={testimonial.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline flex items-center gap-1.5"
+              className="text-sm text-primary hover:underline flex items-center gap-1.5"
             >
               <Video className="h-4 w-4" />
               Watch video testimonial
@@ -324,133 +265,124 @@ export function TestimonialCard({
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-4">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>
-            Submitted {formatDistanceToNow(new Date(testimonial.createdAt))} ago
-          </span>
+        {/* Moderation Info */}
+        {testimonial.moderationStatus && testimonial.moderationStatus !== "PENDING" && (
+          <div className="mb-4">
+            {getModerationBadge()}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <TooltipProvider>
+            {!testimonial.isApproved && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAction(() => onApprove(testimonial.id))}
+                      disabled={isLoading}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Approve
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Approve this testimonial</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() => handleAction(() => onReject(testimonial.id))}
+                      disabled={isLoading}
+                    >
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Reject
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Reject this testimonial</TooltipContent>
+                </Tooltip>
+              </>
+            )}
+
+            {testimonial.isApproved && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {testimonial.isPublished ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAction(() => onUnpublish(testimonial.id))}
+                      disabled={isLoading}
+                    >
+                      <EyeOff className="h-4 w-4 mr-1" />
+                      Unpublish
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-primary/20 text-primary hover:bg-primary/5"
+                      onClick={() => handleAction(() => onPublish(testimonial.id))}
+                      disabled={isLoading}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      Publish
+                    </Button>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  {testimonial.isPublished
+                    ? "Hide from public widgets"
+                    : "Show in public widgets"}
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <AlertDialog>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                      disabled={isLoading}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>Delete testimonial</TooltipContent>
+              </Tooltip>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this testimonial from{" "}
+                    <strong>{testimonial.authorName}</strong>? This action cannot
+                    be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleAction(() => onDelete(testimonial.id))}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </TooltipProvider>
         </div>
       </CardContent>
-
-      <CardFooter className="flex flex-wrap gap-2 pt-4 border-t">
-        <TooltipProvider>
-          {/* Approve/Reject */}
-          {!testimonial.isApproved && (
-            <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 sm:flex-none border-green-500 text-green-600 hover:bg-green-50"
-                    onClick={() =>
-                      handleAction(() => onApprove(testimonial.id))
-                    }
-                    disabled={isLoading}
-                  >
-                    <CheckCircle className="h-4 w-4 mr-1.5" />
-                    Approve
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Approve this testimonial</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 sm:flex-none border-red-500 text-red-600 hover:bg-red-50"
-                    onClick={() => handleAction(() => onReject(testimonial.id))}
-                    disabled={isLoading}
-                  >
-                    <XCircle className="h-4 w-4 mr-1.5" />
-                    Reject
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Reject this testimonial</TooltipContent>
-              </Tooltip>
-            </>
-          )}
-
-          {/* Publish/Unpublish */}
-          {testimonial.isApproved && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {testimonial.isPublished ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      handleAction(() => onUnpublish(testimonial.id))
-                    }
-                    disabled={isLoading}
-                  >
-                    <EyeOff className="h-4 w-4 mr-1.5" />
-                    Unpublish
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                    onClick={() =>
-                      handleAction(() => onPublish(testimonial.id))
-                    }
-                    disabled={isLoading}
-                  >
-                    <Eye className="h-4 w-4 mr-1.5" />
-                    Publish
-                  </Button>
-                )}
-              </TooltipTrigger>
-              <TooltipContent>
-                {testimonial.isPublished
-                  ? "Hide from public widgets"
-                  : "Show in public widgets"}
-              </TooltipContent>
-            </Tooltip>
-          )}
-
-          {/* Delete */}
-          <AlertDialog>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-              </TooltipTrigger>
-              <TooltipContent>Delete testimonial</TooltipContent>
-            </Tooltip>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete this testimonial from{" "}
-                  <strong>{testimonial.authorName}</strong>? This action cannot
-                  be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleAction(() => onDelete(testimonial.id))}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </TooltipProvider>
-      </CardFooter>
     </Card>
   );
 }

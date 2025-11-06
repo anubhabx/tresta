@@ -84,6 +84,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
+          <TabsTrigger value="moderation">Moderation</TabsTrigger>
           <TabsTrigger value="widgets">Widgets</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -97,11 +98,25 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
             <CardHeader>
               <CardTitle>Testimonials</CardTitle>
               <CardDescription>
-                Manage and moderate testimonials for this project
+                View and manage approved testimonials for this project.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <TestimonialList projectSlug={slug} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="moderation" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Moderation Queue</CardTitle>
+              <CardDescription>
+                Review pending testimonials with advanced moderation tools, bulk actions, and auto-moderation insights.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TestimonialList projectSlug={slug} moderationMode={true} />
             </CardContent>
           </Card>
         </TabsContent>
