@@ -85,6 +85,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
+          <TabsTrigger value="moderation">Moderation</TabsTrigger>
           <TabsTrigger value="widgets">Widgets</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -103,6 +104,39 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
             </CardHeader>
             <CardContent>
               <TestimonialList projectSlug={slug} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="moderation" className="space-y-4">
+          <Link href={`/projects/${slug}/moderation`}>
+            <Button className="mb-4">
+              Open Moderation Queue
+            </Button>
+          </Link>
+          <Card>
+            <CardHeader>
+              <CardTitle>Auto-Moderation</CardTitle>
+              <CardDescription>
+                The moderation queue provides advanced filtering, bulk actions, and detailed moderation insights
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm text-muted-foreground">
+                <p className="mb-4">
+                  Auto-moderation helps you manage testimonials efficiently by automatically detecting and flagging:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Profanity and inappropriate content</li>
+                  <li>Spam and suspicious patterns</li>
+                  <li>Duplicate submissions</li>
+                  <li>Negative sentiment indicators</li>
+                  <li>Disposable email addresses</li>
+                </ul>
+                <p className="mt-4">
+                  Visit the moderation queue to review flagged testimonials and manage them in bulk.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

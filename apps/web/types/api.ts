@@ -86,6 +86,13 @@ export enum TestimonialStatus {
   REJECTED = "REJECTED",
 }
 
+export enum ModerationStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  FLAGGED = "FLAGGED",
+}
+
 export interface Testimonial {
   id: string;
   authorName: string;
@@ -102,6 +109,10 @@ export interface Testimonial {
   isPublished: boolean;
   isOAuthVerified: boolean;
   oauthProvider: string | null;
+  moderationStatus: ModerationStatus;
+  moderationScore: number | null;
+  moderationFlags: string[] | null;
+  autoPublished: boolean;
   projectId: string | null;
   Project?: {
     id: string;
@@ -110,6 +121,29 @@ export interface Testimonial {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ModerationStats {
+  total: number;
+  pending: number;
+  flagged: number;
+  approved: number;
+  rejected: number;
+}
+
+export interface ModerationQueueResponse extends PaginatedResponse<Testimonial> {
+  meta: {
+    timestamp: string;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    stats?: ModerationStats;
+  };
 }
 
 export enum WidgetType {
