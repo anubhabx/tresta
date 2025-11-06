@@ -7,7 +7,8 @@ const PROTECTED_ROUTES = [
   "/settings(.*)",
   "/products(.*)",
   "/projects(.*)",
-  "/account(.*)"
+  "/account(.*)",
+  "/privacy(.*)"
 ];
 const AUTH_ROUTES = ["/sign-in(.*)", "/sign-up(.*)", "/sso-callback(.*)"];
 

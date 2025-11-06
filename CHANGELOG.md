@@ -4,6 +4,71 @@ All notable changes to the Tresta project will be documented in this file.
 
 ## [Unreleased]
 
+### Added - 2024-11-06
+
+#### Custom Account Settings with Privacy Transparency
+
+**Feature:** Comprehensive custom account settings page matching authentication UI design with modular components and dedicated privacy transparency.
+
+**Implementation:**
+- **Account Settings Refactoring**:
+  - Refactored monolithic `account-settings-form.tsx` into 6 modular components
+  - `ProfileImageSection`: Avatar upload/removal with 5MB validation
+  - `ProfileInformationSection`: Name editing with react-hook-form
+  - `PasswordSection`: Conditional password management (OAuth users can't change)
+  - `ConnectedAccountsSection`: Display OAuth provider status with badges
+  - `AccountInformationSection`: Member since and last updated dates
+  - `DataPrivacySection`: Enhanced data export + account deletion
+  
+- **Enhanced Data Export**:
+  - Export includes user profile, projects, widgets, and testimonials in single JSON file
+  - Timestamped filename: `tresta-data-export-YYYY-MM-DD-HHmmss.json`
+  - Complete data portability for GDPR compliance
+  
+- **Account Deletion**:
+  - AlertDialog confirmation before deletion
+  - Clear warning about permanent data loss
+  - Redirects to sign-in after successful deletion
+  
+- **Privacy Transparency Page**:
+  - Created dedicated `/privacy` route for data collection disclosure
+  - Structured data with TypeScript interfaces (DataItem, DataCategory, etc.)
+  - 30+ Lucide icons for visual clarity (User, Mail, MapPin, Activity, etc.)
+  - Four main sections: Data Categories, Data Usage, Storage & Security, Your Rights
+  - Data-driven rendering via constant arrays (DATA_CATEGORIES, DATA_USAGE, STORAGE_INFO, DATA_RIGHTS)
+  - 383 lines of comprehensive privacy information
+  
+- **Layout Consistency**:
+  - Applied `container mx-auto max-w-4xl py-8 px-4` to all form pages
+  - Center-aligned forms: account settings, privacy, new project, edit project
+  - Consistent spacing and visual hierarchy
+  
+- **UX Improvements**:
+  - Removed user ID exposure from account information display
+  - Better data collection info formatting with structured components
+  - Icon-driven UI for better scannability
+  - Modular component architecture for maintainability
+
+**Files Modified:**
+- `apps/web/components/account-settings-form.tsx` - Refactored to 65 lines
+- `apps/web/components/account-settings/profile-image-section.tsx` - NEW
+- `apps/web/components/account-settings/profile-information-section.tsx` - NEW
+- `apps/web/components/account-settings/password-section.tsx` - NEW
+- `apps/web/components/account-settings/connected-accounts-section.tsx` - NEW
+- `apps/web/components/account-settings/account-information-section.tsx` - NEW
+- `apps/web/components/account-settings/data-privacy-section.tsx` - NEW
+- `apps/web/components/account-settings/data-collection-info.tsx` - NEW: 383 lines with structured data
+- `apps/web/components/account-settings/index.ts` - NEW: Barrel export
+- `apps/web/app/(dashboard)/privacy/page.tsx` - NEW: Dedicated privacy page
+- `apps/web/app/(dashboard)/projects/new/page.tsx` - Updated layout alignment
+- `apps/web/app/(dashboard)/projects/[slug]/edit/page.tsx` - Updated layout alignment
+- `apps/web/middleware.ts` - Added `/privacy` to protected routes
+
+**Dependencies:**
+- No new dependencies (uses existing Lucide React icons)
+
+---
+
 ### Added - 2024-11-05
 
 #### Google OAuth Verification for Testimonials

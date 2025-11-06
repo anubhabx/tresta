@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import * as React from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
 
 function Avatar({
   className,
@@ -18,7 +18,7 @@ function Avatar({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({
@@ -31,7 +31,7 @@ function AvatarImage({
       className={cn("aspect-square size-full", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarFallback({
@@ -47,7 +47,7 @@ function AvatarFallback({
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -66,7 +66,7 @@ const sizeClasses = {
   sm: "size-8 text-sm",
   md: "size-10 text-base",
   lg: "size-12 text-lg",
-  xl: "size-16 text-xl",
+  xl: "size-16 text-xl"
 };
 
 /**
@@ -75,15 +75,17 @@ const sizeClasses = {
  */
 function getInitials(name: string): string {
   if (!name) return "?";
-  
+
   const parts = name.trim().split(/\s+/).filter(Boolean);
-  
+
   if (parts.length === 0) return "?";
   if (parts.length === 1) {
     return parts[0]!.charAt(0).toUpperCase();
   }
-  
-  return (parts[0]!.charAt(0) + parts[parts.length - 1]!.charAt(0)).toUpperCase();
+
+  return (
+    parts[0]!.charAt(0) + parts[parts.length - 1]!.charAt(0)
+  ).toUpperCase();
 }
 
 /**
@@ -95,19 +97,25 @@ function getColorFromName(name: string): string {
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   const hue = hash % 360;
   return `hsl(${hue}, 65%, 50%)`;
 }
 
-export function CustomAvatar({ src, alt, name, className, size = "md" }: CustomAvatarProps) {
+export function CustomAvatar({
+  src,
+  alt,
+  name,
+  className,
+  size = "md"
+}: CustomAvatarProps) {
   const initials = getInitials(name);
   const backgroundColor = getColorFromName(name);
-  
+
   return (
-    <Avatar className={cn(sizeClasses[size], className)}>
+    <Avatar className={cn(sizeClasses[size], className, "object-cover")}>
       <AvatarImage src={src || undefined} alt={alt || name} />
-      <AvatarFallback 
+      <AvatarFallback
         style={{ backgroundColor }}
         className="text-white font-semibold"
       >
@@ -117,4 +125,4 @@ export function CustomAvatar({ src, alt, name, className, size = "md" }: CustomA
   );
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarImage, AvatarFallback };
