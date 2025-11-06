@@ -6,13 +6,13 @@
 import { ModerationQueue } from "@/components/moderation/moderation-queue";
 
 interface ModerationPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function ModerationPage({ params }: ModerationPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   return (
     <div className="container mx-auto max-w-6xl py-8 px-4">

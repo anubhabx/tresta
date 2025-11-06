@@ -167,12 +167,6 @@ export interface UpdateTestimonialPayload {
   isPublished?: boolean;
 }
 
-export interface CreateWidgetPayload {
-  name: string;
-  slug: string;
-  description?: string;
-}
-
 export interface CreateProjectPayload {
   name: string;
   shortDescription?: string;
