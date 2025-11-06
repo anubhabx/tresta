@@ -7,16 +7,31 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage
+} from "@workspace/ui/components/avatar";
 import { Label } from "@workspace/ui/components/label";
 import { Input } from "@workspace/ui/components/input";
 import { toast } from "sonner";
 import { InlineLoader } from "./loader";
-import { UserIcon, MailIcon, KeyIcon, UserCircleIcon, CameraIcon } from "lucide-react";
+import {
+  UserIcon,
+  MailIcon,
+  KeyIcon,
+  UserCircleIcon,
+  CameraIcon,
+  ShieldCheckIcon,
+  LinkIcon,
+  CheckCircle2Icon
+} from "lucide-react";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+import { Badge } from "@workspace/ui/components/badge";
 
 interface AccountSettingsFormProps {
   user: NonNullable<ReturnType<typeof useUser>["user"]>;
@@ -27,10 +42,21 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
 
+  // Check if user has password authentication (not OAuth-only)
+  const hasPassword = user.passwordEnabled;
+  
+  // Get external accounts (OAuth connections)
+  const externalAccounts = user.externalAccounts || [];
+  const hasGoogleAccount = externalAccounts.some(
+    (account) => account.provider === "google"
+  );
+  const hasGithubAccount = externalAccounts.some(
+    (account) => account.provider === "github"
+  );
+
   // Profile Information State
   const [firstName, setFirstName] = useState(user.firstName || "");
   const [lastName, setLastName] = useState(user.lastName || "");
-  const [username, setUsername] = useState(user.username || "");
 
   // Password State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -39,7 +65,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!currentUser) {
       toast.error("User not found");
       return;
@@ -47,11 +73,10 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
     try {
       setLoading(true);
-      
+
       await currentUser.update({
         firstName: firstName || undefined,
         lastName: lastName || undefined,
-        username: username || undefined,
       });
 
       toast.success("Profile updated successfully!");
@@ -88,10 +113,10 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
     try {
       setLoading(true);
-      
+
       await currentUser.updatePassword({
         currentPassword,
-        newPassword,
+        newPassword
       });
 
       toast.success("Password updated successfully!");
@@ -172,7 +197,10 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user.imageUrl} alt={user.firstName || "User"} />
+                <AvatarImage
+                  src={user.imageUrl}
+                  alt={user.firstName || "User"}
+                />
                 <AvatarFallback>
                   <UserIcon className="h-12 w-12" />
                 </AvatarFallback>
@@ -183,14 +211,16 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1 space-y-3">
               <div className="flex gap-3">
                 <Button
                   variant="outline"
                   size="sm"
                   disabled={imageLoading}
-                  onClick={() => document.getElementById("avatar-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("avatar-upload")?.click()
+                  }
                 >
                   <CameraIcon className="h-4 w-4 mr-2" />
                   Change Image
@@ -245,7 +275,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                   disabled={loading}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
@@ -257,18 +287,6 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                   disabled={loading}
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                disabled={loading}
-              />
             </div>
 
             <div className="space-y-2">
@@ -307,67 +325,167 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
       </Card>
 
       {/* Password Section */}
+      {hasPassword ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <KeyIcon className="h-5 w-5" />
+              Change Password
+            </CardTitle>
+            <CardDescription>
+              Update your password to keep your account secure
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter your current password"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min. 8 characters)"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  disabled={loading}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <InlineLoader />
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Password"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheckIcon className="h-5 w-5" />
+              Password Authentication
+            </CardTitle>
+            <CardDescription>
+              You signed in with a social account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <ShieldCheckIcon className="h-5 w-5 text-blue-500 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">OAuth Authentication Active</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Your account uses social sign-in (Google/GitHub) for authentication. 
+                  Password management is not available for OAuth-only accounts.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Connected Accounts Section */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <KeyIcon className="h-5 w-5" />
-            Change Password
+            <LinkIcon className="h-5 w-5" />
+            Connected Accounts
           </CardTitle>
-          <CardDescription>Update your password to keep your account secure</CardDescription>
+          <CardDescription>
+            Manage your connected social accounts
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleUpdatePassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter your current password"
-                disabled={loading}
-              />
+        <CardContent className="space-y-3">
+          {/* Google Account */}
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-red-500/10">
+                <FaGoogle className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Google</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasGoogleAccount
+                    ? externalAccounts.find((a) => a.provider === "google")
+                        ?.emailAddress || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
             </div>
+            {hasGoogleAccount ? (
+              <Badge variant="outline" className="gap-1.5">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500" />
+                Connected
+              </Badge>
+            ) : (
+              <Badge variant="secondary">Not Connected</Badge>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password (min. 8 characters)"
-                disabled={loading}
-              />
+          {/* GitHub Account */}
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gray-500/10">
+                <FaGithub className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">GitHub</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasGithubAccount
+                    ? externalAccounts.find((a) => a.provider === "github")
+                        ?.username || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
             </div>
+            {hasGithubAccount ? (
+              <Badge variant="outline" className="gap-1.5">
+                <CheckCircle2Icon className="h-3 w-3 text-green-500" />
+                Connected
+              </Badge>
+            ) : (
+              <Badge variant="secondary">Not Connected</Badge>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                disabled={loading}
-              />
+          {externalAccounts.length === 0 && (
+            <div className="text-center py-6 text-sm text-muted-foreground">
+              No social accounts connected
             </div>
-
-            <Separator />
-
-            <div className="flex justify-end">
-              <Button type="submit" disabled={loading}>
-                {loading ? (
-                  <>
-                    <InlineLoader />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Password"
-                )}
-              </Button>
-            </div>
-          </form>
+          )}
         </CardContent>
       </Card>
 
@@ -380,18 +498,24 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center py-2 border-b">
             <span className="text-sm font-medium">Account ID</span>
-            <span className="text-sm text-muted-foreground font-mono">{user.id}</span>
+            <span className="text-sm text-muted-foreground font-mono">
+              {user.id}
+            </span>
           </div>
           <div className="flex justify-between items-center py-2 border-b">
             <span className="text-sm font-medium">Account Created</span>
             <span className="text-sm text-muted-foreground">
-              {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+              {user.createdAt
+                ? new Date(user.createdAt).toLocaleDateString()
+                : "N/A"}
             </span>
           </div>
           <div className="flex justify-between items-center py-2">
             <span className="text-sm font-medium">Last Updated</span>
             <span className="text-sm text-muted-foreground">
-              {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : "N/A"}
+              {user.updatedAt
+                ? new Date(user.updatedAt).toLocaleDateString()
+                : "N/A"}
             </span>
           </div>
         </CardContent>

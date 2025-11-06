@@ -1,8 +1,8 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { AccountSettingsForm } from "@/components/account-settings-form";
 import { LoadingStars } from "@/components/loader";
+import { AccountSettingsForm } from "@/components/account-settings-form";
 
 export default function AccountPage() {
   const { user, isLoaded } = useUser();
@@ -11,7 +11,9 @@ export default function AccountPage() {
     return (
       <div className="flex flex-col gap-4 w-full h-screen items-center justify-center">
         <LoadingStars />
-        <p className="text-sm text-muted-foreground">Loading account settings...</p>
+        <p className="text-sm text-muted-foreground">
+          Loading account settings...
+        </p>
       </div>
     );
   }
@@ -19,7 +21,9 @@ export default function AccountPage() {
   if (!user) {
     return (
       <div className="container mx-auto py-8 px-4">
-        <p className="text-center text-muted-foreground">Please sign in to view account settings.</p>
+        <p className="text-center text-muted-foreground">
+          Please sign in to view account settings.
+        </p>
       </div>
     );
   }
@@ -32,7 +36,7 @@ export default function AccountPage() {
           Manage your account information and preferences
         </p>
       </div>
-      
+
       <AccountSettingsForm user={user} />
     </div>
   );
