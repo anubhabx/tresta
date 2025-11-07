@@ -48,8 +48,6 @@ import { cn } from "@workspace/ui/lib/utils";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
-  onApprove: (id: string) => Promise<void>;
-  onReject: (id: string) => Promise<void>;
   onPublish: (id: string) => Promise<void>;
   onUnpublish: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -57,8 +55,6 @@ interface TestimonialCardProps {
 
 export function TestimonialCard({
   testimonial,
-  onApprove,
-  onReject,
   onPublish,
   onUnpublish,
   onDelete
@@ -166,22 +162,18 @@ export function TestimonialCard({
   };
 
   return (
-    <Card className="hover:shadow-md transition-all">
+    <Card className="hover:shadow-md transition-all h-full">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {testimonial.authorAvatar ? (
-              <img
-                src={testimonial.authorAvatar}
-                alt={testimonial.authorName}
-                className="h-10 w-10 rounded-full object-cover flex-shrink-0 ring-1 ring-border"
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-            )}
+            <CustomAvatar
+              src={testimonial.authorAvatar}
+              name={testimonial.authorName}
+              alt={testimonial.authorName}
+              size="md"
+              className="flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold truncate">
@@ -217,7 +209,7 @@ export function TestimonialCard({
         </div>
 
         {/* Content */}
-        <p className="text-sm mb-4 whitespace-pre-wrap">
+        <p className="text-sm mb-4 whitespace-pre-wrap flex-1">
           {testimonial.content}
         </p>
 
@@ -275,41 +267,7 @@ export function TestimonialCard({
         {/* Actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <TooltipProvider>
-            {!testimonial.isApproved && (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleAction(() => onApprove(testimonial.id))}
-                      disabled={isLoading}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      Approve
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Approve this testimonial</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-destructive hover:bg-destructive/10"
-                      onClick={() => handleAction(() => onReject(testimonial.id))}
-                      disabled={isLoading}
-                    >
-                      <XCircle className="h-4 w-4 mr-1" />
-                      Reject
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reject this testimonial</TooltipContent>
-                </Tooltip>
-              </>
-            )}
-
+            {/* Publish/Unpublish - Only for approved testimonials */}
             {testimonial.isApproved && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -344,6 +302,7 @@ export function TestimonialCard({
               </Tooltip>
             )}
 
+            {/* Delete */}
             <AlertDialog>
               <Tooltip>
                 <TooltipTrigger asChild>
