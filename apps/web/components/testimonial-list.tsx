@@ -622,18 +622,21 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
 
       {/* Filter Presets - Only in moderation mode */}
       {moderationMode && (
-        <FilterPresets
-          activePreset={activePreset}
-          onPresetChange={handlePresetChange}
-          counts={stats}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <FilterPresets
+            activePreset={activePreset}
+            onPresetChange={handlePresetChange}
+            counts={stats}
+          />
+          <KeyboardShortcutsHelp />
+        </div>
       )}
 
       {/* Header with Stats - Only in normal mode */}
       {!moderationMode && (
         <div className="flex items-center gap-4 pb-4 border-b flex-wrap">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-sm">
+            <Badge variant="outline" className="px-3 py-1 rounded-md border bg-muted/30">
               {data?.meta?.pagination?.total || 0} Total
             </Badge>
           </div>
@@ -839,10 +842,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         </div>
       ) : (
         <>
-          <div className={cn(
-            "grid gap-4",
-            moderationMode ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"
-          )}>
+          <div className="grid gap-4 grid-cols-1">
             {filteredTestimonials?.map((testimonial: Testimonial) => (
               moderationMode ? (
                 <ModerationTestimonialCard
@@ -856,19 +856,13 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
                   loadingAction={loadingState?.id === testimonial.id ? loadingState.action : null}
                 />
               ) : (
-                <div
+                <TestimonialCard
                   key={testimonial.id}
-                  className={cn(
-                    "relative group transition-all duration-200"
-                  )}
-                >
-                  <TestimonialCard
-                    testimonial={testimonial}
-                    onPublish={handlePublish}
-                    onUnpublish={handleUnpublish}
-                    onDelete={handleDelete}
-                  />
-                </div>
+                  testimonial={testimonial}
+                  onPublish={handlePublish}
+                  onUnpublish={handleUnpublish}
+                  onDelete={handleDelete}
+                />
               )
             ))}
           </div>
