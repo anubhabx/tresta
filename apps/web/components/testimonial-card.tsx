@@ -3,20 +3,19 @@
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import {
-  CheckCircle,
-  XCircle,
   Star,
-  Trash2,
-  Eye,
-  EyeOff,
   Mail,
   User,
   Video,
   Briefcase,
   Building2,
-  ShieldCheck,
   AlertTriangle,
-  Shield
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Shield,
+  Trash2,
+  XCircle
 } from "lucide-react";
 import type { Testimonial } from "@/types/api";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
@@ -25,7 +24,6 @@ import {
   Card,
   CardContent
 } from "@workspace/ui/components/card";
-import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   AlertDialog,
@@ -45,6 +43,8 @@ import {
   TooltipTrigger
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
+import { StatusBadge, TestimonialActions } from "./testimonials";
+import { Button } from "@workspace/ui/components/button";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -162,8 +162,8 @@ export function TestimonialCard({
   };
 
   return (
-    <Card className="hover:shadow-md transition-all h-full">
-      <CardContent className="p-6">
+    <Card className="transition-all hover:shadow-md">
+      <CardContent className="p-6 h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -181,7 +181,7 @@ export function TestimonialCard({
                 </h3>
                 {testimonial.isOAuthVerified && (
                   <Badge variant="secondary" className="text-xs bg-primary/5 border-primary/20">
-                    <ShieldCheck className="h-3 w-3 mr-1 text-primary" />
+                    <Shield className="h-3 w-3 mr-1 text-primary" />
                     Verified
                   </Badge>
                 )}
@@ -209,7 +209,7 @@ export function TestimonialCard({
         </div>
 
         {/* Content */}
-        <p className="text-sm mb-4 whitespace-pre-wrap flex-1">
+        <p className="text-sm mb-4 whitespace-pre-wrap">
           {testimonial.content}
         </p>
 
