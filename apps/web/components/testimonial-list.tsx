@@ -172,6 +172,10 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       } else if (activePreset === "verified") {
         filtered = filtered.filter((t) => t.isOAuthVerified);
       }
+      // When activePreset is "all", show all testimonials in moderation mode
+    } else {
+      // Regular mode: Show only APPROVED testimonials
+      filtered = filtered.filter((t) => t.isApproved === true);
     }
 
     return filtered;
@@ -187,7 +191,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
           moderationStatus: "APPROVED" as ModerationStatus
         } 
       });
-      toast.success("Testimonial approved!");
+      toast.success("Testimonial approved! View in Testimonials tab to publish it.");
     } catch (error: any) {
       toast.error(error?.message || "Failed to approve testimonial");
     } finally {
@@ -219,7 +223,13 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       await updateMutation.mutateAsync({ id, data: { isPublished: true } });
       toast.success("Testimonial published!");
     } catch (error: any) {
-      toast.error(error?.message || "Failed to publish testimonial");
+      const errorMessage = error?.message || "Failed to publish testimonial";
+      // Check if it's the approval workflow error
+      if (errorMessage.includes("approved")) {
+        toast.error("Cannot publish unapproved testimonial. Approve it in the Moderation tab first.");
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setLoadingState(null);
     }
@@ -581,11 +591,20 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       ) : filteredTestimonials && filteredTestimonials.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed rounded-lg">
           <div className="flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-            <Search className="h-8 w-8 text-muted-foreground" />
+            {moderationMode ? (
+              <ShieldCheck className="h-8 w-8 text-muted-foreground" />
+            ) : (
+              <CheckCircle2 className="h-8 w-8 text-muted-foreground" />
+            )}
           </div>
-          <h3 className="text-xl font-semibold mb-2">No Results Found</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            {moderationMode ? "All Clear!" : "No Approved Testimonials"}
+          </h3>
           <p className="text-muted-foreground text-center max-w-md">
-            Try adjusting your filters or search query
+            {moderationMode 
+              ? "No testimonials need review. All submissions have been processed."
+              : "Approve testimonials in the Moderation tab first, then publish them here."
+            }
           </p>
         </div>
       ) : (
@@ -601,8 +620,6 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
                   testimonial={testimonial}
                   onApprove={handleApprove}
                   onReject={handleReject}
-                  onPublish={handlePublish}
-                  onUnpublish={handleUnpublish}
                   onDelete={handleDelete}
                   isSelected={selectedIds.includes(testimonial.id)}
                   onToggleSelect={toggleSelection}
@@ -617,8 +634,6 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
                 >
                   <TestimonialCard
                     testimonial={testimonial}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
                     onPublish={handlePublish}
                     onUnpublish={handleUnpublish}
                     onDelete={handleDelete}
