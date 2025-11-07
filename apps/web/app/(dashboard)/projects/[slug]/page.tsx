@@ -112,7 +112,8 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
             <CardHeader>
               <CardTitle>Moderation Queue</CardTitle>
               <CardDescription>
-                Review pending testimonials with advanced moderation tools, bulk actions, and auto-moderation insights.
+                Review pending testimonials with advanced moderation tools, bulk
+                actions, and auto-moderation insights.
               </CardDescription>
             </CardHeader>
             <CardContent>

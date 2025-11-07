@@ -5,7 +5,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { CustomFormField } from "@/components/custom-form-field";
 import { ProjectTypeSelect } from "@/components/forms/project-type-select";
@@ -27,32 +27,38 @@ export function BasicInfoSection({
   setValue,
   getValues,
   watch,
-  enableSlugAutoGeneration = true
+  enableSlugAutoGeneration = true,
 }: BasicInfoSectionProps) {
   // Track the last auto-generated slug to know if user has manually edited it
   const [lastAutoSlug, setLastAutoSlug] = useState("");
   const [userEditedSlug, setUserEditedSlug] = useState(false);
 
-  const handleNameChange = useCallback((value: string) => {
-    if (!enableSlugAutoGeneration) return;
-    
-    const newSlug = generateSlug(value);
+  const handleNameChange = useCallback(
+    (value: string) => {
+      if (!enableSlugAutoGeneration) return;
 
-    // Only auto-update slug if user hasn't manually edited it
-    if (!userEditedSlug) {
-      setValue("slug", newSlug);
-      setLastAutoSlug(newSlug);
-    }
-  }, [userEditedSlug, setValue, enableSlugAutoGeneration]);
+      const newSlug = generateSlug(value);
 
-  const handleSlugChange = useCallback((slug: string) => {
-    if (!enableSlugAutoGeneration) return;
-    
-    // Mark as manually edited if it differs from the auto-generated slug
-    if (slug !== lastAutoSlug) {
-      setUserEditedSlug(true);
-    }
-  }, [lastAutoSlug, enableSlugAutoGeneration]);
+      // Only auto-update slug if user hasn't manually edited it
+      if (!userEditedSlug) {
+        setValue("slug", newSlug);
+        setLastAutoSlug(newSlug);
+      }
+    },
+    [userEditedSlug, setValue, enableSlugAutoGeneration],
+  );
+
+  const handleSlugChange = useCallback(
+    (slug: string) => {
+      if (!enableSlugAutoGeneration) return;
+
+      // Mark as manually edited if it differs from the auto-generated slug
+      if (slug !== lastAutoSlug) {
+        setUserEditedSlug(true);
+      }
+    },
+    [lastAutoSlug, enableSlugAutoGeneration],
+  );
 
   return (
     <Card>
@@ -112,7 +118,9 @@ export function BasicInfoSection({
 
         <ProjectTypeSelect
           value={watch("projectType")}
-          onValueChange={(value) => setValue("projectType", value as ProjectType)}
+          onValueChange={(value) =>
+            setValue("projectType", value as ProjectType)
+          }
         />
 
         <VisibilitySelect

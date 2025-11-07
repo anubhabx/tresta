@@ -44,11 +44,7 @@ export function ProjectOverviewTab({
               <CopyIcon className="h-4 w-4 mr-2" />
               Copy
             </Button>
-            <a
-              href={collectionUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={collectionUrl} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm">
                 <ExternalLinkIcon className="h-4 w-4 mr-2" />
                 Visit
@@ -62,9 +58,8 @@ export function ProjectOverviewTab({
                 Share this link with your customers
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Anyone with this link can submit a testimonial for your
-                project. You can moderate submissions before they appear
-                publicly.
+                Anyone with this link can submit a testimonial for your project.
+                You can moderate submissions before they appear publicly.
               </p>
             </div>
           </div>

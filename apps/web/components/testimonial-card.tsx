@@ -15,15 +15,12 @@ import {
   EyeOff,
   Shield,
   Trash2,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import type { Testimonial } from "@/types/api";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 
-import {
-  Card,
-  CardContent
-} from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   AlertDialog,
@@ -34,13 +31,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { StatusBadge, TestimonialActions } from "./testimonials";
@@ -57,7 +54,7 @@ export function TestimonialCard({
   testimonial,
   onPublish,
   onUnpublish,
-  onDelete
+  onDelete,
 }: TestimonialCardProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -111,48 +108,62 @@ export function TestimonialCard({
       case "FLAGGED":
         return (
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-destructive/30 text-destructive">
+            <Badge
+              variant="outline"
+              className="border-destructive/30 text-destructive"
+            >
               <AlertTriangle className="h-3 w-3 mr-1" />
               Flagged
             </Badge>
-            {testimonial.moderationFlags && 
-             Array.isArray(testimonial.moderationFlags) && 
-             testimonial.moderationFlags.length > 0 && (
-              <div className="p-2 rounded-md bg-muted/50 border text-xs">
-                <p className="font-medium mb-1">Issues:</p>
-                <ul className="space-y-0.5">
-                  {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
-                    <li key={i} className="text-muted-foreground">• {flag}</li>
-                  ))}
-                  {testimonial.moderationFlags.length > 3 && (
-                    <li className="text-muted-foreground">
-                      +{testimonial.moderationFlags.length - 3} more
-                    </li>
-                  )}
-                </ul>
-              </div>
-            )}
+            {testimonial.moderationFlags &&
+              Array.isArray(testimonial.moderationFlags) &&
+              testimonial.moderationFlags.length > 0 && (
+                <div className="p-2 rounded-md bg-muted/50 border text-xs">
+                  <p className="font-medium mb-1">Issues:</p>
+                  <ul className="space-y-0.5">
+                    {testimonial.moderationFlags
+                      .slice(0, 3)
+                      .map((flag: string, i: number) => (
+                        <li key={i} className="text-muted-foreground">
+                          • {flag}
+                        </li>
+                      ))}
+                    {testimonial.moderationFlags.length > 3 && (
+                      <li className="text-muted-foreground">
+                        +{testimonial.moderationFlags.length - 3} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
           </div>
         );
       case "REJECTED":
         return (
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-destructive/30 text-destructive">
+            <Badge
+              variant="outline"
+              className="border-destructive/30 text-destructive"
+            >
               <XCircle className="h-3 w-3 mr-1" />
               Rejected
             </Badge>
-            {testimonial.moderationFlags && 
-             Array.isArray(testimonial.moderationFlags) && 
-             testimonial.moderationFlags.length > 0 && (
-              <div className="p-2 rounded-md bg-muted/50 border text-xs">
-                <p className="font-medium mb-1">Reasons:</p>
-                <ul className="space-y-0.5">
-                  {testimonial.moderationFlags.slice(0, 3).map((flag: string, i: number) => (
-                    <li key={i} className="text-muted-foreground">• {flag}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {testimonial.moderationFlags &&
+              Array.isArray(testimonial.moderationFlags) &&
+              testimonial.moderationFlags.length > 0 && (
+                <div className="p-2 rounded-md bg-muted/50 border text-xs">
+                  <p className="font-medium mb-1">Reasons:</p>
+                  <ul className="space-y-0.5">
+                    {testimonial.moderationFlags
+                      .slice(0, 3)
+                      .map((flag: string, i: number) => (
+                        <li key={i} className="text-muted-foreground">
+                          • {flag}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
           </div>
         );
       case "PENDING":
@@ -180,7 +191,10 @@ export function TestimonialCard({
                   {testimonial.authorName}
                 </h3>
                 {testimonial.isOAuthVerified && (
-                  <Badge variant="secondary" className="text-xs bg-primary/5 border-primary/20">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-primary/5 border-primary/20"
+                  >
                     <Shield className="h-3 w-3 mr-1 text-primary" />
                     Verified
                   </Badge>
@@ -203,9 +217,7 @@ export function TestimonialCard({
           </div>
 
           {/* Status Badge */}
-          <div className="ml-2 flex-shrink-0">
-            {getStatusBadge()}
-          </div>
+          <div className="ml-2 flex-shrink-0">{getStatusBadge()}</div>
         </div>
 
         {/* Content */}
@@ -224,7 +236,7 @@ export function TestimonialCard({
                     "h-3 w-3",
                     index < testimonial.rating!
                       ? "fill-primary text-primary"
-                      : "text-muted-foreground/30"
+                      : "text-muted-foreground/30",
                   )}
                 />
               ))}
@@ -232,7 +244,9 @@ export function TestimonialCard({
             </div>
           )}
           <span>
-            {formatDistanceToNow(new Date(testimonial.createdAt), { addSuffix: true })}
+            {formatDistanceToNow(new Date(testimonial.createdAt), {
+              addSuffix: true,
+            })}
           </span>
           {testimonial.type === "VIDEO" && (
             <div className="flex items-center gap-1">
@@ -258,11 +272,10 @@ export function TestimonialCard({
         )}
 
         {/* Moderation Info */}
-        {testimonial.moderationStatus && testimonial.moderationStatus !== "PENDING" && (
-          <div className="mb-4">
-            {getModerationBadge()}
-          </div>
-        )}
+        {testimonial.moderationStatus &&
+          testimonial.moderationStatus !== "PENDING" && (
+            <div className="mb-4">{getModerationBadge()}</div>
+          )}
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -275,7 +288,9 @@ export function TestimonialCard({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleAction(() => onUnpublish(testimonial.id))}
+                      onClick={() =>
+                        handleAction(() => onUnpublish(testimonial.id))
+                      }
                       disabled={isLoading}
                     >
                       <EyeOff className="h-4 w-4 mr-1" />
@@ -286,7 +301,9 @@ export function TestimonialCard({
                       size="sm"
                       variant="outline"
                       className="border-primary/20 text-primary hover:bg-primary/5"
-                      onClick={() => handleAction(() => onPublish(testimonial.id))}
+                      onClick={() =>
+                        handleAction(() => onPublish(testimonial.id))
+                      }
                       disabled={isLoading}
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -324,8 +341,8 @@ export function TestimonialCard({
                   <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
                   <AlertDialogDescription>
                     Are you sure you want to delete this testimonial from{" "}
-                    <strong>{testimonial.authorName}</strong>? This action cannot
-                    be undone.
+                    <strong>{testimonial.authorName}</strong>? This action
+                    cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

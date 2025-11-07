@@ -6,11 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import {
-  MessageSquareIcon,
-  LayoutGridIcon,
-  SettingsIcon,
-} from "lucide-react";
+import { MessageSquareIcon, LayoutGridIcon, SettingsIcon } from "lucide-react";
 import type { Project } from "@/types/api";
 
 interface ProjectStatsCardsProps {
@@ -39,9 +35,7 @@ export function ProjectStatsCards({ project }: ProjectStatsCardsProps) {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Active Widgets
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Active Widgets</CardTitle>
           <LayoutGridIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>

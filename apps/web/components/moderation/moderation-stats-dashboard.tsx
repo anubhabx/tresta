@@ -7,7 +7,7 @@ import {
   Clock,
   XCircle,
   Shield,
-  Zap
+  Zap,
 } from "lucide-react";
 
 interface ModerationStats {
@@ -24,7 +24,7 @@ interface ModerationStatsDashboardProps {
 }
 
 export function ModerationStatsDashboard({
-  stats
+  stats,
 }: ModerationStatsDashboardProps) {
   const total = stats.pending + stats.flagged + stats.approved + stats.rejected;
 

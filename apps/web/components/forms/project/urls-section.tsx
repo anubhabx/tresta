@@ -4,7 +4,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { CustomFormField } from "@/components/custom-form-field";
 import { ProjectFormData } from "@/lib/schemas/project-schema";

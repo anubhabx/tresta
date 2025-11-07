@@ -5,7 +5,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
@@ -14,7 +14,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { Info, Star, X } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -27,7 +27,7 @@ import {
   ColorPickerAlpha,
   ColorPickerEyeDropper,
   ColorPickerOutput,
-  ColorPickerFormat
+  ColorPickerFormat,
 } from "@/components/color-picker";
 import { FileUpload } from "@workspace/ui/components/file-upload";
 
@@ -97,7 +97,7 @@ type CustomFormFieldProps<TFieldValues extends FieldValues> =
   | FileUploadFormFieldProps<TFieldValues>;
 
 export function CustomFormField<TFieldValues extends FieldValues>(
-  props: CustomFormFieldProps<TFieldValues>
+  props: CustomFormFieldProps<TFieldValues>,
 ) {
   const {
     control,
@@ -108,7 +108,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
     required = false,
     optional = false,
     className,
-    disabled = false
+    disabled = false,
   } = props;
 
   // State for password visibility
@@ -295,7 +295,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
                           }`}
                         />
                       </button>
-                    )
+                    ),
                   )}
                   {selectedRating > 0 && (
                     <span className="ml-2 text-sm font-medium text-muted-foreground">
@@ -338,7 +338,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
                 props.onChange(hex);
               }
             },
-            [field.onChange]
+            [field.onChange],
           );
 
           return (
@@ -385,11 +385,11 @@ export function CustomFormField<TFieldValues extends FieldValues>(
           <FormItem className={className}>
             {renderLabel()}
             <FormControl>
-              <FileUpload 
+              <FileUpload
                 onChange={(files) => {
                   field.onChange(files);
                   props.onChange?.(files);
-                }} 
+                }}
               />
             </FormControl>
             <FormMessage />

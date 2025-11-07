@@ -13,7 +13,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -22,7 +22,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -40,7 +40,7 @@ interface ColorPickerContextValue {
 }
 
 const ColorPickerContext = createContext<ColorPickerContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 export const useColorPicker = () => {
@@ -70,13 +70,13 @@ export const ColorPicker = ({
   const defaultColor = Color(defaultValue);
 
   const [hue, setHue] = useState(
-    selectedColor.hue() || defaultColor.hue() || 0
+    selectedColor.hue() || defaultColor.hue() || 0,
   );
   const [saturation, setSaturation] = useState(
-    selectedColor.saturationl() || defaultColor.saturationl() || 100
+    selectedColor.saturationl() || defaultColor.saturationl() || 100,
   );
   const [lightness, setLightness] = useState(
-    selectedColor.lightness() || defaultColor.lightness() || 50
+    selectedColor.lightness() || defaultColor.lightness() || 50,
   );
   const [alpha, setAlpha] = useState(() => {
     const selectedAlpha = selectedColor.alpha();
@@ -127,7 +127,7 @@ export const ColorPicker = ({
         setSaturation,
         setLightness,
         setAlpha,
-        setMode
+        setMode,
       }}
     >
       <div
@@ -162,11 +162,11 @@ export const ColorPickerSelection = memo(
         const rect = containerRef.current.getBoundingClientRect();
         const x = Math.max(
           0,
-          Math.min(1, (event.clientX - rect.left) / rect.width)
+          Math.min(1, (event.clientX - rect.left) / rect.width),
         );
         const y = Math.max(
           0,
-          Math.min(1, (event.clientY - rect.top) / rect.height)
+          Math.min(1, (event.clientY - rect.top) / rect.height),
         );
         setPositionX(x);
         setPositionY(y);
@@ -176,7 +176,7 @@ export const ColorPickerSelection = memo(
 
         setLightness(lightness);
       },
-      [isDragging, setSaturation, setLightness]
+      [isDragging, setSaturation, setLightness],
     );
 
     useEffect(() => {
@@ -203,7 +203,7 @@ export const ColorPickerSelection = memo(
         }}
         ref={containerRef}
         style={{
-          background: backgroundGradient
+          background: backgroundGradient,
         }}
         {...props}
       >
@@ -212,12 +212,12 @@ export const ColorPickerSelection = memo(
           style={{
             left: `${positionX * 100}%`,
             top: `${positionY * 100}%`,
-            boxShadow: "0 0 0 1px rgba(0,0,0,0.5)"
+            boxShadow: "0 0 0 1px rgba(0,0,0,0.5)",
           }}
         />
       </div>
     );
-  }
+  },
 );
 
 ColorPickerSelection.displayName = "ColorPickerSelection";
@@ -268,7 +268,7 @@ export const ColorPickerAlpha = ({
         className="relative my-0.5 h-3 w-full grow rounded-full"
         style={{
           background:
-            'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center'
+            'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center',
         }}
       >
         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent to-black/50" />
@@ -346,7 +346,11 @@ export const ColorPickerOutput = ({
 
 type PercentageInputProps = ComponentProps<typeof Input>;
 
-const PercentageInput = ({ className, value, ...props }: PercentageInputProps) => {
+const PercentageInput = ({
+  className,
+  value,
+  ...props
+}: PercentageInputProps) => {
   return (
     <div className="relative">
       <Input
@@ -356,7 +360,7 @@ const PercentageInput = ({ className, value, ...props }: PercentageInputProps) =
         {...props}
         className={cn(
           "h-8 w-[3.25rem] rounded-l-none bg-secondary px-2 text-xs shadow-none",
-          className
+          className,
         )}
       />
       <span className="-translate-y-1/2 absolute top-1/2 right-2 text-muted-foreground text-xs">
@@ -372,7 +376,16 @@ export const ColorPickerFormat = ({
   className,
   ...props
 }: ColorPickerFormatProps) => {
-  const { hue, saturation, lightness, alpha, mode, setHue, setSaturation, setLightness } = useColorPicker();
+  const {
+    hue,
+    saturation,
+    lightness,
+    alpha,
+    mode,
+    setHue,
+    setSaturation,
+    setLightness,
+  } = useColorPicker();
   const color = Color.hsl(hue, saturation, lightness, alpha / 100);
 
   if (mode === "hex") {
@@ -398,7 +411,7 @@ export const ColorPickerFormat = ({
       <div
         className={cn(
           "-space-x-px relative flex w-full items-center rounded-md shadow-sm",
-          className
+          className,
         )}
         {...props}
       >
@@ -426,7 +439,11 @@ export const ColorPickerFormat = ({
         if (!isNaN(numValue) && numValue >= 0 && numValue <= 255) {
           const newRgb = [...rgb];
           newRgb[index] = numValue;
-          const newColor = Color.rgb(newRgb[0] ?? 0, newRgb[1] ?? 0, newRgb[2] ?? 0);
+          const newColor = Color.rgb(
+            newRgb[0] ?? 0,
+            newRgb[1] ?? 0,
+            newRgb[2] ?? 0,
+          );
           const hslValues = newColor.hsl().array();
           setHue(hslValues[0] as number);
           setSaturation(hslValues[1] as number);
@@ -441,7 +458,7 @@ export const ColorPickerFormat = ({
       <div
         className={cn(
           "-space-x-px flex items-center rounded-md shadow-sm",
-          className
+          className,
         )}
         {...props}
       >
@@ -450,7 +467,7 @@ export const ColorPickerFormat = ({
             className={cn(
               "h-8 rounded-r-none bg-secondary px-2 text-xs shadow-none",
               index && "rounded-l-none",
-              className
+              className,
             )}
             key={index}
             type="text"
@@ -492,7 +509,11 @@ export const ColorPickerFormat = ({
       try {
         const numValue = parseInt(value, 10);
         const maxValues = [360, 100, 100]; // H: 0-360, S: 0-100, L: 0-100
-        if (!isNaN(numValue) && numValue >= 0 && numValue <= (maxValues[index] ?? 100)) {
+        if (
+          !isNaN(numValue) &&
+          numValue >= 0 &&
+          numValue <= (maxValues[index] ?? 100)
+        ) {
           const newHsl = [...hsl];
           newHsl[index] = numValue;
           setHue(newHsl[0] ?? 0);
@@ -508,7 +529,7 @@ export const ColorPickerFormat = ({
       <div
         className={cn(
           "-space-x-px flex items-center rounded-md shadow-sm",
-          className
+          className,
         )}
         {...props}
       >
@@ -517,7 +538,7 @@ export const ColorPickerFormat = ({
             className={cn(
               "h-8 rounded-r-none bg-secondary px-2 text-xs shadow-none",
               index && "rounded-l-none",
-              className
+              className,
             )}
             key={index}
             type="text"

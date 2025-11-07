@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
@@ -27,7 +27,7 @@ import { OAuthButtons } from "./auth/oauth-buttons";
 
 const SignInFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
-  password: z.string().min(6, { message: "Password is required" })
+  password: z.string().min(6, { message: "Password is required" }),
 });
 
 const SignInForm = () => {
@@ -50,8 +50,8 @@ const SignInForm = () => {
     resolver: zodResolver(SignInFormSchema),
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
   const onSubmitSignIn = async (data: z.infer<typeof SignInFormSchema>) => {
@@ -76,7 +76,7 @@ const SignInForm = () => {
       setLoading(true);
       const completeSignIn = await signIn?.create({
         identifier: data.email,
-        password: data.password
+        password: data.password,
       });
 
       if (!completeSignIn) {
@@ -102,7 +102,7 @@ const SignInForm = () => {
     void signIn?.authenticateWithRedirect({
       strategy: `oauth_${provider}`,
       redirectUrl: `${window.location.origin}/sso-callback`,
-      redirectUrlComplete: `${window.location.origin}/dashboard`
+      redirectUrlComplete: `${window.location.origin}/dashboard`,
     });
   };
 

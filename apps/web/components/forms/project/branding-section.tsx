@@ -4,7 +4,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
@@ -17,7 +17,10 @@ interface BrandingSectionProps {
   onLogoUpload?: (file: File) => void;
 }
 
-export function BrandingSection({ control, onLogoUpload }: BrandingSectionProps) {
+export function BrandingSection({
+  control,
+  onLogoUpload,
+}: BrandingSectionProps) {
   return (
     <Card>
       <CardHeader>

@@ -10,7 +10,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription
+  FormDescription,
 } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
 import { Progress } from "@workspace/ui/components/progress";
@@ -18,7 +18,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
   useAzureSAS,
   UploadDirectory,
-  validateFile
+  validateFile,
 } from "@/hooks/use-azure-sas";
 
 interface AzureFileUploadProps<TFieldValues extends FieldValues> {
@@ -37,7 +37,7 @@ interface AzureFileUploadProps<TFieldValues extends FieldValues> {
 /**
  * Azure File Upload Component
  * Handles file uploads to Azure Blob Storage with SAS URLs
- * 
+ *
  * @example
  * ```tsx
  * <AzureFileUpload
@@ -60,7 +60,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
   maxSizeMB,
   preview = false,
   className,
-  onUploadComplete
+  onUploadComplete,
 }: AzureFileUploadProps<TFieldValues>) {
   const { uploadFile, uploading, progress, error, reset } = useAzureSAS();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
 
   const handleFileSelect = async (
     file: File,
-    onChange: (value: string) => void
+    onChange: (value: string) => void,
   ) => {
     reset();
 
@@ -99,7 +99,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
         },
         onError: (err) => {
           toast.error(err.message);
-        }
+        },
       });
 
       if (result) {
@@ -127,13 +127,13 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
       render={({ field }) => {
         const currentUrl = field.value as string;
         const displayUrl = previewUrl || currentUrl;
-        const isImage = displayUrl && (
-          displayUrl.includes(".png") ||
-          displayUrl.includes(".jpg") ||
-          displayUrl.includes(".jpeg") ||
-          displayUrl.includes(".webp") ||
-          displayUrl.includes(".svg")
-        );
+        const isImage =
+          displayUrl &&
+          (displayUrl.includes(".png") ||
+            displayUrl.includes(".jpg") ||
+            displayUrl.includes(".jpeg") ||
+            displayUrl.includes(".webp") ||
+            displayUrl.includes(".svg"));
 
         return (
           <FormItem className={className}>
@@ -150,7 +150,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                       "w-full h-32 border-2 border-dashed rounded-lg",
                       "cursor-pointer transition-colors",
                       "border-muted-foreground/25 hover:border-muted-foreground/50",
-                      "hover:bg-muted/10"
+                      "hover:bg-muted/10",
                     )}
                   >
                     <div className="flex flex-col items-center justify-center p-6 text-center">
@@ -232,9 +232,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                 )}
 
                 {/* Error Display */}
-                {error && (
-                  <p className="text-sm text-destructive">{error}</p>
-                )}
+                {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             </FormControl>
             <FormMessage />

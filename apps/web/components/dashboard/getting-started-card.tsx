@@ -13,9 +13,7 @@ export function GettingStartedCard() {
     <Card>
       <CardHeader>
         <CardTitle>Getting Started</CardTitle>
-        <CardDescription>
-          Tips to get the most out of Tresta
-        </CardDescription>
+        <CardDescription>Tips to get the most out of Tresta</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="space-y-3 text-sm">

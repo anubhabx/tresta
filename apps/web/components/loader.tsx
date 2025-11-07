@@ -27,10 +27,10 @@ export function LoadingStars({
 
     // Select all outline and fill elements
     const outlines = gsap.utils.toArray<SVGPathElement>(
-      containerRef.current.querySelectorAll(".star-outline")
+      containerRef.current.querySelectorAll(".star-outline"),
     );
     const fills = gsap.utils.toArray<SVGPathElement>(
-      containerRef.current.querySelectorAll(".star-fill")
+      containerRef.current.querySelectorAll(".star-fill"),
     );
 
     // Initial state: all hidden
@@ -69,7 +69,7 @@ export function LoadingStars({
           strokeDashoffset: 0,
           duration: drawDuration,
         },
-        startTime
+        startTime,
       );
 
       // Fade in fill
@@ -80,7 +80,7 @@ export function LoadingStars({
             opacity: 1,
             duration: fillDuration,
           },
-          startTime + drawDuration * 0.5
+          startTime + drawDuration * 0.5,
         );
       }
     });
@@ -89,13 +89,10 @@ export function LoadingStars({
     tl.to({}, { duration: holdDuration });
 
     // Fade out all stars
-    tl.to(
-      [...outlines, ...fills],
-      {
-        opacity: 0,
-        duration: fadeOutDuration,
-      }
-    );
+    tl.to([...outlines, ...fills], {
+      opacity: 0,
+      duration: fadeOutDuration,
+    });
 
     // Reset stroke offsets for next loop
     tl.set(outlines, { strokeDashoffset: 100 });
@@ -117,7 +114,7 @@ export function LoadingStars({
       {...props}
     >
       <title>{ariaLabel}</title>
-      
+
       {/* Render 5 stars */}
       {[0, 32, 64, 96, 128].map((x, i) => (
         <g key={i} transform={`translate(${x}, 0)`}>

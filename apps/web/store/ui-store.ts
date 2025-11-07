@@ -17,11 +17,11 @@ export const useUIStore = create<UIState>()(
         toggleSidebar: () => set({ sidebarOpen: !get().sidebarOpen }),
 
         projectDisplayMode: "grid",
-        setProjectDisplayMode: (mode) => set({ projectDisplayMode: mode })
+        setProjectDisplayMode: (mode) => set({ projectDisplayMode: mode }),
       };
     },
     {
-      name: "ui-storage"
-    }
-  )
+      name: "ui-storage",
+    },
+  ),
 );

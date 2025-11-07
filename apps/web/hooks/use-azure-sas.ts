@@ -9,7 +9,7 @@ export const UploadDirectory = {
   AVATARS: "avatars",
   VIDEOS: "videos",
   IMAGES: "images",
-  DOCUMENTS: "documents"
+  DOCUMENTS: "documents",
 } as const;
 
 export type UploadDirectory =
@@ -46,7 +46,7 @@ export interface UploadResult {
 async function uploadToAzure(
   file: File,
   uploadUrl: string,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -66,8 +66,8 @@ async function uploadToAzure(
       } else {
         reject(
           new Error(
-            `Upload failed with status ${xhr.status}: ${xhr.statusText}`
-          )
+            `Upload failed with status ${xhr.status}: ${xhr.statusText}`,
+          ),
         );
       }
     });
@@ -117,7 +117,7 @@ export function useAzureSAS() {
     async (
       file: File,
       directory: UploadDirectory,
-      options?: UploadOptions
+      options?: UploadOptions,
     ): Promise<UploadResult | null> => {
       try {
         setUploading(true);
@@ -137,21 +137,21 @@ export function useAzureSAS() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`
+              Authorization: `Bearer ${authToken}`,
             },
             body: JSON.stringify({
               filename: file.name,
               contentType: file.type,
               directory,
-              fileSize: file.size
-            } as GenerateUploadUrlRequest)
-          }
+              fileSize: file.size,
+            } as GenerateUploadUrlRequest),
+          },
         );
 
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
-            errorData.error?.message || "Failed to generate upload URL"
+            errorData.error?.message || "Failed to generate upload URL",
           );
         }
 
@@ -167,7 +167,7 @@ export function useAzureSAS() {
         // Step 3: Return the result
         const result: UploadResult = {
           blobUrl: uploadData.blobUrl,
-          blobName: uploadData.blobName
+          blobName: uploadData.blobName,
         };
 
         setProgress(100);
@@ -178,14 +178,14 @@ export function useAzureSAS() {
           err instanceof Error ? err.message : "Upload failed";
         setError(errorMessage);
         options?.onError?.(
-          err instanceof Error ? err : new Error(errorMessage)
+          err instanceof Error ? err : new Error(errorMessage),
         );
         return null;
       } finally {
         setUploading(false);
       }
     },
-    [getToken]
+    [getToken],
   );
 
   /**
@@ -201,7 +201,7 @@ export function useAzureSAS() {
     uploading,
     progress,
     error,
-    reset
+    reset,
   };
 }
 
@@ -226,7 +226,7 @@ export async function uploadFileToAzure(
   file: File,
   directory: UploadDirectory,
   authToken: string,
-  options?: UploadOptions
+  options?: UploadOptions,
 ): Promise<UploadResult | null> {
   try {
     if (!authToken) {
@@ -240,21 +240,21 @@ export async function uploadFileToAzure(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           filename: file.name,
           contentType: file.type,
           directory,
-          fileSize: file.size
-        } as GenerateUploadUrlRequest)
-      }
+          fileSize: file.size,
+        } as GenerateUploadUrlRequest),
+      },
     );
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.error?.message || "Failed to generate upload URL"
+        errorData.error?.message || "Failed to generate upload URL",
       );
     }
 
@@ -267,7 +267,7 @@ export async function uploadFileToAzure(
     // Step 3: Return result
     const result: UploadResult = {
       blobUrl: uploadData.blobUrl,
-      blobName: uploadData.blobName
+      blobName: uploadData.blobName,
     };
 
     options?.onSuccess?.(result);
@@ -284,7 +284,7 @@ export async function uploadFileToAzure(
  */
 export function validateFile(
   file: File,
-  directory: UploadDirectory
+  directory: UploadDirectory,
 ): { valid: boolean; error?: string } {
   const maxSizes: Record<UploadDirectory, number> = {
     [UploadDirectory.LOGOS]: 5 * 1024 * 1024, // 5MB
@@ -292,7 +292,7 @@ export function validateFile(
     [UploadDirectory.AVATARS]: 2 * 1024 * 1024, // 2MB
     [UploadDirectory.VIDEOS]: 200 * 1024 * 1024, // 200MB
     [UploadDirectory.IMAGES]: 10 * 1024 * 1024, // 10MB
-    [UploadDirectory.DOCUMENTS]: 10 * 1024 * 1024 // 10MB
+    [UploadDirectory.DOCUMENTS]: 10 * 1024 * 1024, // 10MB
   };
 
   const allowedTypes: Record<UploadDirectory, string[]> = {
@@ -301,7 +301,7 @@ export function validateFile(
       "image/jpeg",
       "image/jpg",
       "image/svg+xml",
-      "image/webp"
+      "image/webp",
     ],
     [UploadDirectory.TESTIMONIALS]: [
       "image/png",
@@ -310,19 +310,19 @@ export function validateFile(
       "image/webp",
       "video/mp4",
       "video/webm",
-      "video/quicktime"
+      "video/quicktime",
     ],
     [UploadDirectory.AVATARS]: [
       "image/png",
       "image/jpeg",
       "image/jpg",
-      "image/webp"
+      "image/webp",
     ],
     [UploadDirectory.VIDEOS]: [
       "video/mp4",
       "video/webm",
       "video/quicktime",
-      "video/x-msvideo"
+      "video/x-msvideo",
     ],
     [UploadDirectory.IMAGES]: [
       "image/png",
@@ -330,13 +330,13 @@ export function validateFile(
       "image/jpg",
       "image/gif",
       "image/webp",
-      "image/svg+xml"
+      "image/svg+xml",
     ],
     [UploadDirectory.DOCUMENTS]: [
       "application/pdf",
       "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ]
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ],
   };
 
   const maxSize = maxSizes[directory];
@@ -346,7 +346,7 @@ export function validateFile(
   if (file.size > maxSize) {
     return {
       valid: false,
-      error: `File size exceeds ${Math.round(maxSize / (1024 * 1024))}MB limit`
+      error: `File size exceeds ${Math.round(maxSize / (1024 * 1024))}MB limit`,
     };
   }
 
@@ -354,7 +354,7 @@ export function validateFile(
   if (!allowed.includes(file.type)) {
     return {
       valid: false,
-      error: `File type not allowed. Allowed types: ${allowed.join(", ")}`
+      error: `File type not allowed. Allowed types: ${allowed.join(", ")}`,
     };
   }
 

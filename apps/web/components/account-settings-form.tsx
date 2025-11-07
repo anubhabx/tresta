@@ -8,7 +8,7 @@ import {
   ProfileInformationSection,
   PasswordSection,
   ConnectedAccountsSection,
-  DataPrivacySection
+  DataPrivacySection,
 } from "./account-settings";
 
 interface AccountSettingsFormProps {

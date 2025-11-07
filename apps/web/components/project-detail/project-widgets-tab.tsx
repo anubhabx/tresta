@@ -135,7 +135,9 @@ export function ProjectWidgetsTab({
     <>
       <div className="space-y-6">
         {!hasWidgets ? (
-          <WidgetEmptyState onCreateWidget={() => setIsCreateDialogOpen(true)} />
+          <WidgetEmptyState
+            onCreateWidget={() => setIsCreateDialogOpen(true)}
+          />
         ) : (
           <>
             <div className="flex items-center justify-between">

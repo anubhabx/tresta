@@ -97,11 +97,11 @@ export const useUpdateTestimonial = (slug: string) => {
       // Invalidate both list and detail queries
       queryClient.invalidateQueries({
         queryKey: testimonialKeys.lists(),
-        refetchType: 'active',
+        refetchType: "active",
       });
       queryClient.invalidateQueries({
         queryKey: testimonialKeys.detail(variables.id),
-        refetchType: 'active',
+        refetchType: "active",
       });
     },
   });

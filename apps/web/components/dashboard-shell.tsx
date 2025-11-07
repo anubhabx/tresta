@@ -7,7 +7,7 @@ import UIBreadcrumb from "@/components/ui-breadcrumbs";
 import { useUIStore } from "@/store/ui-store";
 import {
   SidebarProvider,
-  SidebarTrigger
+  SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { Button } from "@workspace/ui/components/button";

@@ -6,7 +6,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@workspace/ui/components/select";
 
 interface ProjectTypeSelectProps {
@@ -18,7 +18,7 @@ interface ProjectTypeSelectProps {
 export function ProjectTypeSelect({
   value,
   onValueChange,
-  required = false
+  required = false,
 }: ProjectTypeSelectProps) {
   return (
     <div className="space-y-2">

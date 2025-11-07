@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-} from "@workspace/ui/components/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { PlusIcon, SparklesIcon } from "lucide-react";
 
 export function DashboardEmptyState() {

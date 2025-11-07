@@ -4,9 +4,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
-import type {
-  ModerationQueueResponse,
-} from "@/types/api";
+import type { ModerationQueueResponse } from "@/types/api";
 
 interface ModerationQueueFilters {
   status?: "pending" | "flagged" | "approved" | "rejected";
@@ -36,7 +34,7 @@ function useGetModerationQueue(slug: string, filters?: ModerationQueueFilters) {
       if (filters?.limit) params.append("limit", filters.limit.toString());
 
       const response = await api.get<ModerationQueueResponse>(
-        `/projects/${slug}/testimonials/moderation/queue?${params.toString()}`
+        `/projects/${slug}/testimonials/moderation/queue?${params.toString()}`,
       );
       return response.data;
     },
@@ -55,15 +53,19 @@ function useBulkModerationAction(slug: string) {
     mutationFn: async (payload: BulkModerationPayload) => {
       const response = await api.post(
         `/projects/${slug}/testimonials/moderation/bulk`,
-        payload
+        payload,
       );
       return response.data.data;
     },
     onSuccess: () => {
       // Invalidate moderation queue
-      queryClient.invalidateQueries({ queryKey: ["moderation", "queue", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["moderation", "queue", slug],
+      });
       // Invalidate testimonials list
-      queryClient.invalidateQueries({ queryKey: ["testimonials", "list", slug] });
+      queryClient.invalidateQueries({
+        queryKey: ["testimonials", "list", slug],
+      });
     },
   });
 }

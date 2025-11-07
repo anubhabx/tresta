@@ -9,7 +9,12 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import { CopyIcon, CheckIcon, Code2Icon, ExternalLinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -176,7 +181,8 @@ function TestimonialWidget() {
                 <code>{scriptCode}</code>
               </pre>
               <p className="text-xs text-muted-foreground">
-                Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials.
+                Paste this code anywhere in your HTML. The widget will
+                automatically load and display your testimonials.
               </p>
             </div>
           </TabsContent>
@@ -202,7 +208,8 @@ function TestimonialWidget() {
                 <code>{iframeCode}</code>
               </pre>
               <p className="text-xs text-muted-foreground">
-                Simple iframe embed. Adjust width and height as needed for your design.
+                Simple iframe embed. Adjust width and height as needed for your
+                design.
               </p>
             </div>
           </TabsContent>
@@ -228,7 +235,8 @@ function TestimonialWidget() {
                 <code>{reactCode}</code>
               </pre>
               <p className="text-xs text-muted-foreground">
-                For React/Next.js projects. Requires TanStack Query setup. Customize the component to match your design.
+                For React/Next.js projects. Requires TanStack Query setup.
+                Customize the component to match your design.
               </p>
             </div>
           </TabsContent>
@@ -264,7 +272,8 @@ function TestimonialWidget() {
                 <code>{apiEndpoint}</code>
               </pre>
               <p className="text-xs text-muted-foreground">
-                Public API endpoint. No authentication required. Cached for 5 minutes. Build your own custom integration.
+                Public API endpoint. No authentication required. Cached for 5
+                minutes. Build your own custom integration.
               </p>
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
                 <p className="text-xs font-medium mb-1">Response Format:</p>
@@ -293,7 +302,8 @@ function TestimonialWidget() {
 
         <div className="flex items-center justify-between pt-4 border-t">
           <p className="text-xs text-muted-foreground">
-            Widget ID: <code className="bg-muted px-1 py-0.5 rounded">{widgetId}</code>
+            Widget ID:{" "}
+            <code className="bg-muted px-1 py-0.5 rounded">{widgetId}</code>
           </p>
           <Button variant="outline" onClick={onClose}>
             Close

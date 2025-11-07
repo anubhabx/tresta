@@ -11,11 +11,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
-import {
-  FolderIcon,
-  MessageSquareIcon,
-  ClockIcon,
-} from "lucide-react";
+import { FolderIcon, MessageSquareIcon, ClockIcon } from "lucide-react";
 import type { Project } from "@/types/api";
 
 interface RecentProjectsListProps {
@@ -54,9 +50,7 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold truncate">
-                      {project.name}
-                    </h4>
+                    <h4 className="font-semibold truncate">{project.name}</h4>
                     {!project.isActive && (
                       <Badge variant="outline" className="text-xs">
                         Inactive
@@ -74,9 +68,7 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
                     <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
                     <span>{project._count?.testimonials || 0}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    testimonials
-                  </p>
+                  <p className="text-xs text-muted-foreground">testimonials</p>
                 </div>
                 <div className="text-right hidden sm:block">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

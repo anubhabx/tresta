@@ -19,7 +19,8 @@ export default async function ModerationPage({ params }: ModerationPageProps) {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Moderation Queue</h2>
         <p className="text-muted-foreground mt-1">
-          Review, approve, and manage testimonials with advanced moderation tools and insights.
+          Review, approve, and manage testimonials with advanced moderation
+          tools and insights.
         </p>
       </div>
 

@@ -9,20 +9,20 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormMessage
+  FormMessage,
 } from "@workspace/ui/components/form";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-  REGEXP_ONLY_DIGITS
+  REGEXP_ONLY_DIGITS,
 } from "@workspace/ui/components/input-otp";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
@@ -41,11 +41,11 @@ import { OAuthButtons } from "./auth/oauth-buttons";
 
 const signUpFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
-  password: z.string().min(6, { message: "Password is required" })
+  password: z.string().min(6, { message: "Password is required" }),
 });
 
 const codeFormSchema = z.object({
-  code: z.string().min(6, { message: "Code is required" }).max(6)
+  code: z.string().min(6, { message: "Code is required" }).max(6),
 });
 
 const SignUpForm = () => {
@@ -70,15 +70,15 @@ const SignUpForm = () => {
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
   const codeForm = useForm<z.infer<typeof codeFormSchema>>({
     resolver: zodResolver(codeFormSchema),
     defaultValues: {
-      code: ""
-    }
+      code: "",
+    },
   });
 
   const onSubmitSignUp = async (data: z.infer<typeof signUpFormSchema>) => {
@@ -103,7 +103,7 @@ const SignUpForm = () => {
       setLoading(true);
       const completeSignUp = await signUp?.create({
         emailAddress: data.email,
-        password: data.password
+        password: data.password,
       });
 
       if (!completeSignUp) {
@@ -112,7 +112,7 @@ const SignUpForm = () => {
       }
 
       await completeSignUp.prepareEmailAddressVerification({
-        strategy: "email_code"
+        strategy: "email_code",
       });
 
       toast.success("Verification code sent to your email.");
@@ -145,7 +145,7 @@ const SignUpForm = () => {
     try {
       setLoading(true);
       const completeSignUp = await signUp?.attemptEmailAddressVerification({
-        code: data.code
+        code: data.code,
       });
 
       if (!completeSignUp) {
@@ -172,7 +172,7 @@ const SignUpForm = () => {
     try {
       setLoading(true);
       await signUp?.prepareEmailAddressVerification({
-        strategy: "email_code"
+        strategy: "email_code",
       });
       toast.success("Verification code resent to your email.");
       setResendCooldown(60);
@@ -187,7 +187,7 @@ const SignUpForm = () => {
     void signUp?.authenticateWithRedirect({
       strategy: `oauth_${provider}`,
       redirectUrl: `${window.location.origin}/sso-callback`,
-      redirectUrlComplete: `${window.location.origin}/dashboard`
+      redirectUrlComplete: `${window.location.origin}/dashboard`,
     });
   };
 
@@ -198,9 +198,7 @@ const SignUpForm = () => {
         <CardDescription>Sign up to get stared with Tresta</CardDescription>
       </CardHeader>
       <CardContent>
-        {authStep === "email" && (
-          <OAuthButtons onOAuthClick={onOAuthSignUp} />
-        )}
+        {authStep === "email" && <OAuthButtons onOAuthClick={onOAuthSignUp} />}
 
         <div className="flex gap-2 items-center my-4">
           <hr className="flex-1 border-border" />

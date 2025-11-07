@@ -6,7 +6,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@workspace/ui/components/select";
 
 interface VisibilitySelectProps {
@@ -18,7 +18,7 @@ interface VisibilitySelectProps {
 export function VisibilitySelect({
   value,
   onValueChange,
-  required = false
+  required = false,
 }: VisibilitySelectProps) {
   return (
     <div className="space-y-2">

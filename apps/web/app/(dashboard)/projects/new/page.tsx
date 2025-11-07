@@ -11,7 +11,7 @@ import {
   URLsSection,
   BrandingSection,
   SocialLinksSection,
-  TagsSection
+  TagsSection,
 } from "@/components/forms/project";
 
 export default function NewProjectPage() {

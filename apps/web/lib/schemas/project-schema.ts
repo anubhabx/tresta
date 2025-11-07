@@ -23,7 +23,7 @@ export const projectFormSchema = z.object({
     .max(255, "Slug must be less than 255 characters")
     .regex(
       /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and hyphens"
+      "Slug can only contain lowercase letters, numbers, and hyphens",
     ),
   logoUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
   projectType: z.nativeEnum(ProjectType).optional(),
@@ -48,7 +48,7 @@ export const projectFormSchema = z.object({
   instagram: z.string().url("Invalid URL").optional().or(z.literal("")),
   youtube: z.string().url("Invalid URL").optional().or(z.literal("")),
   // Tags as comma-separated string
-  tagsInput: z.string().optional()
+  tagsInput: z.string().optional(),
 });
 
 export type ProjectFormData = z.infer<typeof projectFormSchema>;

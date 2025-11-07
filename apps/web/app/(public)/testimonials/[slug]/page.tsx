@@ -118,7 +118,7 @@ export default function TestimonialSubmissionPage({
         atob(base64)
           .split("")
           .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
+          .join(""),
       );
 
       const payload = JSON.parse(jsonPayload);
@@ -185,7 +185,7 @@ export default function TestimonialSubmissionPage({
 
       await api.post<ApiResponse<unknown>>(
         `/projects/${slug}/testimonials`,
-        payload
+        payload,
       );
 
       setIsSuccess(true);
@@ -197,7 +197,7 @@ export default function TestimonialSubmissionPage({
       console.error("Failed to submit testimonial:", error);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to submit testimonial. Please try again."
+          "Failed to submit testimonial. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -258,10 +258,13 @@ export default function TestimonialSubmissionPage({
                   <div className="bg-muted/50 rounded-lg p-6 space-y-4">
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold">Verify with Google (Recommended)</h3>
+                      <h3 className="font-semibold">
+                        Verify with Google (Recommended)
+                      </h3>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Sign in with Google to auto-fill your information and add a verified badge to your testimonial
+                      Sign in with Google to auto-fill your information and add
+                      a verified badge to your testimonial
                     </p>
                     <div className="flex justify-center">
                       <GoogleLogin
@@ -281,10 +284,17 @@ export default function TestimonialSubmissionPage({
                   <div className="bg-slate-950 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
                     <ShieldCheck className="h-5 w-5 text-white" />
                     <div className="flex-1">
-                      <p className="font-medium text-white">Verified with Google</p>
-                      <p className="text-sm text-slate-300">Your testimonial will display a verified badge</p>
+                      <p className="font-medium text-white">
+                        Verified with Google
+                      </p>
+                      <p className="text-sm text-slate-300">
+                        Your testimonial will display a verified badge
+                      </p>
                     </div>
-                    <Badge variant="secondary" className="bg-slate-300 text-primary-foreground hover:bg-green-100">
+                    <Badge
+                      variant="secondary"
+                      className="bg-slate-300 text-primary-foreground hover:bg-green-100"
+                    >
                       Verified
                     </Badge>
                   </div>
@@ -302,110 +312,110 @@ export default function TestimonialSubmissionPage({
                   required
                 />
 
-              {/* Email Field */}
-              <CustomFormField
-                type="email"
-                control={form.control}
-                name="authorEmail"
-                label="Email Address"
-                placeholder="john@example.com"
-                description="We'll never share your email or send spam"
-                optional
-              />
+                {/* Email Field */}
+                <CustomFormField
+                  type="email"
+                  control={form.control}
+                  name="authorEmail"
+                  label="Email Address"
+                  placeholder="john@example.com"
+                  description="We'll never share your email or send spam"
+                  optional
+                />
 
-              {/* Role Field */}
-              <CustomFormField
-                type="text"
-                control={form.control}
-                name="authorRole"
-                label="Your Role"
-                placeholder="e.g., CEO, Marketing Manager, Developer"
-                description="Your job title or role"
-                optional
-              />
+                {/* Role Field */}
+                <CustomFormField
+                  type="text"
+                  control={form.control}
+                  name="authorRole"
+                  label="Your Role"
+                  placeholder="e.g., CEO, Marketing Manager, Developer"
+                  description="Your job title or role"
+                  optional
+                />
 
-              {/* Company Field */}
-              <CustomFormField
-                type="text"
-                control={form.control}
-                name="authorCompany"
-                label="Company Name"
-                placeholder="e.g., Acme Inc."
-                description="The company or organization you represent"
-                optional
-              />
+                {/* Company Field */}
+                <CustomFormField
+                  type="text"
+                  control={form.control}
+                  name="authorCompany"
+                  label="Company Name"
+                  placeholder="e.g., Acme Inc."
+                  description="The company or organization you represent"
+                  optional
+                />
 
-              {/* Avatar Upload - only show if not using Google */}
-              {!isGoogleVerified && (
-                <div className="space-y-2">
-                  <AzureFileUpload
-                    control={form.control}
-                    name="authorAvatar"
-                    label="Profile Picture (Optional)"
-                    directory="avatars"
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    maxSizeMB={2}
-                    description="JPG, PNG, or WebP (max 2MB)"
-                  />
-                </div>
-              )}
+                {/* Avatar Upload - only show if not using Google */}
+                {!isGoogleVerified && (
+                  <div className="space-y-2">
+                    <AzureFileUpload
+                      control={form.control}
+                      name="authorAvatar"
+                      label="Profile Picture (Optional)"
+                      directory="avatars"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      maxSizeMB={2}
+                      description="JPG, PNG, or WebP (max 2MB)"
+                    />
+                  </div>
+                )}
 
-              <Separator className="my-6" />
+                <Separator className="my-6" />
 
-              {/* Rating Field */}
-              <CustomFormField
-                type="rating"
-                control={form.control}
-                name="rating"
-                label="Rating"
-                description="How would you rate your experience?"
-                max={5}
-                optional
-              />
+                {/* Rating Field */}
+                <CustomFormField
+                  type="rating"
+                  control={form.control}
+                  name="rating"
+                  label="Rating"
+                  description="How would you rate your experience?"
+                  max={5}
+                  optional
+                />
 
-              {/* Content Field */}
-              <CustomFormField
-                type="textarea"
-                control={form.control}
-                name="content"
-                label="Your Testimonial"
-                placeholder="Share your experience, what you liked, and how it helped you..."
-                maxLength={2000}
-                showCharacterCount
-                required
-              />
+                {/* Content Field */}
+                <CustomFormField
+                  type="textarea"
+                  control={form.control}
+                  name="content"
+                  label="Your Testimonial"
+                  placeholder="Share your experience, what you liked, and how it helped you..."
+                  maxLength={2000}
+                  showCharacterCount
+                  required
+                />
 
-              {/* Video URL Field */}
-              <CustomFormField
-                type="url"
-                control={form.control}
-                name="videoUrl"
-                label="Video Testimonial URL"
-                placeholder="https://youtube.com/watch?v=..."
-                description="Add a link to your video testimonial (YouTube, Vimeo, etc.)"
-                optional
-              />
+                {/* Video URL Field */}
+                <CustomFormField
+                  type="url"
+                  control={form.control}
+                  name="videoUrl"
+                  label="Video Testimonial URL"
+                  placeholder="https://youtube.com/watch?v=..."
+                  description="Add a link to your video testimonial (YouTube, Vimeo, etc.)"
+                  optional
+                />
 
-              <Separator className="my-6" />
+                <Separator className="my-6" />
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting..." : "Submit Testimonial"}
-              </Button>
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Testimonial"}
+                </Button>
 
-              <p className="text-center text-sm text-muted-foreground">
-                Your testimonial will be reviewed before being published
-              </p>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+                <p className="text-center text-sm text-muted-foreground">
+                  Your testimonial will be reviewed before being published
+                </p>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </GoogleOAuthProvider>
   );
 }

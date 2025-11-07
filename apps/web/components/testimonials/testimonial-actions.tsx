@@ -111,7 +111,7 @@ export function TestimonialActions({
             )}
           </>
         )}
-        
+
         {/* Delete action (always available) */}
         {onDelete && (
           <>

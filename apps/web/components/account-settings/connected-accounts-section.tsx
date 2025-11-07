@@ -6,7 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { LinkIcon, CheckCircle2Icon } from "lucide-react";
@@ -17,13 +17,13 @@ interface ConnectedAccountsSectionProps {
 }
 
 export function ConnectedAccountsSection({
-  externalAccounts
+  externalAccounts,
 }: ConnectedAccountsSectionProps) {
   const hasGoogleAccount = externalAccounts.some(
-    (account) => account.provider === "google"
+    (account) => account.provider === "google",
   );
   const hasGithubAccount = externalAccounts.some(
-    (account) => account.provider === "github"
+    (account) => account.provider === "github",
   );
 
   return (

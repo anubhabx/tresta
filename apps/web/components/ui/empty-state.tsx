@@ -31,9 +31,7 @@ export function EmptyState({
         )}
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-muted-foreground mb-6 max-w-sm">{description}</p>
-        {action && (
-          <Button onClick={action.onClick}>{action.label}</Button>
-        )}
+        {action && <Button onClick={action.onClick}>{action.label}</Button>}
         {children}
       </CardContent>
     </Card>

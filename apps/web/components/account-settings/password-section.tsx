@@ -73,9 +73,7 @@ export function PasswordSection({ user, hasPassword }: PasswordSectionProps) {
             <ShieldCheckIcon className="h-5 w-5" />
             Password Authentication
           </CardTitle>
-          <CardDescription>
-            You signed in with a social account
-          </CardDescription>
+          <CardDescription>You signed in with a social account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">

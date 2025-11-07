@@ -19,7 +19,10 @@ interface ProfileImageSectionProps {
   onImageUpdate?: () => void;
 }
 
-export function ProfileImageSection({ user, onImageUpdate }: ProfileImageSectionProps) {
+export function ProfileImageSection({
+  user,
+  onImageUpdate,
+}: ProfileImageSectionProps) {
   const [imageLoading, setImageLoading] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

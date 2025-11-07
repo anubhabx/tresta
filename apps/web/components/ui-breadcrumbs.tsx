@@ -6,7 +6,7 @@ import {
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbLink,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -31,7 +31,7 @@ const UIBreadcrumb = () => {
     return {
       href,
       label,
-      isLast
+      isLast,
     };
   });
 

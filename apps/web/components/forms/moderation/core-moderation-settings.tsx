@@ -6,7 +6,7 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel
+  FormLabel,
 } from "@workspace/ui/components/form";
 import { Switch } from "@workspace/ui/components/switch";
 import {
@@ -14,7 +14,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@workspace/ui/components/select";
 import { ModerationSettingsFormData } from "@/lib/schemas/moderation-settings-schema";
 import { Info } from "lucide-react";
@@ -22,7 +22,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 
 interface CoreModerationSettingsProps {
@@ -32,7 +32,7 @@ interface CoreModerationSettingsProps {
 
 export function CoreModerationSettings({
   control,
-  watch
+  watch,
 }: CoreModerationSettingsProps) {
   const autoModerationEnabled = watch("autoModeration");
 

@@ -54,7 +54,11 @@ export function StatusBadge({
       );
 
     case "FLAGGED":
-      if (variant === "detailed" && moderationFlags && moderationFlags.length > 0) {
+      if (
+        variant === "detailed" &&
+        moderationFlags &&
+        moderationFlags.length > 0
+      ) {
         return (
           <div className="flex items-center gap-2">
             <Badge
@@ -93,7 +97,11 @@ export function StatusBadge({
       );
 
     case "REJECTED":
-      if (variant === "detailed" && moderationFlags && moderationFlags.length > 0) {
+      if (
+        variant === "detailed" &&
+        moderationFlags &&
+        moderationFlags.length > 0
+      ) {
         return (
           <div className="flex items-center gap-2">
             <Badge

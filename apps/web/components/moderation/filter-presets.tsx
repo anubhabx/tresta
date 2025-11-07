@@ -33,45 +33,45 @@ interface FilterPresetsProps {
 export function FilterPresets({
   activePreset,
   onPresetChange,
-  counts
+  counts,
 }: FilterPresetsProps) {
   const presets = [
     {
       id: "all" as FilterPreset,
       label: "All",
       icon: Zap,
-      count: counts?.all
+      count: counts?.all,
     },
     {
       id: "needs-review" as FilterPreset,
       label: "Needs Review",
       icon: AlertTriangle,
-      count: counts?.needsReview
+      count: counts?.needsReview,
     },
     {
       id: "high-risk" as FilterPreset,
       label: "High Risk",
       icon: AlertTriangle,
-      count: counts?.highRisk
+      count: counts?.highRisk,
     },
     {
       id: "pending" as FilterPreset,
       label: "Pending",
       icon: Clock,
-      count: counts?.pending
+      count: counts?.pending,
     },
     {
       id: "flagged" as FilterPreset,
       label: "Flagged",
       icon: AlertTriangle,
-      count: counts?.flagged
+      count: counts?.flagged,
     },
     {
       id: "verified" as FilterPreset,
       label: "Verified",
       icon: Shield,
-      count: counts?.verified
-    }
+      count: counts?.verified,
+    },
   ];
 
   return (
@@ -84,7 +84,7 @@ export function FilterPresets({
           variant={activePreset === preset.id ? "secondary" : "outline"}
           className={cn(
             "transition-all",
-            activePreset === preset.id && "shadow-sm"
+            activePreset === preset.id && "shadow-sm",
           )}
         >
           {preset.label}
@@ -93,8 +93,7 @@ export function FilterPresets({
               variant="secondary"
               className={cn(
                 "ml-1.5 px-1.5 py-0.5 text-xs",
-                activePreset === preset.id &&
-                  "bg-primary-foreground/50"
+                activePreset === preset.id && "bg-primary-foreground/50",
               )}
             >
               {preset.count}

@@ -8,7 +8,7 @@ export {
   UploadDirectory,
   useAzureSAS,
   uploadFileToAzure,
-  validateFile
+  validateFile,
 } from "@/hooks/use-azure-sas";
 
 export type { UploadResult } from "@/hooks/use-azure-sas";

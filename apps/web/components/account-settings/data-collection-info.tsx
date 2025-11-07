@@ -4,14 +4,14 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Separator } from "@workspace/ui/components/separator";
-import { 
-  InfoIcon, 
-  UserIcon, 
-  FolderIcon, 
+import {
+  InfoIcon,
+  UserIcon,
+  FolderIcon,
   MessageSquareIcon,
   CookieIcon,
   ShieldCheckIcon,
@@ -33,7 +33,7 @@ import {
   FileTextIcon,
   CheckCircle2Icon,
   AlertCircleIcon,
-  LucideIcon
+  LucideIcon,
 } from "lucide-react";
 
 interface DataItem {
@@ -81,29 +81,33 @@ const DATA_CATEGORIES: DataCategory[] = [
       {
         icon: MailIcon,
         label: "Email address",
-        description: "For authentication, account recovery, and important notifications"
+        description:
+          "For authentication, account recovery, and important notifications",
       },
       {
         icon: UserIcon,
         label: "First and last name",
-        description: "To personalize your experience (optional)"
+        description: "To personalize your experience (optional)",
       },
       {
         icon: ImageIcon,
         label: "Profile picture",
-        description: "Stored in Azure Blob Storage, synced from OAuth providers or uploaded directly (optional)"
+        description:
+          "Stored in Azure Blob Storage, synced from OAuth providers or uploaded directly (optional)",
       },
       {
         icon: LinkIcon,
         label: "OAuth connections",
-        description: "If you sign in with Google or GitHub, we store your provider ID and email for authentication"
+        description:
+          "If you sign in with Google or GitHub, we store your provider ID and email for authentication",
       },
       {
         icon: ClockIcon,
         label: "Account timestamps",
-        description: "Creation and last update dates for security and audit purposes"
-      }
-    ]
+        description:
+          "Creation and last update dates for security and audit purposes",
+      },
+    ],
   },
   {
     title: "Project & Content Data",
@@ -115,54 +119,61 @@ const DATA_CATEGORIES: DataCategory[] = [
       {
         icon: FolderIcon,
         label: "Projects",
-        description: "Name, description, website URL, logo, brand colors, visibility settings, project type"
+        description:
+          "Name, description, website URL, logo, brand colors, visibility settings, project type",
       },
       {
         icon: LayoutIcon,
         label: "Widgets",
-        description: "Embed configurations, layout preferences, customization settings (stored as JSON)"
+        description:
+          "Embed configurations, layout preferences, customization settings (stored as JSON)",
       },
       {
         icon: CreditCardIcon,
         label: "Subscription data",
-        description: "Plan type (Free/Pro), billing status, subscription period if applicable"
-      }
-    ]
+        description:
+          "Plan type (Free/Pro), billing status, subscription period if applicable",
+      },
+    ],
   },
   {
     title: "Testimonial Submission Data",
     icon: MessageSquareIcon,
     badge: "Public-Facing",
     badgeVariant: "outline",
-    description: "When someone submits a testimonial to your projects, we collect:",
+    description:
+      "When someone submits a testimonial to your projects, we collect:",
     items: [
       {
         icon: UserCheckIcon,
         label: "Author information",
-        description: "Name, email (optional), role, company, avatar"
+        description: "Name, email (optional), role, company, avatar",
       },
       {
         icon: MessageSquareIcon,
         label: "Testimonial content",
-        description: "Text, rating, media URLs (video/audio)"
+        description: "Text, rating, media URLs (video/audio)",
       },
       {
         icon: ShieldCheckIcon,
         label: "OAuth verification data",
-        description: "Provider (Google/GitHub) and subject ID if verified via OAuth"
+        description:
+          "Provider (Google/GitHub) and subject ID if verified via OAuth",
       },
       {
         icon: FingerprintIcon,
         label: "Technical metadata",
-        description: "IP address and user agent (browser information) for spam prevention and analytics"
+        description:
+          "IP address and user agent (browser information) for spam prevention and analytics",
       },
       {
         icon: GlobeIcon,
         label: "Source information",
-        description: "Submission method (web form, Twitter import, etc.) and source URL if applicable"
-      }
+        description:
+          "Submission method (web form, Twitter import, etc.) and source URL if applicable",
+      },
     ],
-    note: "Note: IP addresses and user agents are used solely for spam prevention and are not shared publicly."
+    note: "Note: IP addresses and user agents are used solely for spam prevention and are not shared publicly.",
   },
   {
     title: "Browser Storage",
@@ -174,85 +185,92 @@ const DATA_CATEGORIES: DataCategory[] = [
       {
         icon: LayoutIcon,
         label: "UI preferences",
-        description: "Sidebar state (open/closed), project display mode (grid/list)"
+        description:
+          "Sidebar state (open/closed), project display mode (grid/list)",
       },
       {
         icon: LockIcon,
         label: "Authentication tokens",
-        description: "Managed by Clerk (our auth provider) for secure session management"
-      }
+        description:
+          "Managed by Clerk (our auth provider) for secure session management",
+      },
     ],
-    note: "This data never leaves your browser and is not sent to our servers."
-  }
+    note: "This data never leaves your browser and is not sent to our servers.",
+  },
 ];
 
 const DATA_USAGE: DataUsageItem[] = [
   {
     icon: ServerIcon,
     label: "Provide our services",
-    description: "Display your projects, manage testimonials, generate widget embeds"
+    description:
+      "Display your projects, manage testimonials, generate widget embeds",
   },
   {
     icon: ShieldCheckIcon,
     label: "Authentication & security",
-    description: "Verify your identity, prevent unauthorized access, detect spam"
+    description:
+      "Verify your identity, prevent unauthorized access, detect spam",
   },
   {
     icon: MailIcon,
     label: "Communication",
-    description: "Send account-related notifications (password resets, important updates)"
+    description:
+      "Send account-related notifications (password resets, important updates)",
   },
   {
     icon: InfoIcon,
     label: "Improve our platform",
-    description: "Understand usage patterns to build better features (aggregated, anonymized data only)"
-  }
+    description:
+      "Understand usage patterns to build better features (aggregated, anonymized data only)",
+  },
 ];
 
 const STORAGE_INFO: StorageItem[] = [
   {
     icon: DatabaseIcon,
     label: "Database",
-    description: "PostgreSQL (secure, encrypted at rest)"
+    description: "PostgreSQL (secure, encrypted at rest)",
   },
   {
     icon: ServerIcon,
     label: "File storage",
-    description: "Azure Blob Storage (avatars, logos, media files)"
+    description: "Azure Blob Storage (avatars, logos, media files)",
   },
   {
     icon: LockIcon,
     label: "Authentication",
-    description: "Clerk (SOC 2 Type II certified, GDPR compliant)"
+    description: "Clerk (SOC 2 Type II certified, GDPR compliant)",
   },
   {
     icon: Trash2Icon,
     label: "Data deletion",
-    description: "When you delete your account, all data is permanently removed via cascade deletes"
-  }
+    description:
+      "When you delete your account, all data is permanently removed via cascade deletes",
+  },
 ];
 
 const DATA_RIGHTS: DataRight[] = [
   {
     icon: DownloadIcon,
     label: "Access",
-    description: "Export all your data anytime (use the Export button above)"
+    description: "Export all your data anytime (use the Export button above)",
   },
   {
     icon: EditIcon,
     label: "Rectify",
-    description: "Update your profile information at any time"
+    description: "Update your profile information at any time",
   },
   {
     icon: Trash2Icon,
     label: "Delete",
-    description: "Permanently delete your account and all associated data"
+    description: "Permanently delete your account and all associated data",
   },
   {
     icon: FileTextIcon,
     label: "Port",
-    description: "Download your data in JSON format for portability"
-  }
+    description: "Download your data in JSON format for portability",
+  },
 ];
 
 const DataCollectionInfo = () => {
@@ -264,7 +282,8 @@ const DataCollectionInfo = () => {
           Data Collection Transparency
         </CardTitle>
         <CardDescription>
-          Complete disclosure of what data we collect, how we use it, and your rights
+          Complete disclosure of what data we collect, how we use it, and your
+          rights
         </CardDescription>
       </CardHeader>
 
@@ -368,9 +387,12 @@ const DataCollectionInfo = () => {
 
         <div className="pt-2">
           <p className="text-xs text-muted-foreground">
-            <strong>No third-party analytics or tracking:</strong> We do not use Google Analytics, Facebook Pixel, or any third-party tracking scripts. 
-            We do not sell or share your personal data with third parties for marketing purposes.
-            <br /><br />
+            <strong>No third-party analytics or tracking:</strong> We do not use
+            Google Analytics, Facebook Pixel, or any third-party tracking
+            scripts. We do not sell or share your personal data with third
+            parties for marketing purposes.
+            <br />
+            <br />
             Last updated: November 6, 2025
           </p>
         </div>

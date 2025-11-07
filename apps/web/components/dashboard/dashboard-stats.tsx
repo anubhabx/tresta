@@ -6,11 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import {
-  FolderIcon,
-  MessageSquareIcon,
-  TrendingUpIcon,
-} from "lucide-react";
+import { FolderIcon, MessageSquareIcon, TrendingUpIcon } from "lucide-react";
 
 interface DashboardStatsProps {
   totalProjects: number;

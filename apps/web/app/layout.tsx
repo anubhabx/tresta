@@ -7,21 +7,21 @@ import { Toaster } from "@workspace/ui/components/sonner";
 
 const fontSans = Figtree({
   subsets: ["latin"],
-  variable: "--font-sans"
+  variable: "--font-sans",
 });
 
 const fontMono = Fira_Code({
   subsets: ["latin"],
-  variable: "--font-mono"
+  variable: "--font-mono",
 });
 
 const fontSerif = Lora({
   subsets: ["latin"],
-  variable: "--font-serif"
+  variable: "--font-serif",
 });
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {

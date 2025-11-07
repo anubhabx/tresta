@@ -21,7 +21,10 @@ interface ProfileInformationSectionProps {
   onUpdate?: () => void;
 }
 
-export function ProfileInformationSection({ user, onUpdate }: ProfileInformationSectionProps) {
+export function ProfileInformationSection({
+  user,
+  onUpdate,
+}: ProfileInformationSectionProps) {
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState(user.firstName || "");
   const [lastName, setLastName] = useState(user.lastName || "");

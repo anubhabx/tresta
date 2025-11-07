@@ -14,14 +14,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarMenuSkeleton
+  SidebarMenuSkeleton,
 } from "@workspace/ui/components/sidebar";
 import {
   ChevronUp,
   Layers2Icon,
   LayoutDashboardIcon,
   UserIcon,
-  PlusIcon
+  PlusIcon,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { usePathname } from "next/navigation";
@@ -30,7 +30,7 @@ import { SignOutButton, useUser } from "@clerk/nextjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";

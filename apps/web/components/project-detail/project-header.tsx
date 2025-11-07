@@ -9,7 +9,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage
+  AvatarImage,
 } from "@workspace/ui/components/avatar";
 import {
   AlertDialog,
@@ -20,7 +20,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog";
 import { FolderIcon, TrashIcon, EditIcon } from "lucide-react";
 import type { Project } from "@/types/api";
@@ -79,7 +79,7 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
           <p className="text-xs text-muted-foreground mt-2">
             Created{" "}
             {formatDistanceToNow(new Date(project.createdAt), {
-              addSuffix: true
+              addSuffix: true,
             })}
           </p>
         </div>

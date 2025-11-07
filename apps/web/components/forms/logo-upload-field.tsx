@@ -13,7 +13,7 @@ interface LogoUploadFieldProps {
 
 export function LogoUploadField({
   control,
-  onFileUpload
+  onFileUpload,
 }: LogoUploadFieldProps) {
   const [useLogoUrl, setUseLogoUrl] = useState(true);
 
@@ -21,7 +21,7 @@ export function LogoUploadField({
     if (files.length > 0 && files[0]) {
       onFileUpload?.(files[0]);
       toast.info(
-        "Logo uploaded. Note: File upload to storage not yet implemented."
+        "Logo uploaded. Note: File upload to storage not yet implemented.",
       );
     }
   };

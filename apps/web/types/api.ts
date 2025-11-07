@@ -143,7 +143,8 @@ export interface ModerationStats {
   rejected: number;
 }
 
-export interface ModerationQueueResponse extends PaginatedResponse<Testimonial> {
+export interface ModerationQueueResponse
+  extends PaginatedResponse<Testimonial> {
   meta: {
     timestamp: string;
     pagination: {

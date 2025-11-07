@@ -29,7 +29,10 @@ interface ProjectSettingsTabProps {
   onDelete: () => Promise<void>;
 }
 
-export function ProjectSettingsTab({ project, onDelete }: ProjectSettingsTabProps) {
+export function ProjectSettingsTab({
+  project,
+  onDelete,
+}: ProjectSettingsTabProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -44,7 +47,11 @@ export function ProjectSettingsTab({ project, onDelete }: ProjectSettingsTabProp
 
   return (
     <div className="space-y-6">
-      <Accordion type="multiple" defaultValue={["general", "moderation"]} className="w-full">
+      <Accordion
+        type="multiple"
+        defaultValue={["general", "moderation"]}
+        className="w-full"
+      >
         {/* General Settings */}
         <AccordionItem value="general">
           <AccordionTrigger className="text-lg font-semibold">
@@ -82,8 +89,8 @@ export function ProjectSettingsTab({ project, onDelete }: ProjectSettingsTabProp
                         Are you absolutely sure?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete
-                        the project "{project.name}" and all associated
+                        This action cannot be undone. This will permanently
+                        delete the project "{project.name}" and all associated
                         testimonials and widgets.
                       </AlertDialogDescription>
                     </AlertDialogHeader>

@@ -13,7 +13,7 @@ import {
   Star,
   User,
   Mail,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { Testimonial } from "@/types/api";
 import { formatDistanceToNow } from "date-fns";
@@ -36,7 +36,7 @@ export function ModerationTestimonialCard({
   onDelete,
   isSelected,
   onToggleSelect,
-  loadingAction = null
+  loadingAction = null,
 }: ModerationTestimonialCardProps) {
   const riskScore = testimonial.moderationScore ?? 0;
   const flags = (testimonial.moderationFlags as string[]) ?? [];
@@ -55,7 +55,7 @@ export function ModerationTestimonialCard({
     <Card
       className={cn(
         "transition-all hover:shadow-md cursor-pointer",
-        isSelected && "ring-2 ring-primary shadow-lg"
+        isSelected && "ring-2 ring-primary shadow-lg",
       )}
       onClick={(e) => {
         // Only toggle selection if clicking on the card itself, not buttons
@@ -113,7 +113,7 @@ export function ModerationTestimonialCard({
               variant="outline"
               className={cn(
                 "ml-2 flex-shrink-0",
-                riskScore >= 0.7 && "border-destructive/30 text-destructive"
+                riskScore >= 0.7 && "border-destructive/30 text-destructive",
               )}
             >
               {riskLevel}
@@ -136,7 +136,7 @@ export function ModerationTestimonialCard({
           )}
           <span>
             {formatDistanceToNow(new Date(testimonial.createdAt), {
-              addSuffix: true
+              addSuffix: true,
             })}
           </span>
         </div>
@@ -153,7 +153,7 @@ export function ModerationTestimonialCard({
                       flag.toLowerCase().includes("positive") ||
                         flag.toLowerCase().includes("auto-approved")
                         ? "text-green-600"
-                        : "text-muted-foreground"
+                        : "text-muted-foreground",
                     )}
                   >
                     •

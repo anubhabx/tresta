@@ -13,7 +13,7 @@ import {
   URLsSection,
   BrandingSection,
   SocialLinksSection,
-  TagsSection
+  TagsSection,
 } from "@/components/forms/project";
 
 interface ProjectEditPageProps {
@@ -24,7 +24,7 @@ interface ProjectEditPageProps {
 
 const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
   const { slug } = use(params);
-  const { 
+  const {
     form,
     control,
     setValue,
@@ -32,11 +32,11 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
     watch,
     register,
     formState,
-    isSubmitting, 
+    isSubmitting,
     isLoadingProject,
     project,
-    handleLogoUpload, 
-    onSubmit 
+    handleLogoUpload,
+    onSubmit,
   } = useProjectEditForm(slug);
 
   if (isLoadingProject) {
@@ -102,10 +102,7 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
 
           <URLsSection control={control} />
 
-          <BrandingSection
-            control={control}
-            onLogoUpload={handleLogoUpload}
-          />
+          <BrandingSection control={control} onLogoUpload={handleLogoUpload} />
 
           <SocialLinksSection control={control} />
 
@@ -116,18 +113,11 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
           {/* Actions */}
           <div className="flex items-center justify-end gap-4">
             <Link href={`/projects/${slug}`}>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isSubmitting}
-              >
+              <Button type="button" variant="outline" disabled={isSubmitting}>
                 Cancel
               </Button>
             </Link>
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-            >
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
