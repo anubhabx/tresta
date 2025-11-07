@@ -54,11 +54,18 @@ export function ModerationTestimonialCard({
   return (
     <Card
       className={cn(
-        "transition-all hover:shadow-md",
+        "transition-all hover:shadow-md cursor-pointer",
         isSelected && "ring-2 ring-primary shadow-lg"
       )}
+      onClick={(e) => {
+        // Only toggle selection if clicking on the card itself, not buttons
+        const target = e.target as HTMLElement;
+        if (!target.closest("button") && onToggleSelect) {
+          onToggleSelect(testimonial.id);
+        }
+      }}
     >
-      <CardContent className="p-6">
+      <CardContent className="p-6 h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
