@@ -13,7 +13,7 @@ import {
   Star,
   User,
   Mail,
-  Loader2,
+  Loader2
 } from "lucide-react";
 import { Testimonial } from "@/types/api";
 import { formatDistanceToNow } from "date-fns";
@@ -36,7 +36,7 @@ export function ModerationTestimonialCard({
   onDelete,
   isSelected,
   onToggleSelect,
-  loadingAction = null,
+  loadingAction = null
 }: ModerationTestimonialCardProps) {
   const riskScore = testimonial.moderationScore ?? 0;
   const flags = (testimonial.moderationFlags as string[]) ?? [];
@@ -75,7 +75,10 @@ export function ModerationTestimonialCard({
                   {testimonial.authorName}
                 </h3>
                 {testimonial.isOAuthVerified && (
-                  <Badge variant="secondary" className="text-xs bg-primary/5 border-primary/20">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-primary/5 border-primary/20"
+                  >
                     <Shield className="h-3 w-3 mr-1 text-primary" />
                     Verified
                   </Badge>
@@ -99,8 +102,8 @@ export function ModerationTestimonialCard({
 
           {/* Risk Badge */}
           {riskScore > 0.2 && (
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className={cn(
                 "ml-2 flex-shrink-0",
                 riskScore >= 0.7 && "border-destructive/30 text-destructive"
@@ -124,7 +127,11 @@ export function ModerationTestimonialCard({
               <span>{testimonial.rating}/5</span>
             </div>
           )}
-          <span>{formatDistanceToNow(new Date(testimonial.createdAt), { addSuffix: true })}</span>
+          <span>
+            {formatDistanceToNow(new Date(testimonial.createdAt), {
+              addSuffix: true
+            })}
+          </span>
         </div>
 
         {/* Moderation Notes */}
@@ -134,11 +141,16 @@ export function ModerationTestimonialCard({
             <ul className="space-y-1">
               {flags.map((flag, index) => (
                 <li key={index} className="text-xs flex items-start gap-2">
-                  <span className={cn(
-                    flag.toLowerCase().includes('positive') || flag.toLowerCase().includes('auto-approved')
-                      ? "text-green-600"
-                      : "text-muted-foreground"
-                  )}>•</span>
+                  <span
+                    className={cn(
+                      flag.toLowerCase().includes("positive") ||
+                        flag.toLowerCase().includes("auto-approved")
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    •
+                  </span>
                   <span className="flex-1">{flag}</span>
                 </li>
               ))}
@@ -148,9 +160,7 @@ export function ModerationTestimonialCard({
 
         {/* Status Badges */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <Badge variant="outline">
-            {testimonial.moderationStatus}
-          </Badge>
+          <Badge variant="outline">{testimonial.moderationStatus}</Badge>
           {testimonial.isPublished && (
             <Badge variant="secondary">Published</Badge>
           )}
@@ -167,9 +177,9 @@ export function ModerationTestimonialCard({
               size="sm"
               variant="default"
               className="bg-primary hover:bg-primary/90"
-              disabled={loadingAction === 'approve'}
+              disabled={loadingAction === "approve"}
             >
-              {loadingAction === 'approve' ? (
+              {loadingAction === "approve" ? (
                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
               ) : (
                 <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -183,9 +193,9 @@ export function ModerationTestimonialCard({
               onClick={() => onReject(testimonial.id)}
               size="sm"
               variant="outline"
-              disabled={loadingAction === 'reject'}
+              disabled={loadingAction === "reject"}
             >
-              {loadingAction === 'reject' ? (
+              {loadingAction === "reject" ? (
                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
               ) : (
                 <XCircle className="h-4 w-4 mr-1" />
@@ -200,9 +210,9 @@ export function ModerationTestimonialCard({
             size="sm"
             variant="ghost"
             className="ml-auto"
-            disabled={loadingAction === 'delete'}
+            disabled={loadingAction === "delete"}
           >
-            {loadingAction === 'delete' ? (
+            {loadingAction === "delete" ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Trash2 className="h-4 w-4" />
