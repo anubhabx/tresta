@@ -3,12 +3,11 @@
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import { CustomAvatar } from "@workspace/ui/components/avatar";
 import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  Eye,
-  EyeOff,
   Trash2,
   Shield,
   Star,
@@ -24,8 +23,6 @@ interface ModerationTestimonialCardProps {
   testimonial: Testimonial;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
-  onPublish: (id: string) => void;
-  onUnpublish: (id: string) => void;
   onDelete: (id: string) => void;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
@@ -36,8 +33,6 @@ export function ModerationTestimonialCard({
   testimonial,
   onApprove,
   onReject,
-  onPublish,
-  onUnpublish,
   onDelete,
   isSelected,
   onToggleSelect,
@@ -67,17 +62,13 @@ export function ModerationTestimonialCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {testimonial.authorAvatar ? (
-              <img
-                src={testimonial.authorAvatar}
-                alt={testimonial.authorName}
-                className="h-10 w-10 rounded-full object-cover flex-shrink-0 ring-1 ring-border"
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center flex-shrink-0">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-            )}
+            <CustomAvatar
+              src={testimonial.authorAvatar}
+              name={testimonial.authorName}
+              alt={testimonial.authorName}
+              size="md"
+              className="flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold truncate">
@@ -136,14 +127,18 @@ export function ModerationTestimonialCard({
           <span>{formatDistanceToNow(new Date(testimonial.createdAt), { addSuffix: true })}</span>
         </div>
 
-        {/* Moderation Flags */}
+        {/* Moderation Notes */}
         {flags.length > 0 && (
           <div className="mb-4 p-3 rounded-md bg-muted/50 border">
             <p className="text-xs font-medium mb-2">Moderation Notes:</p>
             <ul className="space-y-1">
               {flags.map((flag, index) => (
                 <li key={index} className="text-xs flex items-start gap-2">
-                  <span className="text-muted-foreground">•</span>
+                  <span className={cn(
+                    flag.toLowerCase().includes('positive') || flag.toLowerCase().includes('auto-approved')
+                      ? "text-green-600"
+                      : "text-muted-foreground"
+                  )}>•</span>
                   <span className="flex-1">{flag}</span>
                 </li>
               ))}
@@ -199,36 +194,7 @@ export function ModerationTestimonialCard({
             </Button>
           )}
 
-          {testimonial.isPublished ? (
-            <Button
-              onClick={() => onUnpublish(testimonial.id)}
-              size="sm"
-              variant="outline"
-              disabled={loadingAction === 'unpublish'}
-            >
-              {loadingAction === 'unpublish' ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-              ) : (
-                <EyeOff className="h-4 w-4 mr-1" />
-              )}
-              Unpublish
-            </Button>
-          ) : (
-            <Button
-              onClick={() => onPublish(testimonial.id)}
-              size="sm"
-              variant="outline"
-              disabled={loadingAction === 'publish'}
-            >
-              {loadingAction === 'publish' ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-              ) : (
-                <Eye className="h-4 w-4 mr-1" />
-              )}
-              Publish
-            </Button>
-          )}
-
+          {/* Delete */}
           <Button
             onClick={() => onDelete(testimonial.id)}
             size="sm"
