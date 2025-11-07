@@ -7,6 +7,7 @@ import { ModerationTestimonialCard } from "./moderation/moderation-testimonial-c
 import { ModerationStatsDashboard } from "./moderation/moderation-stats-dashboard";
 import { FilterPresets, FilterPreset } from "./moderation/filter-presets";
 import { LoadingStars } from "./loader";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import type { Testimonial, ModerationStatus } from "@/types/api";
 
 import { Button } from "@workspace/ui/components/button";
@@ -37,6 +38,8 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { cn } from "@workspace/ui/lib/utils";
 import { Card, CardContent } from "@workspace/ui/components/card";
+import { KeyboardShortcutBadge } from "./keyboard-shortcut-badge";
+import { KeyboardShortcutsHelp } from "./keyboard-shortcuts-help";
 import {
   Tooltip,
   TooltipContent,
@@ -329,6 +332,149 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       setSelectedIds(filteredTestimonials?.map((t: Testimonial) => t.id) || []);
     }
   };
+
+  // Keyboard shortcuts for moderation mode
+  useKeyboardShortcuts({
+    enabled: moderationMode && selectedIds.length > 0,
+    shortcuts: [
+      {
+        key: 'a',
+        action: () => {
+          if (selectedIds.length === 1 && selectedIds[0]) {
+            handleApprove(selectedIds[0]);
+          } else {
+            handleBulkApprove();
+          }
+        },
+        disabled: loadingState !== null || bulkModerationMutation.isPending || validForApprove.length === 0,
+      },
+      {
+        key: 'r',
+        action: () => {
+          if (selectedIds.length === 1 && selectedIds[0]) {
+            handleReject(selectedIds[0]);
+          } else {
+            handleBulkReject();
+          }
+        },
+        disabled: loadingState !== null || bulkModerationMutation.isPending || validForReject.length === 0,
+      },
+      {
+        key: 'f',
+        action: () => {
+          handleBulkFlag();
+        },
+        disabled: loadingState !== null || bulkModerationMutation.isPending || validForFlag.length === 0,
+      },
+      {
+        key: 'd',
+        action: () => {
+          if (selectedIds.length === 1 && selectedIds[0]) {
+            handleDelete(selectedIds[0]);
+          } else {
+            toast.error("Can only delete one testimonial at a time. Please select only one.");
+          }
+        },
+        disabled: loadingState !== null,
+      },
+      {
+        key: 'x',
+        action: () => {
+          setSelectedIds([]);
+        },
+      },
+    ],
+  });
+
+  // Keyboard shortcuts for Select All (works in moderation mode always)
+  useKeyboardShortcuts({
+    enabled: moderationMode,
+    shortcuts: [
+      {
+        key: 'a',
+        shift: true,
+        action: () => {
+          toggleSelectAll();
+          toast.success(
+            selectedIds.length === filteredTestimonials?.length
+              ? "All selections cleared"
+              : `${filteredTestimonials?.length || 0} testimonials selected`
+          );
+        },
+      },
+    ],
+  });
+
+  // Keyboard shortcuts for smart selection by state
+  useKeyboardShortcuts({
+    enabled: moderationMode,
+    shortcuts: [
+      {
+        key: 'p',
+        shift: true,
+        action: () => {
+          const pendingIds = filteredTestimonials
+            ?.filter((t: Testimonial) => t.moderationStatus === 'PENDING')
+            .map((t: Testimonial) => t.id) || [];
+          
+          setSelectedIds(pendingIds);
+          toast.success(
+            pendingIds.length > 0
+              ? `${pendingIds.length} pending testimonial(s) selected`
+              : "No pending testimonials to select"
+          );
+        },
+      },
+      {
+        key: 'v',
+        shift: true,
+        action: () => {
+          const approvedIds = filteredTestimonials
+            ?.filter((t: Testimonial) => t.moderationStatus === 'APPROVED')
+            .map((t: Testimonial) => t.id) || [];
+          
+          setSelectedIds(approvedIds);
+          toast.success(
+            approvedIds.length > 0
+              ? `${approvedIds.length} approved testimonial(s) selected`
+              : "No approved testimonials to select"
+          );
+        },
+      },
+      {
+        key: 'r',
+        shift: true,
+        action: () => {
+          const rejectedIds = filteredTestimonials
+            ?.filter((t: Testimonial) => t.moderationStatus === 'REJECTED')
+            .map((t: Testimonial) => t.id) || [];
+          
+          setSelectedIds(rejectedIds);
+          toast.success(
+            rejectedIds.length > 0
+              ? `${rejectedIds.length} rejected testimonial(s) selected`
+              : "No rejected testimonials to select"
+          );
+        },
+      },
+      {
+        key: 'f',
+        shift: true,
+        action: () => {
+          const flaggedIds = filteredTestimonials
+            ?.filter((t: Testimonial) => t.moderationStatus === 'FLAGGED')
+            .map((t: Testimonial) => t.id) || [];
+          
+          setSelectedIds(flaggedIds);
+          toast.success(
+            flaggedIds.length > 0
+              ? `${flaggedIds.length} flagged testimonial(s) selected`
+              : "No flagged testimonials to select"
+          );
+        },
+      },
+    ],
+  });
 
   const handlePresetChange = (preset: FilterPreset) => {
     setActivePreset(preset);
