@@ -475,7 +475,16 @@ function calculateQualityScore(
 }
 
 /**
- * Main moderation function
+ * Main moderation function with separated issues and notes
+ * 
+ * @param content - Testimonial content to moderate
+ * @param email - Author's email (optional)
+ * @param rating - Rating given (optional)
+ * @param isOAuthVerified - Whether user is OAuth verified
+ * @param config - Moderation configuration (includes averageRating, existingContents)
+ * 
+ * Returns flags separated into issues (problems) and notes (positive info)
+ * Auto-publish only if no issues detected
  */
 export async function moderateTestimonial(
   content: string,
@@ -484,7 +493,8 @@ export async function moderateTestimonial(
   isOAuthVerified: boolean,
   config: ModerationConfig
 ): Promise<ModerationResult> {
-  const flags: string[] = [];
+  const issues: string[] = []; // Bad flags - problems that need attention
+  const notes: string[] = []; // Info flags - positive signals
   let status: ModerationResult['status'] = 'PENDING';
   let autoPublish = false;
 
@@ -501,51 +511,67 @@ export async function moderateTestimonial(
   // Check minimum length
   const minLength = config.moderationSettings?.minContentLength || 10;
   if (content.length < minLength) {
-    flags.push(`Content too short (< ${minLength} characters)`);
+    issues.push(`Content too short (< ${minLength} characters)`);
     status = 'REJECTED';
   }
 
-  // Check profanity
+  // Check profanity with intensity-based action
   const profanityCheck = containsProfanity(
     content,
     config.profanityFilterLevel,
     config.moderationSettings?.customProfanityList
   );
   if (profanityCheck.found) {
-    flags.push(`Contains profanity: ${profanityCheck.words.join(', ')}`);
-    status = 'REJECTED';
+    if (profanityCheck.intensity === 'severe') {
+      issues.push(`Severe profanity detected: ${profanityCheck.words.slice(0, 3).join(', ')}${profanityCheck.words.length > 3 ? ` (+${profanityCheck.words.length - 3} more)` : ''}`);
+      status = 'REJECTED';
+    } else if (profanityCheck.intensity === 'mild') {
+      issues.push(`Mild profanity detected: ${profanityCheck.words.slice(0, 3).join(', ')}${profanityCheck.words.length > 3 ? ` (+${profanityCheck.words.length - 3} more)` : ''}`);
+      status = status === 'PENDING' ? 'FLAGGED' : status;
+    }
   }
 
-  // Check spam indicators
-  const spamCheck = checkSpamIndicators(content, email);
+  // Check spam indicators with advanced heuristics
+  const averageRating = config.moderationSettings?.averageRating;
+  const spamCheck = checkSpamIndicators(content, email, rating, averageRating, config);
   if (spamCheck.isSpam) {
-    flags.push(...spamCheck.indicators);
+    issues.push(...spamCheck.indicators);
     status = 'REJECTED';
   } else if (spamCheck.indicators.length > 0) {
-    flags.push(...spamCheck.indicators);
+    issues.push(...spamCheck.indicators);
     status = status === 'PENDING' ? 'FLAGGED' : status;
   }
 
-  // Advanced sentiment analysis
+  // Advanced sentiment analysis with negation detection
   const sentimentAnalysis = analyzeSentiment(content);
   if (sentimentAnalysis.sentiment === 'very_negative') {
-    flags.push(`Very negative sentiment detected: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
+    issues.push(`Very negative sentiment: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
     status = 'REJECTED';
   } else if (sentimentAnalysis.sentiment === 'negative') {
-    flags.push(`Negative sentiment: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
+    issues.push(`Negative sentiment: ${sentimentAnalysis.negativeKeywords.slice(0, 3).join(', ')}`);
     status = status === 'PENDING' ? 'FLAGGED' : status;
-  }
-  
-  // Bonus for positive sentiment
-  if (sentimentAnalysis.sentiment === 'very_positive' || sentimentAnalysis.sentiment === 'positive') {
-    flags.push(`Positive sentiment detected (${sentimentAnalysis.positiveKeywords.length} positive indicators)`);
+  } else if (sentimentAnalysis.sentiment === 'positive' || sentimentAnalysis.sentiment === 'very_positive') {
+    // Positive sentiment is a good signal, add to notes
+    notes.push(`Positive sentiment (${sentimentAnalysis.positiveKeywords.length} indicators)`);
   }
 
-  // Check blocked domains
+  // Check blocked email domains
   if (email && config.moderationSettings?.blockedDomains) {
     const emailDomain = email.split('@')[1]?.toLowerCase();
     if (emailDomain && config.moderationSettings.blockedDomains.includes(emailDomain)) {
-      flags.push(`Blocked email domain: ${emailDomain}`);
+      issues.push(`Blocked email domain: ${emailDomain}`);
+      status = 'REJECTED';
+    }
+  }
+
+  // Duplicate content detection
+  if (config.moderationSettings?.existingContents && config.moderationSettings.existingContents.length > 0) {
+    const duplicateCheck = checkDuplicateContent(
+      content,
+      config.moderationSettings.existingContents
+    );
+    if (duplicateCheck.isDuplicate) {
+      issues.push(`Duplicate content detected (${(duplicateCheck.similarity! * 100).toFixed(0)}% similarity)`);
       status = 'REJECTED';
     }
   }
@@ -553,28 +579,70 @@ export async function moderateTestimonial(
   // Calculate quality score
   const qualityScore = calculateQualityScore(content, rating, isOAuthVerified);
 
-  // Auto-approve logic
-  if (status === 'PENDING' && flags.length === 0) {
+  // Auto-approve logic - only if no issues detected
+  if (status === 'PENDING' && issues.length === 0) {
     if (isOAuthVerified && config.autoApproveVerified) {
       // Auto-approve verified users
       status = 'APPROVED';
       autoPublish = true;
-      flags.push('Auto-approved: OAuth verified');
+      notes.push('Auto-approved: OAuth verified');
     } else if (qualityScore >= 0.8 && rating && rating >= 4) {
       // Auto-approve high-quality testimonials
       status = 'APPROVED';
       autoPublish = true;
-      flags.push('Auto-approved: High quality score');
+      notes.push('Auto-approved: High quality score');
     }
   }
+
+  // Combine issues and notes - issues first for visibility
+  const allFlags = [...issues, ...notes];
 
   return {
     status,
     score: 1 - qualityScore, // Invert score (higher = more likely spam)
-    flags,
+    flags: allFlags,
     autoPublish
   };
 }
+
+/**
+ * TODO: Reviewer behavioral pattern detection (post-MVP)
+ * 
+ * Future enhancement: Detect spam patterns across multiple reviews
+ * 
+ * Heuristics to implement:
+ * - Multiple reviews from same email/IP in short timeframe
+ * - Similar content patterns from same reviewer
+ * - Velocity-based detection (burst of reviews)
+ * - Cross-project spam detection
+ * 
+ * Example implementation:
+ * 
+ * async function checkReviewerBehavior(
+ *   email: string,
+ *   ipAddress: string,
+ *   projectId: string
+ * ): Promise<{ isSuspicious: boolean; patterns: string[] }> {
+ *   // Query testimonials table for reviewer history
+ *   const recentReviews = await prisma.testimonial.findMany({
+ *     where: {
+ *       OR: [
+ *         { authorEmail: email },
+ *         { ipAddress: ipAddress }
+ *       ],
+ *       createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
+ *     }
+ *   });
+ * 
+ *   const patterns = [];
+ *   if (recentReviews.length > 5) patterns.push('High review velocity');
+ *   if (recentReviews.filter(r => r.projectId !== projectId).length > 3) {
+ *     patterns.push('Cross-project spam pattern');
+ *   }
+ *   
+ *   return { isSuspicious: patterns.length > 0, patterns };
+ * }
+ */
 
 /**
  * Check for duplicate content
