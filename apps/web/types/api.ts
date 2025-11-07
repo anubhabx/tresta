@@ -71,6 +71,18 @@ export interface Project {
   tags: string[];
   visibility: ProjectVisibility;
   isActive: boolean;
+  // Auto-Moderation Settings
+  autoModeration?: boolean;
+  autoApproveVerified?: boolean;
+  profanityFilterLevel?: string | null;
+  moderationSettings?: {
+    minContentLength?: number;
+    maxUrlCount?: number;
+    allowedDomains?: string[];
+    blockedDomains?: string[];
+    customProfanityList?: string[];
+    brandKeywords?: string[];
+  } | null;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -199,6 +211,18 @@ export interface UpdateProjectPayload {
   tags?: string[];
   visibility?: ProjectVisibility;
   isActive?: boolean;
+  // Auto-Moderation Settings
+  autoModeration?: boolean;
+  autoApproveVerified?: boolean;
+  profanityFilterLevel?: "STRICT" | "MODERATE" | "LENIENT";
+  moderationSettings?: {
+    minContentLength?: number;
+    maxUrlCount?: number;
+    allowedDomains?: string[];
+    blockedDomains?: string[];
+    customProfanityList?: string[];
+    brandKeywords?: string[];
+  };
 }
 
 export interface CreateTestimonialPayload {

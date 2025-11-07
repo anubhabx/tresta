@@ -263,6 +263,18 @@ export interface UpdateProjectPayload {
   tags?: string[];
   visibility?: ProjectVisibility;
   isActive?: boolean;
+  // Auto-Moderation Settings
+  autoModeration?: boolean;
+  autoApproveVerified?: boolean;
+  profanityFilterLevel?: "STRICT" | "MODERATE" | "LENIENT";
+  moderationSettings?: {
+    minContentLength?: number;
+    maxUrlCount?: number;
+    allowedDomains?: string[];
+    blockedDomains?: string[];
+    customProfanityList?: string[];
+    brandKeywords?: string[];
+  };
 }
 
 /**
