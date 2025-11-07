@@ -322,6 +322,13 @@ const updateTestimonial = async (
       throw new NotFoundError("Testimonial not found");
     }
 
+    // Enforce workflow: Cannot publish unless approved
+    if (isPublished === true && !existingTestimonial.isApproved) {
+      throw new BadRequestError(
+        "Cannot publish unapproved testimonial. Please approve it first in the moderation queue."
+      );
+    }
+
     // Build update data
     const updateData: any = {};
     if (isPublished !== undefined) updateData.isPublished = isPublished;
