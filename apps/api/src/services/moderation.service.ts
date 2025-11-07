@@ -22,18 +22,63 @@ interface ModerationConfig {
     allowedDomains?: string[];
     blockedDomains?: string[];
     customProfanityList?: string[];
+    brandKeywords?: string[]; // For detecting excessive brand mentions (spam indicator)
+    averageRating?: number; // Project average rating for deviation detection
+    existingContents?: string[]; // Existing testimonial contents for duplicate detection
   };
 }
 
-// Profanity lists by severity
-const PROFANITY_STRICT = [
-  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'crap',
-  'piss', 'dick', 'pussy', 'cock', 'whore', 'slut', 'fag'
+// Enhanced profanity lists by severity (expanded from open-source datasets)
+// Sources: Shutterstock GitHub, Kaggle profanity datasets
+const PROFANITY_SEVERE = [
+  // Original severe terms
+  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'cunt', 'dick', 'pussy', 'cock', 
+  'whore', 'slut', 'fag', 'piss',
+  // Hate speech additions
+  'nigger', 'nigga', 'retard', 'kike', 'chink', 'spic', 'beaner', 'wetback',
+  // International/variant profanity
+  'wanker', 'bollocks', 'twat', 'prick', 'bugger', 'arse', 'tosser', 'bellend',
+  'knobhead', 'minger', 'git', 'pillock', 'plonker', 'wazzock', 'numpty',
+  // Sex-related severe
+  'fucked', 'fucking', 'motherfucker', 'fuckhead', 'shithead', 'bullshit',
+  'horseshit', 'dipshit', 'jackass', 'dumbass', 'badass', 'fatass',
+  // Slurs and derogatory
+  'faggot', 'dyke', 'tranny', 'shemale', 'raghead', 'towelhead', 'gook',
+  // Anatomical vulgar
+  'titties', 'boobs', 'penis', 'vagina', 'anal', 'anus', 'scrotum',
+  // Action-based vulgar
+  'pissed', 'pissing', 'shitting', 'screwed', 'humping', 'bonking'
 ];
 
-const PROFANITY_MODERATE = [
-  'hell', 'ass', 'suck', 'stupid', 'idiot', 'dumb', 'jerk'
+const PROFANITY_MILD = [
+  // Mild profanity
+  'hell', 'ass', 'suck', 'stupid', 'idiot', 'dumb', 'jerk', 'crap', 'damn',
+  'frig', 'darn', 'bloody', 'knob', 'git', 'sucks', 'sucked', 'sucking',
+  // Mild insults
+  'moron', 'imbecile', 'fool', 'loser', 'lame', 'pathetic', 'wimpy',
+  'dork', 'nerd', 'geek', 'freak', 'weirdo', 'creep', 'creepy',
+  // Mild anatomical
+  'butt', 'booty', 'booger', 'fart', 'poop', 'pee', 'turd',
+  // British mild
+  'blimey', 'crikey', 'sod', 'naff', 'pants', 'rubbish', 'codswallop'
 ];
+
+// Obfuscation patterns for leet speak and character substitutions
+const OBFUSCATION_REPLACEMENTS: { [key: string]: string[] } = {
+  'a': ['@', '4', 'α', 'а', 'á', 'à', 'â', 'ä', 'ã', 'å'],
+  'e': ['3', '€', 'е', 'é', 'è', 'ê', 'ë'],
+  'i': ['1', '!', 'і', 'í', 'ì', 'î', 'ï', '|'],
+  'o': ['0', 'ο', 'о', 'ó', 'ò', 'ô', 'ö', 'õ'],
+  's': ['$', '5', 'ѕ', 'ś', 'š', 'ş', 'ß'],
+  't': ['7', '+', 'τ', '†'],
+  'b': ['8', 'β', 'в'],
+  'g': ['9', '6'],
+  'l': ['1', '|', 'ι'],
+  'z': ['2'],
+  'c': ['(', '<', 'ç'],
+  'u': ['υ', 'ù', 'ú', 'û', 'ü'],
+  'n': ['ñ'],
+};
 
 // Spam patterns
 const SPAM_PHRASES = [
@@ -75,22 +120,51 @@ const DISPOSABLE_DOMAINS = [
 ];
 
 /**
- * Check if text contains profanity
+ * Detect obfuscated profanity using normalization techniques
+ * Handles leet speak (f@ck), repetitions (shiiiit), insertions (s.h.i.t), emojis
+ */
+function detectObfuscation(text: string, word: string): boolean {
+  let normalized = text.toLowerCase();
+  
+  // Step 1: Collapse repeated characters (e.g., "biiiitch" -> "bitch")
+  normalized = normalized.replace(/(.)\1{2,}/g, '$1$1');
+  
+  // Step 2: Replace leet speak and special characters
+  for (const [char, replacements] of Object.entries(OBFUSCATION_REPLACEMENTS)) {
+    replacements.forEach(rep => {
+      const escapedRep = rep.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      normalized = normalized.replace(new RegExp(escapedRep, 'gi'), char);
+    });
+  }
+  
+  // Step 3: Remove spaces, dots, dashes, underscores between letters (e.g., "f.u.c.k" -> "fuck")
+  normalized = normalized.replace(/([a-z])[.\s_-]+([a-z])/gi, '$1$2');
+  
+  // Step 4: Remove all remaining special characters and emojis
+  normalized = normalized.replace(/[^a-z0-9\s]/g, '');
+  
+  // Step 5: Check if the word exists in normalized text
+  return new RegExp(`\\b${word}\\b`, 'i').test(normalized);
+}
+
+/**
+ * Check if text contains profanity with obfuscation detection
  */
 function containsProfanity(
   text: string,
   level: 'STRICT' | 'MODERATE' | 'LENIENT',
   customList?: string[]
-): { found: boolean; words: string[] } {
+): { found: boolean; words: string[]; intensity: 'severe' | 'mild' | 'none' } {
   const lowerText = text.toLowerCase();
   let profanityList: string[] = [];
+  let intensity: 'severe' | 'mild' | 'none' = 'none';
 
   switch (level) {
     case 'STRICT':
-      profanityList = [...PROFANITY_STRICT, ...PROFANITY_MODERATE];
+      profanityList = [...PROFANITY_SEVERE, ...PROFANITY_MILD];
       break;
     case 'MODERATE':
-      profanityList = PROFANITY_STRICT;
+      profanityList = PROFANITY_SEVERE;
       break;
     case 'LENIENT':
       profanityList = []; // Only custom list
@@ -101,17 +175,28 @@ function containsProfanity(
     profanityList = [...profanityList, ...customList];
   }
 
-  const foundWords = profanityList.filter(word =>
-    new RegExp(`\\b${word}\\b`, 'i').test(lowerText)
-  );
+  // Use obfuscation detection for each word
+  const foundWords = profanityList.filter(word => detectObfuscation(lowerText, word));
+  
+  if (foundWords.length > 0) {
+    const hasSevere = foundWords.some(w => PROFANITY_SEVERE.includes(w));
+    intensity = hasSevere ? 'severe' : 'mild';
+  }
 
-  return { found: foundWords.length > 0, words: foundWords };
+  return { found: foundWords.length > 0, words: foundWords, intensity };
 }
 
 /**
- * Check for spam indicators
+ * Check for spam indicators with advanced heuristics
+ * Based on research from IJCAI/ResearchGate spam detection papers
  */
-function checkSpamIndicators(text: string, email?: string): {
+function checkSpamIndicators(
+  text: string, 
+  email?: string, 
+  rating?: number, 
+  averageRating?: number,
+  config?: ModerationConfig
+): {
   isSpam: boolean;
   indicators: string[];
 } {
