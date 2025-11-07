@@ -55,6 +55,12 @@ interface TestimonialListProps {
 type FilterStatus = "all" | "pending" | "approved" | "published";
 type ModerationFilter = "all" | "PENDING" | "APPROVED" | "REJECTED" | "FLAGGED";
 
+interface BulkActionHistory {
+  testimonialIds: string[];
+  action: "approve" | "reject" | "flag";
+  previousStatuses: Map<string, ModerationStatus>;
+}
+
 export function TestimonialList({ projectSlug, moderationMode = false }: TestimonialListProps) {
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
@@ -67,6 +73,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>("all");
   const [loadingState, setLoadingState] = useState<{ id: string; action: string } | null>(null);
+  const [lastBulkAction, setLastBulkAction] = useState<BulkActionHistory | null>(null);
   const limit = 10;
 
   const collectionUrl =
@@ -295,6 +302,33 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
     [selectedIds, allTestimonials]
   );
 
+  // Undo handler for bulk actions
+  const handleUndoBulkAction = async () => {
+    if (!lastBulkAction) return;
+
+    const { testimonialIds, previousStatuses } = lastBulkAction;
+
+    try {
+      // Restore each testimonial to its previous status
+      for (const id of testimonialIds) {
+        const previousStatus = previousStatuses.get(id);
+        if (previousStatus) {
+          await bulkModerationMutation.mutateAsync({
+            testimonialIds: [id],
+            action: previousStatus === "APPROVED" ? "approve" : 
+                    previousStatus === "REJECTED" ? "reject" : 
+                    "flag"
+          });
+        }
+      }
+
+      toast.success(`Undid action on ${testimonialIds.length} testimonial(s)`);
+      setLastBulkAction(null);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to undo action");
+    }
+  };
+
   // Bulk moderation handlers
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) {
@@ -309,6 +343,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    // Store previous statuses for undo
+    const previousStatuses = new Map<string, ModerationStatus>();
+    validForApprove.forEach((t) => {
+      previousStatuses.set(t.id, t.moderationStatus);
+    });
+
     const skipped = selectedIds.length - validIds.length;
 
     try {
@@ -316,13 +356,33 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         testimonialIds: validIds,
         action: "approve"
       });
+
+      // Store action history for undo
+      setLastBulkAction({
+        testimonialIds: validIds,
+        action: "approve",
+        previousStatuses
+      });
       
       if (skipped > 0) {
         toast.success(
-          `${validIds.length} testimonial(s) approved (${skipped} already approved, skipped)`
+          `${validIds.length} testimonial(s) approved (${skipped} already approved, skipped)`,
+          {
+            action: {
+              label: "Undo",
+              onClick: handleUndoBulkAction
+            },
+            duration: 10000
+          }
         );
       } else {
-        toast.success(`${validIds.length} testimonial(s) approved`);
+        toast.success(`${validIds.length} testimonial(s) approved`, {
+          action: {
+            label: "Undo",
+            onClick: handleUndoBulkAction
+          },
+          duration: 10000
+        });
       }
       
       setSelectedIds([]);
@@ -344,6 +404,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    // Store previous statuses for undo
+    const previousStatuses = new Map<string, ModerationStatus>();
+    validForReject.forEach((t) => {
+      previousStatuses.set(t.id, t.moderationStatus);
+    });
+
     const skipped = selectedIds.length - validIds.length;
 
     try {
@@ -351,13 +417,33 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         testimonialIds: validIds,
         action: "reject"
       });
+
+      // Store action history for undo
+      setLastBulkAction({
+        testimonialIds: validIds,
+        action: "reject",
+        previousStatuses
+      });
       
       if (skipped > 0) {
         toast.success(
-          `${validIds.length} testimonial(s) rejected (${skipped} already rejected, skipped)`
+          `${validIds.length} testimonial(s) rejected (${skipped} already rejected, skipped)`,
+          {
+            action: {
+              label: "Undo",
+              onClick: handleUndoBulkAction
+            },
+            duration: 10000
+          }
         );
       } else {
-        toast.success(`${validIds.length} testimonial(s) rejected`);
+        toast.success(`${validIds.length} testimonial(s) rejected`, {
+          action: {
+            label: "Undo",
+            onClick: handleUndoBulkAction
+          },
+          duration: 10000
+        });
       }
       
       setSelectedIds([]);
@@ -379,6 +465,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    // Store previous statuses for undo
+    const previousStatuses = new Map<string, ModerationStatus>();
+    validForFlag.forEach((t) => {
+      previousStatuses.set(t.id, t.moderationStatus);
+    });
+
     const skipped = selectedIds.length - validIds.length;
 
     try {
@@ -386,13 +478,33 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         testimonialIds: validIds,
         action: "flag"
       });
+
+      // Store action history for undo
+      setLastBulkAction({
+        testimonialIds: validIds,
+        action: "flag",
+        previousStatuses
+      });
       
       if (skipped > 0) {
         toast.success(
-          `${validIds.length} testimonial(s) flagged for review (${skipped} already flagged, skipped)`
+          `${validIds.length} testimonial(s) flagged for review (${skipped} already flagged, skipped)`,
+          {
+            action: {
+              label: "Undo",
+              onClick: handleUndoBulkAction
+            },
+            duration: 10000
+          }
         );
       } else {
-        toast.success(`${validIds.length} testimonial(s) flagged for review`);
+        toast.success(`${validIds.length} testimonial(s) flagged for review`, {
+          action: {
+            label: "Undo",
+            onClick: handleUndoBulkAction
+          },
+          duration: 10000
+        });
       }
       
       setSelectedIds([]);
