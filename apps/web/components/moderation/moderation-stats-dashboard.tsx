@@ -1,9 +1,10 @@
 "use client";
 
-import { 
-  AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
+import { Badge } from "@workspace/ui/components/badge";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
   XCircle,
   Shield,
   Zap
@@ -22,16 +23,21 @@ interface ModerationStatsDashboardProps {
   stats: ModerationStats;
 }
 
-export function ModerationStatsDashboard({ stats }: ModerationStatsDashboardProps) {
+export function ModerationStatsDashboard({
+  stats
+}: ModerationStatsDashboardProps) {
   const total = stats.pending + stats.flagged + stats.approved + stats.rejected;
 
   return (
     <div className="flex items-center gap-4 pb-4 border-b flex-wrap">
       {/* Total */}
       <div className="flex items-center gap-2">
-        <div className="px-3 py-1 rounded-md border bg-muted/30">
-          <span className="text-sm font-medium">{total} Total</span>
-        </div>
+        <Badge
+          variant={"outline"}
+          className="px-3 py-1 rounded-md border bg-muted/30 text-xs"
+        >
+          {total} Total
+        </Badge>
       </div>
 
       {/* Pending */}
@@ -54,7 +60,9 @@ export function ModerationStatsDashboard({ stats }: ModerationStatsDashboardProp
       {stats.approved > 0 && (
         <div className="flex items-center gap-2 text-sm">
           <div className="h-2 w-2 rounded-full bg-primary/30" />
-          <span className="text-muted-foreground">{stats.approved} Approved</span>
+          <span className="text-muted-foreground">
+            {stats.approved} Approved
+          </span>
         </div>
       )}
 
@@ -62,7 +70,9 @@ export function ModerationStatsDashboard({ stats }: ModerationStatsDashboardProp
       {stats.rejected > 0 && (
         <div className="flex items-center gap-2 text-sm">
           <XCircle className="h-3 w-3 text-destructive/60" />
-          <span className="text-muted-foreground">{stats.rejected} Rejected</span>
+          <span className="text-muted-foreground">
+            {stats.rejected} Rejected
+          </span>
         </div>
       )}
 
@@ -70,7 +80,9 @@ export function ModerationStatsDashboard({ stats }: ModerationStatsDashboardProp
       {stats.oauthVerified !== undefined && stats.oauthVerified > 0 && (
         <div className="flex items-center gap-2 text-sm">
           <Shield className="h-3 w-3 text-primary/60" />
-          <span className="text-muted-foreground">{stats.oauthVerified} Verified</span>
+          <span className="text-muted-foreground">
+            {stats.oauthVerified} Verified
+          </span>
         </div>
       )}
 
@@ -78,7 +90,9 @@ export function ModerationStatsDashboard({ stats }: ModerationStatsDashboardProp
       {stats.autoModerated !== undefined && stats.autoModerated > 0 && (
         <div className="flex items-center gap-2 text-sm">
           <Zap className="h-3 w-3 text-muted-foreground/60" />
-          <span className="text-muted-foreground">{stats.autoModerated} Auto-Moderated</span>
+          <span className="text-muted-foreground">
+            {stats.autoModerated} Auto-Moderated
+          </span>
         </div>
       )}
     </div>
