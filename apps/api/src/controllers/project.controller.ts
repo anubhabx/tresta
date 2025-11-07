@@ -477,6 +477,47 @@ const updateProject = async (
       throw new BadRequestError("Invalid visibility option");
     }
 
+    // Validate moderation settings if provided
+    if (payload.profanityFilterLevel !== undefined) {
+      const validLevels = ["STRICT", "MODERATE", "LENIENT"];
+      if (!validLevels.includes(payload.profanityFilterLevel)) {
+        throw new BadRequestError("Invalid profanity filter level. Must be STRICT, MODERATE, or LENIENT");
+      }
+    }
+
+    if (payload.moderationSettings !== undefined && payload.moderationSettings) {
+      const settings = payload.moderationSettings;
+      
+      if (settings.minContentLength !== undefined) {
+        if (typeof settings.minContentLength !== "number" || settings.minContentLength < 0 || settings.minContentLength > 1000) {
+          throw new BadRequestError("Minimum content length must be between 0 and 1000");
+        }
+      }
+
+      if (settings.maxUrlCount !== undefined) {
+        if (typeof settings.maxUrlCount !== "number" || settings.maxUrlCount < 0 || settings.maxUrlCount > 10) {
+          throw new BadRequestError("Maximum URL count must be between 0 and 10");
+        }
+      }
+
+      // Validate domain arrays
+      if (settings.allowedDomains !== undefined && !Array.isArray(settings.allowedDomains)) {
+        throw new BadRequestError("Allowed domains must be an array");
+      }
+
+      if (settings.blockedDomains !== undefined && !Array.isArray(settings.blockedDomains)) {
+        throw new BadRequestError("Blocked domains must be an array");
+      }
+
+      if (settings.customProfanityList !== undefined && !Array.isArray(settings.customProfanityList)) {
+        throw new BadRequestError("Custom profanity list must be an array");
+      }
+
+      if (settings.brandKeywords !== undefined && !Array.isArray(settings.brandKeywords)) {
+        throw new BadRequestError("Brand keywords must be an array");
+      }
+    }
+
     // Build update data object
     const updateData: any = {};
     if (payload.name !== undefined) updateData.name = payload.name.trim();
@@ -498,6 +539,12 @@ const updateProject = async (
     if (payload.tags !== undefined) updateData.tags = payload.tags;
     if (payload.visibility !== undefined) updateData.visibility = payload.visibility;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
+    
+    // Add moderation settings
+    if (payload.autoModeration !== undefined) updateData.autoModeration = payload.autoModeration;
+    if (payload.autoApproveVerified !== undefined) updateData.autoApproveVerified = payload.autoApproveVerified;
+    if (payload.profanityFilterLevel !== undefined) updateData.profanityFilterLevel = payload.profanityFilterLevel;
+    if (payload.moderationSettings !== undefined) updateData.moderationSettings = payload.moderationSettings;
 
     // Update project
     const updatedProject = await prisma.project.update({
