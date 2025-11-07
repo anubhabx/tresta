@@ -262,6 +262,39 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
     }
   };
 
+  // Helper to get selected testimonials and filter by action validity
+  const getValidTestimonialsForAction = (action: "approve" | "reject" | "flag") => {
+    const selected = allTestimonials.filter((t) => selectedIds.includes(t.id));
+    
+    switch (action) {
+      case "approve":
+        // Only testimonials that are not already approved
+        return selected.filter((t) => t.moderationStatus !== "APPROVED");
+      case "reject":
+        // Only testimonials that are not already rejected
+        return selected.filter((t) => t.moderationStatus !== "REJECTED");
+      case "flag":
+        // Only testimonials that are not already flagged
+        return selected.filter((t) => t.moderationStatus !== "FLAGGED");
+      default:
+        return selected;
+    }
+  };
+
+  // Calculate valid testimonials for each action
+  const validForApprove = useMemo(
+    () => getValidTestimonialsForAction("approve"),
+    [selectedIds, allTestimonials]
+  );
+  const validForReject = useMemo(
+    () => getValidTestimonialsForAction("reject"),
+    [selectedIds, allTestimonials]
+  );
+  const validForFlag = useMemo(
+    () => getValidTestimonialsForAction("flag"),
+    [selectedIds, allTestimonials]
+  );
+
   // Bulk moderation handlers
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) {
@@ -269,12 +302,29 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    const validIds = validForApprove.map((t) => t.id);
+    
+    if (validIds.length === 0) {
+      toast.info("All selected testimonials are already approved");
+      return;
+    }
+
+    const skipped = selectedIds.length - validIds.length;
+
     try {
       await bulkModerationMutation.mutateAsync({
-        testimonialIds: selectedIds,
+        testimonialIds: validIds,
         action: "approve"
       });
-      toast.success(`${selectedIds.length} testimonial(s) approved`);
+      
+      if (skipped > 0) {
+        toast.success(
+          `${validIds.length} testimonial(s) approved (${skipped} already approved, skipped)`
+        );
+      } else {
+        toast.success(`${validIds.length} testimonial(s) approved`);
+      }
+      
       setSelectedIds([]);
     } catch (error: any) {
       toast.error(error?.message || "Failed to approve testimonials");
@@ -287,12 +337,29 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    const validIds = validForReject.map((t) => t.id);
+    
+    if (validIds.length === 0) {
+      toast.info("All selected testimonials are already rejected");
+      return;
+    }
+
+    const skipped = selectedIds.length - validIds.length;
+
     try {
       await bulkModerationMutation.mutateAsync({
-        testimonialIds: selectedIds,
+        testimonialIds: validIds,
         action: "reject"
       });
-      toast.success(`${selectedIds.length} testimonial(s) rejected`);
+      
+      if (skipped > 0) {
+        toast.success(
+          `${validIds.length} testimonial(s) rejected (${skipped} already rejected, skipped)`
+        );
+      } else {
+        toast.success(`${validIds.length} testimonial(s) rejected`);
+      }
+      
       setSelectedIds([]);
     } catch (error: any) {
       toast.error(error?.message || "Failed to reject testimonials");
@@ -305,12 +372,29 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       return;
     }
 
+    const validIds = validForFlag.map((t) => t.id);
+    
+    if (validIds.length === 0) {
+      toast.info("All selected testimonials are already flagged");
+      return;
+    }
+
+    const skipped = selectedIds.length - validIds.length;
+
     try {
       await bulkModerationMutation.mutateAsync({
-        testimonialIds: selectedIds,
+        testimonialIds: validIds,
         action: "flag"
       });
-      toast.success(`${selectedIds.length} testimonial(s) flagged for review`);
+      
+      if (skipped > 0) {
+        toast.success(
+          `${validIds.length} testimonial(s) flagged for review (${skipped} already flagged, skipped)`
+        );
+      } else {
+        toast.success(`${validIds.length} testimonial(s) flagged for review`);
+      }
+      
       setSelectedIds([]);
     } catch (error: any) {
       toast.error(error?.message || "Failed to flag testimonials");
@@ -806,44 +890,159 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
                     </div>
                     <div className="h-6 w-px bg-border" />
                     <div className="flex items-center gap-2 flex-1">
-                      <Button
-                        onClick={handleBulkApprove}
-                        disabled={bulkModerationMutation.isPending}
-                        size="sm"
-                        variant="default"
-                        className="bg-green-500 hover:bg-green-600 flex-1"
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={handleBulkFlag}
-                        disabled={bulkModerationMutation.isPending}
-                        size="sm"
-                        variant="secondary"
-                        className="flex-1"
-                      >
-                        <AlertTriangle className="h-4 w-4 mr-2" />
-                        Flag
-                      </Button>
-                      <Button
-                        onClick={handleBulkReject}
-                        disabled={bulkModerationMutation.isPending}
-                        size="sm"
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-1">
+                              <Button
+                                onClick={handleBulkApprove}
+                                disabled={
+                                  bulkModerationMutation.isPending ||
+                                  validForApprove.length === 0
+                                }
+                                size="sm"
+                                variant="default"
+                                className="bg-green-500 hover:bg-green-600 w-full flex items-center justify-center gap-2"
+                              >
+                                <div className="flex items-center">
+                                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                                  Approve
+                                  {validForApprove.length > 0 &&
+                                    validForApprove.length < selectedIds.length && (
+                                      <span className="ml-1 text-xs opacity-75">
+                                        ({validForApprove.length})
+                                      </span>
+                                    )}
+                                </div>
+                                <KeyboardShortcutBadge shortcut="A" />
+                              </Button>
+                            </div>
+                          </TooltipTrigger>
+                          {validForApprove.length === 0 && (
+                            <TooltipContent>
+                              <p className="text-xs">
+                                All selected testimonials are already approved
+                              </p>
+                            </TooltipContent>
+                          )}
+                          {validForApprove.length > 0 &&
+                            validForApprove.length < selectedIds.length && (
+                              <TooltipContent>
+                                <p className="text-xs">
+                                  {validForApprove.length} can be approved,{" "}
+                                  {selectedIds.length - validForApprove.length}{" "}
+                                  already approved
+                                </p>
+                              </TooltipContent>
+                            )}
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-1">
+                              <Button
+                                onClick={handleBulkFlag}
+                                disabled={
+                                  bulkModerationMutation.isPending ||
+                                  validForFlag.length === 0
+                                }
+                                size="sm"
+                                variant="secondary"
+                                className="w-full flex items-center justify-center gap-2"
+                              >
+                                <div className="flex items-center">
+                                  <AlertTriangle className="h-4 w-4 mr-2" />
+                                  Flag
+                                  {validForFlag.length > 0 &&
+                                    validForFlag.length < selectedIds.length && (
+                                      <span className="ml-1 text-xs opacity-75">
+                                        ({validForFlag.length})
+                                      </span>
+                                    )}
+                                </div>
+                                <KeyboardShortcutBadge shortcut="F" />
+                              </Button>
+                            </div>
+                          </TooltipTrigger>
+                          {validForFlag.length === 0 && (
+                            <TooltipContent>
+                              <p className="text-xs">
+                                All selected testimonials are already flagged
+                              </p>
+                            </TooltipContent>
+                          )}
+                          {validForFlag.length > 0 &&
+                            validForFlag.length < selectedIds.length && (
+                              <TooltipContent>
+                                <p className="text-xs">
+                                  {validForFlag.length} can be flagged,{" "}
+                                  {selectedIds.length - validForFlag.length}{" "}
+                                  already flagged
+                                </p>
+                              </TooltipContent>
+                            )}
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-1">
+                              <Button
+                                onClick={handleBulkReject}
+                                disabled={
+                                  bulkModerationMutation.isPending ||
+                                  validForReject.length === 0
+                                }
+                                size="sm"
+                                variant="destructive"
+                                className="w-full flex items-center justify-center gap-2"
+                              >
+                                <div className="flex items-center">
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Reject
+                                  {validForReject.length > 0 &&
+                                    validForReject.length < selectedIds.length && (
+                                      <span className="ml-1 text-xs opacity-75">
+                                        ({validForReject.length})
+                                      </span>
+                                    )}
+                                </div>
+                                <KeyboardShortcutBadge shortcut="R" />
+                              </Button>
+                            </div>
+                          </TooltipTrigger>
+                          {validForReject.length === 0 && (
+                            <TooltipContent>
+                              <p className="text-xs">
+                                All selected testimonials are already rejected
+                              </p>
+                            </TooltipContent>
+                          )}
+                          {validForReject.length > 0 &&
+                            validForReject.length < selectedIds.length && (
+                              <TooltipContent>
+                                <p className="text-xs">
+                                  {validForReject.length} can be rejected,{" "}
+                                  {selectedIds.length - validForReject.length}{" "}
+                                  already rejected
+                                </p>
+                              </TooltipContent>
+                            )}
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                     <div className="h-6 w-px bg-border" />
                     <Button
                       onClick={() => setSelectedIds([])}
                       size="sm"
                       variant="ghost"
+                      className="flex items-center gap-2"
                     >
                       Clear
+                      <KeyboardShortcutBadge shortcut="X" />
                     </Button>
                   </div>
                 </CardContent>
