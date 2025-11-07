@@ -18,12 +18,12 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { InlineLoader } from "./loader";
 import { CustomFormField } from "./custom-form-field";
+import { OAuthButtons } from "./auth/oauth-buttons";
 
 const SignInFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),
@@ -113,24 +113,7 @@ const SignInForm = () => {
         <CardDescription>Sign up to get stared with Tresta</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-2 items-center justify-center">
-          <Button
-            variant={"secondary"}
-            className="flex-1 px-2"
-            onClick={() => onOAuthSignUp("google")}
-          >
-            <FaGoogle className="mr-2 h-4 w-4" />
-            Continue with Google
-          </Button>
-          <Button
-            variant={"secondary"}
-            className="flex-1 px-2"
-            onClick={() => onOAuthSignUp("github")}
-          >
-            <FaGithub className="mr-2 h-4 w-4" />
-            Continue with Github
-          </Button>
-        </div>
+        <OAuthButtons onOAuthClick={onOAuthSignUp} />
 
         <div className="flex gap-2 items-center my-4">
           <hr className="flex-1 border-border" />
