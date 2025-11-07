@@ -56,9 +56,12 @@ type FilterStatus = "all" | "pending" | "approved" | "published";
 type ModerationFilter = "all" | "PENDING" | "APPROVED" | "REJECTED" | "FLAGGED";
 
 interface BulkActionHistory {
+  id: string;
+  timestamp: Date;
   testimonialIds: string[];
   action: "approve" | "reject" | "flag";
   previousStatuses: Map<string, ModerationStatus>;
+  count: number;
 }
 
 export function TestimonialList({ projectSlug, moderationMode = false }: TestimonialListProps) {
@@ -73,7 +76,8 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>("all");
   const [loadingState, setLoadingState] = useState<{ id: string; action: string } | null>(null);
-  const [lastBulkAction, setLastBulkAction] = useState<BulkActionHistory | null>(null);
+  const [actionHistory, setActionHistory] = useState<BulkActionHistory[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const limit = 10;
 
   const collectionUrl =
@@ -303,10 +307,11 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
   );
 
   // Undo handler for bulk actions
-  const handleUndoBulkAction = async () => {
-    if (!lastBulkAction) return;
+  const handleUndoBulkAction = async (actionId: string) => {
+    const action = actionHistory.find(a => a.id === actionId);
+    if (!action) return;
 
-    const { testimonialIds, previousStatuses } = lastBulkAction;
+    const { testimonialIds, previousStatuses } = action;
 
     try {
       // Restore each testimonial to its previous status
@@ -323,10 +328,29 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
       }
 
       toast.success(`Undid action on ${testimonialIds.length} testimonial(s)`);
-      setLastBulkAction(null);
+      
+      // Remove this action from history
+      setActionHistory(prev => prev.filter(a => a.id !== actionId));
     } catch (error: any) {
       toast.error(error?.message || "Failed to undo action");
     }
+  };
+
+  // Helper to add action to history
+  const addToHistory = (action: Omit<BulkActionHistory, "id" | "timestamp">) => {
+    const newAction: BulkActionHistory = {
+      ...action,
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: new Date(),
+    };
+    
+    setActionHistory(prev => {
+      const updated = [newAction, ...prev];
+      // Keep only last 10 actions
+      return updated.slice(0, 10);
+    });
+    
+    return newAction.id;
   };
 
   // Bulk moderation handlers
@@ -357,11 +381,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         action: "approve"
       });
 
-      // Store action history for undo
-      setLastBulkAction({
+      // Add to history
+      const actionId = addToHistory({
         testimonialIds: validIds,
         action: "approve",
-        previousStatuses
+        previousStatuses,
+        count: validIds.length
       });
       
       if (skipped > 0) {
@@ -370,7 +395,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
           {
             action: {
               label: "Undo",
-              onClick: handleUndoBulkAction
+              onClick: () => handleUndoBulkAction(actionId)
             },
             duration: 10000
           }
@@ -379,7 +404,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         toast.success(`${validIds.length} testimonial(s) approved`, {
           action: {
             label: "Undo",
-            onClick: handleUndoBulkAction
+            onClick: () => handleUndoBulkAction(actionId)
           },
           duration: 10000
         });
@@ -418,11 +443,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         action: "reject"
       });
 
-      // Store action history for undo
-      setLastBulkAction({
+      // Add to history
+      const actionId = addToHistory({
         testimonialIds: validIds,
         action: "reject",
-        previousStatuses
+        previousStatuses,
+        count: validIds.length
       });
       
       if (skipped > 0) {
@@ -431,7 +457,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
           {
             action: {
               label: "Undo",
-              onClick: handleUndoBulkAction
+              onClick: () => handleUndoBulkAction(actionId)
             },
             duration: 10000
           }
@@ -440,7 +466,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         toast.success(`${validIds.length} testimonial(s) rejected`, {
           action: {
             label: "Undo",
-            onClick: handleUndoBulkAction
+            onClick: () => handleUndoBulkAction(actionId)
           },
           duration: 10000
         });
@@ -479,11 +505,12 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         action: "flag"
       });
 
-      // Store action history for undo
-      setLastBulkAction({
+      // Add to history
+      const actionId = addToHistory({
         testimonialIds: validIds,
         action: "flag",
-        previousStatuses
+        previousStatuses,
+        count: validIds.length
       });
       
       if (skipped > 0) {
@@ -492,7 +519,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
           {
             action: {
               label: "Undo",
-              onClick: handleUndoBulkAction
+              onClick: () => handleUndoBulkAction(actionId)
             },
             duration: 10000
           }
@@ -501,7 +528,7 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
         toast.success(`${validIds.length} testimonial(s) flagged for review`, {
           action: {
             label: "Undo",
-            onClick: handleUndoBulkAction
+            onClick: () => handleUndoBulkAction(actionId)
           },
           duration: 10000
         });
@@ -731,6 +758,66 @@ export function TestimonialList({ projectSlug, moderationMode = false }: Testimo
     <div className="space-y-6">
       {/* Moderation Stats Dashboard - Only in moderation mode */}
       {moderationMode && <ModerationStatsDashboard stats={stats} />}
+
+      {/* Action History Panel - Only in moderation mode when there's history */}
+      {moderationMode && actionHistory.length > 0 && (
+        <Card>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Recent Actions</h3>
+                <Badge variant="secondary">{actionHistory.length}</Badge>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHistory(!showHistory)}
+              >
+                {showHistory ? "Hide" : "Show"} History
+              </Button>
+            </div>
+            
+            {showHistory && (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {actionHistory.map((action) => (
+                  <div
+                    key={action.id}
+                    className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        {action.action === "approve" && (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        )}
+                        {action.action === "reject" && (
+                          <XCircle className="h-4 w-4 text-red-600" />
+                        )}
+                        {action.action === "flag" && (
+                          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                        )}
+                        <span className="text-sm font-medium capitalize">
+                          {action.action}d {action.count} testimonial{action.count !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(action.timestamp).toLocaleTimeString()} - {new Date(action.timestamp).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleUndoBulkAction(action.id)}
+                      disabled={bulkModerationMutation.isPending}
+                    >
+                      Undo
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filter Presets - Only in moderation mode */}
       {moderationMode && (
