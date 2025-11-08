@@ -29,7 +29,6 @@ export type {
 export interface PublicWidgetData {
   widget: {
     id: string;
-    embedType: string;
     config: WidgetConfig;
   };
   project: {

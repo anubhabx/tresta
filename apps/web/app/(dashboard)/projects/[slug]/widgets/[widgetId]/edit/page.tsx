@@ -27,7 +27,7 @@ export default function EditWidgetPage() {
   }
 
   return (
-    <div className="container max-w-7xl py-8">
+    <div className="container w-full py-8">
       <WidgetBuilder
         projectSlug={slug}
         projectId={project.id}

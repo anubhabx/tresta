@@ -345,7 +345,6 @@ export interface WidgetConfig {
 export interface WidgetData {
   id: string;
   projectId?: string;
-  embedType: string;
   config: WidgetConfig;
   createdAt: string;
   updatedAt: string;
@@ -362,12 +361,10 @@ export type WidgetUpdatedResponse = SuccessResponse<WidgetData>;
  */
 export interface CreateWidgetPayload {
   projectId: string;
-  embedType: string; // e.g., "GRID", "CAROUSEL", "MASONRY"
   config: WidgetConfig;
 }
 
 export interface UpdateWidgetPayload {
-  embedType?: string;
   config?: Partial<WidgetConfig>;
 }
 
@@ -377,7 +374,6 @@ export interface UpdateWidgetPayload {
 export interface WidgetPublicData {
   id: string;
   projectId: string;
-  embedType: string;
   config: WidgetConfig;
   createdAt: string;
   updatedAt: string;

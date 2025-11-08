@@ -75,7 +75,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
+    <div className="flex flex-col gap-6 w-full h-full p-6 mx-auto">
       <ProjectHeader project={project} slug={slug} onDelete={handleDelete} />
 
       <ProjectStatsCards project={project} />

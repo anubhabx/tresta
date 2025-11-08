@@ -85,7 +85,6 @@ export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
 export interface Widget {
   id: string;
   projectId: string;
-  embedType: string;
   config: WidgetConfig;
   createdAt: string;
   updatedAt: string;
@@ -119,7 +118,6 @@ export interface PublicWidgetData {
     layout: WidgetLayout;
     theme: Record<string, any>;
     settings: WidgetConfig;
-    embedType: string;
   };
   project: {
     name: string;
@@ -140,7 +138,6 @@ export interface PublicWidgetData {
  */
 export interface CreateWidgetPayload {
   projectId: string;
-  embedType: string;
   config: WidgetConfig;
 }
 
@@ -148,6 +145,5 @@ export interface CreateWidgetPayload {
  * Widget update payload
  */
 export interface UpdateWidgetPayload {
-  embedType?: string;
   config?: Partial<WidgetConfig>;
 }

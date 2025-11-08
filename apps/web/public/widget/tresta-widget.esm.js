@@ -3,12 +3,13 @@ var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { en
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 const DEFAULT_THEME = {
   primaryColor: "#3b82f6",
-  backgroundColor: "#ffffff",
+  backgroundColor: "transparent",
   textColor: "#1f2937",
   cardBackgroundColor: "#ffffff",
-  borderRadius: 8,
+  borderRadius: 12,
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  starColor: "#000000"
+  starColor: "#fbbf24"
+  // Warm gold for stars
 };
 function generateStyles(theme, _layout, widgetId, settings) {
   const t = { ...DEFAULT_THEME, ...theme };
@@ -20,7 +21,7 @@ function generateStyles(theme, _layout, widgetId, settings) {
     ${prefix} {
       font-family: ${t.fontFamily};
       color: ${t.textColor};
-      background-color: ${t.backgroundColor};
+      background-color: transparent;
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
@@ -80,19 +81,21 @@ function generateStyles(theme, _layout, widgetId, settings) {
     /* Testimonial Card - Base */
     ${prefix} .tresta-testimonial {
       background-color: ${t.cardBackgroundColor};
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: ${t.borderRadius}px;
+      padding: 28px;
       margin-bottom: 16px;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       height: 100%;
       display: flex;
       flex-direction: column;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
     }
 
     ${prefix} .tresta-testimonial:hover {
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      border-color: ${t.primaryColor}80;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      border-color: ${t.primaryColor}40;
+      transform: translateY(-2px);
     }
 
     ${prefix}.tresta-layout-grid .tresta-testimonial {
@@ -102,55 +105,58 @@ function generateStyles(theme, _layout, widgetId, settings) {
     /* Rating Stars */
     ${prefix} .tresta-rating {
       display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
+      gap: 3px;
+      margin-bottom: 18px;
       line-height: 1;
     }
 
     ${prefix} .tresta-star {
       display: inline-block;
-      width: 16px;
-      height: 16px;
-      min-width: 16px;
-      min-height: 16px;
-      max-width: 16px;
-      max-height: 16px;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      min-height: 18px;
+      max-width: 18px;
+      max-height: 18px;
       color: ${t.starColor};
       fill: ${t.starColor};
       flex-shrink: 0;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
     }
 
     ${prefix} .tresta-star-empty {
-      color: #d1d5db;
-      fill: #d1d5db;
+      color: #e5e7eb;
+      fill: #e5e7eb;
+      filter: none;
     }
 
     /* Testimonial Content */
     ${prefix} .tresta-content {
-      font-size: 14px;
-      line-height: 1.625;
+      font-size: 15px;
+      line-height: 1.7;
       color: ${t.textColor};
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       flex: 1;
       display: -webkit-box;
-      -webkit-line-clamp: 4;
+      -webkit-line-clamp: 5;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      opacity: 0.95;
     }
 
     /* Author Section */
     ${prefix} .tresta-author {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid #e5e7eb;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     ${prefix} .tresta-author-image {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -160,7 +166,8 @@ function generateStyles(theme, _layout, widgetId, settings) {
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 17px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     ${prefix} .tresta-author-image.tresta-author-initials {
@@ -176,15 +183,15 @@ function generateStyles(theme, _layout, widgetId, settings) {
 
     ${prefix} .tresta-author-name {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       color: ${t.textColor};
-      margin: 0 0 2px 0;
+      margin: 0 0 4px 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     ${prefix} .tresta-verified-badge {
@@ -194,18 +201,19 @@ function generateStyles(theme, _layout, widgetId, settings) {
       flex-shrink: 0;
       color: #10b981;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      padding: 2px;
+      width: 18px;
+      height: 18px;
+      padding: 0;
     }
 
     ${prefix} .tresta-verified-badge svg {
       width: 100%;
       height: 100%;
+      filter: drop-shadow(0 1px 2px rgba(16, 185, 129, 0.2));
     }
 
     ${prefix} .tresta-author-role {
-      font-size: 12px;
+      font-size: 13px;
       color: #6b7280;
       margin: 0;
       white-space: nowrap;
@@ -236,7 +244,7 @@ function generateStyles(theme, _layout, widgetId, settings) {
     /* Layout: Grid */
     ${prefix}.tresta-layout-grid .tresta-testimonials {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: ${gap}px;
       align-items: stretch;
     }
@@ -268,12 +276,12 @@ function generateStyles(theme, _layout, widgetId, settings) {
     /* Layout: Masonry */
     ${prefix}.tresta-layout-masonry .tresta-testimonials {
       column-count: 3;
-      column-gap: 20px;
+      column-gap: ${gap}px;
     }
 
     ${prefix}.tresta-layout-masonry .tresta-testimonial {
       break-inside: avoid;
-      margin-bottom: 20px;
+      margin-bottom: ${gap}px;
     }
 
     @media (max-width: 1024px) {
@@ -288,11 +296,11 @@ function generateStyles(theme, _layout, widgetId, settings) {
       }
     }
 
-    /* Layout: Carousel - New Enhanced Styles */
+    /* Layout: Carousel - Enhanced Flexbox Layout */
     ${prefix}.tresta-layout-carousel .tresta-carousel {
       position: relative;
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
@@ -301,31 +309,40 @@ function generateStyles(theme, _layout, widgetId, settings) {
     }
 
     ${prefix} .tresta-carousel-wrapper {
-      position: relative;
-      padding: 0 70px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
     }
 
+    /* Hide navigation buttons on mobile (touch enabled) */
     @media (max-width: 768px) {
       ${prefix} .tresta-carousel-wrapper {
-        padding: 0 50px;
+        gap: 0;
+      }
+      
+      ${prefix} .tresta-carousel-nav-button {
+        display: none !important;
       }
     }
 
     ${prefix} .tresta-carousel-card {
-      background-color: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 60px 80px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      background-color: ${t.cardBackgroundColor};
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: ${t.borderRadius}px;
+      padding: 48px 60px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       transition: opacity 0.3s ease-in-out;
       min-height: 400px;
       display: flex;
       align-items: stretch;
+      flex: 1;
+      width: 100%;
     }
 
     @media (max-width: 768px) {
       ${prefix} .tresta-carousel-card {
-        padding: 40px 32px;
+        padding: 32px 24px;
         min-height: 350px;
       }
     }
@@ -341,17 +358,17 @@ function generateStyles(theme, _layout, widgetId, settings) {
 
     ${prefix} .tresta-carousel-rating {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       justify-content: flex-start;
       flex-shrink: 0;
     }
 
     ${prefix} .tresta-carousel-star-filled {
-      color: #000000;
+      color: ${t.starColor};
     }
 
     ${prefix} .tresta-carousel-star-empty {
-      color: #d1d5db;
+      color: #e5e7eb;
     }
 
     ${prefix} .tresta-carousel-quote-container {
@@ -363,9 +380,9 @@ function generateStyles(theme, _layout, widgetId, settings) {
     }
 
     ${prefix} .tresta-carousel-quote {
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1.7;
-      color: #1f2937;
+      color: ${t.textColor};
       font-style: normal;
       margin: 0;
       font-weight: 400;
@@ -375,7 +392,7 @@ function generateStyles(theme, _layout, widgetId, settings) {
 
     @media (max-width: 768px) {
       ${prefix} .tresta-carousel-quote {
-        font-size: 18px;
+        font-size: 17px;
       }
     }
 
@@ -413,8 +430,8 @@ function generateStyles(theme, _layout, widgetId, settings) {
 
     ${prefix} .tresta-carousel-author-name {
       font-weight: 600;
-      font-size: 16px;
-      color: #1f2937;
+      font-size: 15px;
+      color: ${t.textColor};
       margin: 0 0 4px 0;
       display: flex;
       align-items: center;
@@ -422,7 +439,7 @@ function generateStyles(theme, _layout, widgetId, settings) {
     }
 
     ${prefix} .tresta-carousel-author-role {
-      font-size: 14px;
+      font-size: 13px;
       color: #6b7280;
       margin: 0;
     }
@@ -434,49 +451,40 @@ function generateStyles(theme, _layout, widgetId, settings) {
       text-align: left;
     }
 
-    /* Carousel Navigation Buttons */
+    /* Carousel Navigation Buttons - Flexbox Layout */
     ${prefix} .tresta-carousel-nav-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: #1f2937;
-      color: white;
-      border: none;
+      background-color: ${t.cardBackgroundColor};
+      color: ${t.textColor};
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 50%;
       width: 48px;
       height: 48px;
+      min-width: 48px;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease;
-      z-index: 10;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     ${prefix} .tresta-carousel-nav-button:hover {
-      background-color: #374151;
-      transform: translateY(-50%) scale(1.05);
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      background-color: ${t.primaryColor};
+      color: white;
+      border-color: ${t.primaryColor};
     }
 
     ${prefix} .tresta-carousel-nav-button:focus {
       outline: none;
-      box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.2);
+      box-shadow: 0 0 0 3px ${t.primaryColor}40;
     }
 
-    ${prefix} .tresta-carousel-nav-prev {
-      left: 16px;
-    }
-
-    ${prefix} .tresta-carousel-nav-next {
-      right: 16px;
-    }
-
-    @media (max-width: 768px) {
-      ${prefix} .tresta-carousel-nav-button {
-        width: 40px;
-        height: 40px;
-      }
+    ${prefix} .tresta-carousel-nav-button:active {
+      transform: scale(0.95);
     }
 
     /* Carousel Indicators */
@@ -485,27 +493,27 @@ function generateStyles(theme, _layout, widgetId, settings) {
       justify-content: center;
       align-items: center;
       gap: 8px;
-      margin-top: 32px;
+      margin-top: 24px;
     }
 
     ${prefix} .tresta-carousel-indicator {
       width: 32px;
       height: 4px;
       border-radius: 2px;
-      background-color: #d1d5db;
+      background-color: ${t.primaryColor}50;
       border: none;
       padding: 0;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     ${prefix} .tresta-carousel-indicator:hover {
-      background-color: #9ca3af;
+      background-color: ${t.primaryColor}80;
     }
 
     ${prefix} .tresta-carousel-indicator-active {
       width: 48px;
-      background-color: #1f2937;
+      background-color: ${t.primaryColor};
     }
 
     /* Carousel Autoplay Toggle */
@@ -829,6 +837,7 @@ class Carousel {
     __publicField(this, "showCompany");
     __publicField(this, "showAvatar");
     __publicField(this, "showDate");
+    __publicField(this, "showNavigation");
     __publicField(this, "onSlideChange");
     __publicField(this, "isAutoPlayActive");
     // Touch support
@@ -850,6 +859,7 @@ class Carousel {
     this.showCompany = options.showCompany ?? true;
     this.showAvatar = options.showAvatar ?? true;
     this.showDate = options.showDate ?? true;
+    this.showNavigation = options.showNavigation ?? true;
     this.onSlideChange = options.onSlideChange;
     this.isAutoPlayActive = this.autoplay;
     this.init();
@@ -880,16 +890,20 @@ class Carousel {
     this.container.className = "tresta-carousel-container";
     const wrapper = document.createElement("div");
     wrapper.className = "tresta-carousel-wrapper";
+    if (this.showNavigation) {
+      this.prevButton = this.createNavigationButton("prev", "Previous testimonial");
+      wrapper.appendChild(this.prevButton);
+    }
     this.carouselCard = document.createElement("div");
     this.carouselCard.className = "tresta-carousel-card";
     this.contentContainer = document.createElement("div");
     this.contentContainer.className = "tresta-carousel-content";
     this.carouselCard.appendChild(this.contentContainer);
     wrapper.appendChild(this.carouselCard);
-    this.prevButton = this.createNavigationButton("prev", "Previous testimonial");
-    this.nextButton = this.createNavigationButton("next", "Next testimonial");
-    wrapper.appendChild(this.prevButton);
-    wrapper.appendChild(this.nextButton);
+    if (this.showNavigation) {
+      this.nextButton = this.createNavigationButton("next", "Next testimonial");
+      wrapper.appendChild(this.nextButton);
+    }
     this.container.appendChild(wrapper);
     this.indicatorsContainer = document.createElement("div");
     this.indicatorsContainer.className = "tresta-carousel-indicators";
@@ -1340,22 +1354,38 @@ class TrestaWidget {
    */
   async init() {
     try {
+      console.log("[TrestaWidget] Init started with config:", this.config);
       this.container = this.findContainer();
       if (!this.container) {
         throw new Error("Widget container not found");
       }
+      console.log("[TrestaWidget] Container found:", this.container);
       this.render(renderLoading());
-      await this.fetchWidgetData();
+      if (this.config.mockData) {
+        this.widget = this.config.mockData.widget;
+        this.testimonials = this.config.mockData.testimonials || [];
+        console.log("[TrestaWidget] Using mock data:", { widget: this.widget, testimonials: this.testimonials });
+      } else {
+        console.log("[TrestaWidget] Fetching from API...");
+        await this.fetchWidgetData();
+      }
+      console.log("[TrestaWidget] About to inject styles, widget is:", this.widget);
       this.injectWidgetStyles();
+      console.log("[TrestaWidget] About to render widget");
       this.renderWidget();
+      console.log("[TrestaWidget] Widget rendered");
       const layout = this.config.settings?.layout || this.widget?.layout;
+      console.log("[TrestaWidget] Layout is:", layout);
       if (layout === "carousel") {
+        console.log("[TrestaWidget] Initializing carousel");
         this.initCarousel();
       }
       if (this.config.onLoad && this.widget) {
         this.config.onLoad(this.widget);
       }
+      console.log("[TrestaWidget] Init complete");
     } catch (error) {
+      console.error("[TrestaWidget] Init error:", error);
       this.handleError(error);
     }
   }
@@ -1424,7 +1454,7 @@ class TrestaWidget {
    * Inject widget styles
    */
   injectWidgetStyles() {
-    if (!this.widget) return;
+    if (!this.widget || !this.container) return;
     const theme = {
       ...DEFAULT_THEME,
       ...this.widget.theme,
@@ -1503,6 +1533,8 @@ class TrestaWidget {
       showCompany: settings.showAuthorCompany ?? true,
       showAvatar: settings.showAvatar ?? true,
       showDate: settings.showDate ?? true,
+      showNavigation: settings.showNavigation ?? true,
+      // Add navigation control
       onSlideChange: (index) => {
         this.currentSlide = index;
       }
@@ -1700,3 +1732,4 @@ if (typeof window !== "undefined") {
 export {
   TrestaWidget
 };
+//# sourceMappingURL=tresta-widget.esm.js.map

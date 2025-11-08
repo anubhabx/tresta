@@ -26,6 +26,7 @@ export interface CarouselOptions {
     showCompany?: boolean;
     showAvatar?: boolean;
     showDate?: boolean;
+    showNavigation?: boolean; // Show/hide prev/next buttons
     onSlideChange?: (index: number) => void;
 }
 
@@ -40,6 +41,7 @@ export class Carousel {
     private showCompany: boolean;
     private showAvatar: boolean;
     private showDate: boolean;
+    private showNavigation: boolean;
     private onSlideChange?: (index: number) => void;
     private isAutoPlayActive: boolean;
 
@@ -65,6 +67,7 @@ export class Carousel {
         this.showCompany = options.showCompany ?? true;
         this.showAvatar = options.showAvatar ?? true;
         this.showDate = options.showDate ?? true;
+        this.showNavigation = options.showNavigation ?? true;
         this.onSlideChange = options.onSlideChange;
         this.isAutoPlayActive = this.autoplay;
 
@@ -101,27 +104,32 @@ export class Carousel {
         this.container.innerHTML = '';
         this.container.className = 'tresta-carousel-container';
 
-        // Create main structure
+        // Create main structure with flexbox layout
         const wrapper = document.createElement('div');
         wrapper.className = 'tresta-carousel-wrapper';
 
-        // Create carousel card
+        // Create navigation buttons first (for flex order: prev, card, next)
+        if (this.showNavigation) {
+            this.prevButton = this.createNavigationButton('prev', 'Previous testimonial');
+            wrapper.appendChild(this.prevButton);
+        }
+
+        // Create carousel card (will expand to fill available space)
         this.carouselCard = document.createElement('div');
         this.carouselCard.className = 'tresta-carousel-card';
 
-        // Create content container with padding for arrows
+        // Create content container
         this.contentContainer = document.createElement('div');
         this.contentContainer.className = 'tresta-carousel-content';
 
         this.carouselCard.appendChild(this.contentContainer);
         wrapper.appendChild(this.carouselCard);
 
-        // Create navigation buttons
-        this.prevButton = this.createNavigationButton('prev', 'Previous testimonial');
-        this.nextButton = this.createNavigationButton('next', 'Next testimonial');
-
-        wrapper.appendChild(this.prevButton);
-        wrapper.appendChild(this.nextButton);
+        // Add next button after card
+        if (this.showNavigation) {
+            this.nextButton = this.createNavigationButton('next', 'Next testimonial');
+            wrapper.appendChild(this.nextButton);
+        }
 
         this.container.appendChild(wrapper);
 

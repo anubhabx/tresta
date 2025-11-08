@@ -35,36 +35,9 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
     <Card>
       <CardHeader>
         <CardTitle>Basic Settings</CardTitle>
-        <CardDescription>Configure the widget type and layout</CardDescription>
+        <CardDescription>Configure the widget layout and theme</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormField
-          control={control}
-          name="embedType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Embed Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select embed type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="carousel">Carousel</SelectItem>
-                  <SelectItem value="grid">Grid</SelectItem>
-                  <SelectItem value="masonry">Masonry</SelectItem>
-                  <SelectItem value="wall">Wall of Love</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Choose how testimonials will be displayed
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={control}
           name="layout"
@@ -84,6 +57,9 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                   <SelectItem value="wall">Wall</SelectItem>
                 </SelectContent>
               </Select>
+              <FormDescription>
+                Choose how testimonials will be displayed
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

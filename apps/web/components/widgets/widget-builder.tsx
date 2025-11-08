@@ -9,7 +9,7 @@ import type { WidgetFormData } from "@/components/widgets/widget-form";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface WidgetBuilderProps {
   projectSlug: string;
@@ -22,17 +22,64 @@ export function WidgetBuilder({
   projectSlug,
   projectId,
   widgetId,
-  mode,
+  mode
 }: WidgetBuilderProps) {
   const router = useRouter();
-  const [previewConfig, setPreviewConfig] = useState<WidgetFormData | null>(null);
+
+  // Default config for preview
+  const defaultConfig: WidgetFormData = {
+    layout: "carousel",
+    theme: "light",
+    primaryColor: "#0066FF",
+    secondaryColor: "#00CC99",
+    showRating: true,
+    showDate: true,
+    showAvatar: false,
+    maxTestimonials: 10,
+    autoRotate: false,
+    rotateInterval: 5000,
+    columns: 3,
+    cardStyle: "default",
+    animation: "fade"
+  };
+
+  const [previewConfig, setPreviewConfig] =
+    useState<WidgetFormData>(defaultConfig);
+
+  // Memoize the callback to prevent infinite loops
+  const handleConfigChange = useCallback((config: WidgetFormData) => {
+    setPreviewConfig(config);
+  }, []);
 
   // Fetch widgets list and find the specific widget if editing
-  const { data: widgetsList, isLoading: isLoadingWidget } = widgets.queries.useList(projectSlug);
-  
-  const widget = mode === "edit" && widgetsList 
-    ? widgetsList.find(w => w.id === widgetId)
-    : undefined;
+  const { data: widgetsList, isLoading: isLoadingWidget } =
+    widgets.queries.useList(projectSlug);
+
+  const widget =
+    mode === "edit" && widgetsList
+      ? widgetsList.find((w) => w.id === widgetId)
+      : undefined;
+
+  // Initialize preview config with widget data when editing
+  useEffect(() => {
+    if (mode === "edit" && widget?.config) {
+      setPreviewConfig({
+        layout: (widget.config.layout as any) || "carousel",
+        theme: (widget.config.theme as any) || "light",
+        primaryColor: widget.config.primaryColor || "#0066FF",
+        secondaryColor: widget.config.secondaryColor || "#00CC99",
+        showRating: widget.config.showRating ?? true,
+        showDate: widget.config.showDate ?? true,
+        showAvatar: widget.config.showAvatar ?? false,
+        maxTestimonials: widget.config.maxTestimonials || 10,
+        autoRotate: widget.config.autoRotate ?? false,
+        rotateInterval: widget.config.rotateInterval || 5000,
+        columns: widget.config.columns || 3,
+        cardStyle: (widget.config.cardStyle as any) || "default",
+        animation: (widget.config.animation as any) || "fade"
+      });
+    }
+  }, [mode, widget]);
 
   const createWidget = widgets.mutations.useCreate();
   const updateWidget = widgets.mutations.useUpdate(widgetId || "");
@@ -42,7 +89,6 @@ export function WidgetBuilder({
       if (mode === "create") {
         await createWidget.mutateAsync({
           projectId,
-          embedType: data.embedType,
           config: {
             layout: data.layout,
             theme: data.theme,
@@ -56,13 +102,12 @@ export function WidgetBuilder({
             rotateInterval: data.rotateInterval,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation,
-          },
+            animation: data.animation
+          }
         });
         toast.success("Widget created successfully!");
       } else {
         await updateWidget.mutateAsync({
-          embedType: data.embedType,
           config: {
             layout: data.layout,
             theme: data.theme,
@@ -76,12 +121,11 @@ export function WidgetBuilder({
             rotateInterval: data.rotateInterval,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation,
-          },
+            animation: data.animation
+          }
         });
         toast.success("Widget updated successfully!");
       }
-      router.push(`/projects/${projectSlug}?tab=widgets`);
     } catch (error: any) {
       toast.error(error?.message || `Failed to ${mode} widget`);
     }
@@ -126,7 +170,7 @@ export function WidgetBuilder({
       </div>
 
       {/* Split Layout: Form (Left) | Preview (Right) */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column: Form */}
         <div className="space-y-6">
           <div className="rounded-lg border bg-card">
@@ -142,19 +186,16 @@ export function WidgetBuilder({
                 onSubmit={handleSubmit}
                 onCancel={handleCancel}
                 isSubmitting={isSubmitting}
-                onConfigChange={setPreviewConfig}
+                onConfigChange={handleConfigChange}
               />
             </div>
           </div>
         </div>
 
         {/* Right Column: Live Preview - Sticky */}
-        <div className="lg:sticky lg:top-6 lg:h-fit">
+        <div className="lg:sticky lg:top-6 lg:h-fit col-span-2">
           <div className="rounded-lg border bg-card p-6">
-            <WidgetPreview
-              config={previewConfig || ({} as WidgetFormData)}
-              widgetId={widgetId}
-            />
+            <WidgetPreview config={previewConfig} widgetId={widgetId} />
           </div>
         </div>
       </div>

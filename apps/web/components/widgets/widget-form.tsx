@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@workspace/ui/components/button";
@@ -15,10 +15,8 @@ import {
   WidgetDisplaySection,
   WidgetLayoutSection,
 } from "./widget-form-sections";
-import { WidgetPreview } from "./widget-preview";
 
 const widgetFormSchema = z.object({
-  embedType: z.string().min(1, "Embed type is required"),
   layout: z.enum(["carousel", "grid", "masonry", "wall"]),
   theme: z.enum(["light", "dark", "auto"]),
   primaryColor: z.string().optional(),
@@ -55,7 +53,6 @@ export function WidgetForm({
     resolver: zodResolver(widgetFormSchema),
     defaultValues: initialData
       ? {
-          embedType: initialData.embedType,
           layout: (initialData.config?.layout as any) || "carousel",
           theme: (initialData.config?.theme as any) || "light",
           primaryColor: initialData.config?.primaryColor || "#0066FF",
@@ -71,7 +68,6 @@ export function WidgetForm({
           animation: (initialData.config?.animation as any) || "fade",
         }
       : {
-          embedType: "carousel",
           layout: "carousel",
           theme: "light",
           primaryColor: "#0066FF",
@@ -90,14 +86,24 @@ export function WidgetForm({
 
   const watchLayout = form.watch("layout");
   const watchAutoRotate = form.watch("autoRotate");
-  const watchedValues = form.watch(); // Watch all form values for preview
-
-  // Notify parent component of config changes for preview
+  
+  // Use ref to store the callback to avoid dependency issues
+  const onConfigChangeRef = useRef(onConfigChange);
+  
   useEffect(() => {
-    if (onConfigChange) {
-      onConfigChange(watchedValues as WidgetFormData);
-    }
-  }, [watchedValues, onConfigChange]);
+    onConfigChangeRef.current = onConfigChange;
+  }, [onConfigChange]);
+
+  // Subscribe to form changes and notify parent
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (onConfigChangeRef.current) {
+        onConfigChangeRef.current(value as WidgetFormData);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -110,14 +116,6 @@ export function WidgetForm({
           control={form.control}
           layout={watchLayout}
           autoRotate={watchAutoRotate}
-        />
-
-        <Separator />
-
-        {/* Live Preview */}
-        <WidgetPreview
-          config={watchedValues}
-          widgetId={initialData?.id}
         />
 
         <Separator />

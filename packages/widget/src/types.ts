@@ -74,6 +74,7 @@ export interface WidgetSettings {
   // Carousel Behavior
   autoRotate?: boolean;
   rotateInterval?: number;
+  showNavigation?: boolean; // Show/hide carousel navigation buttons
 }
 
 export interface WidgetConfig {
@@ -84,6 +85,10 @@ export interface WidgetConfig {
   settings?: Partial<WidgetSettings>;
   onLoad?: (widget: Widget) => void;
   onError?: (error: Error) => void;
+  // For preview/demo mode - skip API call and use provided data
+  mockData?: WidgetData;
+  // Auto-adapt theme to host page colors
+  adaptToHost?: boolean;
 }
 
 export interface ApiResponse<T> {

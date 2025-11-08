@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -21,13 +21,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@workspace/ui/components/alert-dialog";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from "@workspace/ui/components/tooltip";
 import {
   LayoutGridIcon,
@@ -35,7 +35,7 @@ import {
   EditIcon,
   TrashIcon,
   EyeIcon,
-  CopyIcon,
+  CopyIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Widget } from "@/lib/queries/widgets";
@@ -51,7 +51,7 @@ export function WidgetCard({
   widget,
   onEdit,
   onDelete,
-  onViewEmbed,
+  onViewEmbed
 }: WidgetCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -99,7 +99,7 @@ export function WidgetCard({
               {getLayoutIcon()}
             </div>
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg">{widget.embedType}</CardTitle>
+              <CardTitle className="text-lg">{getLayoutLabel()} Widget</CardTitle>
               <CardDescription className="text-xs mt-1 truncate">
                 ID: {widget.id}
               </CardDescription>

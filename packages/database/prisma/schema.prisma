@@ -153,7 +153,6 @@ enum ModerationStatus {
 model Widget {
   id        String   @id @default(cuid())
   projectId String?
-  embedType String // e.g., "carousel", "grid", etc.
   config    Json // Customization tokens, colors, layout, etc.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
