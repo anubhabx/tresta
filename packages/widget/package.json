@@ -11,8 +11,10 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --mode production",
+    "build:dev": "tsc && vite build --mode development",
     "preview": "vite preview",
+    "demo": "vite preview --port 3001",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
