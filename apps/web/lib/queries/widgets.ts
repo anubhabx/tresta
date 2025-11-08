@@ -77,7 +77,7 @@ export const useWidgetList = (projectSlug: string) => {
     queryKey: widgetKeys.list(projectSlug),
     queryFn: async () => {
       const response = await api.get<ApiResponse<Widget[]>>(
-        `/widgets/project/${projectSlug}`,
+        `/api/widgets/project/${projectSlug}`,
       );
       return response.data.data;
     },
@@ -100,7 +100,7 @@ export const usePublicWidgetData = (widgetId: string) => {
     queryKey: widgetKeys.public(widgetId),
     queryFn: async () => {
       const response = await api.get<ApiResponse<PublicWidgetData>>(
-        `/widgets/${widgetId}/public`,
+        `/api/widgets/${widgetId}/public`,
       );
       return response.data.data;
     },
@@ -128,7 +128,10 @@ export const useCreateWidget = () => {
 
   return useMutation({
     mutationFn: async (data: CreateWidgetPayload) => {
-      const response = await api.post<ApiResponse<Widget>>("/widgets", data);
+      const response = await api.post<ApiResponse<Widget>>(
+        "/api/widgets",
+        data,
+      );
       return response.data.data;
     },
     onSuccess: (data) => {
@@ -150,7 +153,7 @@ export const useUpdateWidget = (widgetId: string) => {
   return useMutation({
     mutationFn: async (data: UpdateWidgetPayload) => {
       const response = await api.put<ApiResponse<Widget>>(
-        `/widgets/${widgetId}`,
+        `/api/widgets/${widgetId}`,
         data,
       );
       return response.data.data;
@@ -181,7 +184,7 @@ export const useDeleteWidget = (widgetId: string) => {
   return useMutation({
     mutationFn: async () => {
       const response = await api.delete<ApiResponse<void>>(
-        `/widgets/${widgetId}`,
+        `/api/widgets/${widgetId}`,
       );
       return response.data;
     },

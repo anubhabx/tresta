@@ -248,6 +248,46 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={control}
+          name="showAuthorRole"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Show Author Role</FormLabel>
+                <FormDescription>
+                  Display author's job title or role
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={control}
+          name="showAuthorCompany"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Show Author Company</FormLabel>
+                <FormDescription>Display author's company name</FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );
@@ -379,6 +419,27 @@ export function WidgetLayoutSection({
                 )}
               />
             )}
+
+            <FormField
+              control={control}
+              name="showNavigation"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Show Navigation</FormLabel>
+                    <FormDescription>
+                      Display navigation arrows for manual control
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </>
         )}
       </CardContent>

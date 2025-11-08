@@ -10,15 +10,23 @@ import type { Testimonial, WidgetSettings, WidgetLayout } from "./types.ts";
  */
 export function renderTestimonial(
   testimonial: Testimonial,
-  settings: WidgetSettings
+  settings: WidgetSettings,
 ): string {
   const {
     showRating,
     showDate,
     showAvatar, // This is the actual field name from database
     showAuthorRole,
-    showAuthorCompany
+    showAuthorCompany,
   } = settings;
+
+  // Debug logging
+  console.log("[renderTestimonial] Settings:", {
+    showAvatar,
+    showAuthorRole,
+    showAuthorCompany,
+    fullSettings: settings,
+  });
 
   // Generate rating stars
   const ratingHtml = showRating
@@ -27,7 +35,7 @@ export function renderTestimonial(
            .map((_, i) =>
              i < (testimonial.rating || 5)
                ? '<svg class="tresta-star" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>'
-               : '<svg class="tresta-star tresta-star-empty" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>'
+               : '<svg class="tresta-star tresta-star-empty" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
            )
            .join("")}
        </div>`
@@ -70,7 +78,7 @@ export function renderTestimonial(
     : "";
 
   return `
-    <div class="tresta-testimonial tresta-fade-in" data-testimonial-id="${testimonial.id}">
+    <div class="tresta-testimonial tresta-animate" data-testimonial-id="${testimonial.id}">
       ${ratingHtml}
       <div class="tresta-content">"${escapeHtml(testimonial.content)}"</div>
       <div class="tresta-author">
@@ -93,7 +101,7 @@ export function renderTestimonial(
  */
 export function renderListLayout(
   testimonials: Testimonial[],
-  settings: WidgetSettings
+  settings: WidgetSettings,
 ): string {
   const items = testimonials
     .map((t) => renderTestimonial(t, settings))
@@ -107,7 +115,7 @@ export function renderListLayout(
  */
 export function renderGridLayout(
   testimonials: Testimonial[],
-  settings: WidgetSettings
+  settings: WidgetSettings,
 ): string {
   const items = testimonials
     .map((t) => renderTestimonial(t, settings))
@@ -121,7 +129,7 @@ export function renderGridLayout(
  */
 export function renderMasonryLayout(
   testimonials: Testimonial[],
-  settings: WidgetSettings
+  settings: WidgetSettings,
 ): string {
   const items = testimonials
     .map((t) => renderTestimonial(t, settings))
@@ -137,7 +145,7 @@ export function renderMasonryLayout(
 export function renderCarouselLayout(
   testimonials: Testimonial[],
   settings: WidgetSettings,
-  widgetId: string
+  widgetId: string,
 ): string {
   // Return an empty container that the Carousel class will populate
   return `<div class="tresta-carousel" data-widget-id="${widgetId}"></div>`;
@@ -148,7 +156,7 @@ export function renderCarouselLayout(
  */
 export function renderWallLayout(
   testimonials: Testimonial[],
-  settings: WidgetSettings
+  settings: WidgetSettings,
 ): string {
   const items = testimonials
     .map((t) => renderTestimonial(t, settings))
@@ -164,7 +172,7 @@ export function renderWidget(
   testimonials: Testimonial[],
   layout: WidgetLayout,
   settings: WidgetSettings,
-  widgetId: string
+  widgetId: string,
 ): string {
   if (!testimonials || testimonials.length === 0) {
     return '<div class="tresta-empty">No testimonials yet.</div>';

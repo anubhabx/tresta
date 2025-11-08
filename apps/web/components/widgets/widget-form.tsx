@@ -24,9 +24,12 @@ const widgetFormSchema = z.object({
   showRating: z.boolean(),
   showDate: z.boolean(),
   showAvatar: z.boolean(),
+  showAuthorRole: z.boolean(),
+  showAuthorCompany: z.boolean(),
   maxTestimonials: z.number().min(1).max(100),
   autoRotate: z.boolean(),
   rotateInterval: z.number().min(1000).max(30000),
+  showNavigation: z.boolean(),
   columns: z.number().min(1).max(6),
   cardStyle: z.enum(["default", "minimal", "bordered"]),
   animation: z.enum(["fade", "slide", "none"]),
@@ -60,9 +63,12 @@ export function WidgetForm({
           showRating: initialData.config?.showRating ?? true,
           showDate: initialData.config?.showDate ?? true,
           showAvatar: initialData.config?.showAvatar ?? false,
+          showAuthorRole: initialData.config?.showAuthorRole ?? true,
+          showAuthorCompany: initialData.config?.showAuthorCompany ?? true,
           maxTestimonials: initialData.config?.maxTestimonials || 10,
           autoRotate: initialData.config?.autoRotate ?? false,
           rotateInterval: initialData.config?.rotateInterval || 5000,
+          showNavigation: initialData.config?.showNavigation ?? true,
           columns: initialData.config?.columns || 3,
           cardStyle: (initialData.config?.cardStyle as any) || "default",
           animation: (initialData.config?.animation as any) || "fade",
@@ -75,9 +81,12 @@ export function WidgetForm({
           showRating: true,
           showDate: true,
           showAvatar: false,
+          showAuthorRole: true,
+          showAuthorCompany: true,
           maxTestimonials: 10,
           autoRotate: false,
           rotateInterval: 5000,
+          showNavigation: true,
           columns: 3,
           cardStyle: "default",
           animation: "fade",
@@ -86,10 +95,10 @@ export function WidgetForm({
 
   const watchLayout = form.watch("layout");
   const watchAutoRotate = form.watch("autoRotate");
-  
+
   // Use ref to store the callback to avoid dependency issues
   const onConfigChangeRef = useRef(onConfigChange);
-  
+
   useEffect(() => {
     onConfigChangeRef.current = onConfigChange;
   }, [onConfigChange]);
@@ -101,7 +110,7 @@ export function WidgetForm({
         onConfigChangeRef.current(value as WidgetFormData);
       }
     });
-    
+
     return () => subscription.unsubscribe();
   }, [form]);
 

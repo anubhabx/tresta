@@ -17,6 +17,7 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 **Used for:** Authenticated endpoints that require user login
 
 **Configuration:**
+
 ```typescript
 {
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
@@ -27,6 +28,7 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 ```
 
 **Applied to:**
+
 - `/api/projects/*` - Project management
 - `/api/media/*` - Media uploads
 - `/api/widgets/*` - Widget management (except public endpoint)
@@ -40,6 +42,7 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 **Used for:** Public read-only endpoints that power widget embeds
 
 **Configuration:**
+
 ```typescript
 {
   origin: "*",
@@ -51,12 +54,14 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 ```
 
 **Applied to:**
+
 - `/api/public/*` - Public project/testimonial data
 - `/api/widgets/:widgetId/public` - Widget data for embedding
 
 **Why:** Widgets need to be embedded on ANY external website. Allowing `origin: "*"` is necessary for this use case.
 
 **Security measures:**
+
 - No credentials allowed (prevents CSRF attacks)
 - Read-only (GET only)
 - Business logic validates project is PUBLIC and ACTIVE
@@ -70,6 +75,7 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 **Used for:** Webhook endpoints (e.g., Clerk user sync)
 
 **Configuration:**
+
 ```typescript
 {
   origin: [
@@ -85,6 +91,7 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 ```
 
 **Applied to:**
+
 - `/api/webhook/*` - Webhook handlers
 
 **Why:** Webhooks should only be triggered by trusted sources.
@@ -98,9 +105,15 @@ Tresta uses **route-specific CORS configurations** to balance security with the 
 All CORS configurations are defined in `/apps/api/src/middleware/cors.middleware.ts`:
 
 ```typescript
-export const restrictiveCors = cors({ /* ... */ });
-export const publicCors = cors({ /* ... */ });
-export const webhookCors = cors({ /* ... */ });
+export const restrictiveCors = cors({
+  /* ... */
+});
+export const publicCors = cors({
+  /* ... */
+});
+export const webhookCors = cors({
+  /* ... */
+});
 ```
 
 ### Usage in Routes
@@ -132,11 +145,13 @@ router.post("/", restrictiveCors, attachUser, createWidget);
 ### What CORS Does NOT Protect
 
 CORS is a **browser security feature**. It does NOT:
+
 - Prevent server-to-server requests (can be bypassed with curl/Postman)
 - Authenticate users (that's what Clerk tokens do)
 - Validate data integrity (that's what Zod schemas do)
 
 **Real security comes from:**
+
 - Proper authentication (Clerk middleware)
 - Authorization checks (ownership validation)
 - Input validation (Zod schemas)
@@ -203,10 +218,10 @@ FRONTEND_URL=https://app.tresta.io  # Production
 
 ## Summary
 
-| Endpoint Type | CORS Policy | Credentials | Methods | Use Case |
-|--------------|-------------|-------------|---------|----------|
-| Dashboard/Management | Restrictive (frontend only) | ✅ Yes | All | Authenticated operations |
-| Public Widgets | Open (any origin) | ❌ No | GET only | Widget embedding |
-| Webhooks | Allowlist | ❌ No | POST only | External integrations |
+| Endpoint Type        | CORS Policy                 | Credentials | Methods   | Use Case                 |
+| -------------------- | --------------------------- | ----------- | --------- | ------------------------ |
+| Dashboard/Management | Restrictive (frontend only) | ✅ Yes      | All       | Authenticated operations |
+| Public Widgets       | Open (any origin)           | ❌ No       | GET only  | Widget embedding         |
+| Webhooks             | Allowlist                   | ❌ No       | POST only | External integrations    |
 
 **Key Principle:** CORS is about controlling browser access, not API security. Real security comes from authentication, authorization, and validation.

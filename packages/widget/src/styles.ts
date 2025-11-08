@@ -7,9 +7,13 @@ import type { WidgetTheme, WidgetLayout } from "./types.ts";
 
 /**
  * Default theme values - Modern, clean aesthetic
+ * These are fallback values used when properties aren't provided.
+ * Only primaryColor and secondaryColor are customizable via the UI.
+ * Other properties are reserved for future expansion.
  */
 export const DEFAULT_THEME: WidgetTheme = {
   primaryColor: "#3b82f6",
+  secondaryColor: "#3b82f6", // Falls back to primaryColor if not set
   backgroundColor: "transparent",
   textColor: "#1f2937",
   cardBackgroundColor: "#ffffff",
@@ -18,6 +22,51 @@ export const DEFAULT_THEME: WidgetTheme = {
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   starColor: "#fbbf24", // Warm gold for stars
 };
+
+/**
+ * Get theme-specific colors based on theme mode
+ */
+function getThemeColors(
+  themeMode: "light" | "dark" | "auto" | undefined,
+  customTheme: WidgetTheme,
+) {
+  // Determine effective theme mode
+  let effectiveMode: "light" | "dark" = "light";
+
+  if (themeMode === "dark") {
+    effectiveMode = "dark";
+  } else if (themeMode === "auto") {
+    // Auto mode: detect system preference
+    effectiveMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+
+  // Base theme colors based on mode
+  const baseColors =
+    effectiveMode === "dark"
+      ? {
+          backgroundColor: "transparent",
+          textColor: "#e5e7eb",
+          cardBackgroundColor: "#1f2937",
+          borderColor: "rgba(255, 255, 255, 0)",
+          mutedTextColor: "#9ca3af",
+          hoverShadow: "rgba(255, 255, 255, 0.1)",
+        }
+      : {
+          backgroundColor: "transparent",
+          textColor: "#1f2937",
+          cardBackgroundColor: "#ffffff",
+          borderColor: "rgba(0, 0, 0, 0.08)",
+          mutedTextColor: "#6b7280",
+          hoverShadow: "rgba(0, 0, 0, 0.08)",
+        };
+
+  // Return theme colors based on mode
+  // Don't merge with customTheme for backgroundColor, textColor, cardBackgroundColor
+  // as these should be determined by the theme mode, not overridden
+  return baseColors;
+}
 
 /**
  * Generates CSS string for widget styles
@@ -29,16 +78,23 @@ export function generateStyles(
   settings?: any,
 ): string {
   const t = { ...DEFAULT_THEME, ...theme };
+  const themeColors = getThemeColors(settings?.theme, theme);
   const prefix = `.tresta-widget-${widgetId}`;
   const gap = settings?.gap || 24;
   const columns = settings?.columns || 2;
+  const cardStyle = settings?.cardStyle || "default";
+  const animation = settings?.animation || "fade";
+
+  // Use secondaryColor if provided, otherwise derive from primaryColor
+  const secondaryColor =
+    settings?.secondaryColor || theme.secondaryColor || t.primaryColor;
 
   return `
     /* Base Widget Container */
     ${prefix} {
       font-family: ${t.fontFamily};
-      color: ${t.textColor};
-      background-color: transparent;
+      color: ${themeColors.textColor};
+      background-color: ${themeColors.backgroundColor};
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
@@ -69,7 +125,7 @@ export function generateStyles(
     ${prefix} .tresta-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid ${t.cardBackgroundColor};
+      border: 3px solid ${themeColors.cardBackgroundColor};
       border-top-color: ${t.primaryColor};
       border-radius: 50%;
       animation: tresta-spin 0.8s linear infinite;
@@ -92,13 +148,13 @@ export function generateStyles(
     ${prefix} .tresta-empty {
       padding: 40px;
       text-align: center;
-      color: #6b7280;
+      color: ${themeColors.mutedTextColor};
     }
 
     /* Testimonial Card - Base */
     ${prefix} .tresta-testimonial {
-      background-color: ${t.cardBackgroundColor};
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: ${themeColors.cardBackgroundColor};
+      border: 1px solid ${themeColors.borderColor};
       border-radius: ${t.borderRadius}px;
       padding: 28px;
       margin-bottom: 16px;
@@ -110,13 +166,36 @@ export function generateStyles(
     }
 
     ${prefix} .tresta-testimonial:hover {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 10px 25px -5px ${themeColors.hoverShadow}, 0 8px 10px -6px ${themeColors.hoverShadow};
       border-color: ${t.primaryColor}40;
       transform: translateY(-2px);
     }
 
     ${prefix}.tresta-layout-grid .tresta-testimonial {
       margin-bottom: 0;
+    }
+
+    /* Card Style: Minimal */
+    ${prefix}.tresta-card-style-minimal .tresta-testimonial {
+      box-shadow: none;
+      border: 1px solid ${themeColors.borderColor};
+      background-color: transparent;
+    }
+
+    ${prefix}.tresta-card-style-minimal .tresta-testimonial:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      background-color: ${themeColors.cardBackgroundColor};
+    }
+
+    /* Card Style: Bordered */
+    ${prefix}.tresta-card-style-bordered .tresta-testimonial {
+      border: 2px solid ${t.primaryColor}20;
+      box-shadow: none;
+    }
+
+    ${prefix}.tresta-card-style-bordered .tresta-testimonial:hover {
+      border-color: ${t.primaryColor};
+      box-shadow: 0 4px 12px ${t.primaryColor}15;
     }
 
     /* Rating Stars */
@@ -151,7 +230,7 @@ export function generateStyles(
     ${prefix} .tresta-content {
       font-size: 15px;
       line-height: 1.7;
-      color: ${t.textColor};
+      color: ${themeColors.textColor};
       margin-bottom: 20px;
       flex: 1;
       display: -webkit-box;
@@ -168,7 +247,7 @@ export function generateStyles(
       gap: 14px;
       margin-top: auto;
       padding-top: 20px;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      border-top: 1px solid ${themeColors.borderColor};
     }
 
     ${prefix} .tresta-author-image {
@@ -201,7 +280,7 @@ export function generateStyles(
     ${prefix} .tresta-author-name {
       font-weight: 600;
       font-size: 15px;
-      color: ${t.textColor};
+      color: ${themeColors.textColor};
       margin: 0 0 4px 0;
       white-space: nowrap;
       overflow: hidden;
@@ -216,7 +295,7 @@ export function generateStyles(
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      color: #10b981;
+      color: ${secondaryColor};
       border-radius: 50%;
       width: 18px;
       height: 18px;
@@ -226,12 +305,12 @@ export function generateStyles(
     ${prefix} .tresta-verified-badge svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 1px 2px rgba(16, 185, 129, 0.2));
+      filter: drop-shadow(0 1px 2px ${secondaryColor}33);
     }
 
     ${prefix} .tresta-author-role {
       font-size: 13px;
-      color: #6b7280;
+      color: ${themeColors.mutedTextColor};
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -240,13 +319,13 @@ export function generateStyles(
 
     ${prefix} .tresta-author-company {
       font-size: 12px;
-      color: #9ca3af;
+      color: ${themeColors.mutedTextColor};
     }
 
     /* Date */
     ${prefix} .tresta-date {
       font-size: 12px;
-      color: #9ca3af;
+      color: ${themeColors.mutedTextColor};
       margin-top: 12px;
       text-align: left;
     }
@@ -344,8 +423,8 @@ export function generateStyles(
     }
 
     ${prefix} .tresta-carousel-card {
-      background-color: ${t.cardBackgroundColor};
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background-color: ${themeColors.cardBackgroundColor};
+      border: 1px solid ${themeColors.borderColor};
       border-radius: ${t.borderRadius}px;
       padding: 48px 60px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -399,7 +478,7 @@ export function generateStyles(
     ${prefix} .tresta-carousel-quote {
       font-size: 20px;
       line-height: 1.7;
-      color: ${t.textColor};
+      color: ${themeColors.textColor};
       font-style: normal;
       margin: 0;
       font-weight: 400;
@@ -448,7 +527,7 @@ export function generateStyles(
     ${prefix} .tresta-carousel-author-name {
       font-weight: 600;
       font-size: 15px;
-      color: ${t.textColor};
+      color: ${themeColors.textColor};
       margin: 0 0 4px 0;
       display: flex;
       align-items: center;
@@ -457,22 +536,22 @@ export function generateStyles(
 
     ${prefix} .tresta-carousel-author-role {
       font-size: 13px;
-      color: #6b7280;
+      color: ${themeColors.mutedTextColor};
       margin: 0;
     }
 
     ${prefix} .tresta-carousel-date {
       font-size: 12px;
-      color: #9ca3af;
+      color: ${themeColors.mutedTextColor};
       margin-top: 12px;
       text-align: left;
     }
 
     /* Carousel Navigation Buttons - Flexbox Layout */
     ${prefix} .tresta-carousel-nav-button {
-      background-color: ${t.cardBackgroundColor};
-      color: ${t.textColor};
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: ${themeColors.cardBackgroundColor};
+      color: ${themeColors.textColor};
+      border: 1px solid ${themeColors.borderColor};
       border-radius: 50%;
       width: 48px;
       height: 48px;
@@ -525,12 +604,12 @@ export function generateStyles(
     }
 
     ${prefix} .tresta-carousel-indicator:hover {
-      background-color: ${t.primaryColor}80;
+      background-color: ${secondaryColor}80;
     }
 
     ${prefix} .tresta-carousel-indicator-active {
       width: 48px;
-      background-color: ${t.primaryColor};
+      background-color: ${secondaryColor};
     }
 
     /* Carousel Autoplay Toggle */
@@ -543,7 +622,7 @@ export function generateStyles(
     ${prefix} .tresta-carousel-autoplay-toggle {
       background: none;
       border: none;
-      color: #6b7280;
+      color: ${themeColors.mutedTextColor};
       font-size: 14px;
       cursor: pointer;
       padding: 8px 16px;
@@ -554,7 +633,7 @@ export function generateStyles(
     }
 
     ${prefix} .tresta-carousel-autoplay-toggle:hover {
-      color: #1f2937;
+      color: ${themeColors.textColor};
     }
 
     /* Carousel Empty State */
@@ -563,7 +642,7 @@ export function generateStyles(
       align-items: center;
       justify-content: center;
       padding: 32px;
-      color: #6b7280;
+      color: ${themeColors.mutedTextColor};
       text-align: center;
     }
 
@@ -603,8 +682,11 @@ export function generateStyles(
       font-size: 12px;
     }
 
-    /* Fade-in Animation */
-    ${prefix} .tresta-fade-in {
+    /* Animations */
+    ${
+      animation === "fade"
+        ? `
+    ${prefix} .tresta-animate {
       animation: tresta-fadeIn 0.5s ease;
     }
 
@@ -617,6 +699,45 @@ export function generateStyles(
         opacity: 1;
         transform: translateY(0);
       }
+    }
+    `
+        : ""
+    }
+
+    ${
+      animation === "slide"
+        ? `
+    ${prefix} .tresta-animate {
+      animation: tresta-slideIn 0.5s ease;
+    }
+
+    @keyframes tresta-slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    `
+        : ""
+    }
+
+    ${
+      animation === "none"
+        ? `
+    ${prefix} .tresta-animate {
+      animation: none;
+    }
+    `
+        : ""
+    }
+
+    /* Legacy fade-in class for backwards compatibility */
+    ${prefix} .tresta-fade-in {
+      animation: ${animation === "fade" ? "tresta-fadeIn 0.5s ease" : animation === "slide" ? "tresta-slideIn 0.5s ease" : "none"};
     }
 
     /* Responsive */
@@ -651,13 +772,14 @@ export function generateStyles(
     }
 
     ${prefix} .tresta-branding a {
-      color: ${t.primaryColor};
+      color: ${secondaryColor};
       text-decoration: none;
       font-weight: 500;
     }
 
     ${prefix} .tresta-branding a:hover {
       text-decoration: underline;
+      color: ${t.primaryColor};
     }
   `;
 }

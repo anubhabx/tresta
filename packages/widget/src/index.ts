@@ -39,9 +39,19 @@ function autoInitialize(): void {
     // Read configuration from data attributes
     const config: WidgetConfig = {
       widgetId,
-      apiUrl: script.getAttribute("data-api-url") || undefined,
-      container: script.getAttribute("data-container") || undefined,
     };
+
+    // Only set apiUrl if the attribute exists
+    const apiUrl = script.getAttribute("data-api-url");
+    if (apiUrl) {
+      config.apiUrl = apiUrl;
+    }
+
+    // Only set container if the attribute exists
+    const container = script.getAttribute("data-container");
+    if (container) {
+      config.container = container;
+    }
 
     // Parse theme overrides
     const primaryColor = script.getAttribute("data-primary-color");
@@ -171,6 +181,6 @@ TrestaWidget.getAll = () => {
 };
 
 // Ensure TrestaWidget is properly exposed globally for IIFE builds
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   (window as any).TrestaWidget = TrestaWidget;
 }

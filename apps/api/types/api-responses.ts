@@ -56,7 +56,7 @@ export enum ApiErrorCode {
   CONFLICT = "CONFLICT",
   VALIDATION_ERROR = "VALIDATION_ERROR",
   INTERNAL_ERROR = "INTERNAL_ERROR",
-  SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE"
+  SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE",
 }
 
 /**
@@ -73,7 +73,7 @@ export enum HttpStatus {
   CONFLICT = 409,
   UNPROCESSABLE_ENTITY = 422,
   INTERNAL_SERVER_ERROR = 500,
-  SERVICE_UNAVAILABLE = 503
+  SERVICE_UNAVAILABLE = 503,
 }
 
 /**
@@ -117,13 +117,13 @@ export enum ProjectType {
   PRODUCT = "PRODUCT",
   COURSE = "COURSE",
   COMMUNITY = "COMMUNITY",
-  OTHER = "OTHER"
+  OTHER = "OTHER",
 }
 
 export enum ProjectVisibility {
   PUBLIC = "PUBLIC",
   PRIVATE = "PRIVATE",
-  INVITE_ONLY = "INVITE_ONLY"
+  INVITE_ONLY = "INVITE_ONLY",
 }
 
 export interface SocialLinks {
@@ -202,7 +202,7 @@ export interface ValidationErrorDetails {
  * Type guard to check if response is successful
  */
 export function isSuccessResponse<T>(
-  response: ApiResponse<T>
+  response: ApiResponse<T>,
 ): response is SuccessResponse<T> {
   return response.success === true;
 }
@@ -211,7 +211,7 @@ export function isSuccessResponse<T>(
  * Type guard to check if response is an error
  */
 export function isErrorResponse(
-  response: ApiResponse
+  response: ApiResponse,
 ): response is ErrorResponse {
   return response.success === false;
 }
@@ -220,7 +220,7 @@ export function isErrorResponse(
  * Type guard to check if response is paginated
  */
 export function isPaginatedResponse<T>(
-  response: ApiResponse<T[]>
+  response: ApiResponse<T[]>,
 ): response is PaginatedResponse<T> {
   return (
     response.success === true &&
@@ -285,13 +285,13 @@ export enum WidgetType {
   CAROUSEL = "CAROUSEL",
   MASONRY = "MASONRY",
   LIST = "LIST",
-  SINGLE = "SINGLE"
+  SINGLE = "SINGLE",
 }
 
 export enum WidgetTheme {
   LIGHT = "LIGHT",
   DARK = "DARK",
-  AUTO = "AUTO"
+  AUTO = "AUTO",
 }
 
 export interface WidgetConfig {
@@ -299,19 +299,19 @@ export interface WidgetConfig {
   type: WidgetType;
   theme: WidgetTheme;
   maxTestimonials?: number; // Maximum number of testimonials to display
-  
+
   // Layout settings
   columns?: number; // For grid/masonry layouts (1-4)
   itemsPerSlide?: number; // For carousel (1-3)
   gap?: number; // Gap between items in pixels
-  
+
   // Styling settings
   backgroundColor?: string;
   textColor?: string;
   primaryColor?: string; // For buttons, links, accents
   borderRadius?: number; // Border radius in pixels
   cardShadow?: boolean;
-  
+
   // Content display settings
   showRating?: boolean;
   showDate?: boolean;
@@ -319,7 +319,7 @@ export interface WidgetConfig {
   showAuthorName?: boolean;
   showAuthorEmail?: boolean;
   excerptLength?: number; // Max characters before "Read more" (0 = full)
-  
+
   // Behavior settings
   autoplay?: boolean; // For carousel
   autoplayInterval?: number; // In milliseconds (carousel)
@@ -327,12 +327,12 @@ export interface WidgetConfig {
   loop?: boolean; // For carousel
   showNavigation?: boolean; // Show prev/next buttons
   showPagination?: boolean; // Show dots/pagination
-  
+
   // Filter settings
   minRating?: number; // Only show testimonials with rating >= this (1-5)
   tags?: string[]; // Filter by tags
   sortBy?: "newest" | "oldest" | "highest_rating" | "random";
-  
+
   // Advanced settings
   customCSS?: string; // Custom CSS to inject
   animation?: "none" | "fade" | "slide" | "scale";
@@ -348,7 +348,10 @@ export interface WidgetData {
   config: WidgetConfig;
   createdAt: string;
   updatedAt: string;
-  project?: Pick<ProjectData, "id" | "name" | "slug" | "brandColorPrimary" | "brandColorSecondary">;
+  project?: Pick<
+    ProjectData,
+    "id" | "name" | "slug" | "brandColorPrimary" | "brandColorSecondary"
+  >;
 }
 
 export type WidgetResponse = SuccessResponse<WidgetData>;
@@ -378,7 +381,15 @@ export interface WidgetPublicData {
   createdAt: string;
   updatedAt: string;
   testimonials: TestimonialData[];
-  project: Pick<ProjectData, "id" | "name" | "slug" | "logoUrl" | "brandColorPrimary" | "brandColorSecondary">;
+  project: Pick<
+    ProjectData,
+    | "id"
+    | "name"
+    | "slug"
+    | "logoUrl"
+    | "brandColorPrimary"
+    | "brandColorSecondary"
+  >;
 }
 
 export type WidgetPublicResponse = SuccessResponse<WidgetPublicData>;

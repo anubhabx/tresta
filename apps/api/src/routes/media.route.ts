@@ -3,7 +3,7 @@ import {
   generateUploadUrl,
   generateReadUrl,
   deleteBlob,
-  getBlobMetadata
+  getBlobMetadata,
 } from "../controllers/media.controller.ts";
 
 const router: Router = Router();

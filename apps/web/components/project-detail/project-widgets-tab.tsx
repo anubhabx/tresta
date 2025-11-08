@@ -58,7 +58,9 @@ export function ProjectWidgetsTab({
       <div className="space-y-6">
         {!hasWidgets ? (
           <WidgetEmptyState
-            onCreateWidget={() => router.push(`/projects/${projectSlug}/widgets/new`)}
+            onCreateWidget={() =>
+              router.push(`/projects/${projectSlug}/widgets/new`)
+            }
           />
         ) : (
           <>
@@ -71,7 +73,11 @@ export function ProjectWidgetsTab({
                   Embed testimonials on your website
                 </p>
               </div>
-              <Button onClick={() => router.push(`/projects/${projectSlug}/widgets/new`)}>
+              <Button
+                onClick={() =>
+                  router.push(`/projects/${projectSlug}/widgets/new`)
+                }
+              >
                 <PlusIcon className="mr-2 h-4 w-4" />
                 Create Widget
               </Button>

@@ -22,7 +22,7 @@ export function WidgetBuilder({
   projectSlug,
   projectId,
   widgetId,
-  mode
+  mode,
 }: WidgetBuilderProps) {
   const router = useRouter();
 
@@ -35,12 +35,15 @@ export function WidgetBuilder({
     showRating: true,
     showDate: true,
     showAvatar: false,
+    showAuthorRole: true,
+    showAuthorCompany: true,
     maxTestimonials: 10,
     autoRotate: false,
     rotateInterval: 5000,
+    showNavigation: true,
     columns: 3,
     cardStyle: "default",
-    animation: "fade"
+    animation: "fade",
   };
 
   const [previewConfig, setPreviewConfig] =
@@ -71,12 +74,15 @@ export function WidgetBuilder({
         showRating: widget.config.showRating ?? true,
         showDate: widget.config.showDate ?? true,
         showAvatar: widget.config.showAvatar ?? false,
+        showAuthorRole: widget.config.showAuthorRole ?? true,
+        showAuthorCompany: widget.config.showAuthorCompany ?? true,
         maxTestimonials: widget.config.maxTestimonials || 10,
         autoRotate: widget.config.autoRotate ?? false,
         rotateInterval: widget.config.rotateInterval || 5000,
+        showNavigation: widget.config.showNavigation ?? true,
         columns: widget.config.columns || 3,
         cardStyle: (widget.config.cardStyle as any) || "default",
-        animation: (widget.config.animation as any) || "fade"
+        animation: (widget.config.animation as any) || "fade",
       });
     }
   }, [mode, widget]);
@@ -97,13 +103,16 @@ export function WidgetBuilder({
             showRating: data.showRating,
             showDate: data.showDate,
             showAvatar: data.showAvatar,
+            showAuthorRole: data.showAuthorRole,
+            showAuthorCompany: data.showAuthorCompany,
             maxTestimonials: data.maxTestimonials,
             autoRotate: data.autoRotate,
             rotateInterval: data.rotateInterval,
+            showNavigation: data.showNavigation,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation
-          }
+            animation: data.animation,
+          },
         });
         toast.success("Widget created successfully!");
       } else {
@@ -116,13 +125,16 @@ export function WidgetBuilder({
             showRating: data.showRating,
             showDate: data.showDate,
             showAvatar: data.showAvatar,
+            showAuthorRole: data.showAuthorRole,
+            showAuthorCompany: data.showAuthorCompany,
             maxTestimonials: data.maxTestimonials,
             autoRotate: data.autoRotate,
             rotateInterval: data.rotateInterval,
+            showNavigation: data.showNavigation,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation
-          }
+            animation: data.animation,
+          },
         });
         toast.success("Widget updated successfully!");
       }
@@ -170,9 +182,9 @@ export function WidgetBuilder({
       </div>
 
       {/* Split Layout: Form (Left) | Preview (Right) */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid space-x-6 space-y-6 grid-cols-1 lg:grid-cols-3">
         {/* Left Column: Form */}
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           <div className="rounded-lg border bg-card">
             <div className="border-b p-6">
               <h2 className="text-lg font-semibold">Widget Settings</h2>

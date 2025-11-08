@@ -67,7 +67,7 @@ export class ResponseHandler {
       message = "Request successful",
       data,
       statusCode = 200,
-      meta = {}
+      meta = {},
     } = options;
 
     const response: ApiResponse<T> = {
@@ -76,8 +76,8 @@ export class ResponseHandler {
       data,
       meta: {
         timestamp: new Date().toISOString(),
-        ...meta
-      }
+        ...meta,
+      },
     };
 
     return res.status(statusCode).json(response);
@@ -90,12 +90,12 @@ export class ResponseHandler {
    */
   static created<T>(
     res: Response,
-    options: Omit<ResponseOptions<T>, "statusCode"> = {}
+    options: Omit<ResponseOptions<T>, "statusCode"> = {},
   ): Response {
     return this.success(res, {
       ...options,
       message: options.message || "Resource created successfully",
-      statusCode: 201
+      statusCode: 201,
     });
   }
 
@@ -106,12 +106,12 @@ export class ResponseHandler {
    */
   static updated<T>(
     res: Response,
-    options: Omit<ResponseOptions<T>, "statusCode"> = {}
+    options: Omit<ResponseOptions<T>, "statusCode"> = {},
   ): Response {
     return this.success(res, {
       ...options,
       message: options.message || "Resource updated successfully",
-      statusCode: 200
+      statusCode: 200,
     });
   }
 
@@ -123,7 +123,7 @@ export class ResponseHandler {
   static deleted(res: Response, message?: string): Response {
     return this.success(res, {
       message: message || "Resource deleted successfully",
-      statusCode: 200
+      statusCode: 200,
     });
   }
 
@@ -142,9 +142,15 @@ export class ResponseHandler {
    */
   static paginated<T>(
     res: Response,
-    options: PaginatedResponseOptions<T>
+    options: PaginatedResponseOptions<T>,
   ): Response {
-    const { data, page, limit, total, message = "Request successful" } = options;
+    const {
+      data,
+      page,
+      limit,
+      total,
+      message = "Request successful",
+    } = options;
 
     const totalPages = Math.ceil(total / limit);
     const hasNextPage = page < totalPages;
@@ -156,15 +162,15 @@ export class ResponseHandler {
       total,
       totalPages,
       hasNextPage,
-      hasPreviousPage
+      hasPreviousPage,
     };
 
     return this.success(res, {
       message,
       data,
       meta: {
-        pagination: paginationMeta
-      }
+        pagination: paginationMeta,
+      },
     });
   }
 
@@ -181,18 +187,18 @@ export class ResponseHandler {
     statusCode: number,
     message: string,
     code?: string,
-    details?: any
+    details?: any,
   ): Response {
     const response: ApiResponse = {
       success: false,
       error: {
         code: code || `ERROR_${statusCode}`,
         message,
-        details
+        details,
       },
       meta: {
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     return res.status(statusCode).json(response);
@@ -207,7 +213,7 @@ export class ResponseHandler {
   static badRequest(
     res: Response,
     message: string = "Bad Request",
-    details?: any
+    details?: any,
   ): Response {
     return this.error(res, 400, message, "BAD_REQUEST", details);
   }
@@ -219,7 +225,7 @@ export class ResponseHandler {
    */
   static unauthorized(
     res: Response,
-    message: string = "Unauthorized"
+    message: string = "Unauthorized",
   ): Response {
     return this.error(res, 401, message, "UNAUTHORIZED");
   }
@@ -251,7 +257,7 @@ export class ResponseHandler {
   static conflict(
     res: Response,
     message: string = "Conflict",
-    details?: any
+    details?: any,
   ): Response {
     return this.error(res, 409, message, "CONFLICT", details);
   }
@@ -265,15 +271,9 @@ export class ResponseHandler {
   static validationError(
     res: Response,
     message: string = "Validation Error",
-    validationErrors?: any
+    validationErrors?: any,
   ): Response {
-    return this.error(
-      res,
-      422,
-      message,
-      "VALIDATION_ERROR",
-      validationErrors
-    );
+    return this.error(res, 422, message, "VALIDATION_ERROR", validationErrors);
   }
 
   /**
@@ -283,7 +283,7 @@ export class ResponseHandler {
    */
   static internalError(
     res: Response,
-    message: string = "Internal Server Error"
+    message: string = "Internal Server Error",
   ): Response {
     return this.error(res, 500, message, "INTERNAL_ERROR");
   }
@@ -295,7 +295,7 @@ export class ResponseHandler {
    */
   static serviceUnavailable(
     res: Response,
-    message: string = "Service Unavailable"
+    message: string = "Service Unavailable",
   ): Response {
     return this.error(res, 503, message, "SERVICE_UNAVAILABLE");
   }
@@ -308,7 +308,7 @@ export class ResponseHandler {
  */
 export function extractPaginationParams(
   query: any,
-  defaults: { page?: number; limit?: number } = {}
+  defaults: { page?: number; limit?: number } = {},
 ): { page: number; limit: number } {
   const defaultPage = defaults.page || 1;
   const defaultLimit = defaults.limit || 10;
@@ -317,7 +317,7 @@ export function extractPaginationParams(
   const page = Math.max(1, parseInt(query.page as string, 10) || defaultPage);
   const limit = Math.min(
     maxLimit,
-    Math.max(1, parseInt(query.limit as string, 10) || defaultLimit)
+    Math.max(1, parseInt(query.limit as string, 10) || defaultLimit),
   );
 
   return { page, limit };

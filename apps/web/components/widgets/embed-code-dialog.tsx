@@ -24,6 +24,69 @@ interface EmbedCodeDialogProps {
   onClose: () => void;
 }
 
+interface CodeTabProps {
+  title: string;
+  code: string;
+  description: string;
+  tabId: string;
+  copiedTab: string | null;
+  onCopy: (code: string, tabId: string) => void;
+  extraAction?: {
+    label: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+  };
+  additionalContent?: React.ReactNode;
+}
+
+function CodeTab({
+  title,
+  code,
+  description,
+  tabId,
+  copiedTab,
+  onCopy,
+  extraAction,
+  additionalContent,
+}: CodeTabProps) {
+  return (
+    <div className="space-y-3 min-h-[300px]">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">{title}</p>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onCopy(code, tabId)}
+          >
+            {copiedTab === tabId ? (
+              <CheckIcon className="h-4 w-4 mr-1.5" />
+            ) : (
+              <CopyIcon className="h-4 w-4 mr-1.5" />
+            )}
+            {copiedTab === tabId ? "Copied!" : "Copy"}
+          </Button>
+          {extraAction && (
+            <Button size="sm" variant="outline" onClick={extraAction.onClick}>
+              {extraAction.icon}
+              {extraAction.label}
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="relative">
+        <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[200px] text-xs border">
+          <code className="text-xs font-mono">{code}</code>
+        </pre>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        {description}
+      </p>
+      {additionalContent}
+    </div>
+  );
+}
+
 export function EmbedCodeDialog({
   widgetId,
   isOpen,
@@ -32,253 +95,91 @@ export function EmbedCodeDialog({
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const embedUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
+  const widgetScriptUrl = `${apiUrl}/widget/tresta-widget.js`;
+  const iframeUrl = `${apiUrl}/api/public/embed/${widgetId}`;
+  const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 
-  const scriptCode = `<!-- Tresta Widget -->
-<div id="tresta-widget-${widgetId}"></div>
-<script>
-  (function() {
-    fetch('${embedUrl}')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const container = document.getElementById('tresta-widget-${widgetId}');
-          const testimonials = data.data.testimonials;
+  const embedCodes = {
+    script: `<!-- Tresta Widget -->
+<script src="${widgetScriptUrl}" data-tresta-widget="${widgetId}" data-api-url="${apiUrl}"></script>`,
 
-          testimonials.forEach(testimonial => {
-            const card = document.createElement('div');
-            card.className = 'tresta-testimonial-card';
-            card.innerHTML = \`
-              <div class="tresta-testimonial-header">
-                <h4>\${testimonial.authorName}</h4>
-                \${testimonial.rating ? '<div class="tresta-rating">' + '⭐'.repeat(testimonial.rating) + '</div>' : ''}
-              </div>
-              <p class="tresta-testimonial-content">\${testimonial.content}</p>
-            \`;
-            container.appendChild(card);
-          });
-        }
-      })
-      .catch(err => console.error('Tresta widget error:', err));
-  })();
-</script>
-<style>
-  .tresta-testimonial-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-  .tresta-testimonial-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .tresta-testimonial-header h4 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-  }
-  .tresta-rating {
-    font-size: 14px;
-  }
-  .tresta-testimonial-content {
-    margin: 0;
-    color: #6b7280;
-    line-height: 1.6;
-  }
-</style>`;
-
-  const iframeCode = `<!-- Tresta Widget (iframe) -->
+    iframe: `<!-- Tresta Widget (iframe) -->
 <iframe
-  src="${embedUrl}"
+  src="${iframeUrl}"
   width="100%"
   height="600"
   frameborder="0"
   style="border: none; border-radius: 8px;"
   title="Testimonials"
-></iframe>`;
+></iframe>`,
 
-  const reactCode = `import { widgets } from '@/lib/queries';
+    react: `import { useEffect } from 'react';
 
 function TestimonialWidget() {
-  const { data, isLoading } = widgets.queries.usePublicData('${widgetId}');
+  useEffect(() => {
+    // Load widget script
+    const script = document.createElement('script');
+    script.src = '${widgetScriptUrl}';
+    script.setAttribute('data-tresta-widget', '${widgetId}');
+    document.body.appendChild(script);
 
-  if (isLoading) return <div>Loading...</div>;
+    return () => {
+      // Cleanup widget on unmount
+      if (window.TrestaWidget) {
+        window.TrestaWidget.destroy('${widgetId}');
+      }
+      document.body.removeChild(script);
+    };
+  }, []);
 
-  return (
-    <div className="testimonial-widget">
-      {data?.testimonials.map((testimonial) => (
-        <div key={testimonial.id} className="testimonial-card">
-          <div className="testimonial-header">
-            <h4>{testimonial.authorName}</h4>
-            {testimonial.rating && (
-              <div className="rating">
-                {'⭐'.repeat(testimonial.rating)}
-              </div>
-            )}
-          </div>
-          <p>{testimonial.content}</p>
-        </div>
-      ))}
-    </div>
-  );
-}`;
+  return <div id="tresta-widget-container" />;
+}`,
 
-  const apiEndpoint = `GET ${embedUrl}`;
-
-  const handleCopy = async (code: string, tab: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedTab(tab);
-      toast.success("Code copied to clipboard!");
-      setTimeout(() => setCopiedTab(null), 2000);
-    } catch (error) {
-      toast.error("Failed to copy code");
-    }
+    api: `GET ${apiEndpointUrl}`,
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Code2Icon className="h-5 w-5" />
-            Embed Code
-          </DialogTitle>
-          <DialogDescription>
-            Copy and paste the code below to embed testimonials on your website
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs defaultValue="script" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="script">JavaScript</TabsTrigger>
-            <TabsTrigger value="iframe">iframe</TabsTrigger>
-            <TabsTrigger value="react">React</TabsTrigger>
-            <TabsTrigger value="api">API</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="script" className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Vanilla JavaScript</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(scriptCode, "script")}
-                >
-                  {copiedTab === "script" ? (
-                    <CheckIcon className="h-4 w-4 mr-1.5" />
-                  ) : (
-                    <CopyIcon className="h-4 w-4 mr-1.5" />
-                  )}
-                  Copy
-                </Button>
-              </div>
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-xs">
-                <code>{scriptCode}</code>
-              </pre>
-              <p className="text-xs text-muted-foreground">
-                Paste this code anywhere in your HTML. The widget will
-                automatically load and display your testimonials.
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="iframe" className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">iframe Embed</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(iframeCode, "iframe")}
-                >
-                  {copiedTab === "iframe" ? (
-                    <CheckIcon className="h-4 w-4 mr-1.5" />
-                  ) : (
-                    <CopyIcon className="h-4 w-4 mr-1.5" />
-                  )}
-                  Copy
-                </Button>
-              </div>
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-xs">
-                <code>{iframeCode}</code>
-              </pre>
-              <p className="text-xs text-muted-foreground">
-                Simple iframe embed. Adjust width and height as needed for your
-                design.
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="react" className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">React Component</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleCopy(reactCode, "react")}
-                >
-                  {copiedTab === "react" ? (
-                    <CheckIcon className="h-4 w-4 mr-1.5" />
-                  ) : (
-                    <CopyIcon className="h-4 w-4 mr-1.5" />
-                  )}
-                  Copy
-                </Button>
-              </div>
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-xs">
-                <code>{reactCode}</code>
-              </pre>
-              <p className="text-xs text-muted-foreground">
-                For React/Next.js projects. Requires TanStack Query setup.
-                Customize the component to match your design.
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="api" className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">API Endpoint</p>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleCopy(embedUrl, "api")}
-                  >
-                    {copiedTab === "api" ? (
-                      <CheckIcon className="h-4 w-4 mr-1.5" />
-                    ) : (
-                      <CopyIcon className="h-4 w-4 mr-1.5" />
-                    )}
-                    Copy URL
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.open(embedUrl, "_blank")}
-                  >
-                    <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
-                    Test
-                  </Button>
-                </div>
-              </div>
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-xs">
-                <code>{apiEndpoint}</code>
-              </pre>
-              <p className="text-xs text-muted-foreground">
-                Public API endpoint. No authentication required. Cached for 5
-                minutes. Build your own custom integration.
-              </p>
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
-                <p className="text-xs font-medium mb-1">Response Format:</p>
-                <pre className="bg-muted/50 p-2 rounded text-xs overflow-x-auto">
-                  <code>{`{
+  const tabConfigs = [
+    {
+      id: "script",
+      label: "JavaScript",
+      title: "Vanilla JavaScript",
+      code: embedCodes.script,
+      description:
+        "Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials with the configured layout and styling.",
+    },
+    {
+      id: "iframe",
+      label: "iframe",
+      title: "iframe Embed",
+      code: embedCodes.iframe,
+      description:
+        "Simple iframe embed. Adjust width and height as needed for your design.",
+    },
+    {
+      id: "react",
+      label: "React",
+      title: "React Component",
+      code: embedCodes.react,
+      description:
+        "For React/Next.js projects. The widget script handles all rendering automatically with your configured settings.",
+    },
+    {
+      id: "api",
+      label: "API",
+      title: "API Endpoint",
+      code: embedCodes.api,
+      description:
+        "Public API endpoint. No authentication required. Cached for 5 minutes. Build your own custom integration.",
+      extraAction: {
+        label: "Test",
+        icon: <ExternalLinkIcon className="h-4 w-4 mr-1.5" />,
+        onClick: () => window.open(apiEndpointUrl, "_blank"),
+      },
+      additionalContent: (
+        <div>
+          <p className="text-xs font-medium mb-2">Response Format:</p>
+          <pre className="bg-muted/50 p-3 rounded text-xs overflow-auto max-h-[120px] border">
+            <code>{`{
   "success": true,
   "data": {
     "widget": { "id": "...", "config": {...} },
@@ -294,16 +195,72 @@ function TestimonialWidget() {
     ]
   }
 }`}</code>
-                </pre>
-              </div>
-            </div>
-          </TabsContent>
+          </pre>
+        </div>
+      ),
+    },
+  ];
+
+  const handleCopy = async (code: string, tab: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedTab(tab);
+      toast.success("Code copied to clipboard!");
+      setTimeout(() => setCopiedTab(null), 2000);
+    } catch (error) {
+      toast.error("Failed to copy code");
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="flex items-center gap-2">
+            <Code2Icon className="h-5 w-5" />
+            Embed Code
+          </DialogTitle>
+          <DialogDescription>
+            Copy and paste the code below to embed testimonials on your website
+          </DialogDescription>
+        </DialogHeader>
+
+        <Tabs
+          defaultValue="script"
+          className="flex-1 flex flex-col min-h-0 overflow-hidden"
+        >
+          <TabsList className="grid w-full grid-cols-4 shrink-0">
+            {tabConfigs.map((tab) => (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <div className="flex-1 overflow-y-auto py-4 min-h-0">
+            {tabConfigs.map((tab) => (
+              <TabsContent key={tab.id} value={tab.id} className="mt-0">
+                <CodeTab
+                  title={tab.title}
+                  code={tab.code}
+                  description={tab.description}
+                  tabId={tab.id}
+                  copiedTab={copiedTab}
+                  onCopy={handleCopy}
+                  extraAction={tab.extraAction}
+                  additionalContent={tab.additionalContent}
+                />
+              </TabsContent>
+            ))}
+          </div>
         </Tabs>
 
-        <div className="flex items-center justify-between pt-4 border-t">
+        <div className="flex items-center justify-between pt-4 border-t shrink-0">
           <p className="text-xs text-muted-foreground">
             Widget ID:{" "}
-            <code className="bg-muted px-1 py-0.5 rounded">{widgetId}</code>
+            <code className="bg-muted px-1.5 py-0.5 rounded text-xs">
+              {widgetId}
+            </code>
           </p>
           <Button variant="outline" onClick={onClose}>
             Close

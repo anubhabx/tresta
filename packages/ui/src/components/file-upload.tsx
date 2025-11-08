@@ -7,26 +7,26 @@ import { cn } from "@workspace/ui/lib/utils";
 const mainVariant = {
   initial: {
     x: 0,
-    y: 0
+    y: 0,
   },
   animate: {
     x: 20,
     y: -20,
-    opacity: 0.9
-  }
+    opacity: 0.9,
+  },
 };
 
 const secondaryVariant = {
   initial: {
-    opacity: 0
+    opacity: 0,
   },
   animate: {
-    opacity: 1
-  }
+    opacity: 1,
+  },
 };
 
 export const FileUpload = ({
-  onChange
+  onChange,
 }: {
   onChange?: (files: File[]) => void;
 }) => {
@@ -48,7 +48,7 @@ export const FileUpload = ({
     onDrop: handleFileChange,
     onDropRejected: (error) => {
       console.log(error);
-    }
+    },
   });
 
   return (
@@ -80,7 +80,7 @@ export const FileUpload = ({
                   layoutId={idx === 0 ? "file-upload" : "file-upload-" + idx}
                   className={cn(
                     "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
-                    "shadow-sm"
+                    "shadow-sm",
                   )}
                 >
                   <div className="flex justify-between w-full items-center gap-4">
@@ -130,11 +130,11 @@ export const FileUpload = ({
                 transition={{
                   type: "spring",
                   stiffness: 300,
-                  damping: 20
+                  damping: 20,
                 }}
                 className={cn(
                   "relative group-hover/file:shadow-2xl z-40 bg-white dark:bg-neutral-900 flex items-center border-border border justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
-                  "shadow-[0px_10px_50px_rgba(0,0,0,0.1)]"
+                  "shadow-[0px_10px_50px_rgba(0,0,0,0.1)]",
                 )}
               >
                 {isDragActive ? (

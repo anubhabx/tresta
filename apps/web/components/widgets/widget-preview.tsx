@@ -26,14 +26,14 @@ export function WidgetPreview({
     if (scriptLoadedRef.current) return;
 
     const loadWidget = async () => {
-      console.log('[WidgetPreview] Starting script load...');
+      console.log("[WidgetPreview] Starting script load...");
       setIsLoading(true);
       setError(null);
 
       try {
         // Check if script is already loaded
         if (typeof (window as any).TrestaWidget !== "undefined") {
-          console.log('[WidgetPreview] Script already loaded');
+          console.log("[WidgetPreview] Script already loaded");
           scriptLoadedRef.current = true;
           setIsLoading(false);
           return;
@@ -43,25 +43,25 @@ export function WidgetPreview({
         const script = document.createElement("script");
         script.src = `${window.location.origin}/widget/tresta-widget.js`;
         script.async = true;
-        
-        console.log('[WidgetPreview] Loading script from:', script.src);
+
+        console.log("[WidgetPreview] Loading script from:", script.src);
 
         script.onload = () => {
-          console.log('[WidgetPreview] Script loaded');
+          console.log("[WidgetPreview] Script loaded");
           // Wait for TrestaWidget to be available
           if (typeof (window as any).TrestaWidget !== "undefined") {
-            console.log('[WidgetPreview] TrestaWidget is available');
+            console.log("[WidgetPreview] TrestaWidget is available");
             scriptLoadedRef.current = true;
             setIsLoading(false);
           } else {
-            console.error('[WidgetPreview] TrestaWidget not found after load');
+            console.error("[WidgetPreview] TrestaWidget not found after load");
             setError("Widget library loaded but TrestaWidget not found");
             setIsLoading(false);
           }
         };
 
         script.onerror = (e) => {
-          console.error('[WidgetPreview] Script load error:', e);
+          console.error("[WidgetPreview] Script load error:", e);
           setError("Failed to load widget library");
           setIsLoading(false);
         };
@@ -75,7 +75,7 @@ export function WidgetPreview({
           }
         };
       } catch (err) {
-        console.error('[WidgetPreview] Exception during load:', err);
+        console.error("[WidgetPreview] Exception during load:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
         setIsLoading(false);
       }
@@ -86,21 +86,26 @@ export function WidgetPreview({
 
   // Render/update widget when config changes
   useEffect(() => {
-    console.log('[WidgetPreview] Render effect triggered', {
+    console.log("[WidgetPreview] Render effect triggered", {
       scriptLoaded: scriptLoadedRef.current,
       hasContainer: !!containerRef.current,
       configLayout: config.layout,
     });
 
     if (!scriptLoadedRef.current || !containerRef.current) {
-      console.log('[WidgetPreview] Not ready - script loaded:', scriptLoadedRef.current, 'has container:', !!containerRef.current);
+      console.log(
+        "[WidgetPreview] Not ready - script loaded:",
+        scriptLoadedRef.current,
+        "has container:",
+        !!containerRef.current,
+      );
       return;
     }
 
     const renderWidget = () => {
       if (!containerRef.current) return;
 
-      console.log('[WidgetPreview] Starting render...');
+      console.log("[WidgetPreview] Starting render...");
 
       // Clear previous content
       containerRef.current.innerHTML = "";
@@ -189,20 +194,21 @@ export function WidgetPreview({
         adaptToHost: false, // Disable auto-theming in preview mode
         theme: {
           primaryColor: config.primaryColor || "#0066FF",
-          backgroundColor: config.theme === 'dark' ? '#1a1a1a' : '#ffffff',
-          textColor: config.theme === 'dark' ? '#e5e7eb' : '#1f2937',
-          cardBackgroundColor: config.theme === 'dark' ? '#2a2a2a' : '#f9fafb',
+          backgroundColor: config.theme === "dark" ? "#1a1a1a" : "#ffffff",
+          textColor: config.theme === "dark" ? "#e5e7eb" : "#1f2937",
+          cardBackgroundColor: config.theme === "dark" ? "#2a2a2a" : "#f9fafb",
           borderRadius: 12,
-          starColor: '#fbbf24',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          starColor: "#fbbf24",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         },
         settings: {
           layout: config.layout,
           showRating: config.showRating ?? true,
           showDate: config.showDate ?? true,
           showAvatar: config.showAvatar ?? false,
-          showAuthorRole: true,
-          showAuthorCompany: true,
+          showAuthorRole: config.showAuthorRole ?? true,
+          showAuthorCompany: config.showAuthorCompany ?? true,
           maxTestimonials: Math.min(config.maxTestimonials || 10, 6), // Limit to 6 for preview
           autoplay: config.autoRotate ?? true, // Enable autoplay by default for preview
           autoplaySpeed: config.rotateInterval || 5000,
@@ -219,19 +225,20 @@ export function WidgetPreview({
             layout: config.layout as any,
             theme: {
               primaryColor: config.primaryColor || "#0066FF",
-              backgroundColor: config.theme === 'dark' ? '#1a1a1a' : '#ffffff',
-              textColor: config.theme === 'dark' ? '#e5e7eb' : '#1f2937',
-              cardBackgroundColor: config.theme === 'dark' ? '#2a2a2a' : '#f9fafb',
+              backgroundColor: config.theme === "dark" ? "#1a1a1a" : "#ffffff",
+              textColor: config.theme === "dark" ? "#e5e7eb" : "#1f2937",
+              cardBackgroundColor:
+                config.theme === "dark" ? "#2a2a2a" : "#f9fafb",
               borderRadius: 8,
-              starColor: '#fbbf24',
+              starColor: "#fbbf24",
             },
             settings: {
               layout: config.layout,
               showRating: config.showRating ?? true,
               showDate: config.showDate ?? true,
               showAvatar: config.showAvatar ?? false,
-              showAuthorRole: true,
-              showAuthorCompany: true,
+              showAuthorRole: config.showAuthorRole ?? true,
+              showAuthorCompany: config.showAuthorCompany ?? true,
               maxTestimonials: Math.min(config.maxTestimonials || 10, 6),
               autoplay: config.autoRotate ?? true, // Enable autoplay by default
               autoplaySpeed: config.rotateInterval || 5000,
@@ -246,21 +253,29 @@ export function WidgetPreview({
 
       // Initialize widget
       try {
-        console.log('[WidgetPreview] Attempting to initialize widget');
-        console.log('[WidgetPreview] TrestaWidget available?', typeof (window as any).TrestaWidget);
-        console.log('[WidgetPreview] Widget config:', widgetConfig);
-        
+        console.log("[WidgetPreview] Attempting to initialize widget");
+        console.log(
+          "[WidgetPreview] TrestaWidget available?",
+          typeof (window as any).TrestaWidget,
+        );
+        console.log("[WidgetPreview] Widget config:", widgetConfig);
+
         if ((window as any).TrestaWidget) {
           // Instantiate widget directly for preview with mock data
           const widgetInstance = new (window as any).TrestaWidget(widgetConfig);
-          console.log('[WidgetPreview] Widget instance created:', widgetInstance);
+          console.log(
+            "[WidgetPreview] Widget instance created:",
+            widgetInstance,
+          );
         } else {
-          console.error('[WidgetPreview] TrestaWidget not available');
+          console.error("[WidgetPreview] TrestaWidget not available");
           setError("Widget library not loaded");
         }
       } catch (err) {
-        console.error('[WidgetPreview] Error initializing widget:', err);
-        setError(err instanceof Error ? err.message : "Failed to render widget");
+        console.error("[WidgetPreview] Error initializing widget:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to render widget",
+        );
       }
     };
 
@@ -279,15 +294,21 @@ export function WidgetPreview({
         )}
       </div>
 
-      <div className="rounded-xl border overflow-hidden shadow-sm" style={{
-        backgroundColor: config.theme === 'dark' ? '#0a0a0a' : '#fafafa',
-      }}>
+      <div
+        className="rounded-xl border overflow-hidden shadow-sm"
+        style={{
+          backgroundColor: config.theme === "dark" ? "#0a0a0a" : "#fafafa",
+        }}
+      >
         {error ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-destructive mb-2">Preview Error</p>
             <p className="text-xs text-muted-foreground">{error}</p>
             <p className="text-xs text-muted-foreground mt-2">
-              Make sure the widget is built: <code className="bg-muted px-1.5 py-0.5 rounded">cd packages/widget && pnpm build</code>
+              Make sure the widget is built:{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded">
+                cd packages/widget && pnpm build
+              </code>
             </p>
           </div>
         ) : (
@@ -299,7 +320,8 @@ export function WidgetPreview({
       </div>
 
       <p className="mt-2 text-xs text-muted-foreground">
-        Preview updates in real-time as you change settings. Mock testimonials are shown for demonstration.
+        Preview updates in real-time as you change settings. Mock testimonials
+        are shown for demonstration.
       </p>
     </div>
   );

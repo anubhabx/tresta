@@ -3,7 +3,7 @@ import {
   StorageSharedKeyCredential,
   generateBlobSASQueryParameters,
   BlobSASPermissions,
-  ContainerClient
+  ContainerClient,
 } from "@azure/storage-blob";
 import { v4 as uuidv4 } from "uuid";
 import { InternalServerError } from "../lib/errors.ts";
@@ -24,10 +24,11 @@ export const StorageDirectory = {
   AVATARS: "avatars",
   VIDEOS: "videos",
   IMAGES: "images",
-  DOCUMENTS: "documents"
+  DOCUMENTS: "documents",
 } as const;
 
-export type StorageDirectory = typeof StorageDirectory[keyof typeof StorageDirectory];
+export type StorageDirectory =
+  (typeof StorageDirectory)[keyof typeof StorageDirectory];
 
 // Allowed file types per directory
 const ALLOWED_FILE_TYPES: Record<StorageDirectory, string[]> = {
@@ -36,7 +37,7 @@ const ALLOWED_FILE_TYPES: Record<StorageDirectory, string[]> = {
     "image/jpeg",
     "image/jpg",
     "image/svg+xml",
-    "image/webp"
+    "image/webp",
   ],
   [StorageDirectory.TESTIMONIALS]: [
     "image/png",
@@ -45,19 +46,19 @@ const ALLOWED_FILE_TYPES: Record<StorageDirectory, string[]> = {
     "image/webp",
     "video/mp4",
     "video/webm",
-    "video/quicktime"
+    "video/quicktime",
   ],
   [StorageDirectory.AVATARS]: [
     "image/png",
     "image/jpeg",
     "image/jpg",
-    "image/webp"
+    "image/webp",
   ],
   [StorageDirectory.VIDEOS]: [
     "video/mp4",
     "video/webm",
     "video/quicktime",
-    "video/x-msvideo"
+    "video/x-msvideo",
   ],
   [StorageDirectory.IMAGES]: [
     "image/png",
@@ -65,13 +66,13 @@ const ALLOWED_FILE_TYPES: Record<StorageDirectory, string[]> = {
     "image/jpg",
     "image/gif",
     "image/webp",
-    "image/svg+xml"
+    "image/svg+xml",
   ],
   [StorageDirectory.DOCUMENTS]: [
     "application/pdf",
     "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ]
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
 };
 
 // Max file sizes per directory (in bytes)
@@ -81,7 +82,7 @@ const MAX_FILE_SIZES: Record<StorageDirectory, number> = {
   [StorageDirectory.AVATARS]: 2 * 1024 * 1024, // 2MB
   [StorageDirectory.VIDEOS]: 200 * 1024 * 1024, // 200MB
   [StorageDirectory.IMAGES]: 10 * 1024 * 1024, // 10MB
-  [StorageDirectory.DOCUMENTS]: 10 * 1024 * 1024 // 10MB
+  [StorageDirectory.DOCUMENTS]: 10 * 1024 * 1024, // 10MB
 };
 
 // Initialize Azure Blob Storage client (lazy initialization)
@@ -92,10 +93,10 @@ let _containerClient: ContainerClient | null = null;
 const getCredentials = (): StorageSharedKeyCredential => {
   if (!_credentials) {
     const { accountName, accountKey } = getStorageConfig();
-    
+
     if (!accountName || !accountKey) {
       throw new InternalServerError(
-        "Azure Storage credentials are not configured. Please set AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY environment variables."
+        "Azure Storage credentials are not configured. Please set AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY environment variables.",
       );
     }
 
@@ -108,10 +109,10 @@ const getBlobServiceClient = (): BlobServiceClient => {
   if (!_blobServiceClient) {
     const { accountName } = getStorageConfig();
     const credentials = getCredentials();
-    
+
     _blobServiceClient = new BlobServiceClient(
       `https://${accountName}.blob.core.windows.net`,
-      credentials
+      credentials,
     );
   }
   return _blobServiceClient;
@@ -156,7 +157,7 @@ class BlobStorageService {
     try {
       const containerClient = getContainerClient();
       const { containerName } = getStorageConfig();
-      
+
       const exists = await containerClient.exists();
       if (!exists) {
         // Create private container - access controlled via SAS URLs
@@ -176,33 +177,35 @@ class BlobStorageService {
   async configureCORS(): Promise<void> {
     try {
       const blobServiceClient = getBlobServiceClient();
-      
+
       // Configure CORS rules
-      const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS 
+      const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
         ? process.env.CORS_ALLOWED_ORIGINS
-        : 'http://localhost:3000,http://localhost:3001';
-      
+        : "http://localhost:3000,http://localhost:3001";
+
       const corsRules = [
         {
           allowedOrigins,
-          allowedMethods: 'GET,PUT,POST,DELETE,HEAD,OPTIONS',
-          allowedHeaders: '*',
-          exposedHeaders: '*',
-          maxAgeInSeconds: 3600
-        }
+          allowedMethods: "GET,PUT,POST,DELETE,HEAD,OPTIONS",
+          allowedHeaders: "*",
+          exposedHeaders: "*",
+          maxAgeInSeconds: 3600,
+        },
       ];
-      
+
       // Set the CORS properties
       await blobServiceClient.setProperties({
-        cors: corsRules
+        cors: corsRules,
       });
-      
-    //   console.log('CORS configured successfully for Azure Blob Storage');
-    //   console.log('Allowed origins:', allowedOrigins);
+
+      //   console.log('CORS configured successfully for Azure Blob Storage');
+      //   console.log('Allowed origins:', allowedOrigins);
     } catch (error) {
-      console.error('Error configuring CORS:', error);
+      console.error("Error configuring CORS:", error);
       // Don't throw - CORS configuration failure shouldn't stop the app
-      console.warn('Failed to configure CORS. You may need to configure it manually in Azure Portal.');
+      console.warn(
+        "Failed to configure CORS. You may need to configure it manually in Azure Portal.",
+      );
     }
   }
 
@@ -211,12 +214,12 @@ class BlobStorageService {
    */
   private validateFileType(
     directory: StorageDirectory,
-    contentType: string
+    contentType: string,
   ): void {
     const allowedTypes = ALLOWED_FILE_TYPES[directory];
     if (!allowedTypes.includes(contentType)) {
       throw new Error(
-        `File type "${contentType}" is not allowed in "${directory}" directory. Allowed types: ${allowedTypes.join(", ")}`
+        `File type "${contentType}" is not allowed in "${directory}" directory. Allowed types: ${allowedTypes.join(", ")}`,
       );
     }
   }
@@ -226,14 +229,14 @@ class BlobStorageService {
    */
   private validateFileSize(
     directory: StorageDirectory,
-    fileSize?: number
+    fileSize?: number,
   ): void {
     if (!fileSize) return;
 
     const maxSize = MAX_FILE_SIZES[directory];
     if (fileSize > maxSize) {
       throw new Error(
-        `File size exceeds maximum allowed size of ${maxSize / (1024 * 1024)}MB for "${directory}" directory`
+        `File size exceeds maximum allowed size of ${maxSize / (1024 * 1024)}MB for "${directory}" directory`,
       );
     }
   }
@@ -244,7 +247,7 @@ class BlobStorageService {
   private generateBlobName(
     directory: StorageDirectory,
     filename: string,
-    userId?: string
+    userId?: string,
   ): string {
     // Sanitize filename - remove special characters
     const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -271,7 +274,7 @@ class BlobStorageService {
    * Generate a SAS URL for uploading a file
    */
   async generateUploadUrl(
-    options: GenerateUploadUrlOptions
+    options: GenerateUploadUrlOptions,
   ): Promise<UploadUrlResponse> {
     try {
       const {
@@ -280,7 +283,7 @@ class BlobStorageService {
         contentType,
         fileSize,
         expiresInMinutes = 10,
-        userId
+        userId,
       } = options;
 
       const { accountName, containerName } = getStorageConfig();
@@ -295,7 +298,7 @@ class BlobStorageService {
 
       // Set expiry time
       const expiresOn = new Date(
-        new Date().valueOf() + expiresInMinutes * 60 * 1000
+        new Date().valueOf() + expiresInMinutes * 60 * 1000,
       );
 
       // Generate SAS token with create and write permissions
@@ -306,9 +309,9 @@ class BlobStorageService {
           permissions: BlobSASPermissions.parse("cw"), // Create and Write
           startsOn: new Date(),
           expiresOn,
-          contentType // Set content type in SAS
+          contentType, // Set content type in SAS
         },
-        credentials
+        credentials,
       ).toString();
 
       // Construct URLs
@@ -319,7 +322,7 @@ class BlobStorageService {
         uploadUrl,
         blobUrl,
         blobName,
-        expiresAt: expiresOn
+        expiresAt: expiresOn,
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -334,14 +337,14 @@ class BlobStorageService {
    */
   async generateReadUrl(
     blobName: string,
-    expiresInMinutes: number = 60
+    expiresInMinutes: number = 60,
   ): Promise<string> {
     try {
       const { accountName, containerName } = getStorageConfig();
       const credentials = getCredentials();
-      
+
       const expiresOn = new Date(
-        new Date().valueOf() + expiresInMinutes * 60 * 1000
+        new Date().valueOf() + expiresInMinutes * 60 * 1000,
       );
 
       const sasToken = generateBlobSASQueryParameters(
@@ -350,9 +353,9 @@ class BlobStorageService {
           blobName,
           permissions: BlobSASPermissions.parse("r"), // Read only
           startsOn: new Date(),
-          expiresOn
+          expiresOn,
         },
-        credentials
+        credentials,
       ).toString();
 
       return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
@@ -399,7 +402,7 @@ class BlobStorageService {
         contentType: properties.contentType,
         contentLength: properties.contentLength,
         lastModified: properties.lastModified,
-        metadata: properties.metadata
+        metadata: properties.metadata,
       };
     } catch (error) {
       throw new InternalServerError("Failed to get blob metadata");
@@ -413,14 +416,16 @@ class BlobStorageService {
   async uploadFromUrl(
     imageUrl: string,
     directory: StorageDirectory,
-    userId?: string
+    userId?: string,
   ): Promise<string> {
     try {
       // Fetch the image from the URL
       const response = await fetch(imageUrl);
-      
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch image from URL: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch image from URL: ${response.statusText}`,
+        );
       }
 
       // Get the content type and buffer
@@ -434,9 +439,13 @@ class BlobStorageService {
       // Generate filename from URL or use a default
       const urlParts = new URL(imageUrl).pathname.split("/");
       const originalFilename = urlParts[urlParts.length - 1] || "avatar.jpg";
-      
+
       // Generate unique blob name
-      const blobName = this.generateBlobName(directory, originalFilename, userId);
+      const blobName = this.generateBlobName(
+        directory,
+        originalFilename,
+        userId,
+      );
 
       // Upload to Azure Blob Storage
       const containerClient = getContainerClient();
@@ -444,8 +453,8 @@ class BlobStorageService {
 
       await blockBlobClient.upload(buffer, buffer.length, {
         blobHTTPHeaders: {
-          blobContentType: contentType
-        }
+          blobContentType: contentType,
+        },
       });
 
       // Return the public blob URL (without SAS token for public read)

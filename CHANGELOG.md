@@ -13,8 +13,9 @@ All notable changes to the Tresta project will be documented in this file.
 **UI/UX Changes:**
 
 **1. Design System Principles:**
+
 - **Minimal aesthetic**: Removed all bright backgrounds (yellow/orange/green/red/blue)
-- **Strategic colors**: 
+- **Strategic colors**:
   - Primary (teal): Positive actions, verification, published states
   - Destructive (red): Warnings, risks, flagged/rejected content
   - Muted/neutral: All other elements
@@ -86,6 +87,7 @@ All notable changes to the Tresta project will be documented in this file.
   - Ensures instant UI updates after actions
 
 **7. Cleanup:**
+
 - Removed corrupted `moderation-queue.tsx` file (1168 lines of broken code)
 - Component was not being used anywhere
 - Functionality already implemented in `TestimonialList` with `moderationMode` prop
@@ -130,6 +132,7 @@ All notable changes to the Tresta project will be documented in this file.
 **Feature:** AI-powered content moderation system to automatically filter spam, profanity, and inappropriate testimonials with sentiment analysis.
 
 **Implementation:**
+
 - **Auto-Moderation Service** (`apps/api/src/services/moderation.service.ts`):
   - Multi-category profanity detection (severe, mild, offensive)
   - Advanced sentiment analysis with weighted keywords
@@ -138,19 +141,16 @@ All notable changes to the Tresta project will be documented in this file.
   - Spam pattern detection (excessive caps, repeated characters, URLs)
   - Risk score calculation (0-1, higher = more problematic)
   - Detailed moderation flags with reasons
-  
 - **Database Schema** (Migration: `20251106144930_add_auto_moderation`):
   - Added `ModerationStatus` enum: PENDING, APPROVED, REJECTED, FLAGGED
   - Added `moderationStatus`, `moderationScore`, `moderationFlags`, `autoPublished` to Testimonial model
   - Project-level moderation settings: `autoModeration`, `autoApproveVerified`, `profanityFilterLevel`
-  
 - **Migration Script for Existing Data**:
   - Created `apps/api/src/scripts/migrate-existing-testimonials.ts`
   - Batch processes existing PENDING testimonials (50 at a time)
   - Respects project-level auto-moderation settings
   - Run via `pnpm migrate:testimonials` command
   - Outputs detailed statistics (approved/flagged/rejected counts)
-  
 - **Integrated Moderation UI** (`apps/web/components/testimonial-list.tsx`):
   - Replaced separate moderation page with inline moderation
   - Select All checkbox for bulk operations
@@ -158,7 +158,6 @@ All notable changes to the Tresta project will be documented in this file.
   - Individual checkboxes per testimonial card
   - Fixed bottom bulk actions bar (Approve/Flag/Reject buttons)
   - Moderation stats badges in header
-  
 - **Enhanced Testimonial Cards** (`apps/web/components/testimonial-card.tsx`):
   - Color-coded moderation badges (Green Shield, Red AlertTriangle, Red XCircle)
   - Detailed tooltips showing risk score and moderation flags
@@ -166,6 +165,7 @@ All notable changes to the Tresta project will be documented in this file.
   - Truncated flag display (first 3 + count of remaining)
 
 **UX Improvements:**
+
 - No separate moderation page needed - all inline
 - Quick bulk moderation actions
 - Fixed action bar prevents layout shift
@@ -173,17 +173,20 @@ All notable changes to the Tresta project will be documented in this file.
 - Transparent moderation reasons via tooltips
 
 **Files Added:**
+
 - `apps/api/src/services/moderation.service.ts` - Core moderation logic (450+ lines)
 - `apps/api/src/scripts/migrate-existing-testimonials.ts` - Data migration script
 - `packages/database/prisma/migrations/20251106144930_add_auto_moderation/` - Schema migration
 
 **Files Modified:**
+
 - `apps/api/src/controllers/testimonial.controller.ts` - Integrated moderation on create
 - `apps/web/components/testimonial-list.tsx` - Bulk actions and filters
 - `apps/web/components/testimonial-card.tsx` - Moderation badges
 - `apps/api/package.json` - Added `migrate:testimonials` script
 
 **Dependencies:**
+
 - No new external dependencies (uses built-in string matching)
 
 ---
@@ -195,6 +198,7 @@ All notable changes to the Tresta project will be documented in this file.
 **Feature:** Comprehensive custom account settings page matching authentication UI design with modular components and dedicated privacy transparency.
 
 **Implementation:**
+
 - **Account Settings Refactoring**:
   - Refactored monolithic `account-settings-form.tsx` into 6 modular components
   - `ProfileImageSection`: Avatar upload/removal with 5MB validation
@@ -203,17 +207,14 @@ All notable changes to the Tresta project will be documented in this file.
   - `ConnectedAccountsSection`: Display OAuth provider status with badges
   - `AccountInformationSection`: Member since and last updated dates
   - `DataPrivacySection`: Enhanced data export + account deletion
-  
 - **Enhanced Data Export**:
   - Export includes user profile, projects, widgets, and testimonials in single JSON file
   - Timestamped filename: `tresta-data-export-YYYY-MM-DD-HHmmss.json`
   - Complete data portability for GDPR compliance
-  
 - **Account Deletion**:
   - AlertDialog confirmation before deletion
   - Clear warning about permanent data loss
   - Redirects to sign-in after successful deletion
-  
 - **Privacy Transparency Page**:
   - Created dedicated `/privacy` route for data collection disclosure
   - Structured data with TypeScript interfaces (DataItem, DataCategory, etc.)
@@ -221,12 +222,10 @@ All notable changes to the Tresta project will be documented in this file.
   - Four main sections: Data Categories, Data Usage, Storage & Security, Your Rights
   - Data-driven rendering via constant arrays (DATA_CATEGORIES, DATA_USAGE, STORAGE_INFO, DATA_RIGHTS)
   - 383 lines of comprehensive privacy information
-  
 - **Layout Consistency**:
   - Applied `container mx-auto max-w-4xl py-8 px-4` to all form pages
   - Center-aligned forms: account settings, privacy, new project, edit project
   - Consistent spacing and visual hierarchy
-  
 - **UX Improvements**:
   - Removed user ID exposure from account information display
   - Better data collection info formatting with structured components
@@ -234,6 +233,7 @@ All notable changes to the Tresta project will be documented in this file.
   - Modular component architecture for maintainability
 
 **Files Modified:**
+
 - `apps/web/components/account-settings-form.tsx` - Refactored to 65 lines
 - `apps/web/components/account-settings/profile-image-section.tsx` - NEW
 - `apps/web/components/account-settings/profile-information-section.tsx` - NEW
@@ -249,6 +249,7 @@ All notable changes to the Tresta project will be documented in this file.
 - `apps/web/middleware.ts` - Added `/privacy` to protected routes
 
 **Dependencies:**
+
 - No new dependencies (uses existing Lucide React icons)
 
 ---
@@ -260,38 +261,36 @@ All notable changes to the Tresta project will be documented in this file.
 **Feature:** Integrated Google OAuth authentication to verify testimonial authors and increase credibility.
 
 **Implementation:**
-- **Frontend OAuth integration**: 
+
+- **Frontend OAuth integration**:
   - Added `@react-oauth/google` package for Google Sign-In button
   - Created `GoogleOAuthProvider` wrapper component
   - Auto-fill testimonial form (name, email, avatar) from Google profile
   - Store Google ID token for server-side verification
-  
 - **Backend verification**:
   - Added `google-auth-library` package for token verification
   - Created `verifyGoogleIdToken()` utility for server-side validation
   - Updated testimonial controller to accept and verify `googleIdToken` parameter
   - Store verification status with `isOAuthVerified`, `oauthProvider`, `oauthSubject` fields
-  
 - **Database schema updates**:
   - Added `isOAuthVerified` (Boolean, default false) to Testimonial model
   - Added `oauthProvider` (String?, nullable) to store provider name
   - Added `oauthSubject` (String?, nullable) to store unique OAuth subject ID
   - Created migration: `20251105044214_add_oauth_verification`
   - Added index on `isOAuthVerified` for efficient filtering
-  
 - **Verified badge display**:
   - Added green checkmark badge to verified testimonials in all widget layouts
   - Badge shows OAuth provider in tooltip (e.g., "Verified via google")
   - Styled with green background (#d1fae5), circular shape, 16px size
   - SVG shield check icon for visual clarity
-  
 - **Management UI enhancements**:
   - Display verified badge on testimonial cards with `ShieldCheck` icon
   - Added verification filter dropdown (All Verification / Verified / Unverified)
   - Combined filtering: status (pending/approved/published) + verification
   - Show OAuth provider in badge tooltip for owner reference
-  
+
 **Files Modified:**
+
 - `packages/database/prisma/schema.prisma` - Added OAuth fields
 - `apps/api/src/lib/google-oauth.ts` - NEW: Token verification utility
 - `apps/api/src/controllers/testimonial.controller.ts` - Accept and verify tokens
@@ -308,11 +307,13 @@ All notable changes to the Tresta project will be documented in this file.
 - `packages/widget/src/widget.ts` - Pass OAuth fields to carousel
 
 **Environment Variables:**
+
 - `NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID` - Frontend client ID
 - `GOOGLE_OAUTH_CLIENT_ID` - Backend client ID (same as frontend)
 - `GOOGLE_OAUTH_CLIENT_SECRET` - Backend client secret
 
 **Widget Build:**
+
 - Rebuilt widget: 42.39 KB (IIFE), 58.61 KB (ESM)
 - Includes verified badge support in all layouts
 
@@ -321,6 +322,7 @@ All notable changes to the Tresta project will be documented in this file.
 **Feature:** Added "Powered by Tresta" watermark to all widgets for brand visibility.
 
 **Implementation:**
+
 - Created `renderBranding()` function in renderer
 - Always displays at bottom of widget with top border separator
 - Small gray text (12px) with branded link to tresta.io
@@ -328,6 +330,7 @@ All notable changes to the Tresta project will be documented in this file.
 - Fixed demo files to properly render branding footer
 
 **Files Modified:**
+
 - `packages/widget/src/renderer.ts` - `renderBranding()` function
 - `packages/widget/src/widget.ts` - Call branding in render pipeline
 - `packages/widget/index.html` - Include branding in demo
@@ -342,6 +345,7 @@ All notable changes to the Tresta project will be documented in this file.
 **Feature:** Created a self-contained JavaScript widget library that can be embedded on any website with a simple script tag.
 
 **Implementation:**
+
 - **Zero-dependency widget**: Pure vanilla JavaScript, no external dependencies
 - **Auto-initialization**: Automatically detects and initializes from script tags with `data-tresta-widget` attribute
 - **Multiple layouts**: Carousel, Grid, Masonry, Wall, List
@@ -353,6 +357,7 @@ All notable changes to the Tresta project will be documented in this file.
 - **Security**: XSS protection via HTML escaping
 
 **Files Created:**
+
 - `/packages/widget/` - Complete widget package
   - `src/index.ts` - Entry point with auto-initialization
   - `src/widget.ts` - Main TrestaWidget class
@@ -366,6 +371,7 @@ All notable changes to the Tresta project will be documented in this file.
   - `demo.html` - Interactive demo with multiple examples
 
 **Build Output:**
+
 - `tresta-widget.js` - Minified IIFE bundle (~12KB gzipped)
 - `tresta-widget.esm.js` - ES Module bundle
 - Source maps for debugging
@@ -373,17 +379,19 @@ All notable changes to the Tresta project will be documented in this file.
 **Usage Examples:**
 
 Simple embed (auto-initialize):
+
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
 ></script>
 ```
 
 With customization:
+
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-primary-color="#10b981"
   data-autoplay="true"
@@ -392,15 +400,17 @@ With customization:
 ```
 
 Programmatic control:
+
 ```javascript
-const widget = TrestaWidget.init('WIDGET_ID', {
-  container: '#testimonials',
-  theme: { primaryColor: '#3b82f6' },
-  onLoad: (widget) => console.log('Loaded!'),
+const widget = TrestaWidget.init("WIDGET_ID", {
+  container: "#testimonials",
+  theme: { primaryColor: "#3b82f6" },
+  onLoad: (widget) => console.log("Loaded!"),
 });
 ```
 
 **CDN Deployment Options:**
+
 1. **Azure Blob Storage + Azure CDN** (Recommended)
    - Fastest and most cost-effective
    - Global edge caching
@@ -417,11 +427,13 @@ const widget = TrestaWidget.init('WIDGET_ID', {
    - $7+/month
 
 **Scripts Added:**
+
 - `pnpm widget:build` - Build production widget
 - `pnpm widget:dev` - Watch mode for development
 - `pnpm widget:preview` - Preview built widget
 
 **Impact:**
+
 - ✅ Users can embed testimonials with one line of code
 - ✅ No technical knowledge required (vs. API access)
 - ✅ Widget is free tier feature
@@ -458,6 +470,7 @@ const widget = TrestaWidget.init('WIDGET_ID', {
    - POST requests only
 
 **Files Changed:**
+
 - Created `/apps/api/src/middleware/cors.middleware.ts` - Centralized CORS configurations
 - Updated `/apps/api/src/index.ts` - Applied route-specific CORS
 - Updated `/apps/api/src/routes/widget.route.ts` - Widget-specific CORS handling
@@ -465,6 +478,7 @@ const widget = TrestaWidget.init('WIDGET_ID', {
 - Created `/apps/api/examples/widget-embed-example.html` - Live embedding example
 
 **Security Measures:**
+
 - Public endpoints are read-only (GET only)
 - No credentials allowed on public endpoints (prevents CSRF)
 - Business logic validates project visibility (PUBLIC + ACTIVE)
@@ -473,11 +487,13 @@ const widget = TrestaWidget.init('WIDGET_ID', {
 - Preflight cache set to 24 hours (reduces OPTIONS requests)
 
 **Testing:**
+
 - TypeScript compilation successful (no errors)
 - CORS headers properly configured per route type
 - Example HTML demonstrates cross-origin fetching
 
 **Impact:**
+
 - ✅ Widgets can now be embedded on any external website
 - ✅ Dashboard/management APIs remain secure (frontend-only)
 - ✅ No breaking changes to existing functionality

@@ -1,11 +1,13 @@
 # Widget Preview Integration
 
 ## Overview
+
 The Widget Preview component provides real-time visualization of widget configuration changes in the dashboard.
 
 ## Setup
 
 ### 1. Build the Widget
+
 Before the preview will work, you need to build the widget package:
 
 ```bash
@@ -14,6 +16,7 @@ pnpm build
 ```
 
 ### 2. Copy Widget to Public Folder
+
 The widget files need to be accessible from Next.js:
 
 ```bash
@@ -22,6 +25,7 @@ cp -r packages/widget/dist/* apps/web/public/widget/
 ```
 
 Or on Windows PowerShell:
+
 ```powershell
 Copy-Item packages\widget\dist\* -Destination apps\web\public\widget\ -Recurse -Force
 ```
@@ -37,7 +41,7 @@ import { WidgetPreview } from "@/components/widgets/widget-preview";
   config={formValues}
   widgetId={widget?.id}
   testimonials={testimonials}
-/>
+/>;
 ```
 
 ## Features
@@ -59,16 +63,18 @@ The preview accepts these props:
 ## Troubleshooting
 
 ### Widget not loading?
+
 1. Make sure you've built the widget: `cd packages/widget && pnpm build`
 2. Copy the build to public folder (see Setup above)
 3. Check browser console for errors
 
 ### Preview not updating?
+
 The preview uses React's `useEffect` with dependencies on the config object. Make sure you're passing the watched form values:
 
 ```tsx
 const watchedValues = form.watch();
-<WidgetPreview config={watchedValues} />
+<WidgetPreview config={watchedValues} />;
 ```
 
 ## Development Workflow

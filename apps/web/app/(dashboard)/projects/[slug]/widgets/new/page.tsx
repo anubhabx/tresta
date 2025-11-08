@@ -27,11 +27,7 @@ export default function NewWidgetPage() {
 
   return (
     <div className="container max-w-7xl py-8">
-      <WidgetBuilder
-        projectSlug={slug}
-        projectId={project.id}
-        mode="create"
-      />
+      <WidgetBuilder projectSlug={slug} projectId={project.id} mode="create" />
     </div>
   );
 }

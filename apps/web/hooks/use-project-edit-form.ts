@@ -104,7 +104,7 @@ export function useProjectEditForm(slug: string) {
           blobUrl: string;
           blobName: string;
         };
-      }>("/media/generate-upload-url", {
+      }>("/api/media/generate-upload-url", {
         filename: file.name,
         contentType: file.type,
         directory: "logos",

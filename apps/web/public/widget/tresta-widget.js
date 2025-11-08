@@ -1,7 +1,16 @@
 var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-(function(exports) {
+var __defNormalProp = (obj, key, value) =>
+  key in obj
+    ? __defProp(obj, key, {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value,
+      })
+    : (obj[key] = value);
+var __publicField = (obj, key, value) =>
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+(function (exports) {
   "use strict";
   const DEFAULT_THEME = {
     primaryColor: "#3b82f6",
@@ -9,8 +18,9 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     textColor: "#1f2937",
     cardBackgroundColor: "#ffffff",
     borderRadius: 12,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    starColor: "#fbbf24"
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    starColor: "#fbbf24",
     // Warm gold for stars
   };
   function generateStyles(theme, _layout, widgetId, settings) {
@@ -671,13 +681,19 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       showAvatar,
       // This is the actual field name from database
       showAuthorRole,
-      showAuthorCompany
+      showAuthorCompany,
     } = settings;
-    const ratingHtml = showRating ? `<div class="tresta-rating">
-         ${Array.from({ length: 5 }).map(
-      (_, i) => i < (testimonial.rating || 5) ? '<svg class="tresta-star" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>' : '<svg class="tresta-star tresta-star-empty" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>'
-    ).join("")}
-       </div>` : "";
+    const ratingHtml = showRating
+      ? `<div class="tresta-rating">
+         ${Array.from({ length: 5 })
+           .map((_, i) =>
+             i < (testimonial.rating || 5)
+               ? '<svg class="tresta-star" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>'
+               : '<svg class="tresta-star tresta-star-empty" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
+           )
+           .join("")}
+       </div>`
+      : "";
     let authorImageHtml = "";
     if (showAvatar) {
       if (testimonial.authorAvatar) {
@@ -694,10 +710,14 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     } else if (showAuthorCompany && testimonial.authorCompany) {
       authorMetaHtml = `<p class="tresta-author-role"><span class="tresta-author-company">${escapeHtml(testimonial.authorCompany)}</span></p>`;
     }
-    const verifiedBadgeHtml = testimonial.isOAuthVerified ? `<span class="tresta-verified-badge" title="Verified via ${testimonial.oauthProvider || "OAuth"}">
+    const verifiedBadgeHtml = testimonial.isOAuthVerified
+      ? `<span class="tresta-verified-badge" title="Verified via ${testimonial.oauthProvider || "OAuth"}">
       <svg width="64px" height="64px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(0)matrix(1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9.78133 3.89027C10.3452 3.40974 10.6271 3.16948 10.9219 3.02859C11.6037 2.70271 12.3963 2.70271 13.0781 3.02859C13.3729 3.16948 13.6548 3.40974 14.2187 3.89027C14.4431 4.08152 14.5553 4.17715 14.6752 4.25747C14.9499 4.4416 15.2584 4.56939 15.5828 4.63344C15.7244 4.66139 15.8713 4.67312 16.1653 4.69657C16.9038 4.7555 17.273 4.78497 17.5811 4.89378C18.2936 5.14546 18.8541 5.70591 19.1058 6.41844C19.2146 6.72651 19.244 7.09576 19.303 7.83426C19.3264 8.12819 19.3381 8.27515 19.3661 8.41669C19.4301 8.74114 19.5579 9.04965 19.7421 9.32437C19.8224 9.44421 19.918 9.55642 20.1093 9.78084C20.5898 10.3447 20.8301 10.6267 20.971 10.9214C21.2968 11.6032 21.2968 12.3958 20.971 13.0776C20.8301 13.3724 20.5898 13.6543 20.1093 14.2182C19.918 14.4426 19.8224 14.5548 19.7421 14.6747C19.5579 14.9494 19.4301 15.2579 19.3661 15.5824C19.3381 15.7239 19.3264 15.8709 19.303 16.1648C19.244 16.9033 19.2146 17.2725 19.1058 17.5806C18.8541 18.2931 18.2936 18.8536 17.5811 19.1053C17.273 19.2141 16.9038 19.2435 16.1653 19.3025C15.8713 19.3259 15.7244 19.3377 15.5828 19.3656C15.2584 19.4297 14.9499 19.5574 14.6752 19.7416C14.5553 19.8219 14.4431 19.9175 14.2187 20.1088C13.6548 20.5893 13.3729 20.8296 13.0781 20.9705C12.3963 21.2963 11.6037 21.2963 10.9219 20.9705C10.6271 20.8296 10.3452 20.5893 9.78133 20.1088C9.55691 19.9175 9.44469 19.8219 9.32485 19.7416C9.05014 19.5574 8.74163 19.4297 8.41718 19.3656C8.27564 19.3377 8.12868 19.3259 7.83475 19.3025C7.09625 19.2435 6.72699 19.2141 6.41893 19.1053C5.7064 18.8536 5.14594 18.2931 4.89427 17.5806C4.78546 17.2725 4.75599 16.9033 4.69706 16.1648C4.6736 15.8709 4.66188 15.7239 4.63393 15.5824C4.56988 15.2579 4.44209 14.9494 4.25796 14.6747C4.17764 14.5548 4.08201 14.4426 3.89076 14.2182C3.41023 13.6543 3.16997 13.3724 3.02907 13.0776C2.7032 12.3958 2.7032 11.6032 3.02907 10.9214C3.16997 10.6266 3.41023 10.3447 3.89076 9.78084C4.08201 9.55642 4.17764 9.44421 4.25796 9.32437C4.44209 9.04965 4.56988 8.74114 4.63393 8.41669C4.66188 8.27515 4.6736 8.12819 4.69706 7.83426C4.75599 7.09576 4.78546 6.72651 4.89427 6.41844C5.14594 5.70591 5.7064 5.14546 6.41893 4.89378C6.72699 4.78497 7.09625 4.7555 7.83475 4.69657C8.12868 4.67312 8.27564 4.66139 8.41718 4.63344C8.74163 4.56939 9.05014 4.4416 9.32485 4.25747C9.4447 4.17715 9.55691 4.08152 9.78133 3.89027Z" stroke="#1C274C" stroke-width="1.44"></path> <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke="#1C274C" stroke-width="1.44" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-      </span>` : "";
-    const dateHtml = showDate ? `<div class="tresta-date">${formatDate(testimonial.createdAt)}</div>` : "";
+      </span>`
+      : "";
+    const dateHtml = showDate
+      ? `<div class="tresta-date">${formatDate(testimonial.createdAt)}</div>`
+      : "";
     return `
     <div class="tresta-testimonial tresta-fade-in" data-testimonial-id="${testimonial.id}">
       ${ratingHtml}
@@ -717,29 +737,39 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   `;
   }
   function renderListLayout(testimonials, settings) {
-    const items = testimonials.map((t) => renderTestimonial(t, settings)).join("");
+    const items = testimonials
+      .map((t) => renderTestimonial(t, settings))
+      .join("");
     return `<div class="tresta-testimonials">${items}</div>`;
   }
   function renderGridLayout(testimonials, settings) {
-    const items = testimonials.map((t) => renderTestimonial(t, settings)).join("");
+    const items = testimonials
+      .map((t) => renderTestimonial(t, settings))
+      .join("");
     return `<div class="tresta-testimonials">${items}</div>`;
   }
   function renderMasonryLayout(testimonials, settings) {
-    const items = testimonials.map((t) => renderTestimonial(t, settings)).join("");
+    const items = testimonials
+      .map((t) => renderTestimonial(t, settings))
+      .join("");
     return `<div class="tresta-testimonials">${items}</div>`;
   }
   function renderCarouselLayout(testimonials, settings, widgetId) {
     return `<div class="tresta-carousel" data-widget-id="${widgetId}"></div>`;
   }
   function renderWallLayout(testimonials, settings) {
-    const items = testimonials.map((t) => renderTestimonial(t, settings)).join("");
+    const items = testimonials
+      .map((t) => renderTestimonial(t, settings))
+      .join("");
     return `<div class="tresta-testimonials">${items}</div>`;
   }
   function renderWidget(testimonials, layout, settings, widgetId) {
     if (!testimonials || testimonials.length === 0) {
       return '<div class="tresta-empty">No testimonials yet.</div>';
     }
-    const limitedTestimonials = settings.maxTestimonials ? testimonials.slice(0, settings.maxTestimonials) : testimonials;
+    const limitedTestimonials = settings.maxTestimonials
+      ? testimonials.slice(0, settings.maxTestimonials)
+      : testimonials;
     switch (layout) {
       case "carousel":
         return renderCarouselLayout(limitedTestimonials, settings, widgetId);
@@ -777,7 +807,12 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   `;
   }
   function escapeHtml(unsafe) {
-    return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
   function getInitials(name) {
     const parts = name.trim().split(/\s+/);
@@ -893,7 +928,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const wrapper = document.createElement("div");
       wrapper.className = "tresta-carousel-wrapper";
       if (this.showNavigation) {
-        this.prevButton = this.createNavigationButton("prev", "Previous testimonial");
+        this.prevButton = this.createNavigationButton(
+          "prev",
+          "Previous testimonial",
+        );
         wrapper.appendChild(this.prevButton);
       }
       this.carouselCard = document.createElement("div");
@@ -903,7 +941,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.carouselCard.appendChild(this.contentContainer);
       wrapper.appendChild(this.carouselCard);
       if (this.showNavigation) {
-        this.nextButton = this.createNavigationButton("next", "Next testimonial");
+        this.nextButton = this.createNavigationButton(
+          "next",
+          "Next testimonial",
+        );
         wrapper.appendChild(this.nextButton);
       }
       this.container.appendChild(wrapper);
@@ -933,7 +974,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       svg.setAttribute("stroke-width", "2.5");
       svg.setAttribute("stroke-linecap", "round");
       svg.setAttribute("stroke-linejoin", "round");
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
       if (direction === "prev") {
         path.setAttribute("d", "M15 18l-6-6 6-6");
       } else {
@@ -950,7 +994,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const indicator = document.createElement("button");
         indicator.setAttribute("aria-label", `Go to testimonial ${index + 1}`);
         indicator.setAttribute("data-index", String(index));
-        indicator.className = index === this.currentIndex ? "tresta-carousel-indicator tresta-carousel-indicator-active" : "tresta-carousel-indicator";
+        indicator.className =
+          index === this.currentIndex
+            ? "tresta-carousel-indicator tresta-carousel-indicator-active"
+            : "tresta-carousel-indicator";
         if (index === this.currentIndex) {
           indicator.setAttribute("aria-current", "true");
         }
@@ -991,7 +1038,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
           avatarElement.alt = testimonial.name;
         } else {
           avatarElement = document.createElement("div");
-          avatarElement.className = "tresta-carousel-avatar tresta-carousel-avatar-initials";
+          avatarElement.className =
+            "tresta-carousel-avatar tresta-carousel-avatar-initials";
           const initials = this.getInitials(testimonial.name);
           const backgroundColor = this.getColorFromName(testimonial.name);
           avatarElement.style.backgroundColor = backgroundColor;
@@ -1034,7 +1082,9 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       if (this.showDate) {
         const dateElement = document.createElement("div");
         dateElement.className = "tresta-carousel-date";
-        dateElement.textContent = this.formatRelativeDate(testimonial.createdAt);
+        dateElement.textContent = this.formatRelativeDate(
+          testimonial.createdAt,
+        );
         this.contentContainer.appendChild(dateElement);
       }
       this.updateAutoplayToggle();
@@ -1049,9 +1099,18 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       svg.setAttribute("stroke-width", "1.5");
       svg.setAttribute("stroke-linecap", "round");
       svg.setAttribute("stroke-linejoin", "round");
-      svg.setAttribute("class", filled ? "tresta-carousel-star-filled" : "tresta-carousel-star-empty");
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z");
+      svg.setAttribute(
+        "class",
+        filled ? "tresta-carousel-star-filled" : "tresta-carousel-star-empty",
+      );
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path.setAttribute(
+        "d",
+        "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+      );
       svg.appendChild(path);
       return svg;
     }
@@ -1066,13 +1125,19 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       svg.setAttribute("stroke", "none");
       svg.style.marginRight = "6px";
       if (this.isAutoPlayActive) {
-        const rect1 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        const rect1 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "rect",
+        );
         rect1.setAttribute("x", "6");
         rect1.setAttribute("y", "4");
         rect1.setAttribute("width", "4");
         rect1.setAttribute("height", "16");
         rect1.setAttribute("rx", "1");
-        const rect2 = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        const rect2 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "rect",
+        );
         rect2.setAttribute("x", "14");
         rect2.setAttribute("y", "4");
         rect2.setAttribute("width", "4");
@@ -1081,12 +1146,17 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         svg.appendChild(rect1);
         svg.appendChild(rect2);
       } else {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path",
+        );
         path.setAttribute("d", "M8 5v14l11-7z");
         svg.appendChild(path);
       }
       this.autoplayToggle.appendChild(svg);
-      const text = document.createTextNode(this.isAutoPlayActive ? "Pause" : "Play");
+      const text = document.createTextNode(
+        this.isAutoPlayActive ? "Pause" : "Play",
+      );
       this.autoplayToggle.appendChild(text);
     }
     setupControls() {
@@ -1113,20 +1183,28 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     }
     setupTouchSupport() {
       if (!this.carouselCard) return;
-      this.carouselCard.addEventListener("touchstart", (e) => {
-        const touch = e.touches[0];
-        if (touch) {
-          this.touchStartX = touch.clientX;
-          this.isDragging = true;
-        }
-      }, { passive: true });
-      this.carouselCard.addEventListener("touchmove", (e) => {
-        if (!this.isDragging) return;
-        const touch = e.touches[0];
-        if (touch) {
-          this.touchEndX = touch.clientX;
-        }
-      }, { passive: true });
+      this.carouselCard.addEventListener(
+        "touchstart",
+        (e) => {
+          const touch = e.touches[0];
+          if (touch) {
+            this.touchStartX = touch.clientX;
+            this.isDragging = true;
+          }
+        },
+        { passive: true },
+      );
+      this.carouselCard.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!this.isDragging) return;
+          const touch = e.touches[0];
+          if (touch) {
+            this.touchEndX = touch.clientX;
+          }
+        },
+        { passive: true },
+      );
       this.carouselCard.addEventListener("touchend", () => {
         if (!this.isDragging) return;
         this.isDragging = false;
@@ -1347,7 +1425,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       __publicField(this, "effectiveLayout", null);
       this.config = {
         apiUrl: "http://localhost:8000",
-        ...config
+        ...config,
       };
       this.init();
     }
@@ -1366,12 +1444,18 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         if (this.config.mockData) {
           this.widget = this.config.mockData.widget;
           this.testimonials = this.config.mockData.testimonials || [];
-          console.log("[TrestaWidget] Using mock data:", { widget: this.widget, testimonials: this.testimonials });
+          console.log("[TrestaWidget] Using mock data:", {
+            widget: this.widget,
+            testimonials: this.testimonials,
+          });
         } else {
           console.log("[TrestaWidget] Fetching from API...");
           await this.fetchWidgetData();
         }
-        console.log("[TrestaWidget] About to inject styles, widget is:", this.widget);
+        console.log(
+          "[TrestaWidget] About to inject styles, widget is:",
+          this.widget,
+        );
         this.injectWidgetStyles();
         console.log("[TrestaWidget] About to render widget");
         this.renderWidget();
@@ -1398,7 +1482,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       if (!this.config.container) {
         const scripts = document.querySelectorAll("script[data-tresta-widget]");
         const currentScript = Array.from(scripts).find(
-          (script) => script.getAttribute("data-tresta-widget") === this.config.widgetId
+          (script) =>
+            script.getAttribute("data-tresta-widget") === this.config.widgetId,
         );
         if (currentScript) {
           const containerId = currentScript.getAttribute("data-container");
@@ -1410,7 +1495,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
           container2.className = `tresta-widget-${this.config.widgetId}`;
           currentScript.parentNode?.insertBefore(
             container2,
-            currentScript.nextSibling
+            currentScript.nextSibling,
           );
           return container2;
         }
@@ -1433,12 +1518,12 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch widget data: ${response.status} ${response.statusText}`
+          `Failed to fetch widget data: ${response.status} ${response.statusText}`,
         );
       }
       const result = await response.json();
@@ -1449,7 +1534,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.testimonials = result.data.testimonials || [];
       console.log("API Response:", {
         widget: this.widget,
-        testimonials: this.testimonials
+        testimonials: this.testimonials,
       });
     }
     /**
@@ -1460,11 +1545,11 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const theme = {
         ...DEFAULT_THEME,
         ...this.widget.theme,
-        ...this.config.theme
+        ...this.config.theme,
       };
       const settings = {
         ...this.widget.settings,
-        ...this.config.settings
+        ...this.config.settings,
       };
       const layout = this.config.settings?.layout || this.widget.layout;
       const css = generateStyles(theme, layout, this.config.widgetId, settings);
@@ -1477,7 +1562,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       if (!this.widget || !this.container) return;
       const settings = {
         ...this.widget.settings,
-        ...this.config.settings
+        ...this.config.settings,
       };
       const layout = this.config.settings?.layout || this.widget.layout;
       this.effectiveLayout = layout;
@@ -1485,13 +1570,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         fromAPI: this.widget.settings,
         fromConfig: this.config.settings,
         merged: settings,
-        layout
+        layout,
       });
       const widgetHtml = renderWidget(
         this.testimonials,
         layout,
         settings,
-        this.config.widgetId
+        this.config.widgetId,
       );
       const brandingHtml = renderBranding();
       const fullHtml = `
@@ -1510,9 +1595,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const layout = this.config.settings?.layout || this.widget.layout;
       if (layout !== "carousel") return;
       const settings = this.widget.settings;
-      const carouselContainer = this.container.querySelector(
-        ".tresta-carousel"
-      );
+      const carouselContainer =
+        this.container.querySelector(".tresta-carousel");
       if (!carouselContainer) return;
       const carouselTestimonials = this.testimonials.map((t) => ({
         id: t.id,
@@ -1524,7 +1608,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         rating: t.rating,
         createdAt: t.createdAt,
         isOAuthVerified: t.isOAuthVerified,
-        oauthProvider: t.oauthProvider
+        oauthProvider: t.oauthProvider,
       }));
       const carousel = new Carousel({
         container: carouselContainer,
@@ -1539,7 +1623,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         // Add navigation control
         onSlideChange: (index) => {
           this.currentSlide = index;
-        }
+        },
       });
       this.carouselInstance = carousel;
     }
@@ -1611,22 +1695,34 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   }
   // Static methods for global widget management (implemented in index.ts)
   __publicField(TrestaWidget, "init", () => {
-    throw new Error("TrestaWidget.init not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.init not initialized. Make sure the widget script is loaded.",
+    );
   });
   __publicField(TrestaWidget, "destroy", () => {
-    throw new Error("TrestaWidget.destroy not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.destroy not initialized. Make sure the widget script is loaded.",
+    );
   });
   __publicField(TrestaWidget, "refresh", async () => {
-    throw new Error("TrestaWidget.refresh not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.refresh not initialized. Make sure the widget script is loaded.",
+    );
   });
   __publicField(TrestaWidget, "refreshAll", async () => {
-    throw new Error("TrestaWidget.refreshAll not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.refreshAll not initialized. Make sure the widget script is loaded.",
+    );
   });
   __publicField(TrestaWidget, "get", () => {
-    throw new Error("TrestaWidget.get not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.get not initialized. Make sure the widget script is loaded.",
+    );
   });
   __publicField(TrestaWidget, "getAll", () => {
-    throw new Error("TrestaWidget.getAll not initialized. Make sure the widget script is loaded.");
+    throw new Error(
+      "TrestaWidget.getAll not initialized. Make sure the widget script is loaded.",
+    );
   });
   window.TrestaWidget = TrestaWidget;
   window.trestaWidgets = window.trestaWidgets || /* @__PURE__ */ new Map();
@@ -1639,24 +1735,31 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const config = {
         widgetId,
         apiUrl: script.getAttribute("data-api-url") || void 0,
-        container: script.getAttribute("data-container") || void 0
+        container: script.getAttribute("data-container") || void 0,
       };
       const primaryColor = script.getAttribute("data-primary-color");
       const backgroundColor = script.getAttribute("data-background-color");
       const textColor = script.getAttribute("data-text-color");
       const cardBackgroundColor = script.getAttribute(
-        "data-card-background-color"
+        "data-card-background-color",
       );
       const borderRadius = script.getAttribute("data-border-radius");
       const fontFamily = script.getAttribute("data-font-family");
-      if (primaryColor || backgroundColor || textColor || cardBackgroundColor || borderRadius || fontFamily) {
+      if (
+        primaryColor ||
+        backgroundColor ||
+        textColor ||
+        cardBackgroundColor ||
+        borderRadius ||
+        fontFamily
+      ) {
         config.theme = {
-          ...primaryColor && { primaryColor },
-          ...backgroundColor && { backgroundColor },
-          ...textColor && { textColor },
-          ...cardBackgroundColor && { cardBackgroundColor },
-          ...borderRadius && { borderRadius: parseInt(borderRadius, 10) },
-          ...fontFamily && { fontFamily }
+          ...(primaryColor && { primaryColor }),
+          ...(backgroundColor && { backgroundColor }),
+          ...(textColor && { textColor }),
+          ...(cardBackgroundColor && { cardBackgroundColor }),
+          ...(borderRadius && { borderRadius: parseInt(borderRadius, 10) }),
+          ...(fontFamily && { fontFamily }),
         };
       }
       const showRating = script.getAttribute("data-show-rating");
@@ -1667,18 +1770,29 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const autoplay = script.getAttribute("data-autoplay");
       const autoplaySpeed = script.getAttribute("data-autoplay-speed");
       const maxItems = script.getAttribute("data-max-items");
-      if (showRating || showDate || showAuthorImage || showAuthorRole || showAuthorCompany || autoplay || autoplaySpeed || maxItems) {
+      if (
+        showRating ||
+        showDate ||
+        showAuthorImage ||
+        showAuthorRole ||
+        showAuthorCompany ||
+        autoplay ||
+        autoplaySpeed ||
+        maxItems
+      ) {
         config.settings = {
-          ...showRating && { showRating: showRating === "true" },
-          ...showDate && { showDate: showDate === "true" },
-          ...showAuthorImage && { showAuthorImage: showAuthorImage === "true" },
-          ...showAuthorRole && { showAuthorRole: showAuthorRole === "true" },
-          ...showAuthorCompany && {
-            showAuthorCompany: showAuthorCompany === "true"
-          },
-          ...autoplay && { autoplay: autoplay === "true" },
-          ...autoplaySpeed && { autoplaySpeed: parseInt(autoplaySpeed, 10) },
-          ...maxItems && { maxItems: parseInt(maxItems, 10) }
+          ...(showRating && { showRating: showRating === "true" }),
+          ...(showDate && { showDate: showDate === "true" }),
+          ...(showAuthorImage && {
+            showAuthorImage: showAuthorImage === "true",
+          }),
+          ...(showAuthorRole && { showAuthorRole: showAuthorRole === "true" }),
+          ...(showAuthorCompany && {
+            showAuthorCompany: showAuthorCompany === "true",
+          }),
+          ...(autoplay && { autoplay: autoplay === "true" }),
+          ...(autoplaySpeed && { autoplaySpeed: parseInt(autoplaySpeed, 10) }),
+          ...(maxItems && { maxItems: parseInt(maxItems, 10) }),
         };
       }
       try {
@@ -1697,7 +1811,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   TrestaWidget.init = (widgetId, config) => {
     const fullConfig = {
       widgetId,
-      ...config
+      ...config,
     };
     const widget = new TrestaWidget(fullConfig);
     window.trestaWidgets.set(widgetId, widget);
@@ -1717,8 +1831,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     }
   };
   TrestaWidget.refreshAll = async () => {
-    const promises = Array.from(window.trestaWidgets.values()).map(
-      (widget) => widget.refresh()
+    const promises = Array.from(window.trestaWidgets.values()).map((widget) =>
+      widget.refresh(),
     );
     await Promise.all(promises);
   };
@@ -1733,5 +1847,5 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   }
   exports.TrestaWidget = TrestaWidget;
   Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-})(this.TrestaWidget = this.TrestaWidget || {});
+})((this.TrestaWidget = this.TrestaWidget || {}));
 //# sourceMappingURL=tresta-widget.js.map

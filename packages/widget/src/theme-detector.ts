@@ -24,12 +24,12 @@ export function detectHostTheme(container: HTMLElement): DetectedTheme {
 
   // Try to detect primary/brand color from common CSS variable names
   const primaryColorVars = [
-    '--primary-color',
-    '--brand-color',
-    '--accent-color',
-    '--theme-primary',
-    '--color-primary',
-    '--primary',
+    "--primary-color",
+    "--brand-color",
+    "--accent-color",
+    "--theme-primary",
+    "--color-primary",
+    "--primary",
   ];
 
   for (const varName of primaryColorVars) {
@@ -42,7 +42,7 @@ export function detectHostTheme(container: HTMLElement): DetectedTheme {
 
   // Detect background color
   const bgColor = containerStyles.backgroundColor || bodyStyles.backgroundColor;
-  if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+  if (bgColor && bgColor !== "rgba(0, 0, 0, 0)" && bgColor !== "transparent") {
     detectedTheme.backgroundColor = bgColor;
   }
 
@@ -66,7 +66,7 @@ export function detectHostTheme(container: HTMLElement): DetectedTheme {
 
   // Detect font family
   const fontFamily = containerStyles.fontFamily || bodyStyles.fontFamily;
-  if (fontFamily && fontFamily !== 'serif' && fontFamily !== 'sans-serif') {
+  if (fontFamily && fontFamily !== "serif" && fontFamily !== "sans-serif") {
     detectedTheme.fontFamily = fontFamily;
   }
 
@@ -79,7 +79,7 @@ export function detectHostTheme(container: HTMLElement): DetectedTheme {
 function isValidColor(color: string): boolean {
   const s = new Option().style;
   s.color = color;
-  return s.color !== '';
+  return s.color !== "";
 }
 
 /**
@@ -98,9 +98,11 @@ function isColorDark(color: string): boolean {
 /**
  * Extract RGB values from a CSS color string
  */
-function getRGBFromColor(color: string): { r: number; g: number; b: number } | null {
+function getRGBFromColor(
+  color: string,
+): { r: number; g: number; b: number } | null {
   // Create a temporary element to compute the color
-  const temp = document.createElement('div');
+  const temp = document.createElement("div");
   temp.style.color = color;
   document.body.appendChild(temp);
   const computed = window.getComputedStyle(temp).color;
@@ -153,5 +155,8 @@ function darkenColor(color: string, percent: number): string {
  * Check if user prefers dark color scheme
  */
 export function prefersDarkMode(): boolean {
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
 }
