@@ -1,0 +1,163 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { widgets } from "@/lib/queries";
+import { LoadingStars } from "@/components/loader";
+import { WidgetForm } from "@/components/widgets/widget-form";
+import { WidgetPreview } from "@/components/widgets/widget-preview";
+import type { WidgetFormData } from "@/components/widgets/widget-form";
+import { Button } from "@workspace/ui/components/button";
+import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
+import { useState } from "react";
+
+interface WidgetBuilderProps {
+  projectSlug: string;
+  projectId: string;
+  widgetId?: string;
+  mode: "create" | "edit";
+}
+
+export function WidgetBuilder({
+  projectSlug,
+  projectId,
+  widgetId,
+  mode,
+}: WidgetBuilderProps) {
+  const router = useRouter();
+  const [previewConfig, setPreviewConfig] = useState<WidgetFormData | null>(null);
+
+  // Fetch widgets list and find the specific widget if editing
+  const { data: widgetsList, isLoading: isLoadingWidget } = widgets.queries.useList(projectSlug);
+  
+  const widget = mode === "edit" && widgetsList 
+    ? widgetsList.find(w => w.id === widgetId)
+    : undefined;
+
+  const createWidget = widgets.mutations.useCreate();
+  const updateWidget = widgets.mutations.useUpdate(widgetId || "");
+
+  const handleSubmit = async (data: WidgetFormData) => {
+    try {
+      if (mode === "create") {
+        await createWidget.mutateAsync({
+          projectId,
+          embedType: data.embedType,
+          config: {
+            layout: data.layout,
+            theme: data.theme,
+            primaryColor: data.primaryColor,
+            secondaryColor: data.secondaryColor,
+            showRating: data.showRating,
+            showDate: data.showDate,
+            showAvatar: data.showAvatar,
+            maxTestimonials: data.maxTestimonials,
+            autoRotate: data.autoRotate,
+            rotateInterval: data.rotateInterval,
+            columns: data.columns,
+            cardStyle: data.cardStyle,
+            animation: data.animation,
+          },
+        });
+        toast.success("Widget created successfully!");
+      } else {
+        await updateWidget.mutateAsync({
+          embedType: data.embedType,
+          config: {
+            layout: data.layout,
+            theme: data.theme,
+            primaryColor: data.primaryColor,
+            secondaryColor: data.secondaryColor,
+            showRating: data.showRating,
+            showDate: data.showDate,
+            showAvatar: data.showAvatar,
+            maxTestimonials: data.maxTestimonials,
+            autoRotate: data.autoRotate,
+            rotateInterval: data.rotateInterval,
+            columns: data.columns,
+            cardStyle: data.cardStyle,
+            animation: data.animation,
+          },
+        });
+        toast.success("Widget updated successfully!");
+      }
+      router.push(`/projects/${projectSlug}?tab=widgets`);
+    } catch (error: any) {
+      toast.error(error?.message || `Failed to ${mode} widget`);
+    }
+  };
+
+  const handleCancel = () => {
+    router.push(`/projects/${projectSlug}?tab=widgets`);
+  };
+
+  if (mode === "edit" && isLoadingWidget) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <LoadingStars />
+      </div>
+    );
+  }
+
+  const isSubmitting = createWidget.isPending || updateWidget.isPending;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleCancel}
+          className="h-8 w-8"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold">
+            {mode === "create" ? "Create New Widget" : "Edit Widget"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {mode === "create"
+              ? "Configure and preview your widget in real-time"
+              : "Update widget configuration and see changes instantly"}
+          </p>
+        </div>
+      </div>
+
+      {/* Split Layout: Form (Left) | Preview (Right) */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Left Column: Form */}
+        <div className="space-y-6">
+          <div className="rounded-lg border bg-card">
+            <div className="border-b p-6">
+              <h2 className="text-lg font-semibold">Widget Settings</h2>
+              <p className="text-sm text-muted-foreground">
+                Customize your widget appearance and behavior
+              </p>
+            </div>
+            <div className="p-6">
+              <WidgetForm
+                initialData={mode === "edit" ? widget : undefined}
+                onSubmit={handleSubmit}
+                onCancel={handleCancel}
+                isSubmitting={isSubmitting}
+                onConfigChange={setPreviewConfig}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Live Preview - Sticky */}
+        <div className="lg:sticky lg:top-6 lg:h-fit">
+          <div className="rounded-lg border bg-card p-6">
+            <WidgetPreview
+              config={previewConfig || ({} as WidgetFormData)}
+              widgetId={widgetId}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@workspace/ui/components/button";
@@ -40,6 +41,7 @@ interface WidgetFormProps {
   onSubmit: (data: WidgetFormData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  onConfigChange?: (config: WidgetFormData) => void;
 }
 
 export function WidgetForm({
@@ -47,6 +49,7 @@ export function WidgetForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
+  onConfigChange,
 }: WidgetFormProps) {
   const form = useForm<WidgetFormData>({
     resolver: zodResolver(widgetFormSchema),
@@ -88,6 +91,13 @@ export function WidgetForm({
   const watchLayout = form.watch("layout");
   const watchAutoRotate = form.watch("autoRotate");
   const watchedValues = form.watch(); // Watch all form values for preview
+
+  // Notify parent component of config changes for preview
+  useEffect(() => {
+    if (onConfigChange) {
+      onConfigChange(watchedValues as WidgetFormData);
+    }
+  }, [watchedValues, onConfigChange]);
 
   return (
     <Form {...form}>
