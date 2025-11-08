@@ -14,6 +14,7 @@ import {
   WidgetDisplaySection,
   WidgetLayoutSection,
 } from "./widget-form-sections";
+import { WidgetPreview } from "./widget-preview";
 
 const widgetFormSchema = z.object({
   embedType: z.string().min(1, "Embed type is required"),
@@ -86,6 +87,7 @@ export function WidgetForm({
 
   const watchLayout = form.watch("layout");
   const watchAutoRotate = form.watch("autoRotate");
+  const watchedValues = form.watch(); // Watch all form values for preview
 
   return (
     <Form {...form}>
@@ -98,6 +100,14 @@ export function WidgetForm({
           control={form.control}
           layout={watchLayout}
           autoRotate={watchAutoRotate}
+        />
+
+        <Separator />
+
+        {/* Live Preview */}
+        <WidgetPreview
+          config={watchedValues}
+          widgetId={initialData?.id}
         />
 
         <Separator />
