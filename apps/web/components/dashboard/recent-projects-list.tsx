@@ -22,7 +22,7 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
             <Link
               key={project.id}
               href={`/projects/${project.slug}`}
-              className="flex items-center border border-border/50 shadow-md justify-between p-3 sm:p-4 rounded-lg hover:bg-accent/50 active:bg-accent transition-colors group min-h-[60px] touch-manipulation"
+              className="flex items-center border border-border/50 shadow-md justify-between p-3 sm:p-4 rounded-lg hover:border-border hover:shadow-lg active:bg-accent transition-colors group min-h-[60px] touch-manipulation"
             >
               <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors">

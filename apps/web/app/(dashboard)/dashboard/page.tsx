@@ -11,7 +11,7 @@ import {
   DashboardEmptyState,
   GettingStartedCard,
   PendingActionsCard,
-  QuickInsightsCard,
+  StatusOverviewCard,
 } from "@/components/dashboard";
 import { useUser } from "@clerk/nextjs";
 
@@ -90,7 +90,10 @@ const DashboardPage = () => {
             />
           </section>
 
-          {/* Two Column Layout for Recent Projects and Quick Insights */}
+          {/* Pending Actions - Only shows when there are actionable items */}
+          <PendingActionsCard projects={projectsList} />
+
+          {/* Two Column Layout for Recent Projects and Status Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Recent Projects - Takes 2 columns */}
             <section className="lg:col-span-2">
@@ -102,14 +105,14 @@ const DashboardPage = () => {
               <RecentProjectsList projects={recentProjects} />
             </section>
 
-            {/* Quick Insights - Takes 1 column */}
+            {/* Status Overview - Takes 1 column */}
             <section>
               <div className="mb-3 sm:mb-4">
                 <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Quick Insights
+                  Status Overview
                 </h2>
               </div>
-              <QuickInsightsCard projects={projectsList} />
+              <StatusOverviewCard projects={projectsList} />
             </section>
           </div>
 

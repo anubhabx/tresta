@@ -39,11 +39,11 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
   return (
     <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {/* Top performing project */}
           <Link
             href={`/projects/${topProject.slug}`}
-            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors group"
+            className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
           >
             <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex-shrink-0 mt-0.5">
               <TrophyIcon className="h-4 w-4 text-amber-600 dark:text-amber-500" />
@@ -65,7 +65,7 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
           {/* Most recent activity */}
           <Link
             href={`/projects/${mostRecentProject.slug}`}
-            className="flex items-start gap-3 p-3 rounded-lg transition-colors group"
+            className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
           >
             <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex-shrink-0 mt-0.5">
               <ClockIcon className="h-4 w-4 text-blue-600 dark:text-blue-500" />
