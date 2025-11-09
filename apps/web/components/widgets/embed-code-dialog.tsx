@@ -6,20 +6,28 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
 } from "@workspace/ui/components/tabs";
-import { CopyIcon, CheckIcon, Code2Icon, ExternalLinkIcon } from "lucide-react";
+import {
+  CopyIcon,
+  CheckIcon,
+  Code2Icon,
+  ExternalLinkIcon,
+  AlertTriangle
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface EmbedCodeDialogProps {
   widgetId: string;
+  apiKey?: string; // API key for the widget (optional for backward compatibility)
+  projectSlug?: string; // Project slug to link to API keys page
   isOpen: boolean;
   onClose: () => void;
 }
@@ -47,7 +55,7 @@ function CodeTab({
   copiedTab,
   onCopy,
   extraAction,
-  additionalContent,
+  additionalContent
 }: CodeTabProps) {
   return (
     <div className="space-y-3 min-h-[300px]">
@@ -89,8 +97,10 @@ function CodeTab({
 
 export function EmbedCodeDialog({
   widgetId,
+  apiKey,
+  projectSlug,
   isOpen,
-  onClose,
+  onClose
 }: EmbedCodeDialogProps) {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
@@ -99,9 +109,17 @@ export function EmbedCodeDialog({
   const iframeUrl = `${apiUrl}/api/public/embed/${widgetId}`;
   const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 
+  const apiKeyPlaceholder = "YOUR_API_KEY_HERE";
+  const displayApiKey = apiKey || apiKeyPlaceholder;
+
   const embedCodes = {
     script: `<!-- Tresta Widget -->
-<script src="${widgetScriptUrl}" data-tresta-widget="${widgetId}" data-api-url="${apiUrl}"></script>`,
+<script 
+  src="${widgetScriptUrl}" 
+  data-tresta-widget="${widgetId}" 
+  data-api-url="${apiUrl}"
+  data-api-key="${displayApiKey}">
+</script>`,
 
     iframe: `<!-- Tresta Widget (iframe) -->
 <iframe
@@ -121,6 +139,7 @@ function TestimonialWidget() {
     const script = document.createElement('script');
     script.src = '${widgetScriptUrl}';
     script.setAttribute('data-tresta-widget', '${widgetId}');
+    script.setAttribute('data-api-key', '${displayApiKey}');
     document.body.appendChild(script);
 
     return () => {
@@ -135,7 +154,8 @@ function TestimonialWidget() {
   return <div id="tresta-widget-container" />;
 }`,
 
-    api: `GET ${apiEndpointUrl}`,
+    api: `curl -X GET "${apiEndpointUrl}" \\
+  -H "Authorization: Bearer ${displayApiKey}"`
   };
 
   const tabConfigs = [
@@ -145,7 +165,7 @@ function TestimonialWidget() {
       title: "Vanilla JavaScript",
       code: embedCodes.script,
       description:
-        "Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials with the configured layout and styling.",
+        "Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials with the configured layout and styling."
     },
     {
       id: "iframe",
@@ -153,7 +173,7 @@ function TestimonialWidget() {
       title: "iframe Embed",
       code: embedCodes.iframe,
       description:
-        "Simple iframe embed. Adjust width and height as needed for your design.",
+        "Simple iframe embed. Adjust width and height as needed for your design."
     },
     {
       id: "react",
@@ -161,7 +181,7 @@ function TestimonialWidget() {
       title: "React Component",
       code: embedCodes.react,
       description:
-        "For React/Next.js projects. The widget script handles all rendering automatically with your configured settings.",
+        "For React/Next.js projects. The widget script handles all rendering automatically with your configured settings."
     },
     {
       id: "api",
@@ -169,11 +189,17 @@ function TestimonialWidget() {
       title: "API Endpoint",
       code: embedCodes.api,
       description:
-        "Public API endpoint. No authentication required. Cached for 5 minutes. Build your own custom integration.",
+        "Public API endpoint with API key authentication. Cached for 5 minutes. Build your own custom integration.",
       extraAction: {
         label: "Test",
         icon: <ExternalLinkIcon className="h-4 w-4 mr-1.5" />,
-        onClick: () => window.open(apiEndpointUrl, "_blank"),
+        onClick: () => {
+          // Open with API key in authorization header (browser can't set headers directly, so just show the URL)
+          toast.info(
+            "Include Authorization: Bearer YOUR_API_KEY header when making requests"
+          );
+          window.open(apiEndpointUrl, "_blank");
+        }
       },
       additionalContent: (
         <div>
@@ -197,8 +223,8 @@ function TestimonialWidget() {
 }`}</code>
           </pre>
         </div>
-      ),
-    },
+      )
+    }
   ];
 
   const handleCopy = async (code: string, tab: string) => {
@@ -224,6 +250,25 @@ function TestimonialWidget() {
             Copy and paste the code below to embed testimonials on your website
           </DialogDescription>
         </DialogHeader>
+
+        {!apiKey && (
+          <div className="shrink-0 p-3 bg-info-bg border border-border rounded-md">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-info-text mt-0.5" />
+              <div className="flex-1 text-sm text-info-text">
+                <p className="font-medium">API Key Required</p>
+                <p className="text-xs mt-1">
+                  Create an API key in the <strong>API Keys</strong> tab to
+                  enable widget embedding. Replace{" "}
+                  <code className="px-1 py-0.5 bg-info-highlight-bg rounded">
+                    YOUR_API_KEY_HERE
+                  </code>{" "}
+                  with your actual API key.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Tabs
           defaultValue="script"

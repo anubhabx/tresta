@@ -8,6 +8,7 @@ import {
   ApiError,
   ForbiddenError,
   InternalServerError,
+  ValidationError,
   handlePrismaError,
 } from "../lib/errors.ts";
 import { ResponseHandler } from "../lib/response.ts";
@@ -24,40 +25,63 @@ const createWidget = async (
     const { projectId, config } = req.body;
 
     // Validate required fields
-    if (!projectId) {
-      throw new BadRequestError("Project ID is required");
+    if (!projectId || typeof projectId !== 'string') {
+      throw new ValidationError("Project ID is required and must be a string", {
+        field: 'projectId',
+        received: typeof projectId
+      });
     }
 
     // Validate the config using Zod schema
     if (!config || typeof config !== "object") {
-      throw new BadRequestError("Invalid widget configuration");
+      throw new ValidationError("Widget configuration is required and must be an object", {
+        field: 'config',
+        received: typeof config
+      });
     }
 
     let validatedConfig: WidgetConfig;
     try {
       validatedConfig = validateWidgetConfig(config);
     } catch (error: any) {
-      throw new BadRequestError(
+      throw new ValidationError(
         `Invalid widget configuration: ${error.message}`,
+        {
+          field: 'config',
+          error: error.message
+        }
       );
     }
 
     // Check if project exists
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-    });
+    let project;
+    try {
+      project = await prisma.project.findUnique({
+        where: { id: projectId },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!project) {
-      throw new NotFoundError("Project not found");
+      throw new NotFoundError(`Project with ID "${projectId}" not found`, {
+        projectId,
+        suggestion: 'Please check the project ID'
+      });
     }
 
     // Create the widget with validated config
-    const widget = await prisma.widget.create({
-      data: {
-        projectId,
-        config: validatedConfig as any,
-      },
-    });
+    let widget;
+    try {
+      widget = await prisma.widget.create({
+        data: {
+          projectId,
+          config: validatedConfig as any,
+        },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     ResponseHandler.success(res, {
       message: "Widget created successfully",
@@ -134,12 +158,17 @@ const updateWidget = async (
     }
 
     // Update the widget
-    const updatedWidget = await prisma.widget.update({
-      where: { id: widgetId },
-      data: {
-        config: (validatedConfig ?? existingWidget.config) as any,
-      },
-    });
+    let updatedWidget;
+    try {
+      updatedWidget = await prisma.widget.update({
+        where: { id: widgetId },
+        data: {
+          config: (validatedConfig ?? existingWidget.config) as any,
+        },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     ResponseHandler.success(res, {
       message: "Widget updated successfully",
@@ -159,23 +188,38 @@ const deleteWidget = async (
     const { widgetId } = req.params;
 
     // Validate widget ID
-    if (!widgetId) {
-      throw new BadRequestError("Widget ID is required");
+    if (!widgetId || typeof widgetId !== 'string') {
+      throw new ValidationError("Widget ID is required and must be a string", {
+        field: 'widgetId',
+        received: typeof widgetId
+      });
     }
 
     // Find the existing widget
-    const existingWidget = await prisma.widget.findUnique({
-      where: { id: widgetId },
-    });
+    let existingWidget;
+    try {
+      existingWidget = await prisma.widget.findUnique({
+        where: { id: widgetId },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!existingWidget) {
-      throw new NotFoundError("Widget not found");
+      throw new NotFoundError(`Widget with ID "${widgetId}" not found`, {
+        widgetId,
+        suggestion: 'The widget may have already been deleted'
+      });
     }
 
     // Delete the widget
-    await prisma.widget.delete({
-      where: { id: widgetId },
-    });
+    try {
+      await prisma.widget.delete({
+        where: { id: widgetId },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     ResponseHandler.success(res, {
       message: "Widget deleted successfully",
@@ -252,6 +296,13 @@ const fetchPublicWidgetData = async (
     if (widget.Project.visibility !== "PUBLIC") {
       throw new ForbiddenError(
         "Widgets can only be embedded for public projects",
+      );
+    }
+
+    // Verify API key has access to this project
+    if (req.apiKey && req.apiKey.projectId !== widget.Project.id) {
+      throw new ForbiddenError(
+        "API key does not have permission to access this widget's project",
       );
     }
 

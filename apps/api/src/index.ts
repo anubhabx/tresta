@@ -18,6 +18,7 @@ import { dynamicCors } from "./middleware/cors.middleware.ts";
 import { projectRouter } from "./routes/project.route.ts";
 import { mediaRouter } from "./routes/media.route.ts";
 import { widgetRouter } from "./routes/widget.route.ts";
+import apiKeyRouter from "./routes/api-key.route.ts";
 import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
@@ -65,6 +66,7 @@ app.use("/api/public", publicRouter);
 
 // Protected routes (use global restrictive CORS)
 app.use("/api/projects", attachUser, projectRouter);
+app.use("/api/projects", apiKeyRouter); // API key routes (has its own auth middleware)
 app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
 

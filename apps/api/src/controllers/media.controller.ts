@@ -1,7 +1,12 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import { ResponseHandler } from "../lib/response.ts";
-import { BadRequestError } from "../lib/errors.ts";
+import { 
+  BadRequestError, 
+  ValidationError, 
+  ForbiddenError,
+  handlePrismaError 
+} from "../lib/errors.ts";
 import {
   blobStorageService,
   StorageDirectory,
@@ -43,8 +48,17 @@ const generateUploadUrl = async (
     const validationResult = generateUploadUrlSchema.safeParse(req.body);
 
     if (!validationResult.success) {
-      throw new BadRequestError(
-        validationResult.error.errors[0]?.message || "Invalid request data",
+      const firstError = validationResult.error.errors[0];
+      throw new ValidationError(
+        firstError?.message || "Invalid request data",
+        {
+          field: firstError?.path.join('.'),
+          issues: validationResult.error.errors.map(err => ({
+            path: err.path.join('.'),
+            message: err.message,
+            code: err.code
+          }))
+        }
       );
     }
 
@@ -86,7 +100,16 @@ const generateReadUrl = async (
     const { blobName } = req.body;
 
     if (!blobName || typeof blobName !== "string") {
-      throw new BadRequestError("Blob name is required");
+      throw new ValidationError("Blob name is required and must be a string", {
+        field: 'blobName',
+        received: typeof blobName
+      });
+    }
+
+    if (blobName.trim().length === 0) {
+      throw new ValidationError("Blob name cannot be empty", {
+        field: 'blobName'
+      });
     }
 
     // Generate read URL with SAS token
@@ -113,8 +136,11 @@ const deleteBlob = async (req: Request, res: Response, next: NextFunction) => {
     const { blobName } = req.params;
     const userId = req.user?.id;
 
-    if (!blobName) {
-      throw new BadRequestError("Blob name is required");
+    if (!blobName || typeof blobName !== 'string') {
+      throw new ValidationError("Blob name is required", {
+        field: 'blobName',
+        received: typeof blobName
+      });
     }
 
     if (!userId) {
@@ -134,8 +160,13 @@ const deleteBlob = async (req: Request, res: Response, next: NextFunction) => {
 
       // If the blob has a userId in its path, verify it matches
       if (blobUserId !== userId) {
-        throw new BadRequestError(
+        throw new ForbiddenError(
           "You do not have permission to delete this file",
+          {
+            blobName: decodedBlobName,
+            userId,
+            blobUserId
+          }
         );
       }
     }
@@ -160,8 +191,11 @@ const getBlobMetadata = async (
   try {
     const { blobName } = req.params;
 
-    if (!blobName) {
-      throw new BadRequestError("Blob name is required");
+    if (!blobName || typeof blobName !== 'string') {
+      throw new ValidationError("Blob name is required", {
+        field: 'blobName',
+        received: typeof blobName
+      });
     }
 
     const metadata = await blobStorageService.getBlobMetadata(

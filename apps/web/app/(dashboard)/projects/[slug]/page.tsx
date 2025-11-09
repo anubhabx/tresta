@@ -25,6 +25,7 @@ import {
   ProjectOverviewTab,
   ProjectSettingsTab,
   ProjectWidgetsTab,
+  ProjectApiKeysTab,
 } from "@/components/project-detail";
 
 interface ProjectPageProps {
@@ -86,6 +87,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           <TabsTrigger value="moderation">Moderation</TabsTrigger>
           <TabsTrigger value="widgets">Widgets</TabsTrigger>
+          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -134,6 +136,10 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
               <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="api-keys" className="space-y-4">
+          <ProjectApiKeysTab project={project} />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">

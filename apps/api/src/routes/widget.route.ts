@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { attachUser } from "../middleware/auth.middleware.ts";
+import { validateApiKeyMiddleware, requirePermission } from "../middleware/api-key.middleware.ts";
 import {
   createWidget,
   updateWidget,
@@ -10,9 +11,14 @@ import {
 
 const router: Router = Router();
 
-// Public route - no authentication required, open CORS handled by dynamic middleware
+// Public widget data endpoint - requires API key authentication
 // GET /api/widgets/:widgetId/public - Fetch widget data for embedding
-router.get("/:widgetId/public", fetchPublicWidgetData);
+router.get(
+  "/:widgetId/public", 
+  validateApiKeyMiddleware, 
+  requirePermission('widgets'), 
+  fetchPublicWidgetData
+);
 
 // Protected routes - require authentication (use global restrictive CORS)
 // POST /api/widgets - Create a new widget

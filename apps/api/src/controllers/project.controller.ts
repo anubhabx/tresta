@@ -6,6 +6,8 @@ import {
   UnauthorizedError,
   NotFoundError,
   ForbiddenError,
+  ValidationError,
+  handlePrismaError,
 } from "../lib/errors.ts";
 import {
   ResponseHandler,
@@ -66,28 +68,48 @@ const createProject = async (
     }
 
     // Required field validations
-    if (!name || name.trim().length === 0) {
-      throw new BadRequestError("Project name is required");
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      throw new ValidationError("Project name is required and must be a non-empty string", {
+        field: 'name',
+        received: typeof name
+      });
     }
 
     if (name.length > 255) {
-      throw new BadRequestError(
+      throw new ValidationError(
         "Project name must be less than 255 characters",
+        {
+          field: 'name',
+          maxLength: 255,
+          received: name.length
+        }
       );
     }
 
-    if (!slug || slug.trim().length === 0) {
-      throw new BadRequestError("Project slug is required");
+    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
+      throw new ValidationError("Project slug is required and must be a non-empty string", {
+        field: 'slug',
+        received: typeof slug
+      });
     }
 
     if (!isValidSlug(slug)) {
-      throw new BadRequestError(
+      throw new ValidationError(
         "Slug can only contain lowercase letters, numbers, and hyphens",
+        {
+          field: 'slug',
+          pattern: '^[a-z0-9-]+$',
+          received: slug
+        }
       );
     }
 
     if (slug.length > 255) {
-      throw new BadRequestError("Slug must be less than 255 characters");
+      throw new ValidationError("Slug must be less than 255 characters", {
+        field: 'slug',
+        maxLength: 255,
+        received: slug.length
+      });
     }
 
     // Optional field validations
@@ -150,12 +172,21 @@ const createProject = async (
     }
 
     // Check for existing project with same slug
-    const existingProject = await prisma.project.findUnique({
-      where: { slug },
-    });
+    let existingProject;
+    try {
+      existingProject = await prisma.project.findUnique({
+        where: { slug },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (existingProject) {
-      throw new ConflictError("Project with this slug already exists");
+      throw new ConflictError("Project with this slug already exists", {
+        field: 'slug',
+        value: slug,
+        suggestion: 'Please choose a different slug'
+      });
     }
 
     // Auto-generate collection form URL if not provided
@@ -164,24 +195,29 @@ const createProject = async (
       `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/testimonials/${slug}`;
 
     // Create project
-    const newProject = await prisma.project.create({
-      data: {
-        userId: id,
-        name: name.trim(),
-        shortDescription: shortDescription?.trim() || null,
-        description: description?.trim() || null,
-        slug: slug.toLowerCase().trim(),
-        logoUrl: logoUrl || null,
-        projectType: projectType || "OTHER",
-        websiteUrl: websiteUrl || null,
-        collectionFormUrl: finalCollectionFormUrl,
-        brandColorPrimary: brandColorPrimary || null,
-        brandColorSecondary: brandColorSecondary || null,
-        socialLinks: socialLinks || undefined,
-        tags: tags || [],
-        visibility: visibility || "PRIVATE",
-      },
-    });
+    let newProject;
+    try {
+      newProject = await prisma.project.create({
+        data: {
+          userId: id,
+          name: name.trim(),
+          shortDescription: shortDescription?.trim() || null,
+          description: description?.trim() || null,
+          slug: slug.toLowerCase().trim(),
+          logoUrl: logoUrl || null,
+          projectType: projectType || "OTHER",
+          websiteUrl: websiteUrl || null,
+          collectionFormUrl: finalCollectionFormUrl,
+          brandColorPrimary: brandColorPrimary || null,
+          brandColorSecondary: brandColorSecondary || null,
+          socialLinks: socialLinks || undefined,
+          tags: tags || [],
+          visibility: visibility || "PRIVATE",
+        },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     return ResponseHandler.created(res, {
       message: "Project created successfully",
@@ -206,35 +242,40 @@ const listProjects = async (
 
     const { page, limit } = extractPaginationParams(req.query);
 
-    const [projects, total] = await Promise.all([
-      prisma.project.findMany({
-        where: { userId },
-        skip: calculateSkip(page, limit),
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          name: true,
-          shortDescription: true,
-          slug: true,
-          description: true,
-          logoUrl: true,
-          projectType: true,
-          visibility: true,
-          tags: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              testimonials: true,
-              widgets: true,
+    let projects, total;
+    try {
+      [projects, total] = await Promise.all([
+        prisma.project.findMany({
+          where: { userId },
+          skip: calculateSkip(page, limit),
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            shortDescription: true,
+            slug: true,
+            description: true,
+            logoUrl: true,
+            projectType: true,
+            visibility: true,
+            tags: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                testimonials: true,
+                widgets: true,
+              },
             },
           },
-        },
-      }),
-      prisma.project.count({ where: { userId } }),
-    ]);
+        }),
+        prisma.project.count({ where: { userId } }),
+      ]);
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     return ResponseHandler.paginated(res, {
       data: projects.map(serializeProject),
@@ -261,20 +302,36 @@ const getProjectBySlug = async (
       throw new UnauthorizedError("User not authenticated");
     }
 
-    const project = await prisma.project.findFirst({
-      where: { slug, userId },
-      include: {
-        _count: {
-          select: {
-            testimonials: true,
-            widgets: true,
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug
+      });
+    }
+
+    let project;
+    try {
+      project = await prisma.project.findFirst({
+        where: { slug, userId },
+        include: {
+          _count: {
+            select: {
+              testimonials: true,
+              widgets: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!project) {
-      throw new NotFoundError("Project not found");
+      throw new NotFoundError(`Project with slug "${slug}" not found`, {
+        slug,
+        userId,
+        suggestion: 'Please check the project slug or ensure you have access to this project'
+      });
     }
 
     return ResponseHandler.success(res, {
@@ -298,31 +355,46 @@ const getPublicProjectBySlug = async (
   try {
     const { slug } = req.params;
 
-    const project = await prisma.project.findFirst({
-      where: {
-        slug,
-        visibility: "PUBLIC",
-        isActive: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        shortDescription: true,
-        slug: true,
-        logoUrl: true,
-        projectType: true,
-        websiteUrl: true,
-        collectionFormUrl: true,
-        brandColorPrimary: true,
-        brandColorSecondary: true,
-        tags: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug
+      });
+    }
+
+    let project;
+    try {
+      project = await prisma.project.findFirst({
+        where: {
+          slug,
+          visibility: "PUBLIC",
+          isActive: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          shortDescription: true,
+          slug: true,
+          logoUrl: true,
+          projectType: true,
+          websiteUrl: true,
+          collectionFormUrl: true,
+          brandColorPrimary: true,
+          brandColorSecondary: true,
+          tags: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!project) {
-      throw new NotFoundError("Project not found or not publicly accessible");
+      throw new NotFoundError("Project not found or not publicly accessible", {
+        slug,
+        suggestion: 'This project may be private or inactive. Please contact the project owner.'
+      });
     }
 
     return ResponseHandler.success(res, {
@@ -348,13 +420,29 @@ const updateProject = async (
       throw new UnauthorizedError("User not authenticated");
     }
 
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug
+      });
+    }
+
     // Check if project exists and belongs to user
-    const existingProject = await prisma.project.findFirst({
-      where: { slug, userId },
-    });
+    let existingProject;
+    try {
+      existingProject = await prisma.project.findFirst({
+        where: { slug, userId },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!existingProject) {
-      throw new NotFoundError("Project not found");
+      throw new NotFoundError(`Project with slug "${slug}" not found`, {
+        slug,
+        userId,
+        suggestion: 'Please check the project slug or ensure you have access to this project'
+      });
     }
 
     // Validate optional fields if provided
@@ -383,15 +471,24 @@ const updateProject = async (
       }
 
       // Check if new slug already exists (and it's not the current project)
-      const slugExists = await prisma.project.findFirst({
-        where: {
-          slug: payload.slug,
-          NOT: { id: existingProject.id },
-        },
-      });
+      let slugExists;
+      try {
+        slugExists = await prisma.project.findFirst({
+          where: {
+            slug: payload.slug,
+            NOT: { id: existingProject.id },
+          },
+        });
+      } catch (error) {
+        throw handlePrismaError(error);
+      }
 
       if (slugExists) {
-        throw new ConflictError("Project with this slug already exists");
+        throw new ConflictError("Project with this slug already exists", {
+          field: 'slug',
+          value: payload.slug,
+          suggestion: 'Please choose a different slug'
+        });
       }
     }
 
@@ -597,18 +694,23 @@ const updateProject = async (
       updateData.moderationSettings = payload.moderationSettings;
 
     // Update project
-    const updatedProject = await prisma.project.update({
-      where: { id: existingProject.id },
-      data: updateData,
-      include: {
-        _count: {
-          select: {
-            testimonials: true,
-            widgets: true,
+    let updatedProject;
+    try {
+      updatedProject = await prisma.project.update({
+        where: { id: existingProject.id },
+        data: updateData,
+        include: {
+          _count: {
+            select: {
+              testimonials: true,
+              widgets: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     return ResponseHandler.updated(res, {
       message: "Project updated successfully",
@@ -632,21 +734,41 @@ const deleteProject = async (
       throw new UnauthorizedError("User not authenticated");
     }
 
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug
+      });
+    }
+
     // Check if project exists and belongs to user
-    const existingProject = await prisma.project.findFirst({
-      where: { slug, userId },
-    });
+    let existingProject;
+    try {
+      existingProject = await prisma.project.findFirst({
+        where: { slug, userId },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!existingProject) {
-      throw new NotFoundError("Project not found");
+      throw new NotFoundError(`Project with slug "${slug}" not found`, {
+        slug,
+        userId,
+        suggestion: 'Please check the project slug or ensure you have access to this project'
+      });
     }
 
     // Delete project (cascade will handle related testimonials and widgets)
-    await prisma.project.delete({
-      where: { id: existingProject.id },
-    });
+    try {
+      await prisma.project.delete({
+        where: { id: existingProject.id },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
-    return ResponseHandler.deleted(res, "Project deleted successfully");
+    return ResponseHandler.deleted(res, `Project "${existingProject.name}" deleted successfully`);
   } catch (error) {
     next(error);
   }

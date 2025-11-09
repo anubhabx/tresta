@@ -197,11 +197,23 @@ export class TrestaWidget {
   private async fetchWidgetData(): Promise<void> {
     const url = `${this.config.apiUrl}/api/widgets/${this.config.widgetId}/public`;
 
+    // Get API key from config or data attribute
+    const apiKey = this.config.apiKey || this.getApiKeyFromScriptTag();
+
+    if (!apiKey) {
+      throw new Error(
+        "API key is required. Please provide an API key via config.apiKey or data-api-key attribute.",
+      );
+    }
+
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
+
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -224,6 +236,23 @@ export class TrestaWidget {
       widget: this.widget,
       testimonials: this.testimonials,
     });
+  }
+
+  /**
+   * Extract API key from script tag data attribute
+   */
+  private getApiKeyFromScriptTag(): string | null {
+    const scripts = document.querySelectorAll("script[data-tresta-widget]");
+    const currentScript = Array.from(scripts).find(
+      (script) =>
+        script.getAttribute("data-tresta-widget") === this.config.widgetId,
+    );
+
+    if (currentScript) {
+      return currentScript.getAttribute("data-api-key");
+    }
+
+    return null;
   }
 
   /**

@@ -20,6 +20,7 @@
     "@clerk/express": "^1.7.31",
     "@workspace/database": "workspace:*",
     "@workspace/types": "workspace:*",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
@@ -30,6 +31,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
