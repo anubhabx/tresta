@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { projects } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { DashboardPageSkeleton } from "@/components/skeletons";
 import {
   DashboardStats,
   RecentProjectsList,
@@ -17,11 +17,7 @@ const DashboardPage = () => {
     projects.queries.useList(1, 100);
 
   if (isLoadingProjects) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <DashboardPageSkeleton />;
   }
 
   const projectsList = projectsData?.data || [];

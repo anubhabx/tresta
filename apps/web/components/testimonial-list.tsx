@@ -6,7 +6,7 @@ import { TestimonialCard } from "./testimonial-card";
 import { ModerationTestimonialCard } from "./moderation/moderation-testimonial-card";
 import { ModerationStatsDashboard } from "./moderation/moderation-stats-dashboard";
 import { FilterPresets, FilterPreset } from "./moderation/filter-presets";
-import { LoadingStars } from "./loader";
+import { TestimonialListPageSkeleton } from "./skeletons";
 import { KeyboardShortcutsHelp } from "./keyboard-shortcuts-help";
 import { BulkActionsBar } from "./testimonials/bulk-actions-bar";
 import { ActionHistoryPanel } from "./testimonials/action-history-panel";
@@ -522,12 +522,7 @@ export function TestimonialList({
   };
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-64 items-center justify-center">
-        <LoadingStars />
-        <p className="text-sm text-muted-foreground">Loading testimonials...</p>
-      </div>
-    );
+    return <TestimonialListPageSkeleton moderationMode={moderationMode} />;
   }
 
   const counts = getStatusCounts(allTestimonials);

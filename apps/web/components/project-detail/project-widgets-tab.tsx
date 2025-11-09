@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { widgets } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { WidgetTabSkeleton } from "@/components/skeletons";
 import {
   WidgetCard,
   WidgetEmptyState,
@@ -43,12 +43,7 @@ export function ProjectWidgetsTab({
   };
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-64 items-center justify-center">
-        <LoadingStars />
-        <p className="text-sm text-muted-foreground">Loading widgets...</p>
-      </div>
-    );
+    return <WidgetTabSkeleton />;
   }
 
   const hasWidgets = widgetsList && widgetsList.length > 0;

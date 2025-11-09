@@ -1,21 +1,14 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { LoadingStars } from "@/components/loader";
+import { AccountSettingsSkeleton } from "@/components/skeletons/account-skeleton";
 import { AccountSettingsForm } from "@/components/account-settings-form";
 
 export default function AccountPage() {
   const { user, isLoaded } = useUser();
 
   if (!isLoaded) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-screen items-center justify-center">
-        <LoadingStars />
-        <p className="text-sm text-muted-foreground">
-          Loading account settings...
-        </p>
-      </div>
-    );
+    return <AccountSettingsSkeleton />;
   }
 
   if (!user) {

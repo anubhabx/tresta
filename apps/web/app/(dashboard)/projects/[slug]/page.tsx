@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import { projects } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { ProjectDetailPageSkeleton } from "@/components/skeletons";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -51,11 +51,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
   };
 
   if (isLoadingProject) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <ProjectDetailPageSkeleton />;
   }
 
   if (!project) {

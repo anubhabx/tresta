@@ -2,7 +2,7 @@
 
 import { WidgetBuilder } from "@/components/widgets/widget-builder";
 import { projects } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { WidgetPageSkeleton } from "@/components/skeletons/widget-skeleton";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 
@@ -15,11 +15,7 @@ export default function EditWidgetPage() {
   const { data: project, isLoading } = projects.queries.useDetail(slug);
 
   if (isLoading) {
-    return (
-      <div className="container flex h-[400px] items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <WidgetPageSkeleton />;
   }
 
   if (!project) {
