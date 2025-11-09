@@ -2,13 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
+import { Button } from "@workspace/ui/components/button";
 import { projects } from "@/lib/queries";
 import { DashboardPageSkeleton } from "@/components/skeletons";
 import {
   DashboardStats,
   RecentProjectsList,
   DashboardEmptyState,
-  QuickActionsCard,
   GettingStartedCard,
 } from "@/components/dashboard";
 
@@ -31,8 +31,8 @@ const DashboardPage = () => {
   const recentProjects = projectsList.slice(0, 5);
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
-      {/* Header */}
+    <div className="flex flex-col gap-8 w-full h-full p-6 max-w-7xl mx-auto">
+      {/* Header with Primary CTA */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -40,25 +40,49 @@ const DashboardPage = () => {
             Welcome back! Here's an overview of your testimonials
           </p>
         </div>
+        {projectsList.length > 0 && (
+          <Link href="/projects/new">
+            <Button size="lg" className="shadow-sm">
+              <span className="mr-2">+</span>
+              Create New Project
+            </Button>
+          </Link>
+        )}
       </div>
-
-      {/* Stats Cards */}
-      <DashboardStats
-        totalProjects={totalProjects}
-        activeProjects={activeProjects}
-        totalTestimonials={totalTestimonials}
-      />
 
       {/* Main Content */}
       {projectsList.length === 0 ? (
         <DashboardEmptyState />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RecentProjectsList projects={recentProjects} />
+        <div className="space-y-8">
+          {/* Stats Section */}
+          <section>
+            <div className="mb-4">
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Overview
+              </h2>
+            </div>
+            <DashboardStats
+              totalProjects={totalProjects}
+              activeProjects={activeProjects}
+              totalTestimonials={totalTestimonials}
+            />
+          </section>
 
-          <QuickActionsCard />
+          {/* Recent Projects Section */}
+          <section>
+            <div className="mb-4">
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Recent Projects
+              </h2>
+            </div>
+            <RecentProjectsList projects={recentProjects} />
+          </section>
 
-          <GettingStartedCard />
+          {/* Getting Started Section */}
+          <section>
+            <GettingStartedCard />
+          </section>
         </div>
       )}
     </div>

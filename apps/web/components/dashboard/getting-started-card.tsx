@@ -10,42 +10,42 @@ import {
 
 export function GettingStartedCard() {
   return (
-    <Card>
+    <Card className="border-0 shadow-sm bg-muted/30">
       <CardHeader>
-        <CardTitle>Getting Started</CardTitle>
+        <CardTitle className="text-base">Getting Started</CardTitle>
         <CardDescription>Tips to get the most out of Tresta</CardDescription>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-3 text-sm">
-          <li className="flex items-center gap-2">
+        <ul className="space-y-4 text-sm">
+          <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-semibold text-xs flex-shrink-0 mt-0.5">
               1
             </span>
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground leading-relaxed">
               Create a project and customize its branding
             </span>
           </li>
-          <li className="flex items-center gap-2">
+          <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-semibold text-xs flex-shrink-0 mt-0.5">
               2
             </span>
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground leading-relaxed">
               Share the collection link with your customers
             </span>
           </li>
-          <li className="flex items-center gap-2">
+          <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-semibold text-xs flex-shrink-0 mt-0.5">
               3
             </span>
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground leading-relaxed">
               Review and approve testimonials as they come in
             </span>
           </li>
-          <li className="flex items-center gap-2">
+          <li className="flex items-start gap-3">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-semibold text-xs flex-shrink-0 mt-0.5">
               4
             </span>
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground leading-relaxed">
               Publish approved testimonials to display them
             </span>
           </li>

@@ -12,16 +12,16 @@ import {
  */
 export function DashboardStatsSkeleton() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <Card key={i}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4 rounded" />
+        <Card key={i} className="border-0 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-8 rounded-lg" />
           </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-16 mb-2" />
-            <Skeleton className="h-3 w-20" />
+          <CardContent className="space-y-2">
+            <Skeleton className="h-9 w-20" />
+            <Skeleton className="h-4 w-24" />
           </CardContent>
         </Card>
       ))}
@@ -34,42 +34,30 @@ export function DashboardStatsSkeleton() {
  */
 export function RecentProjectsListSkeleton() {
   return (
-    <Card className="lg:col-span-2">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-56" />
-          </div>
-          <Skeleton className="h-9 w-20" />
-        </div>
-      </CardHeader>
-      <CardContent>
+    <Card className="border-0 shadow-sm">
+      <CardContent className="p-6">
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-4 rounded-lg border"
+              className="flex items-center justify-between p-4 rounded-lg"
             >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Skeleton className="h-9 w-9 rounded-lg flex-shrink-0" />
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
                 <div className="flex-1 min-w-0 space-y-2">
                   <Skeleton className="h-5 w-48" />
                   <Skeleton className="h-4 w-32" />
                 </div>
               </div>
-              <div className="flex items-center space-x-4 flex-shrink-0">
-                <div className="h-5 w-px bg-border" />
-                <div className="min-w-32 space-y-1">
-                  <Skeleton className="h-4 w-28" />
-                </div>
-                <div className="h-5 w-px bg-border" />
-                <div className="min-w-32 hidden sm:block">
-                  <Skeleton className="h-3 w-24" />
-                </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-24 hidden sm:block" />
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-4 pt-4 border-t">
+          <Skeleton className="h-4 w-32" />
         </div>
       </CardContent>
     </Card>
@@ -77,26 +65,10 @@ export function RecentProjectsListSkeleton() {
 }
 
 /**
- * Skeleton for quick actions card
+ * Skeleton for section header
  */
-export function QuickActionsCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {[1, 2].map((i) => (
-            <Skeleton key={i} className="h-11 w-full rounded-md" />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
+export function SectionHeaderSkeleton() {
+  return <Skeleton className="h-4 w-32 mb-4" />;
 }
 
 /**
@@ -104,17 +76,17 @@ export function QuickActionsCardSkeleton() {
  */
 export function GettingStartedCardSkeleton() {
   return (
-    <Card>
+    <Card className="border-0 shadow-sm bg-muted/30">
       <CardHeader>
         <div className="space-y-2">
-          <Skeleton className="h-6 w-36" />
+          <Skeleton className="h-5 w-36" />
           <Skeleton className="h-4 w-52" />
         </div>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <li key={i} className="flex items-center gap-2">
+            <li key={i} className="flex items-start gap-3">
               <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
               <Skeleton className="h-4 flex-1" />
             </li>
@@ -135,6 +107,7 @@ export function DashboardHeaderSkeleton() {
         <Skeleton className="h-9 w-48" />
         <Skeleton className="h-5 w-96" />
       </div>
+      <Skeleton className="h-11 w-48" />
     </div>
   );
 }
@@ -145,18 +118,28 @@ export function DashboardHeaderSkeleton() {
  */
 export function DashboardPageSkeleton() {
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6">
+    <div className="flex flex-col gap-8 w-full h-full p-6 max-w-7xl mx-auto">
       {/* Header */}
       <DashboardHeaderSkeleton />
 
-      {/* Stats Cards */}
-      <DashboardStatsSkeleton />
-
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentProjectsListSkeleton />
-        <QuickActionsCardSkeleton />
-        <GettingStartedCardSkeleton />
+      <div className="space-y-8">
+        {/* Stats Section */}
+        <section>
+          <SectionHeaderSkeleton />
+          <DashboardStatsSkeleton />
+        </section>
+
+        {/* Recent Projects Section */}
+        <section>
+          <SectionHeaderSkeleton />
+          <RecentProjectsListSkeleton />
+        </section>
+
+        {/* Getting Started Section */}
+        <section>
+          <GettingStartedCardSkeleton />
+        </section>
       </div>
     </div>
   );
