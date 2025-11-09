@@ -38,8 +38,8 @@ export function PendingActionsCard({ projects }: PendingActionsCardProps) {
   }
 
   return (
-    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-blue-50/50 dark:bg-blue-950/20">
-      <CardContent className="p-4 sm:p-5">
+    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <CardContent>
         <div className="space-y-3">
           {/* Projects needing testimonials */}
           {projectsNeedingTestimonials.length > 0 && (
@@ -67,7 +67,7 @@ export function PendingActionsCard({ projects }: PendingActionsCardProps) {
           {recentlyUpdatedProjects.length > 0 && (
             <Link
               href="/projects"
-              className="flex items-start gap-3 p-3 rounded-lg hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
             >
               <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30 flex-shrink-0 mt-0.5">
                 <TrendingUpIcon className="h-4 w-4 text-green-600 dark:text-green-500" />

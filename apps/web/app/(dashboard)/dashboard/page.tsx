@@ -59,14 +59,6 @@ const DashboardPage = () => {
             Welcome back{user.user?.firstName ? `, ${user.user.firstName}` : ""}!
           </p>
         </div>
-        {projectsList.length > 0 && (
-          <Link href="/projects/new" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full sm:w-auto shadow-sm">
-              <span className="mr-2">+</span>
-              New Project
-            </Button>
-          </Link>
-        )}
       </div>
 
       {/* Main Content */}
@@ -93,28 +85,24 @@ const DashboardPage = () => {
           {/* Pending Actions - Only shows when there are actionable items */}
           <PendingActionsCard projects={projectsList} />
 
-          {/* Two Column Layout for Recent Projects and Status Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-            {/* Recent Projects - Takes 2 columns */}
-            <section className="lg:col-span-2">
-              <div className="mb-3 sm:mb-4">
-                <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Recent Projects
-                </h2>
-              </div>
-              <RecentProjectsList projects={recentProjects} />
-            </section>
+          {/* Recent Projects - Takes 2 columns */}
+          <section className="lg:col-span-2">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Recent Projects
+              </h2>
+            </div>
+            <RecentProjectsList projects={recentProjects} />
+          </section>
 
-            {/* Status Overview - Takes 1 column */}
-            <section>
-              <div className="mb-3 sm:mb-4">
-                <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Status Overview
-                </h2>
-              </div>
-              <StatusOverviewCard projects={projectsList} />
-            </section>
-          </div>
+          <section className="lg:col-span-2">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Status Overview
+              </h2>
+            </div>
+            <StatusOverviewCard projects={projectsList} />
+          </section>
 
           {/* Getting Started Section */}
           <section>
