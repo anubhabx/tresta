@@ -97,6 +97,7 @@ export interface WidgetSettings {
 export interface WidgetConfig {
   widgetId: string;
   apiUrl?: string;
+  apiKey?: string; // API key for authentication
   container?: string | HTMLElement;
   theme?: Partial<WidgetTheme>;
   settings?: Partial<WidgetSettings>;

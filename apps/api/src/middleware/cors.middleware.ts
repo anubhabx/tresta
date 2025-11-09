@@ -33,7 +33,7 @@ const restrictiveCorsConfig = {
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 };
 
 /**
@@ -47,9 +47,9 @@ const restrictiveCorsConfig = {
 const publicCorsConfig = {
   origin: "*",
   methods: ["GET", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
-  maxAge: 86400, // 24 hours
+  maxAge: 86400 // 24 hours
 };
 
 /**
@@ -68,7 +68,7 @@ const publicCorsMiddleware = cors(publicCorsConfig);
 export function dynamicCors(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): void {
   const path = req.path;
 
@@ -98,14 +98,14 @@ export const webhookCors = cors({
     "https://clerk.com",
     "https://api.clerk.com",
     "https://clerk.dev",
-    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.FRONTEND_URL || "http://localhost:3000"
   ],
   methods: ["POST", "OPTIONS"],
   allowedHeaders: [
     "Content-Type",
     "svix-id",
     "svix-timestamp",
-    "svix-signature",
+    "svix-signature"
   ],
-  credentials: false,
+  credentials: false
 });

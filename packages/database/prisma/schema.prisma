@@ -24,6 +24,7 @@ model User {
   plan         UserPlan      @default(FREE)
   projects     Project[]
   testimonials Testimonial[]
+  apiKeys      ApiKey[]
   subscription Subscription? // null for free tier users
 
   createdAt DateTime @default(now())
@@ -56,6 +57,7 @@ model Project {
   
   testimonials         Testimonial[]
   widgets              Widget[]
+  apiKeys              ApiKey[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -158,6 +160,40 @@ model Widget {
   updatedAt DateTime @updatedAt
 
   Project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(255) // e.g., "Production Widget Key", "Development Key"
+  keyHash     String   @unique @db.VarChar(255) // Hashed API key (bcrypt)
+  keyPrefix   String   @db.VarChar(20) // Visible prefix for identification (e.g., "tresta_live_abcd1234")
+  
+  // Relations
+  userId      String
+  projectId   String
+  
+  // Permissions & Limits
+  permissions Json?    // { widgets: true, testimonials: false, analytics: false }
+  usageCount  Int      @default(0) // Total number of requests
+  usageLimit  Int?     // Maximum allowed requests (null = unlimited)
+  rateLimit   Int      @default(100) // Requests per hour
+  
+  // Status & Lifecycle
+  isActive    Boolean  @default(true)
+  lastUsedAt  DateTime?
+  expiresAt   DateTime? // null = never expires
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([keyHash])
+  @@index([isActive])
 }
 
 model Tag {

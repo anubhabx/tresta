@@ -6,6 +6,8 @@ import {
   UnauthorizedError,
   NotFoundError,
   ForbiddenError,
+  ValidationError,
+  handlePrismaError,
 } from "../lib/errors.ts";
 import {
   ResponseHandler,
@@ -39,27 +41,57 @@ const createTestimonial = async (
     } = req.body;
 
     // Validate required fields
-    if (!authorName || !content) {
-      throw new BadRequestError("Author name and content are required");
+    if (!authorName || typeof authorName !== 'string') {
+      throw new ValidationError("Author name is required and must be a string", {
+        field: 'authorName',
+        received: typeof authorName
+      });
+    }
+
+    if (!content || typeof content !== 'string') {
+      throw new ValidationError("Content is required and must be a string", {
+        field: 'content',
+        received: typeof content
+      });
     }
 
     // Validate authorName length
     if (authorName.length < 2 || authorName.length > 255) {
-      throw new BadRequestError(
+      throw new ValidationError(
         "Author name must be between 2 and 255 characters",
+        {
+          field: 'authorName',
+          minLength: 2,
+          maxLength: 255,
+          received: authorName.length
+        }
       );
     }
 
     // Validate content length
     if (content.length < 10 || content.length > 2000) {
-      throw new BadRequestError(
+      throw new ValidationError(
         "Content must be between 10 and 2000 characters",
+        {
+          field: 'content',
+          minLength: 10,
+          maxLength: 2000,
+          received: content.length
+        }
       );
     }
 
     // Validate rating if provided
-    if (rating !== undefined && (rating < 1 || rating > 5)) {
-      throw new BadRequestError("Rating must be between 1 and 5");
+    if (rating !== undefined) {
+      const ratingNum = Number(rating);
+      if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+        throw new ValidationError("Rating must be a number between 1 and 5", {
+          field: 'rating',
+          min: 1,
+          max: 5,
+          received: rating
+        });
+      }
     }
 
     // Validate optional fields length
@@ -100,18 +132,37 @@ const createTestimonial = async (
       });
     }
 
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug
+      });
+    }
+
     // Find project by slug
-    const project = await prisma.project.findUnique({
-      where: { slug },
-    });
+    let project;
+    try {
+      project = await prisma.project.findUnique({
+        where: { slug },
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     if (!project) {
-      throw new NotFoundError("Project not found");
+      throw new NotFoundError(`Project with slug "${slug}" not found`, {
+        slug,
+        suggestion: 'Please check the project slug'
+      });
     }
 
     // Check if project is active
     if (!project.isActive) {
-      throw new BadRequestError("This project is not accepting testimonials");
+      throw new BadRequestError("This project is not currently accepting testimonials", {
+        projectId: project.id,
+        projectName: project.name,
+        suggestion: 'Please contact the project owner'
+      });
     }
 
     // Check for duplicate content
@@ -198,13 +249,31 @@ const createTestimonial = async (
     }
 
     // Create testimonial
-    const newTestimonial = await prisma.testimonial.create({
-      data: testimonialData,
-    });
+    let newTestimonial;
+    try {
+      newTestimonial = await prisma.testimonial.create({
+        data: testimonialData,
+      });
+    } catch (error) {
+      throw handlePrismaError(error);
+    }
 
     return ResponseHandler.created(res, {
-      message: "Testimonial submitted successfully",
-      data: newTestimonial,
+      message: moderationResult.status === 'APPROVED' 
+        ? "Testimonial submitted and approved successfully" 
+        : "Testimonial submitted successfully and is pending review",
+      data: {
+        ...newTestimonial,
+        moderationInfo: {
+          status: moderationResult.status,
+          autoPublished: moderationResult.autoPublish,
+          message: moderationResult.status === 'APPROVED' 
+            ? 'Your testimonial has been automatically approved and published'
+            : moderationResult.status === 'FLAGGED'
+            ? 'Your testimonial is under review'
+            : 'Your testimonial is pending approval'
+        }
+      }
     });
   } catch (error) {
     next(error);
