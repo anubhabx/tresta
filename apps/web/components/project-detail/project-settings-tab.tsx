@@ -58,7 +58,7 @@ export function ProjectSettingsTab({
             General Settings
           </AccordionTrigger>
           <AccordionContent>
-            <div className="space-y-6 pt-4">
+            <div className="pt-4">
               {/* Project Information */}
               <div>
                 <h4 className="text-sm font-medium mb-3">Project Information</h4>
@@ -102,47 +102,6 @@ export function ProjectSettingsTab({
                   </Button>
                 </div>
               </div>
-
-              <div className="pt-4 border-t">
-                <h4 className="text-sm font-medium mb-2 text-destructive">
-                  Danger Zone
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Permanently delete this project and all associated data
-                </p>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      <TrashIcon className="h-4 w-4 mr-2" />
-                      Delete Project
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete the project "{project.name}" and all associated
-                        testimonials and widgets.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel disabled={isDeleting}>
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDelete}
-                        disabled={isDeleting}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {isDeleting ? "Deleting..." : "Delete Project"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -159,6 +118,48 @@ export function ProjectSettingsTab({
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      {/* Danger Zone - Always at the bottom */}
+      <div className="pt-6 border-t">
+        <h3 className="text-lg font-semibold mb-2 text-destructive">
+          Danger Zone
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Permanently delete this project and all associated data. This action cannot be undone.
+        </p>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <TrashIcon className="h-4 w-4 mr-2" />
+              Delete Project
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you absolutely sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently
+                delete the project "{project.name}" and all associated
+                testimonials and widgets.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? "Deleting..." : "Delete Project"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
