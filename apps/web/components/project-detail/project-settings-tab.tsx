@@ -50,42 +50,44 @@ export function ProjectSettingsTab({
       <Accordion
         type="multiple"
         defaultValue={["general", "moderation"]}
-        className="w-full"
+        className="w-full space-y-4"
       >
         {/* General Settings */}
-        <AccordionItem value="general">
-          <AccordionTrigger className="text-lg font-semibold">
+        <AccordionItem value="general" className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] rounded-lg px-4">
+          <AccordionTrigger className="text-base sm:text-lg font-semibold hover:no-underline">
             General Settings
           </AccordionTrigger>
           <AccordionContent>
-            <div className="pt-4">
+            <div className="pt-4 space-y-4">
               {/* Project Information */}
               <div>
-                <h4 className="text-sm font-medium mb-3">Project Information</h4>
+                <h4 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Project Information
+                </h4>
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Project Name</span>
                     <span className="font-medium">{project.name}</span>
                   </div>
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Project ID</span>
                     <span className="font-mono text-xs">{project.id}</span>
                   </div>
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Status</span>
                     <Badge variant={project.isActive ? "default" : "secondary"}>
                       {project.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Created</span>
                     <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Last Updated</span>
                     <span>{new Date(project.updatedAt).toLocaleDateString()}</span>
                   </div>
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b border-border/50">
                     <span className="text-muted-foreground">Total Testimonials</span>
                     <span className="font-medium">{project._count?.testimonials || 0}</span>
                   </div>
@@ -95,7 +97,7 @@ export function ProjectSettingsTab({
                   </div>
                 </div>
                 <div className="mt-4">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className="touch-manipulation min-h-[44px] sm:min-h-0">
                     <a href={`/projects/${project.slug}/edit`}>
                       Edit Project Details
                     </a>
@@ -107,8 +109,8 @@ export function ProjectSettingsTab({
         </AccordionItem>
 
         {/* Moderation Settings */}
-        <AccordionItem value="moderation">
-          <AccordionTrigger className="text-lg font-semibold">
+        <AccordionItem value="moderation" className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] rounded-lg px-4">
+          <AccordionTrigger className="text-base sm:text-lg font-semibold hover:no-underline">
             Auto-Moderation Settings
           </AccordionTrigger>
           <AccordionContent>
@@ -121,15 +123,15 @@ export function ProjectSettingsTab({
 
       {/* Danger Zone - Always at the bottom */}
       <div className="pt-6 border-t">
-        <h3 className="text-lg font-semibold mb-2 text-destructive">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 text-destructive">
           Danger Zone
         </h3>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="text-xs sm:text-sm text-muted-foreground mb-4 leading-relaxed">
           Permanently delete this project and all associated data. This action cannot be undone.
         </p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm">
+            <Button variant="destructive" size="sm" className="touch-manipulation min-h-[44px] sm:min-h-0">
               <TrashIcon className="h-4 w-4 mr-2" />
               Delete Project
             </Button>

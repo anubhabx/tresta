@@ -170,21 +170,23 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5" />
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10">
+                  <Key className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                </div>
                 API Keys
               </CardTitle>
-              <CardDescription className="mt-2">
+              <CardDescription className="mt-2 text-xs sm:text-sm">
                 Manage API keys for accessing your project's widgets. Each key is scoped to this project.
               </CardDescription>
             </div>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="touch-manipulation min-h-[44px] sm:min-h-0 w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Create API Key
                 </Button>

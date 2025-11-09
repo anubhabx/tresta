@@ -76,30 +76,37 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full p-6 mx-auto">
+    <div className="flex flex-col gap-6 sm:gap-8 w-full h-full p-4 sm:p-6 max-w-7xl mx-auto">
       <ProjectHeader project={project} slug={slug} onDelete={handleDelete} />
 
-      <ProjectStatsCards project={project} />
+      <section>
+        <div className="mb-3 sm:mb-4">
+          <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            Project Statistics
+          </h2>
+        </div>
+        <ProjectStatsCards project={project} />
+      </section>
 
       <Tabs defaultValue={tab || "overview"} className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
-          <TabsTrigger value="moderation">Moderation</TabsTrigger>
-          <TabsTrigger value="widgets">Widgets</TabsTrigger>
-          <TabsTrigger value="api-keys">API Keys</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+          <TabsTrigger value="testimonials" className="text-xs sm:text-sm">Testimonials</TabsTrigger>
+          <TabsTrigger value="moderation" className="text-xs sm:text-sm">Moderation</TabsTrigger>
+          <TabsTrigger value="widgets" className="text-xs sm:text-sm">Widgets</TabsTrigger>
+          <TabsTrigger value="api-keys" className="text-xs sm:text-sm">API Keys</TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs sm:text-sm">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <ProjectOverviewTab project={project} collectionUrl={collectionUrl} />
         </TabsContent>
 
-        <TabsContent value="testimonials" className="space-y-4">
-          <Card>
+        <TabsContent value="testimonials" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <CardHeader>
-              <CardTitle>Testimonials</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">Testimonials</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 View and manage approved testimonials for this project.
               </CardDescription>
             </CardHeader>
@@ -109,11 +116,11 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="moderation" className="space-y-4">
-          <Card>
+        <TabsContent value="moderation" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <CardHeader>
-              <CardTitle>Moderation Queue</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">Moderation Queue</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Review pending testimonials with advanced moderation tools, bulk
                 actions, and auto-moderation insights.
               </CardDescription>
@@ -124,11 +131,11 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="widgets" className="space-y-4">
-          <Card>
+        <TabsContent value="widgets" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <CardHeader>
-              <CardTitle>Display Widgets</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base sm:text-lg">Display Widgets</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Create widgets to display testimonials on your website
               </CardDescription>
             </CardHeader>
@@ -138,11 +145,11 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="api-keys" className="space-y-4">
+        <TabsContent value="api-keys" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <ProjectApiKeysTab project={project} />
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
+        <TabsContent value="settings" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <ProjectSettingsTab project={project} onDelete={handleDelete} />
         </TabsContent>
       </Tabs>

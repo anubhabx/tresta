@@ -59,12 +59,12 @@ export function ProjectWidgetsTab({
           />
         ) : (
           <>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold">
                   Widgets ({widgetsList.length})
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Embed testimonials on your website
                 </p>
               </div>
@@ -72,13 +72,14 @@ export function ProjectWidgetsTab({
                 onClick={() =>
                   router.push(`/projects/${projectSlug}/widgets/new`)
                 }
+                className="touch-manipulation min-h-[44px] sm:min-h-0 w-full sm:w-auto"
               >
                 <PlusIcon className="mr-2 h-4 w-4" />
                 Create Widget
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {widgetsList.map((widget) => (
                 <WidgetCard
                   key={widget.id}

@@ -47,21 +47,23 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
   };
 
   return (
-    <div className="flex items-start justify-between">
-      <div className="flex items-start gap-4">
-        <Avatar className="mt-1 rounded-lg w-12 h-12">
-          <AvatarImage
-            src={project.logoUrl!}
-            alt={project.name}
-            className="object-cover"
-          />
-          <AvatarFallback className="bg-muted text-muted-foreground p-3 rounded-lg">
-            <FolderIcon className="h-6 w-6" />
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
+        <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
+          <Avatar className="rounded-lg w-10 h-10 sm:w-12 sm:h-12">
+            <AvatarImage
+              src={project.logoUrl!}
+              alt={project.name}
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-transparent text-primary rounded-lg">
+              <FolderIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {project.name}
             </h1>
             {!project.isActive && (
@@ -70,9 +72,11 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">/{project.slug}</p>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            /{project.slug}
+          </p>
           {project.description && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
               {project.description}
             </p>
           )}
@@ -85,9 +89,9 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <Link href={`/projects/${slug}/edit`}>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="touch-manipulation min-h-[44px] sm:min-h-0">
             <EditIcon className="h-4 w-4 mr-2" />
             Edit
           </Button>
@@ -95,7 +99,7 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="touch-manipulation min-h-[44px] sm:min-h-0">
               <TrashIcon className="h-4 w-4 mr-2" />
               Delete
             </Button>

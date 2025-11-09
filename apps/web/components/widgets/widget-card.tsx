@@ -91,7 +91,7 @@ export function WidgetCard({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -99,7 +99,7 @@ export function WidgetCard({
               {getLayoutIcon()}
             </div>
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg">
+              <CardTitle className="text-base sm:text-lg">
                 {getLayoutLabel()} Widget
               </CardTitle>
               <CardDescription className="text-xs mt-1 truncate">
@@ -107,7 +107,7 @@ export function WidgetCard({
               </CardDescription>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
             {getThemeBadge()}
             <Badge variant="secondary" className="text-xs">
               {getLayoutLabel()}
@@ -118,20 +118,20 @@ export function WidgetCard({
 
       <CardContent className="pb-4">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs sm:text-sm py-2 border-b border-border/50">
             <span className="text-muted-foreground">Max Testimonials</span>
             <span className="font-medium">
               {widget.config?.maxTestimonials || "All"}
             </span>
           </div>
           {widget.config?.columns && (
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-xs sm:text-sm py-2 border-b border-border/50">
               <span className="text-muted-foreground">Columns</span>
               <span className="font-medium">{widget.config.columns}</span>
             </div>
           )}
           {widget.config?.autoRotate && (
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-xs sm:text-sm py-2 border-b border-border/50">
               <span className="text-muted-foreground">Auto Rotate</span>
               <Badge variant="outline" className="text-xs">
                 {widget.config.rotateInterval
@@ -140,7 +140,7 @@ export function WidgetCard({
               </Badge>
             </div>
           )}
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs sm:text-sm py-2">
             <span className="text-muted-foreground">Show Rating</span>
             <span className="font-medium">
               {widget.config?.showRating ? "Yes" : "No"}
@@ -148,14 +148,14 @@ export function WidgetCard({
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t">
+        <div className="mt-4 pt-4 border-t border-border/50">
           <div className="text-xs text-muted-foreground">
             Created {formatDistanceToNow(new Date(widget.createdAt))} ago
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 pt-4 border-t">
+      <CardFooter className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -163,7 +163,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={() => onViewEmbed(widget.id)}
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <Code2Icon className="h-4 w-4 mr-1.5" />
                 Embed
@@ -178,7 +178,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={() => onEdit(widget.id)}
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <EditIcon className="h-4 w-4 mr-1.5" />
                 Edit
@@ -193,7 +193,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={handleCopyId}
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <CopyIcon className="h-4 w-4 mr-1.5" />
                 ID
@@ -209,7 +209,7 @@ export function WidgetCard({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation min-h-[44px] sm:min-h-0"
                     disabled={isDeleting}
                   >
                     <TrashIcon className="h-4 w-4" />

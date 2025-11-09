@@ -54,7 +54,7 @@ export function ModerationTestimonialCard({
   return (
     <Card
       className={cn(
-        "transition-all hover:shadow-md cursor-pointer",
+        "transition-all border border-border/50 hover:border-border cursor-pointer",
         isSelected && "ring-2 ring-primary shadow-lg",
       )}
       onClick={(e) => {
@@ -65,7 +65,7 @@ export function ModerationTestimonialCard({
         }
       }}
     >
-      <CardContent className="p-6 h-full">
+      <CardContent className="p-4 h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
