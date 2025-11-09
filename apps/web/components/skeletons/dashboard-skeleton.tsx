@@ -14,7 +14,7 @@ export function DashboardStatsSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <Card key={i} className="border-0 shadow-sm">
+        <Card key={i} className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-8 w-8 rounded-lg" />
@@ -37,7 +37,7 @@ export function DashboardStatsSkeleton() {
  */
 export function RecentProjectsListSkeleton() {
   return (
-    <Card className="border-0 shadow-sm">
+    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <CardContent className="p-6">
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (

@@ -37,7 +37,7 @@ export function DashboardStats({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Projects
@@ -64,7 +64,7 @@ export function DashboardStats({
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Total Testimonials
@@ -93,7 +93,7 @@ export function DashboardStats({
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Average per Project

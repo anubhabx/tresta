@@ -11,10 +11,13 @@ import {
   DashboardEmptyState,
   GettingStartedCard,
 } from "@/components/dashboard";
+import { useUser } from "@clerk/nextjs";
 
 const DashboardPage = () => {
   const { data: projectsData, isLoading: isLoadingProjects } =
     projects.queries.useList(1, 100);
+
+  const user = useUser();
 
   if (isLoadingProjects) {
     return <DashboardPageSkeleton />;
@@ -49,17 +52,9 @@ const DashboardPage = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Welcome back! Here's an overview of your testimonials
+            Welcome back, {user.user?.firstName}! Here's an overview of your testimonials
           </p>
         </div>
-        {projectsList.length > 0 && (
-          <Link href="/projects/new">
-            <Button size="lg" className="shadow-sm">
-              <span className="mr-2">+</span>
-              Create New Project
-            </Button>
-          </Link>
-        )}
       </div>
 
       {/* Main Content */}

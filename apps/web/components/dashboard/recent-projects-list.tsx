@@ -2,18 +2,9 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
-import { FolderIcon, MessageSquareIcon, ClockIcon } from "lucide-react";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { FolderIcon, ClockIcon } from "lucide-react";
 import type { Project } from "@/types/api";
-import { Separator } from "@workspace/ui/components/separator";
 
 interface RecentProjectsListProps {
   projects: Project[];
@@ -24,7 +15,7 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
   const hasMore = projects.length > 3;
 
   return (
-    <Card className="border-0 shadow-sm">
+    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <CardContent className="p-6">
         <div className="space-y-3">
           {displayProjects.map((project) => (
