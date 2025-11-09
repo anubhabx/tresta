@@ -46,26 +46,36 @@ const DashboardPage = () => {
   const recentProjects = projectsList.slice(0, 5);
 
   return (
-    <div className="flex flex-col gap-8 w-full h-full p-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-6 sm:gap-8 w-full h-full p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Header with Primary CTA */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Welcome back, {user.user?.firstName}! Here's an overview of your testimonials
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 truncate">
+            Welcome back{user.user?.firstName ? `, ${user.user.firstName}` : ""}!
           </p>
         </div>
+        {projectsList.length > 0 && (
+          <Link href="/projects/new" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto shadow-sm">
+              <span className="mr-2">+</span>
+              Create Project
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Main Content */}
       {projectsList.length === 0 ? (
         <DashboardEmptyState />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Stats Section */}
           <section>
-            <div className="mb-4">
-              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
                 Overview
               </h2>
             </div>
@@ -80,8 +90,8 @@ const DashboardPage = () => {
 
           {/* Recent Projects Section */}
           <section>
-            <div className="mb-4">
-              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="mb-3 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
                 Recent Projects
               </h2>
             </div>

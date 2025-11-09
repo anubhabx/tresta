@@ -16,30 +16,30 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
 
   return (
     <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-      <CardContent className="p-6">
-        <div className="space-y-3">
+      <CardContent className="p-4 sm:p-6">
+        <div className="space-y-2 sm:space-y-3">
           {displayProjects.map((project) => (
             <Link
               key={project.id}
               href={`/projects/${project.slug}`}
-              className="flex items-center justify-between p-4 rounded-lg hover:bg-accent/50 transition-colors group"
+              className="flex items-center justify-between p-3 sm:p-4 rounded-lg hover:bg-accent/50 active:bg-accent transition-colors group min-h-[60px] touch-manipulation"
             >
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                  <FolderIcon className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <FolderIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold truncate text-base">
+                  <h4 className="font-semibold truncate text-sm sm:text-base">
                     {project.name}
                   </h4>
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                     {project._count?.testimonials || 0} testimonial
                     {(project._count?.testimonials ?? 0) !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0 text-sm text-muted-foreground">
-                <ClockIcon className="h-4 w-4" />
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm text-muted-foreground">
+                <ClockIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">
                   {formatDistanceToNow(new Date(project.createdAt), {
                     addSuffix: true,
@@ -51,10 +51,10 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
         </div>
 
         {hasMore && (
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
             <Link
               href="/projects"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
+              className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 touch-manipulation min-h-[44px] items-center"
             >
               View all projects
               <span className="text-xs">→</span>
