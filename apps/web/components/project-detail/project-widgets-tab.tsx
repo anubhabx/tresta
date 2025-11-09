@@ -43,12 +43,7 @@ export function ProjectWidgetsTab({
   };
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-64 items-center justify-center">
-        <LoadingStars />
-        <p className="text-sm text-muted-foreground">Loading widgets...</p>
-      </div>
-    );
+    return <WidgetTabSkeleton />;
   }
 
   const hasWidgets = widgetsList && widgetsList.length > 0;
