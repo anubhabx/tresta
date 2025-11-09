@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { widgets } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { WidgetBuilderSkeleton } from "@/components/skeletons/widget-skeleton";
 import { WidgetForm } from "@/components/widgets/widget-form";
 import { WidgetPreview } from "@/components/widgets/widget-preview";
 import type { WidgetFormData } from "@/components/widgets/widget-form";
@@ -148,11 +148,7 @@ export function WidgetBuilder({
   };
 
   if (mode === "edit" && isLoadingWidget) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <WidgetBuilderSkeleton />;
   }
 
   const isSubmitting = createWidget.isPending || updateWidget.isPending;

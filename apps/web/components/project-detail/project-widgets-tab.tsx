@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { widgets } from "@/lib/queries";
-import { LoadingStars } from "@/components/loader";
+import { WidgetTabSkeleton } from "@/components/skeletons";
 import {
   WidgetCard,
   WidgetEmptyState,

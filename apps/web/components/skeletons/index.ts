@@ -20,3 +20,25 @@ export {
   ProjectDetailContentSkeleton,
   ProjectDetailPageSkeleton,
 } from "./project-skeleton";
+
+// Testimonial skeletons
+export {
+  TestimonialCardSkeleton,
+  FilterBarSkeleton,
+  ModerationStatsSkeleton,
+  TestimonialListSkeleton,
+  PaginationSkeleton,
+  TestimonialListPageSkeleton,
+} from "./testimonial-skeleton";
+
+// Widget skeletons
+export {
+  WidgetCardSkeleton,
+  WidgetGridSkeleton,
+  WidgetListHeaderSkeleton,
+  WidgetFormSkeleton,
+  WidgetPreviewSkeleton,
+  WidgetBuilderSkeleton,
+  WidgetTabSkeleton,
+  WidgetPageSkeleton,
+} from "./widget-skeleton";

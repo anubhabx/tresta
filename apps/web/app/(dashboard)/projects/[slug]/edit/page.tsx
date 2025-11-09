@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
 import { Separator } from "@workspace/ui/components/separator";
-import { LoadingStars } from "@/components/loader";
+import { ProjectEditFormSkeleton } from "@/components/skeletons/form-skeleton";
 import { useProjectEditForm } from "@/hooks/use-project-edit-form";
 import {
   BasicInfoSection,
@@ -40,11 +40,7 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
   } = useProjectEditForm(slug);
 
   if (isLoadingProject) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <ProjectEditFormSkeleton />;
   }
 
   if (!project) {
