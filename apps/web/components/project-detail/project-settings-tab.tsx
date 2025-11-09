@@ -59,14 +59,48 @@ export function ProjectSettingsTab({
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-6 pt-4">
+              {/* Project Information */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Project Status</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Inactive projects won't accept new testimonial submissions
-                </p>
-                <Badge variant={project.isActive ? "default" : "secondary"}>
-                  {project.isActive ? "Active" : "Inactive"}
-                </Badge>
+                <h4 className="text-sm font-medium mb-3">Project Information</h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Project Name</span>
+                    <span className="font-medium">{project.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Project ID</span>
+                    <span className="font-mono text-xs">{project.id}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Status</span>
+                    <Badge variant={project.isActive ? "default" : "secondary"}>
+                      {project.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Created</span>
+                    <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Last Updated</span>
+                    <span>{new Date(project.updatedAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Total Testimonials</span>
+                    <span className="font-medium">{project._count?.testimonials || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Active Widgets</span>
+                    <span className="font-medium">{project._count?.widgets || 0}</span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`/projects/${project.slug}/edit`}>
+                      Edit Project Details
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               <div className="pt-4 border-t">
