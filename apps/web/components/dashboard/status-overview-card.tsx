@@ -56,7 +56,7 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
             : null;
 
     return (
-        <div className="grid grid-cols-2 space-x-4 space-y-4 sm:space-y-6 sm:space-x-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 space-4 md:space-6 gap-4 md:gap-6">
             {/* Quick Insights */}
             {topProjectCount > 0 && topProject && mostRecentProject && (
                 <Card className="flex flex-cols h-full border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
