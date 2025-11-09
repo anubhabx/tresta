@@ -28,6 +28,18 @@ const DashboardPage = () => {
   );
   const activeProjects = projectsList.filter((p) => p.isActive).length;
 
+  // Calculate most recent testimonial date across all projects
+  const allProjectDates = projectsList.map((p) => new Date(p.updatedAt));
+  const mostRecentUpdate =
+    allProjectDates.length > 0 ? new Date(Math.max(...allProjectDates.map((d) => d.getTime()))) : null;
+
+  // Calculate projects created in last 7 days for trend
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentProjectsCount = projectsList.filter(
+    (p) => new Date(p.createdAt) > sevenDaysAgo,
+  ).length;
+
   const recentProjects = projectsList.slice(0, 5);
 
   return (
@@ -66,6 +78,8 @@ const DashboardPage = () => {
               totalProjects={totalProjects}
               activeProjects={activeProjects}
               totalTestimonials={totalTestimonials}
+              recentProjectsCount={recentProjectsCount}
+              mostRecentUpdate={mostRecentUpdate}
             />
           </section>
 

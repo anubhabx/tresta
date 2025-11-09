@@ -20,8 +20,11 @@ export function DashboardStatsSkeleton() {
             <Skeleton className="h-8 w-8 rounded-lg" />
           </CardHeader>
           <CardContent className="space-y-2">
-            <Skeleton className="h-9 w-20" />
-            <Skeleton className="h-4 w-24" />
+            <div className="flex items-baseline gap-2">
+              <Skeleton className="h-9 w-16" />
+              {i === 1 && <Skeleton className="h-4 w-24" />}
+            </div>
+            <Skeleton className="h-4 w-32" />
           </CardContent>
         </Card>
       ))}
