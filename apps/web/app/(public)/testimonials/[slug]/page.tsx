@@ -184,7 +184,7 @@ export default function TestimonialSubmissionPage({
       }
 
       await api.post<ApiResponse<unknown>>(
-        `/projects/${slug}/testimonials`,
+        `/api/projects/${slug}/testimonials`,
         payload,
       );
 

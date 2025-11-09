@@ -29,6 +29,7 @@
 ## 🌟 Overview
 
 Tresta is a comprehensive testimonial management platform that enables businesses to:
+
 - 🎯 Collect verified testimonials from customers via customizable forms
 - 🛡️ Automatically moderate content with advanced sentiment analysis
 - ✅ Manage and moderate testimonials with OAuth verification and bulk actions
@@ -38,6 +39,7 @@ Tresta is a comprehensive testimonial management platform that enables businesse
 Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provides a seamless experience for both platform owners and end-users.
 
 **Recent Updates (November 2025):**
+
 - ✅ Auto-moderation system with sentiment analysis
 - ✅ Google OAuth verification with trust badges
 - ✅ Custom account settings with GDPR compliance
@@ -48,6 +50,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 ## ✨ Features
 
 ### Core Features (MVP - Completed)
+
 - ✅ **OAuth Verification** - Google Sign-In for verified testimonials with trust badges
 - ✅ **Auto-Moderation** - AI-powered spam and profanity filtering with sentiment analysis
 - ✅ **Avatar Support** - Auto-sync from OAuth providers, Azure Blob Storage integration
@@ -60,6 +63,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - ✅ **Data Export & Deletion** - GDPR-compliant data portability and account deletion
 
 ### Moderation Features
+
 - 🛡️ **Advanced Sentiment Analysis** - Weighted keyword detection with 5-category sentiment scoring
 - 🤖 **Profanity Detection** - Multi-category filtering (severe, mild, offensive)
 - 🚫 **Spam Detection** - Pattern matching for excessive caps, repetition, and URLs
@@ -70,6 +74,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - 🔄 **Migration Tools** - Scripts to moderate existing testimonials
 
 ### Widget Features
+
 - 🎨 **5 Layout Types**: Carousel, Grid, Masonry, Wall, List
 - 🎭 **Theme Customization**: Colors, fonts, border radius via data attributes
 - 🔧 **Configurable Settings**: Ratings, dates, author info, autoplay
@@ -79,6 +84,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - ✅ **Verified Badges**: Display OAuth verification status in all layouts
 
 ### Authentication & Security
+
 - 🔐 **Clerk Authentication** - Secure user management and OAuth
 - 🛡️ **CORS Protection** - Configured for secure cross-origin requests
 - 🔒 **JWT Tokens** - Bearer token authentication for API
@@ -86,6 +92,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - 🚫 **Rate Limiting** - Protection against abuse (planned)
 
 ### Coming Soon (In Development)
+
 - 📊 **Analytics Dashboard** - Detailed source tracking and performance metrics
 - 🎬 **Rich Media** - Video and audio testimonial support (routes implemented)
 - 🌐 **Multi-Language** - Internationalization support
@@ -97,6 +104,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
 - **Language**: TypeScript 5.6
 - **Styling**: Tailwind CSS + shadcn/ui components
@@ -106,6 +114,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - **OAuth**: @react-oauth/google
 
 ### Backend
+
 - **Runtime**: Node.js (ES Modules)
 - **Framework**: Express.js
 - **Database**: PostgreSQL + Prisma ORM
@@ -114,11 +123,13 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - **OAuth Verification**: google-auth-library
 
 ### Widget
+
 - **Language**: Vanilla TypeScript (no dependencies)
 - **Build**: Vite (IIFE + ESM formats)
 - **Distribution**: CDN-ready standalone library
 
 ### Infrastructure
+
 - **Monorepo**: Turborepo
 - **Package Manager**: pnpm
 - **Linting**: ESLint
@@ -178,6 +189,7 @@ tresta/
 ```
 
 ### Data Flow
+
 1. **Testimonial Submission**: Public form → Express API → PostgreSQL → Azure Blob (avatars)
 2. **OAuth Verification**: Google Sign-In → Token verification → Database update
 3. **Widget Rendering**: Script tag → Fetch public API → Render testimonials → Display verified badges
@@ -188,6 +200,7 @@ tresta/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Node.js**: 18.x or higher
 - **pnpm**: 8.x or higher
 - **PostgreSQL**: 14.x or higher
@@ -198,66 +211,72 @@ tresta/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/anubhabx/tresta.git
    cd tresta
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Set up environment variables**
-   
+
    **API (apps/api/.env)**
+
    ```bash
    DATABASE_URL="postgresql://user:password@localhost:5432/tresta"
-   
+
    # Clerk
    CLERK_PUBLISHABLE_KEY="pk_test_..."
    CLERK_SECRET_KEY="sk_test_..."
    CLERK_WEBHOOK_SIGNING_SECRET="whsec_..."
-   
+
    # Azure Blob Storage
    AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;..."
    AZURE_STORAGE_CONTAINER_NAME="tresta-uploads"
-   
+
    # Google OAuth
    GOOGLE_OAUTH_CLIENT_ID="your_client_id.apps.googleusercontent.com"
    GOOGLE_OAUTH_CLIENT_SECRET="your_client_secret"
-   
+
    PORT=8000
    ```
-   
+
    **Web (apps/web/.env.local)**
+
    ```bash
    # Clerk
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
    CLERK_SECRET_KEY="sk_test_..."
-   
+
    # API
-   NEXT_PUBLIC_API_URL="http://localhost:8000/api"
-   
+   NEXT_PUBLIC_API_URL="http://localhost:8000"
+
    # Google OAuth
    NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID="your_client_id.apps.googleusercontent.com"
    ```
 
 4. **Set up database**
+
    ```bash
    # Generate Prisma Client
    pnpm generate
-   
+
    # Run migrations
    cd packages/database
    pnpm prisma migrate dev
    ```
 
 5. **Start development servers**
+
    ```bash
    # Start all apps in parallel
    pnpm dev
-   
+
    # Or start individually
    pnpm dev --filter web   # Next.js (http://localhost:3000)
    pnpm dev --filter api   # Express API (http://localhost:8000)
@@ -305,8 +324,9 @@ pnpm dlx shadcn@latest add button -c apps/web
 ```
 
 This places components in `packages/ui/src/components` and makes them available via:
+
 ```tsx
-import { Button } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button";
 ```
 
 ---
@@ -348,6 +368,7 @@ pnpm prisma migrate deploy
 Comprehensive documentation is available in the repository:
 
 ### Project Documentation
+
 - **[Project Status](PROJECT_STATUS.md)** - Detailed completion status and accomplishments (95% complete)
 - **[Features](FEATURES.md)** - Complete feature implementation status and details
 - **[Roadmap](ROADMAP.md)** - Development timeline and future plans
@@ -355,6 +376,7 @@ Comprehensive documentation is available in the repository:
 - **[PRD](PRD.MD)** - Product Requirements Document
 
 ### Technical Documentation
+
 - **[Feature Plan](FEATURE_PLAN.md)** - Planned enhancements and architecture improvements
 - **[Widget API](WIDGET_API.md)** - Widget integration guide and API reference
 - **[Testing Guide](TESTING_GUIDE.md)** - Testing strategies and guidelines
@@ -362,6 +384,7 @@ Comprehensive documentation is available in the repository:
 - **[Copilot Instructions](.github/copilot-instructions.md)** - Development patterns and conventions
 
 ### Quick Links
+
 - 🚀 **[Getting Started](#getting-started)** - Setup and development
 - 🎨 **[Widget Layouts](packages/widget/README.md)** - Widget customization
 - 🔐 **[Authentication](apps/api/src/middleware/auth.middleware.ts)** - Auth implementation
@@ -380,6 +403,7 @@ Contributions are welcome! Please follow these guidelines:
 5. Open a Pull Request
 
 ### Development Workflow
+
 - Follow TypeScript strict mode
 - Use ESLint and Prettier for code formatting
 - Write meaningful commit messages

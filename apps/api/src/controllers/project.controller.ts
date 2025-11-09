@@ -415,7 +415,11 @@ const updateProject = async (
       );
     }
 
-    if (payload.logoUrl !== undefined && payload.logoUrl && !isValidUrl(payload.logoUrl)) {
+    if (
+      payload.logoUrl !== undefined &&
+      payload.logoUrl &&
+      !isValidUrl(payload.logoUrl)
+    ) {
       throw new BadRequestError("Invalid logo URL format");
     }
 
@@ -427,7 +431,11 @@ const updateProject = async (
       throw new BadRequestError("Invalid project type");
     }
 
-    if (payload.websiteUrl !== undefined && payload.websiteUrl && !isValidUrl(payload.websiteUrl)) {
+    if (
+      payload.websiteUrl !== undefined &&
+      payload.websiteUrl &&
+      !isValidUrl(payload.websiteUrl)
+    ) {
       throw new BadRequestError("Invalid website URL format");
     }
 
@@ -473,7 +481,10 @@ const updateProject = async (
       }
     }
 
-    if (payload.visibility !== undefined && !isValidVisibility(payload.visibility)) {
+    if (
+      payload.visibility !== undefined &&
+      !isValidVisibility(payload.visibility)
+    ) {
       throw new BadRequestError("Invalid visibility option");
     }
 
@@ -481,39 +492,68 @@ const updateProject = async (
     if (payload.profanityFilterLevel !== undefined) {
       const validLevels = ["STRICT", "MODERATE", "LENIENT"];
       if (!validLevels.includes(payload.profanityFilterLevel)) {
-        throw new BadRequestError("Invalid profanity filter level. Must be STRICT, MODERATE, or LENIENT");
+        throw new BadRequestError(
+          "Invalid profanity filter level. Must be STRICT, MODERATE, or LENIENT",
+        );
       }
     }
 
-    if (payload.moderationSettings !== undefined && payload.moderationSettings) {
+    if (
+      payload.moderationSettings !== undefined &&
+      payload.moderationSettings
+    ) {
       const settings = payload.moderationSettings;
-      
+
       if (settings.minContentLength !== undefined) {
-        if (typeof settings.minContentLength !== "number" || settings.minContentLength < 0 || settings.minContentLength > 1000) {
-          throw new BadRequestError("Minimum content length must be between 0 and 1000");
+        if (
+          typeof settings.minContentLength !== "number" ||
+          settings.minContentLength < 0 ||
+          settings.minContentLength > 1000
+        ) {
+          throw new BadRequestError(
+            "Minimum content length must be between 0 and 1000",
+          );
         }
       }
 
       if (settings.maxUrlCount !== undefined) {
-        if (typeof settings.maxUrlCount !== "number" || settings.maxUrlCount < 0 || settings.maxUrlCount > 10) {
-          throw new BadRequestError("Maximum URL count must be between 0 and 10");
+        if (
+          typeof settings.maxUrlCount !== "number" ||
+          settings.maxUrlCount < 0 ||
+          settings.maxUrlCount > 10
+        ) {
+          throw new BadRequestError(
+            "Maximum URL count must be between 0 and 10",
+          );
         }
       }
 
       // Validate domain arrays
-      if (settings.allowedDomains !== undefined && !Array.isArray(settings.allowedDomains)) {
+      if (
+        settings.allowedDomains !== undefined &&
+        !Array.isArray(settings.allowedDomains)
+      ) {
         throw new BadRequestError("Allowed domains must be an array");
       }
 
-      if (settings.blockedDomains !== undefined && !Array.isArray(settings.blockedDomains)) {
+      if (
+        settings.blockedDomains !== undefined &&
+        !Array.isArray(settings.blockedDomains)
+      ) {
         throw new BadRequestError("Blocked domains must be an array");
       }
 
-      if (settings.customProfanityList !== undefined && !Array.isArray(settings.customProfanityList)) {
+      if (
+        settings.customProfanityList !== undefined &&
+        !Array.isArray(settings.customProfanityList)
+      ) {
         throw new BadRequestError("Custom profanity list must be an array");
       }
 
-      if (settings.brandKeywords !== undefined && !Array.isArray(settings.brandKeywords)) {
+      if (
+        settings.brandKeywords !== undefined &&
+        !Array.isArray(settings.brandKeywords)
+      ) {
         throw new BadRequestError("Brand keywords must be an array");
       }
     }
@@ -525,26 +565,36 @@ const updateProject = async (
       updateData.shortDescription = payload.shortDescription?.trim() || null;
     if (payload.description !== undefined)
       updateData.description = payload.description?.trim() || null;
-    if (payload.slug !== undefined) updateData.slug = payload.slug.toLowerCase().trim();
-    if (payload.logoUrl !== undefined) updateData.logoUrl = payload.logoUrl || null;
-    if (payload.projectType !== undefined) updateData.projectType = payload.projectType;
-    if (payload.websiteUrl !== undefined) updateData.websiteUrl = payload.websiteUrl || null;
+    if (payload.slug !== undefined)
+      updateData.slug = payload.slug.toLowerCase().trim();
+    if (payload.logoUrl !== undefined)
+      updateData.logoUrl = payload.logoUrl || null;
+    if (payload.projectType !== undefined)
+      updateData.projectType = payload.projectType;
+    if (payload.websiteUrl !== undefined)
+      updateData.websiteUrl = payload.websiteUrl || null;
     if (payload.collectionFormUrl !== undefined)
       updateData.collectionFormUrl = payload.collectionFormUrl || null;
     if (payload.brandColorPrimary !== undefined)
       updateData.brandColorPrimary = payload.brandColorPrimary || null;
     if (payload.brandColorSecondary !== undefined)
       updateData.brandColorSecondary = payload.brandColorSecondary || null;
-    if (payload.socialLinks !== undefined) updateData.socialLinks = payload.socialLinks;
+    if (payload.socialLinks !== undefined)
+      updateData.socialLinks = payload.socialLinks;
     if (payload.tags !== undefined) updateData.tags = payload.tags;
-    if (payload.visibility !== undefined) updateData.visibility = payload.visibility;
+    if (payload.visibility !== undefined)
+      updateData.visibility = payload.visibility;
     if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
-    
+
     // Add moderation settings
-    if (payload.autoModeration !== undefined) updateData.autoModeration = payload.autoModeration;
-    if (payload.autoApproveVerified !== undefined) updateData.autoApproveVerified = payload.autoApproveVerified;
-    if (payload.profanityFilterLevel !== undefined) updateData.profanityFilterLevel = payload.profanityFilterLevel;
-    if (payload.moderationSettings !== undefined) updateData.moderationSettings = payload.moderationSettings;
+    if (payload.autoModeration !== undefined)
+      updateData.autoModeration = payload.autoModeration;
+    if (payload.autoApproveVerified !== undefined)
+      updateData.autoApproveVerified = payload.autoApproveVerified;
+    if (payload.profanityFilterLevel !== undefined)
+      updateData.profanityFilterLevel = payload.profanityFilterLevel;
+    if (payload.moderationSettings !== undefined)
+      updateData.moderationSettings = payload.moderationSettings;
 
     // Update project
     const updatedProject = await prisma.project.update({

@@ -5,34 +5,37 @@ import {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
-  ForbiddenError
+  ForbiddenError,
 } from "../lib/errors.ts";
 import {
   ResponseHandler,
   extractPaginationParams,
-  calculateSkip
+  calculateSkip,
 } from "../lib/response.ts";
 import { verifyGoogleIdToken } from "../lib/google-oauth.ts";
-import { moderateTestimonial, checkDuplicateContent } from "../services/moderation.service.ts";
+import {
+  moderateTestimonial,
+  checkDuplicateContent,
+} from "../services/moderation.service.ts";
 
 const createTestimonial = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug } = req.params;
-    const { 
-      authorName, 
-      authorEmail, 
+    const {
+      authorName,
+      authorEmail,
       authorRole,
       authorCompany,
       authorAvatar,
-      content, 
-      type, 
-      rating, 
+      content,
+      type,
+      rating,
       videoUrl,
-      googleIdToken // Google OAuth ID token
+      googleIdToken, // Google OAuth ID token
     } = req.body;
 
     // Validate required fields
@@ -42,12 +45,16 @@ const createTestimonial = async (
 
     // Validate authorName length
     if (authorName.length < 2 || authorName.length > 255) {
-      throw new BadRequestError("Author name must be between 2 and 255 characters");
+      throw new BadRequestError(
+        "Author name must be between 2 and 255 characters",
+      );
     }
 
     // Validate content length
     if (content.length < 10 || content.length > 2000) {
-      throw new BadRequestError("Content must be between 10 and 2000 characters");
+      throw new BadRequestError(
+        "Content must be between 10 and 2000 characters",
+      );
     }
 
     // Validate rating if provided
@@ -61,7 +68,9 @@ const createTestimonial = async (
     }
 
     if (authorCompany && authorCompany.length > 255) {
-      throw new BadRequestError("Author company must be less than 255 characters");
+      throw new BadRequestError(
+        "Author company must be less than 255 characters",
+      );
     }
 
     // Verify Google OAuth token if provided
@@ -71,7 +80,7 @@ const createTestimonial = async (
 
     if (googleIdToken) {
       googleProfile = await verifyGoogleIdToken(googleIdToken);
-      
+
       if (!googleProfile) {
         throw new BadRequestError("Invalid Google authentication token");
       }
@@ -83,17 +92,17 @@ const createTestimonial = async (
 
       isOAuthVerified = true;
       oauthSubject = googleProfile.sub;
-      
+
       console.log("✅ Google OAuth verified:", {
         email: googleProfile.email,
         name: googleProfile.name,
-        verified: googleProfile.email_verified
+        verified: googleProfile.email_verified,
       });
     }
 
     // Find project by slug
     const project = await prisma.project.findUnique({
-      where: { slug }
+      where: { slug },
     });
 
     if (!project) {
@@ -108,17 +117,17 @@ const createTestimonial = async (
     // Check for duplicate content
     const existingTestimonials = await prisma.testimonial.findMany({
       where: { projectId: project.id },
-      select: { content: true }
+      select: { content: true },
     });
 
     const duplicateCheck = checkDuplicateContent(
       content,
-      existingTestimonials.map(t => t.content)
+      existingTestimonials.map((t) => t.content),
     );
 
     if (duplicateCheck.isDuplicate) {
       throw new ConflictError(
-        `Duplicate testimonial detected (${Math.round((duplicateCheck.similarity || 0) * 100)}% similar)`
+        `Duplicate testimonial detected (${Math.round((duplicateCheck.similarity || 0) * 100)}% similar)`,
       );
     }
 
@@ -126,8 +135,10 @@ const createTestimonial = async (
     const moderationConfig = {
       autoModeration: project.autoModeration ?? true,
       autoApproveVerified: project.autoApproveVerified ?? false,
-      profanityFilterLevel: (project.profanityFilterLevel as 'STRICT' | 'MODERATE' | 'LENIENT') || 'MODERATE',
-      moderationSettings: project.moderationSettings as any
+      profanityFilterLevel:
+        (project.profanityFilterLevel as "STRICT" | "MODERATE" | "LENIENT") ||
+        "MODERATE",
+      moderationSettings: project.moderationSettings as any,
     };
 
     const moderationResult = await moderateTestimonial(
@@ -135,7 +146,7 @@ const createTestimonial = async (
       authorEmail,
       rating,
       isOAuthVerified,
-      moderationConfig
+      moderationConfig,
     );
 
     // Prepare testimonial data
@@ -144,7 +155,7 @@ const createTestimonial = async (
       authorName,
       content,
       type: type || "TEXT",
-      isApproved: moderationResult.status === 'APPROVED',
+      isApproved: moderationResult.status === "APPROVED",
       isPublished: moderationResult.autoPublish,
       source: "web_form", // Track source as web form submission
       ipAddress: req.ip, // Capture IP address for analytics
@@ -155,7 +166,8 @@ const createTestimonial = async (
       // Auto-moderation fields
       moderationStatus: moderationResult.status,
       moderationScore: moderationResult.score,
-      moderationFlags: moderationResult.flags.length > 0 ? moderationResult.flags : null,
+      moderationFlags:
+        moderationResult.flags.length > 0 ? moderationResult.flags : null,
       autoPublished: moderationResult.autoPublish,
     };
 
@@ -187,12 +199,12 @@ const createTestimonial = async (
 
     // Create testimonial
     const newTestimonial = await prisma.testimonial.create({
-      data: testimonialData
+      data: testimonialData,
     });
 
     return ResponseHandler.created(res, {
       message: "Testimonial submitted successfully",
-      data: newTestimonial
+      data: newTestimonial,
     });
   } catch (error) {
     next(error);
@@ -202,7 +214,7 @@ const createTestimonial = async (
 const listTestimonials = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug } = req.params;
@@ -213,7 +225,7 @@ const listTestimonials = async (
     }
 
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -227,9 +239,9 @@ const listTestimonials = async (
         where: { projectId: project.id },
         skip: calculateSkip(page, limit),
         take: limit,
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
       }),
-      prisma.testimonial.count({ where: { projectId: project.id } })
+      prisma.testimonial.count({ where: { projectId: project.id } }),
     ]);
 
     return ResponseHandler.paginated(res, {
@@ -237,7 +249,7 @@ const listTestimonials = async (
       page,
       limit,
       total,
-      message: "Testimonials retrieved successfully"
+      message: "Testimonials retrieved successfully",
     });
   } catch (error) {
     next(error);
@@ -247,7 +259,7 @@ const listTestimonials = async (
 const getTestimonialById = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug, id } = req.params;
@@ -259,7 +271,7 @@ const getTestimonialById = async (
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -268,10 +280,10 @@ const getTestimonialById = async (
 
     // Get testimonial
     const testimonial = await prisma.testimonial.findFirst({
-      where: { 
+      where: {
         id,
-        projectId: project.id
-      }
+        projectId: project.id,
+      },
     });
 
     if (!testimonial) {
@@ -280,7 +292,7 @@ const getTestimonialById = async (
 
     return ResponseHandler.success(res, {
       message: "Testimonial retrieved successfully",
-      data: testimonial
+      data: testimonial,
     });
   } catch (error) {
     next(error);
@@ -290,7 +302,7 @@ const getTestimonialById = async (
 const updateTestimonial = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug, id } = req.params;
@@ -303,7 +315,7 @@ const updateTestimonial = async (
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -312,10 +324,10 @@ const updateTestimonial = async (
 
     // Verify testimonial belongs to the project
     const existingTestimonial = await prisma.testimonial.findFirst({
-      where: { 
+      where: {
         id,
-        projectId: project.id
-      }
+        projectId: project.id,
+      },
     });
 
     if (!existingTestimonial) {
@@ -325,7 +337,7 @@ const updateTestimonial = async (
     // Enforce workflow: Cannot publish unless approved
     if (isPublished === true && !existingTestimonial.isApproved) {
       throw new BadRequestError(
-        "Cannot publish unapproved testimonial. Please approve it first in the moderation queue."
+        "Cannot publish unapproved testimonial. Please approve it first in the moderation queue.",
       );
     }
 
@@ -333,7 +345,8 @@ const updateTestimonial = async (
     const updateData: any = {};
     if (isPublished !== undefined) updateData.isPublished = isPublished;
     if (isApproved !== undefined) updateData.isApproved = isApproved;
-    if (moderationStatus !== undefined) updateData.moderationStatus = moderationStatus;
+    if (moderationStatus !== undefined)
+      updateData.moderationStatus = moderationStatus;
 
     // If no fields to update
     if (Object.keys(updateData).length === 0) {
@@ -343,12 +356,12 @@ const updateTestimonial = async (
     // Update testimonial
     const updatedTestimonial = await prisma.testimonial.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
 
     return ResponseHandler.updated(res, {
       message: "Testimonial updated successfully",
-      data: updatedTestimonial
+      data: updatedTestimonial,
     });
   } catch (error) {
     next(error);
@@ -358,7 +371,7 @@ const updateTestimonial = async (
 const deleteTestimonial = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug, id } = req.params;
@@ -370,7 +383,7 @@ const deleteTestimonial = async (
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -379,10 +392,10 @@ const deleteTestimonial = async (
 
     // Verify testimonial belongs to the project
     const existingTestimonial = await prisma.testimonial.findFirst({
-      where: { 
+      where: {
         id,
-        projectId: project.id
-      }
+        projectId: project.id,
+      },
     });
 
     if (!existingTestimonial) {
@@ -391,7 +404,7 @@ const deleteTestimonial = async (
 
     // Delete testimonial
     await prisma.testimonial.delete({
-      where: { id }
+      where: { id },
     });
 
     return ResponseHandler.deleted(res, "Testimonial deleted successfully");
@@ -406,7 +419,7 @@ const deleteTestimonial = async (
 const getModerationQueue = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug } = req.params;
@@ -418,7 +431,7 @@ const getModerationQueue = async (
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -433,21 +446,21 @@ const getModerationQueue = async (
 
     // Filter by moderation status
     if (status) {
-      if (status === 'pending') {
-        where.moderationStatus = 'PENDING';
-      } else if (status === 'flagged') {
-        where.moderationStatus = 'FLAGGED';
-      } else if (status === 'approved') {
-        where.moderationStatus = 'APPROVED';
-      } else if (status === 'rejected') {
-        where.moderationStatus = 'REJECTED';
+      if (status === "pending") {
+        where.moderationStatus = "PENDING";
+      } else if (status === "flagged") {
+        where.moderationStatus = "FLAGGED";
+      } else if (status === "approved") {
+        where.moderationStatus = "APPROVED";
+      } else if (status === "rejected") {
+        where.moderationStatus = "REJECTED";
       }
     }
 
     // Filter by verification status
-    if (verified === 'true') {
+    if (verified === "true") {
       where.isOAuthVerified = true;
-    } else if (verified === 'false') {
+    } else if (verified === "false") {
       where.isOAuthVerified = false;
     }
 
@@ -457,26 +470,28 @@ const getModerationQueue = async (
         skip: calculateSkip(page, limit),
         take: limit,
         orderBy: [
-          { moderationScore: 'desc' }, // Show high-risk items first
-          { createdAt: 'desc' }
-        ]
+          { moderationScore: "desc" }, // Show high-risk items first
+          { createdAt: "desc" },
+        ],
       }),
-      prisma.testimonial.count({ where })
+      prisma.testimonial.count({ where }),
     ]);
 
     // Get moderation stats
     const stats = await prisma.testimonial.groupBy({
-      by: ['moderationStatus'],
+      by: ["moderationStatus"],
       where: { projectId: project.id },
-      _count: true
+      _count: true,
     });
 
     const moderationStats = {
       total: stats.reduce((sum, s) => sum + s._count, 0),
-      pending: stats.find(s => s.moderationStatus === 'PENDING')?._count || 0,
-      flagged: stats.find(s => s.moderationStatus === 'FLAGGED')?._count || 0,
-      approved: stats.find(s => s.moderationStatus === 'APPROVED')?._count || 0,
-      rejected: stats.find(s => s.moderationStatus === 'REJECTED')?._count || 0,
+      pending: stats.find((s) => s.moderationStatus === "PENDING")?._count || 0,
+      flagged: stats.find((s) => s.moderationStatus === "FLAGGED")?._count || 0,
+      approved:
+        stats.find((s) => s.moderationStatus === "APPROVED")?._count || 0,
+      rejected:
+        stats.find((s) => s.moderationStatus === "REJECTED")?._count || 0,
     };
 
     const response = ResponseHandler.paginated(res, {
@@ -484,14 +499,14 @@ const getModerationQueue = async (
       page,
       limit,
       total,
-      message: "Moderation queue retrieved successfully"
+      message: "Moderation queue retrieved successfully",
     });
 
     // Add stats to meta
-    if (response && typeof response === 'object') {
+    if (response && typeof response === "object") {
       (response as any).meta = {
         ...(response as any).meta,
-        stats: moderationStats
+        stats: moderationStats,
       };
     }
 
@@ -507,7 +522,7 @@ const getModerationQueue = async (
 const bulkModerationAction = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug } = req.params;
@@ -518,17 +533,23 @@ const bulkModerationAction = async (
       throw new UnauthorizedError("User not authenticated");
     }
 
-    if (!testimonialIds || !Array.isArray(testimonialIds) || testimonialIds.length === 0) {
+    if (
+      !testimonialIds ||
+      !Array.isArray(testimonialIds) ||
+      testimonialIds.length === 0
+    ) {
       throw new BadRequestError("testimonialIds array is required");
     }
 
-    if (!action || !['approve', 'reject', 'flag'].includes(action)) {
-      throw new BadRequestError("Invalid action. Must be 'approve', 'reject', or 'flag'");
+    if (!action || !["approve", "reject", "flag"].includes(action)) {
+      throw new BadRequestError(
+        "Invalid action. Must be 'approve', 'reject', or 'flag'",
+      );
     }
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -537,21 +558,21 @@ const bulkModerationAction = async (
 
     // Build update data based on action
     let updateData: any = {};
-    if (action === 'approve') {
+    if (action === "approve") {
       updateData = {
-        moderationStatus: 'APPROVED',
+        moderationStatus: "APPROVED",
         isApproved: true,
-        isPublished: true
+        isPublished: true,
       };
-    } else if (action === 'reject') {
+    } else if (action === "reject") {
       updateData = {
-        moderationStatus: 'REJECTED',
+        moderationStatus: "REJECTED",
         isApproved: false,
-        isPublished: false
+        isPublished: false,
       };
-    } else if (action === 'flag') {
+    } else if (action === "flag") {
       updateData = {
-        moderationStatus: 'FLAGGED'
+        moderationStatus: "FLAGGED",
       };
     }
 
@@ -559,14 +580,14 @@ const bulkModerationAction = async (
     const result = await prisma.testimonial.updateMany({
       where: {
         id: { in: testimonialIds },
-        projectId: project.id
+        projectId: project.id,
       },
-      data: updateData
+      data: updateData,
     });
 
     return ResponseHandler.success(res, {
       message: `${result.count} testimonial(s) ${action}d successfully`,
-      data: { count: result.count, action }
+      data: { count: result.count, action },
     });
   } catch (error) {
     next(error);
@@ -579,7 +600,7 @@ const bulkModerationAction = async (
 const updateModerationStatus = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { slug, id } = req.params;
@@ -592,7 +613,7 @@ const updateModerationStatus = async (
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { slug, userId }
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -601,10 +622,10 @@ const updateModerationStatus = async (
 
     // Verify testimonial belongs to the project
     const existingTestimonial = await prisma.testimonial.findFirst({
-      where: { 
+      where: {
         id,
-        projectId: project.id
-      }
+        projectId: project.id,
+      },
     });
 
     if (!existingTestimonial) {
@@ -620,12 +641,12 @@ const updateModerationStatus = async (
     // Update testimonial
     const updatedTestimonial = await prisma.testimonial.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
 
     return ResponseHandler.updated(res, {
       message: "Moderation status updated successfully",
-      data: updatedTestimonial
+      data: updatedTestimonial,
     });
   } catch (error) {
     next(error);
@@ -640,5 +661,5 @@ export {
   deleteTestimonial,
   getModerationQueue,
   bulkModerationAction,
-  updateModerationStatus
+  updateModerationStatus,
 };

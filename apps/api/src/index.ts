@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { webhookRouter } from "./routes/webhook.route.ts";
 import { publicRouter } from "./routes/public.route.ts";
@@ -20,6 +22,9 @@ import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 app.use(helmet.hidePoweredBy());
@@ -34,6 +39,23 @@ app.use(clerkMiddleware());
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
+
+// Serve widget script (public, CDN-ready with aggressive caching)
+// Note: __dirname will be in apps/api/dist when compiled, so go up to workspace root
+const widgetPath = path.resolve(__dirname, "../../../packages/widget/dist");
+console.log("Widget path:", widgetPath);
+app.use(
+  "/widget",
+  express.static(widgetPath, {
+    maxAge: "1y", // 1 year cache for versioned widget file
+    immutable: true,
+    setHeaders: (res) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  }),
+);
 
 // Webhook routes
 app.use("/api/webhook", webhookRouter);

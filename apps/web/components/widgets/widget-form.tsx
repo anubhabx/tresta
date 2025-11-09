@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@workspace/ui/components/button";
@@ -16,7 +17,6 @@ import {
 } from "./widget-form-sections";
 
 const widgetFormSchema = z.object({
-  embedType: z.string().min(1, "Embed type is required"),
   layout: z.enum(["carousel", "grid", "masonry", "wall"]),
   theme: z.enum(["light", "dark", "auto"]),
   primaryColor: z.string().optional(),
@@ -24,9 +24,12 @@ const widgetFormSchema = z.object({
   showRating: z.boolean(),
   showDate: z.boolean(),
   showAvatar: z.boolean(),
+  showAuthorRole: z.boolean(),
+  showAuthorCompany: z.boolean(),
   maxTestimonials: z.number().min(1).max(100),
   autoRotate: z.boolean(),
   rotateInterval: z.number().min(1000).max(30000),
+  showNavigation: z.boolean(),
   columns: z.number().min(1).max(6),
   cardStyle: z.enum(["default", "minimal", "bordered"]),
   animation: z.enum(["fade", "slide", "none"]),
@@ -39,6 +42,7 @@ interface WidgetFormProps {
   onSubmit: (data: WidgetFormData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  onConfigChange?: (config: WidgetFormData) => void;
 }
 
 export function WidgetForm({
@@ -46,12 +50,12 @@ export function WidgetForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
+  onConfigChange,
 }: WidgetFormProps) {
   const form = useForm<WidgetFormData>({
     resolver: zodResolver(widgetFormSchema),
     defaultValues: initialData
       ? {
-          embedType: initialData.embedType,
           layout: (initialData.config?.layout as any) || "carousel",
           theme: (initialData.config?.theme as any) || "light",
           primaryColor: initialData.config?.primaryColor || "#0066FF",
@@ -59,15 +63,17 @@ export function WidgetForm({
           showRating: initialData.config?.showRating ?? true,
           showDate: initialData.config?.showDate ?? true,
           showAvatar: initialData.config?.showAvatar ?? false,
+          showAuthorRole: initialData.config?.showAuthorRole ?? true,
+          showAuthorCompany: initialData.config?.showAuthorCompany ?? true,
           maxTestimonials: initialData.config?.maxTestimonials || 10,
           autoRotate: initialData.config?.autoRotate ?? false,
           rotateInterval: initialData.config?.rotateInterval || 5000,
+          showNavigation: initialData.config?.showNavigation ?? true,
           columns: initialData.config?.columns || 3,
           cardStyle: (initialData.config?.cardStyle as any) || "default",
           animation: (initialData.config?.animation as any) || "fade",
         }
       : {
-          embedType: "carousel",
           layout: "carousel",
           theme: "light",
           primaryColor: "#0066FF",
@@ -75,9 +81,12 @@ export function WidgetForm({
           showRating: true,
           showDate: true,
           showAvatar: false,
+          showAuthorRole: true,
+          showAuthorCompany: true,
           maxTestimonials: 10,
           autoRotate: false,
           rotateInterval: 5000,
+          showNavigation: true,
           columns: 3,
           cardStyle: "default",
           animation: "fade",
@@ -86,6 +95,24 @@ export function WidgetForm({
 
   const watchLayout = form.watch("layout");
   const watchAutoRotate = form.watch("autoRotate");
+
+  // Use ref to store the callback to avoid dependency issues
+  const onConfigChangeRef = useRef(onConfigChange);
+
+  useEffect(() => {
+    onConfigChangeRef.current = onConfigChange;
+  }, [onConfigChange]);
+
+  // Subscribe to form changes and notify parent
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (onConfigChangeRef.current) {
+        onConfigChangeRef.current(value as WidgetFormData);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Form {...form}>

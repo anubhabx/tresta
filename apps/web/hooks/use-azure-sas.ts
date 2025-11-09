@@ -132,7 +132,7 @@ export function useAzureSAS() {
 
         // Step 1: Request upload URL from backend
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/media/generate-upload-url`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-upload-url`,
           {
             method: "POST",
             headers: {
@@ -235,7 +235,7 @@ export async function uploadFileToAzure(
 
     // Step 1: Request upload URL from backend
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/media/generate-upload-url`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-upload-url`,
       {
         method: "POST",
         headers: {

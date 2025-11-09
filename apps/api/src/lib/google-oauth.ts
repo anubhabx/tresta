@@ -16,7 +16,7 @@ export interface GoogleTokenPayload {
  * @returns Verified token payload or null if invalid
  */
 export async function verifyGoogleIdToken(
-  token: string
+  token: string,
 ): Promise<GoogleTokenPayload | null> {
   try {
     const ticket = await client.verifyIdToken({

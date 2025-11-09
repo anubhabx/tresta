@@ -6,7 +6,7 @@ import {
   deleteTestimonial,
   getModerationQueue,
   bulkModerationAction,
-  updateModerationStatus
+  updateModerationStatus,
 } from "../controllers/testimonial.controller.ts";
 import { Router } from "express";
 import { attachUser } from "../middleware/auth.middleware.ts";

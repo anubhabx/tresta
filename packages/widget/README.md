@@ -19,8 +19,8 @@ A lightweight, self-contained JavaScript widget for embedding Tresta testimonial
 Add this script tag to your HTML:
 
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
 ></script>
 ```
@@ -32,8 +32,8 @@ That's it! The widget will automatically render testimonials below the script ta
 ```html
 <div id="my-testimonials"></div>
 
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-container="#my-testimonials"
 ></script>
@@ -44,8 +44,8 @@ That's it! The widget will automatically render testimonials below the script ta
 ### Theme Customization
 
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-primary-color="#10b981"
   data-background-color="#ffffff"
@@ -59,8 +59,8 @@ That's it! The widget will automatically render testimonials below the script ta
 ### Settings Customization
 
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-show-rating="true"
   data-show-date="false"
@@ -77,8 +77,8 @@ That's it! The widget will automatically render testimonials below the script ta
 For self-hosted or development environments:
 
 ```html
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-api-url="https://your-api.com"
 ></script>
@@ -93,21 +93,21 @@ For self-hosted or development environments:
 
 <script src="https://cdn.tresta.io/widget.js"></script>
 <script>
-  const widget = TrestaWidget.init('YOUR_WIDGET_ID', {
-    container: '#testimonials',
+  const widget = TrestaWidget.init("YOUR_WIDGET_ID", {
+    container: "#testimonials",
     theme: {
-      primaryColor: '#3b82f6',
-      backgroundColor: '#ffffff',
+      primaryColor: "#3b82f6",
+      backgroundColor: "#ffffff",
     },
     settings: {
       showRating: true,
       autoplay: true,
     },
     onLoad: (widget) => {
-      console.log('Widget loaded:', widget);
+      console.log("Widget loaded:", widget);
     },
     onError: (error) => {
-      console.error('Widget error:', error);
+      console.error("Widget error:", error);
     },
   });
 </script>
@@ -117,25 +117,25 @@ For self-hosted or development environments:
 
 ```javascript
 // Refresh widget data
-await TrestaWidget.refresh('YOUR_WIDGET_ID');
+await TrestaWidget.refresh("YOUR_WIDGET_ID");
 
 // Refresh all widgets on the page
 await TrestaWidget.refreshAll();
 
 // Get widget instance
-const widget = TrestaWidget.get('YOUR_WIDGET_ID');
+const widget = TrestaWidget.get("YOUR_WIDGET_ID");
 
 // Get all widget instances
 const widgets = TrestaWidget.getAll();
 
 // Destroy widget
-TrestaWidget.destroy('YOUR_WIDGET_ID');
+TrestaWidget.destroy("YOUR_WIDGET_ID");
 ```
 
 ### Instance Methods
 
 ```javascript
-const widget = TrestaWidget.get('YOUR_WIDGET_ID');
+const widget = TrestaWidget.get("YOUR_WIDGET_ID");
 
 // Refresh data
 await widget.refresh();
@@ -154,40 +154,40 @@ widget.destroy();
 
 ### Required
 
-| Attribute | Description |
-|-----------|-------------|
+| Attribute            | Description               |
+| -------------------- | ------------------------- |
 | `data-tresta-widget` | Your widget ID (required) |
 
 ### Optional
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data-api-url` | string | Auto-detected | API base URL |
+| Attribute        | Type   | Default        | Description                |
+| ---------------- | ------ | -------------- | -------------------------- |
+| `data-api-url`   | string | Auto-detected  | API base URL               |
 | `data-container` | string | Auto-generated | CSS selector or element ID |
 
 ### Theme Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data-primary-color` | color | `#3b82f6` | Primary brand color |
-| `data-background-color` | color | `#ffffff` | Widget background |
-| `data-text-color` | color | `#1f2937` | Text color |
-| `data-card-background-color` | color | `#f9fafb` | Card background |
-| `data-border-radius` | number | `8` | Border radius in pixels |
-| `data-font-family` | string | System fonts | Font family |
+| Attribute                    | Type   | Default      | Description             |
+| ---------------------------- | ------ | ------------ | ----------------------- |
+| `data-primary-color`         | color  | `#3b82f6`    | Primary brand color     |
+| `data-background-color`      | color  | `#ffffff`    | Widget background       |
+| `data-text-color`            | color  | `#1f2937`    | Text color              |
+| `data-card-background-color` | color  | `#f9fafb`    | Card background         |
+| `data-border-radius`         | number | `8`          | Border radius in pixels |
+| `data-font-family`           | string | System fonts | Font family             |
 
 ### Settings Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data-show-rating` | boolean | `true` | Show star ratings |
-| `data-show-date` | boolean | `false` | Show testimonial date |
-| `data-show-author-image` | boolean | `true` | Show author image/initials |
-| `data-show-author-role` | boolean | `true` | Show author role/title |
-| `data-show-author-company` | boolean | `true` | Show author company |
-| `data-autoplay` | boolean | `false` | Enable carousel autoplay |
-| `data-autoplay-speed` | number | `5000` | Autoplay speed (ms) |
-| `data-max-items` | number | `null` | Max testimonials to show |
+| Attribute                  | Type    | Default | Description                |
+| -------------------------- | ------- | ------- | -------------------------- |
+| `data-show-rating`         | boolean | `true`  | Show star ratings          |
+| `data-show-date`           | boolean | `false` | Show testimonial date      |
+| `data-show-author-image`   | boolean | `true`  | Show author image/initials |
+| `data-show-author-role`    | boolean | `true`  | Show author role/title     |
+| `data-show-author-company` | boolean | `true`  | Show author company        |
+| `data-autoplay`            | boolean | `false` | Enable carousel autoplay   |
+| `data-autoplay-speed`      | number  | `5000`  | Autoplay speed (ms)        |
+| `data-max-items`           | number  | `null`  | Max testimonials to show   |
 
 ## Layouts
 
@@ -205,8 +205,8 @@ The widget layout is configured in the Tresta dashboard. Available layouts:
 
 ```html
 <!-- In your theme or page -->
-<script 
-  src="https://cdn.tresta.io/widget.js" 
+<script
+  src="https://cdn.tresta.io/widget.js"
   data-tresta-widget="<?php echo esc_attr(get_option('tresta_widget_id')); ?>"
 ></script>
 ```
@@ -214,17 +214,17 @@ The widget layout is configured in the Tresta dashboard. Available layouts:
 ### React
 
 ```jsx
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 function TestimonialsWidget() {
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.tresta.io/widget.js';
-    script.setAttribute('data-tresta-widget', 'YOUR_WIDGET_ID');
+    const script = document.createElement("script");
+    script.src = "https://cdn.tresta.io/widget.js";
+    script.setAttribute("data-tresta-widget", "YOUR_WIDGET_ID");
     document.body.appendChild(script);
 
     return () => {
-      TrestaWidget.destroy('YOUR_WIDGET_ID');
+      TrestaWidget.destroy("YOUR_WIDGET_ID");
       document.body.removeChild(script);
     };
   }, []);
@@ -243,15 +243,15 @@ function TestimonialsWidget() {
 <script>
 export default {
   mounted() {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.tresta.io/widget.js';
-    script.setAttribute('data-tresta-widget', 'YOUR_WIDGET_ID');
-    script.setAttribute('data-container', '#testimonials-container');
+    const script = document.createElement("script");
+    script.src = "https://cdn.tresta.io/widget.js";
+    script.setAttribute("data-tresta-widget", "YOUR_WIDGET_ID");
+    script.setAttribute("data-container", "#testimonials-container");
     document.body.appendChild(script);
   },
   beforeUnmount() {
     if (window.TrestaWidget) {
-      window.TrestaWidget.destroy('YOUR_WIDGET_ID');
+      window.TrestaWidget.destroy("YOUR_WIDGET_ID");
     }
   },
 };
@@ -261,10 +261,10 @@ export default {
 ### Next.js
 
 ```jsx
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import Script from 'next/script';
+import { useEffect } from "react";
+import Script from "next/script";
 
 export default function Testimonials() {
   return (

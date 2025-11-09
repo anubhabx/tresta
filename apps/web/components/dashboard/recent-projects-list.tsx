@@ -13,6 +13,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge";
 import { FolderIcon, MessageSquareIcon, ClockIcon } from "lucide-react";
 import type { Project } from "@/types/api";
+import { Separator } from "@workspace/ui/components/separator";
 
 interface RecentProjectsListProps {
   projects: Project[];
@@ -62,15 +63,22 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-6 flex-shrink-0">
-                <div className="text-right">
+              <div className="flex items-center space-x-4 flex-shrink-0 h-5">
+                <Separator orientation="vertical" />
+
+                <div className="text-right min-w-32">
                   <div className="flex items-center gap-1.5 text-sm font-medium">
                     <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
-                    <span>{project._count?.testimonials || 0}</span>
+                    <span className="text-muted-foreground">
+                      {project._count?.testimonials || 0} Testimonial
+                      {(project._count?.testimonials ?? 0) > 1 ? "s" : ""}
+                    </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">testimonials</p>
                 </div>
-                <div className="text-right hidden sm:block">
+
+                <Separator orientation="vertical" />
+
+                <div className="text-right hidden sm:block min-w-32">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <ClockIcon className="h-3.5 w-3.5" />
                     <span>

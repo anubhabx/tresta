@@ -5,6 +5,7 @@ This guide will help you verify that all the bug fixes work correctly in your Tr
 ## Prerequisites
 
 Before testing, ensure:
+
 - ✅ Database is running and migrations are applied
 - ✅ API server is running (`pnpm dev --filter api`)
 - ✅ Web app is running (`pnpm dev --filter web`)
@@ -68,6 +69,7 @@ Before testing, ensure:
    - ✅ **Expected:** Search works on all fields
 
 ### ❌ What Would Have Failed Before:
+
 - Clicking approve/reject would cause React errors
 - Multiple hooks would be called conditionally
 - Mutations wouldn't execute properly
@@ -130,6 +132,7 @@ Before testing, ensure:
    - ✅ **Expected:** Logo persists
 
 ### ❌ What Would Have Failed Before:
+
 - Logo URLs were temporary `blob:http://localhost...`
 - Logos disappeared on page refresh
 - Broken image icons everywhere
@@ -181,6 +184,7 @@ Before testing, ensure:
    - ✅ **Expected:** Sparkle icon and welcoming design
 
 ### ❌ What Would Have Failed Before:
+
 - Dashboard was completely empty
 - No navigation or stats
 - Poor user experience
@@ -207,6 +211,7 @@ Before testing, ensure:
    DELETE /api/media/{blobName}
    Authorization: Bearer {user-a-token}
    ```
+
    - ✅ **Expected:** 200 Success - "File deleted successfully"
 
 #### Test B: User Cannot Delete Other User's Files
@@ -217,10 +222,12 @@ Before testing, ensure:
 
 2. **Sign in as User A:**
    - Try to delete User B's blob via API
+
    ```bash
    DELETE /api/media/{user-b-blob-name}
    Authorization: Bearer {user-a-token}
    ```
+
    - ✅ **Expected:** 400 Bad Request
    - ✅ **Expected:** Error: "You do not have permission to delete this file"
 
@@ -237,6 +244,7 @@ Before testing, ensure:
    - Authorization check parses this path
 
 ### ❌ What Would Have Failed Before:
+
 - Any authenticated user could delete any blob
 - No ownership verification
 - Major security vulnerability

@@ -55,13 +55,13 @@ export const BackgroundBeams = React.memo(
       "M-58 -557C-58 -557 10 -152 474 -25C938 102 1006 507 1006 507",
       "M-51 -565C-51 -565 17 -160 481 -33C945 94 1013 499 1013 499",
       "M-44 -573C-44 -573 24 -168 488 -41C952 86 1020 491 1020 491",
-      "M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483"
+      "M-37 -581C-37 -581 31 -176 495 -49C959 78 1027 483 1027 483",
     ];
     return (
       <div
         className={cn(
           "absolute inset-0 flex h-full w-full items-center justify-center [mask-repeat:no-repeat] [mask-size:40px]",
-          className
+          className,
         )}
       >
         <svg
@@ -97,19 +97,19 @@ export const BackgroundBeams = React.memo(
                   x1: "0%",
                   x2: "0%",
                   y1: "0%",
-                  y2: "0%"
+                  y2: "0%",
                 }}
                 animate={{
                   x1: ["0%", "100%"],
                   x2: ["0%", "95%"],
                   y1: ["0%", "100%"],
-                  y2: ["0%", `${93 + Math.random() * 8}%`]
+                  y2: ["0%", `${93 + Math.random() * 8}%`],
                 }}
                 transition={{
                   duration: Math.random() * 10 + 10,
                   ease: "easeInOut",
                   repeat: Infinity,
-                  delay: Math.random() * 10
+                  delay: Math.random() * 10,
                 }}
               >
                 <stop stopColor="#18CCFC" stopOpacity="0"></stop>
@@ -135,7 +135,7 @@ export const BackgroundBeams = React.memo(
         </svg>
       </div>
     );
-  }
+  },
 );
 
 BackgroundBeams.displayName = "BackgroundBeams";

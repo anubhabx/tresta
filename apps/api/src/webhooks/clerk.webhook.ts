@@ -10,11 +10,11 @@ import {
 export const syncUserToDB = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const evt = await verifyWebhook(req, {
-      signingSecret: process.env.CLERK_WEBHOOK_SIGNING_SECRET
+      signingSecret: process.env.CLERK_WEBHOOK_SIGNING_SECRET,
     });
 
     if (
@@ -29,10 +29,11 @@ export const syncUserToDB = async (
     console.log("Clerk Webhook Event:", evt.type);
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
-      const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+      const { id, email_addresses, first_name, last_name, image_url } =
+        evt.data;
 
       const email = email_addresses.find(
-        (email) => email.id === evt.data.primary_email_address_id
+        (email) => email.id === evt.data.primary_email_address_id,
       )?.email_address;
 
       if (!email) {
@@ -47,7 +48,7 @@ export const syncUserToDB = async (
           avatarUrl = await blobStorageService.uploadFromUrl(
             image_url,
             StorageDirectory.AVATARS,
-            id
+            id,
           );
           console.log(`Avatar synced for user ${id}: ${avatarUrl}`);
         } catch (error) {
@@ -64,15 +65,15 @@ export const syncUserToDB = async (
             firstName: first_name || null,
             lastName: last_name || null,
             avatar: avatarUrl || undefined,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           create: {
             id,
             email,
             firstName: first_name || null,
             lastName: last_name || null,
-            avatar: avatarUrl || null
-          }
+            avatar: avatarUrl || null,
+          },
         });
       } catch (error) {
         console.error("Error syncing user to DB:", error);
@@ -86,7 +87,7 @@ export const syncUserToDB = async (
 
       try {
         await prisma.user.delete({
-          where: { id }
+          where: { id },
         });
       } catch (error) {
         console.error("Error deleting user from DB:", error);

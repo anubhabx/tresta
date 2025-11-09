@@ -83,11 +83,11 @@ export function handlePrismaError(error: unknown): ApiError {
       case "P2002": // Unique constraint violation
         const fields = (error.meta?.target as string[])?.join(", ");
         return new ConflictError(
-          `A record with this ${fields || "value"} already exists.`
+          `A record with this ${fields || "value"} already exists.`,
         );
       case "P2025": // Record to update not found
         return new NotFoundError(
-          (error.meta?.cause as string) || "Record not found."
+          (error.meta?.cause as string) || "Record not found.",
         );
       default:
         // Fallback for other known Prisma errors

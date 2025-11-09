@@ -6,22 +6,22 @@
 /**
  * Widget layout types
  */
-export type WidgetLayout = 'carousel' | 'grid' | 'masonry' | 'wall' | 'list';
+export type WidgetLayout = "carousel" | "grid" | "masonry" | "wall" | "list";
 
 /**
  * Widget theme types
  */
-export type WidgetTheme = 'light' | 'dark' | 'auto';
+export type WidgetTheme = "light" | "dark" | "auto";
 
 /**
  * Card style types
  */
-export type CardStyle = 'default' | 'minimal' | 'bordered';
+export type CardStyle = "default" | "minimal" | "bordered";
 
 /**
  * Animation types
  */
-export type AnimationType = 'fade' | 'slide' | 'none';
+export type AnimationType = "fade" | "slide" | "none";
 
 /**
  * Widget Configuration
@@ -31,40 +31,41 @@ export interface WidgetConfig {
   // Layout & Theme
   layout?: WidgetLayout;
   theme?: WidgetTheme;
-  
+
   // Colors
   primaryColor?: string;
   secondaryColor?: string;
-  
+
   // Content Visibility
   showRating?: boolean;
   showDate?: boolean;
   showAvatar?: boolean;
   showAuthorRole?: boolean;
   showAuthorCompany?: boolean;
-  
+
   // Display Settings
   maxTestimonials?: number;
   columns?: number;
   gap?: number;
-  
+
   // Styling
   cardStyle?: CardStyle;
   animation?: AnimationType;
-  
+
   // Carousel Behavior
   autoRotate?: boolean;
   rotateInterval?: number; // milliseconds
+  showNavigation?: boolean;
 }
 
 /**
  * Default widget configuration values
  */
 export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
-  layout: 'grid',
-  theme: 'light',
-  primaryColor: '#0066FF',
-  secondaryColor: '#00CC99',
+  layout: "grid",
+  theme: "light",
+  primaryColor: "#0066FF",
+  secondaryColor: "#00CC99",
   showRating: true,
   showDate: true,
   showAvatar: false,
@@ -73,10 +74,11 @@ export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
   maxTestimonials: 10,
   columns: 3,
   gap: 24,
-  cardStyle: 'default',
-  animation: 'fade',
+  cardStyle: "default",
+  animation: "fade",
   autoRotate: false,
   rotateInterval: 5000,
+  showNavigation: true,
 };
 
 /**
@@ -85,7 +87,6 @@ export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
 export interface Widget {
   id: string;
   projectId: string;
-  embedType: string;
   config: WidgetConfig;
   createdAt: string;
   updatedAt: string;
@@ -119,7 +120,6 @@ export interface PublicWidgetData {
     layout: WidgetLayout;
     theme: Record<string, any>;
     settings: WidgetConfig;
-    embedType: string;
   };
   project: {
     name: string;
@@ -140,7 +140,6 @@ export interface PublicWidgetData {
  */
 export interface CreateWidgetPayload {
   projectId: string;
-  embedType: string;
   config: WidgetConfig;
 }
 
@@ -148,6 +147,5 @@ export interface CreateWidgetPayload {
  * Widget update payload
  */
 export interface UpdateWidgetPayload {
-  embedType?: string;
   config?: Partial<WidgetConfig>;
 }

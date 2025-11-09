@@ -30,7 +30,7 @@ export const useTestimonialList = (
     queryKey: testimonialKeys.list(slug, page, limit),
     queryFn: async () => {
       const response = await api.get<PaginatedResponse<Testimonial>>(
-        `/projects/${slug}/testimonials?page=${page}&limit=${limit}`,
+        `/api/projects/${slug}/testimonials?page=${page}&limit=${limit}`,
       );
       return response.data;
     },
@@ -45,7 +45,7 @@ export const useTestimonialDetail = (slug: string, id: string) => {
     queryKey: testimonialKeys.detail(id),
     queryFn: async () => {
       const response = await api.get<ApiResponse<Testimonial>>(
-        `/projects/${slug}/testimonials/${id}`,
+        `/api/projects/${slug}/testimonials/${id}`,
       );
       return response.data.data;
     },
@@ -61,7 +61,7 @@ export const useCreateTestimonial = (slug: string) => {
   return useMutation({
     mutationFn: async (data: CreateTestimonialPayload) => {
       const response = await api.post<ApiResponse<Testimonial>>(
-        `/projects/${slug}/testimonials`,
+        `/api/projects/${slug}/testimonials`,
         data,
       );
       return response.data.data;
@@ -88,7 +88,7 @@ export const useUpdateTestimonial = (slug: string) => {
       data: UpdateTestimonialPayload;
     }) => {
       const response = await api.put<ApiResponse<Testimonial>>(
-        `/projects/${slug}/testimonials/${id}`,
+        `/api/projects/${slug}/testimonials/${id}`,
         data,
       );
       return response.data.data;
@@ -114,7 +114,7 @@ export const useDeleteTestimonial = (slug: string) => {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await api.delete<ApiResponse<void>>(
-        `/projects/${slug}/testimonials/${id}`,
+        `/api/projects/${slug}/testimonials/${id}`,
       );
       return response.data;
     },

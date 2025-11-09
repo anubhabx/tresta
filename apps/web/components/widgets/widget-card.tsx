@@ -99,7 +99,9 @@ export function WidgetCard({
               {getLayoutIcon()}
             </div>
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg">{widget.embedType}</CardTitle>
+              <CardTitle className="text-lg">
+                {getLayoutLabel()} Widget
+              </CardTitle>
               <CardDescription className="text-xs mt-1 truncate">
                 ID: {widget.id}
               </CardDescription>

@@ -21,11 +21,11 @@ const createWidget = async (
   next: NextFunction,
 ) => {
   try {
-    const { projectId, embedType, config } = req.body;
+    const { projectId, config } = req.body;
 
     // Validate required fields
-    if (!projectId || !embedType) {
-      throw new BadRequestError("Project ID and embed type are required");
+    if (!projectId) {
+      throw new BadRequestError("Project ID is required");
     }
 
     // Validate the config using Zod schema
@@ -55,7 +55,6 @@ const createWidget = async (
     const widget = await prisma.widget.create({
       data: {
         projectId,
-        embedType,
         config: validatedConfig as any,
       },
     });
@@ -103,7 +102,7 @@ const updateWidget = async (
 ) => {
   try {
     const { widgetId } = req.params;
-    const { embedType, config } = req.body;
+    const { config } = req.body;
 
     // Validate widget ID
     if (!widgetId) {
@@ -138,7 +137,6 @@ const updateWidget = async (
     const updatedWidget = await prisma.widget.update({
       where: { id: widgetId },
       data: {
-        embedType: embedType ?? existingWidget.embedType,
         config: (validatedConfig ?? existingWidget.config) as any,
       },
     });
@@ -200,7 +198,7 @@ const fetchPublicWidgetData = async (
   try {
     const { widgetId } = req.params;
 
-    console.log('🔍 Fetching widget with ID:', widgetId);
+    console.log("🔍 Fetching widget with ID:", widgetId);
 
     // Validate widget ID
     if (!widgetId) {
@@ -226,11 +224,10 @@ const fetchPublicWidgetData = async (
       },
     });
 
-    console.log('📦 Widget found:', widget ? 'YES' : 'NO');
+    console.log("📦 Widget found:", widget ? "YES" : "NO");
     if (widget) {
-      console.log('📋 Widget details:', {
+      console.log("📋 Widget details:", {
         id: widget.id,
-        embedType: widget.embedType,
         hasProject: !!widget.Project,
         projectName: widget.Project?.name,
         projectVisibility: widget.Project?.visibility,
@@ -289,7 +286,7 @@ const fetchPublicWidgetData = async (
     // Parse widget config (it's stored as JSON)
     const widgetConfig = widget.config as any;
 
-    console.log(widgetConfig)
+    console.log(widgetConfig);
 
     // Use shared default settings
     const defaultSettings: WidgetConfig = {
@@ -303,12 +300,12 @@ const fetchPublicWidgetData = async (
       rotateInterval: 5000,
       columns: 3,
       gap: 24,
-      cardStyle: 'default',
-      animation: 'fade',
-      layout: 'grid',
-      theme: 'light',
-      primaryColor: '#0066FF',
-      secondaryColor: '#00CC99',
+      cardStyle: "default",
+      animation: "fade",
+      layout: "grid",
+      theme: "light",
+      primaryColor: "#0066FF",
+      secondaryColor: "#00CC99",
     };
 
     // Prepare response data - flatten config for widget consumption
@@ -316,11 +313,16 @@ const fetchPublicWidgetData = async (
       widget: {
         id: widget.id,
         name: widgetConfig.name || widget.Project.name,
-        type: widgetConfig.type || 'testimonial',
-        layout: widgetConfig.layout || 'grid',
-        theme: widgetConfig.theme || {},
-        settings: { ...defaultSettings, ...(widgetConfig.settings || {}) },
-        embedType: widget.embedType,
+        type: widgetConfig.type || "testimonial",
+        layout: widgetConfig.layout || "grid",
+        theme: {
+          primaryColor:
+            widgetConfig.primaryColor || defaultSettings.primaryColor,
+          secondaryColor:
+            widgetConfig.secondaryColor || defaultSettings.secondaryColor,
+        },
+        // widgetConfig already contains all the settings directly (not nested)
+        settings: { ...defaultSettings, ...widgetConfig },
       },
       project: {
         name: widget.Project.name,
@@ -368,10 +370,70 @@ const fetchPublicWidgetData = async (
   }
 };
 
+/**
+ * Render HTML page for iframe embedding
+ */
+const renderWidgetPage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { widgetId } = req.params;
+
+    if (!widgetId) {
+      throw new BadRequestError("Widget ID is required");
+    }
+
+    const apiUrl =
+      process.env.API_URL || `http://localhost:${process.env.PORT || 8000}`;
+    const widgetScriptUrl = `${apiUrl}/widget/tresta-widget.js`;
+
+    // Generate simple HTML page that loads the widget
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tresta Widget</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    #widget-container {
+      width: 100%;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="widget-container"></div>
+  <script src="${widgetScriptUrl}" data-tresta-widget="${widgetId}" data-api-url="${apiUrl}" data-container="#widget-container"></script>
+</body>
+</html>`;
+
+    res.set({
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=300, s-maxage=600",
+      "X-Frame-Options": "ALLOWALL",
+      "Access-Control-Allow-Origin": "*",
+    });
+
+    return res.send(html);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   createWidget,
   updateWidget,
   listWidgets,
   deleteWidget,
   fetchPublicWidgetData,
+  renderWidgetPage,
 };

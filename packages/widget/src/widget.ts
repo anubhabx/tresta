@@ -24,6 +24,7 @@ import {
   renderBranding,
 } from "./renderer.ts";
 import { Carousel } from "./carousel.ts";
+import { detectHostTheme, prefersDarkMode } from "./theme-detector.ts";
 
 export class TrestaWidget {
   // Static methods for global widget management (implemented in index.ts)
@@ -31,22 +32,34 @@ export class TrestaWidget {
     widgetId: string,
     config?: Partial<WidgetConfig>,
   ) => TrestaWidget = () => {
-    throw new Error('TrestaWidget.init not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.init not initialized. Make sure the widget script is loaded.",
+    );
   };
   static destroy: (widgetId: string) => void = () => {
-    throw new Error('TrestaWidget.destroy not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.destroy not initialized. Make sure the widget script is loaded.",
+    );
   };
   static refresh: (widgetId: string) => Promise<void> = async () => {
-    throw new Error('TrestaWidget.refresh not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.refresh not initialized. Make sure the widget script is loaded.",
+    );
   };
   static refreshAll: () => Promise<void> = async () => {
-    throw new Error('TrestaWidget.refreshAll not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.refreshAll not initialized. Make sure the widget script is loaded.",
+    );
   };
   static get: (widgetId: string) => TrestaWidget | null = () => {
-    throw new Error('TrestaWidget.get not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.get not initialized. Make sure the widget script is loaded.",
+    );
   };
   static getAll: () => TrestaWidget[] = () => {
-    throw new Error('TrestaWidget.getAll not initialized. Make sure the widget script is loaded.');
+    throw new Error(
+      "TrestaWidget.getAll not initialized. Make sure the widget script is loaded.",
+    );
   };
   private config: WidgetConfig;
   private container: HTMLElement | null = null;
@@ -70,27 +83,55 @@ export class TrestaWidget {
    */
   private async init(): Promise<void> {
     try {
+      console.log("[TrestaWidget] Init started with config:", this.config);
+
       // Find or create container
       this.container = this.findContainer();
       if (!this.container) {
         throw new Error("Widget container not found");
       }
 
+      console.log("[TrestaWidget] Container found:", this.container);
+
       // Show loading state
       this.render(renderLoading());
 
-      // Fetch widget data
-      await this.fetchWidgetData();
+      // Fetch widget data (or use mock data for preview)
+      if (this.config.mockData) {
+        // Use mock data for preview mode
+        this.widget = this.config.mockData.widget;
+        this.testimonials = this.config.mockData.testimonials || [];
+        console.log("[TrestaWidget] Using mock data:", {
+          widget: this.widget,
+          testimonials: this.testimonials,
+        });
+      } else {
+        // Fetch from API
+        console.log("[TrestaWidget] Fetching from API...");
+        await this.fetchWidgetData();
+      }
+
+      console.log(
+        "[TrestaWidget] About to inject styles, widget is:",
+        this.widget,
+      );
 
       // Inject styles
       this.injectWidgetStyles();
 
+      console.log("[TrestaWidget] About to render widget");
+
       // Render widget
       this.renderWidget();
 
+      console.log("[TrestaWidget] Widget rendered");
+
       // Initialize carousel if needed (check config first, then widget.layout)
       const layout = this.config.settings?.layout || this.widget?.layout;
+      console.log("[TrestaWidget] Layout is:", layout);
+
       if (layout === "carousel") {
+        console.log("[TrestaWidget] Initializing carousel");
         this.initCarousel();
       }
 
@@ -98,7 +139,10 @@ export class TrestaWidget {
       if (this.config.onLoad && this.widget) {
         this.config.onLoad(this.widget);
       }
+
+      console.log("[TrestaWidget] Init complete");
     } catch (error) {
+      console.error("[TrestaWidget] Init error:", error);
       this.handleError(error as Error);
     }
   }
@@ -176,7 +220,7 @@ export class TrestaWidget {
     this.testimonials = result.data.testimonials || [];
 
     // Debug logging
-    console.log('API Response:', {
+    console.log("API Response:", {
       widget: this.widget,
       testimonials: this.testimonials,
     });
@@ -186,7 +230,7 @@ export class TrestaWidget {
    * Inject widget styles
    */
   private injectWidgetStyles(): void {
-    if (!this.widget) return;
+    if (!this.widget || !this.container) return;
 
     const theme = {
       ...DEFAULT_THEME,
@@ -219,12 +263,12 @@ export class TrestaWidget {
 
     // Allow config to override layout from database (useful for testing)
     const layout = this.config.settings?.layout || this.widget.layout;
-    
+
     // Store effective layout for use in render()
     this.effectiveLayout = layout;
 
     // Debug logging
-    console.log('Widget Settings:', {
+    console.log("Widget Settings:", {
       fromAPI: this.widget.settings,
       fromConfig: this.config.settings,
       merged: settings,
@@ -260,11 +304,15 @@ export class TrestaWidget {
 
     // Allow config to override layout
     const layout = this.config.settings?.layout || this.widget.layout;
-    
-    // Only initialize carousel if the layout is actually carousel
-    if (layout !== 'carousel') return;
 
-    const settings = this.widget.settings;
+    // Only initialize carousel if the layout is actually carousel
+    if (layout !== "carousel") return;
+
+    // Merge widget settings with config settings (config takes precedence)
+    const settings: WidgetSettings = {
+      ...this.widget.settings,
+      ...this.config.settings,
+    };
 
     // Find carousel container
     const carouselContainer = this.container.querySelector(
@@ -274,10 +322,10 @@ export class TrestaWidget {
     if (!carouselContainer) return;
 
     // Map testimonials to carousel format
-    const carouselTestimonials = this.testimonials.map(t => ({
+    const carouselTestimonials = this.testimonials.map((t) => ({
       id: t.id,
-      name: t.authorName || 'Anonymous',
-      role: t.authorRole || '',
+      name: t.authorName || "Anonymous",
+      role: t.authorRole || "",
       company: t.authorCompany,
       content: t.content,
       avatar: t.authorAvatar,
@@ -295,8 +343,9 @@ export class TrestaWidget {
       autoplaySpeed: settings.rotateInterval ?? 5000,
       showRating: settings.showRating ?? true,
       showCompany: settings.showAuthorCompany ?? true,
-      showAvatar: settings.showAvatar ?? true,
+      showAvatar: settings.showAvatar ?? false, // Default to false to match form default
       showDate: settings.showDate ?? true,
+      showNavigation: settings.showNavigation ?? true,
       onSlideChange: (index) => {
         this.currentSlide = index;
       },
@@ -306,8 +355,6 @@ export class TrestaWidget {
     (this as any).carouselInstance = carousel;
   }
 
-
-
   /**
    * Render HTML content to container
    */
@@ -316,10 +363,16 @@ export class TrestaWidget {
 
     this.container.innerHTML = html;
 
-    // Add layout class to container - use effective layout if available
+    // Add layout class, card style class, and animation class to container
     if (this.widget) {
       const layoutClass = this.effectiveLayout || this.widget.layout;
-      this.container.className = `tresta-widget-${this.config.widgetId} tresta-layout-${layoutClass}`;
+      const settings = {
+        ...this.widget.settings,
+        ...this.config.settings,
+      };
+      const cardStyle = settings.cardStyle || "default";
+      const animation = settings.animation || "fade";
+      this.container.className = `tresta-widget-${this.config.widgetId} tresta-layout-${layoutClass} tresta-card-style-${cardStyle} tresta-animation-${animation}`;
     }
   }
 

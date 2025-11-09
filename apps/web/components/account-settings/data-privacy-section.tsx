@@ -51,13 +51,13 @@ export function DataPrivacySection({
       setIsExporting(true);
 
       // Fetch user's projects
-      const projectsResponse = await api.get("/projects");
+      const projectsResponse = await api.get("/api/projects");
       const projects = projectsResponse.data?.data || [];
 
       // Fetch user's widgets (from all projects)
       const widgetsPromises = projects.map((project: any) =>
         api
-          .get(`/projects/${project.slug}/widgets`)
+          .get(`/api/projects/${project.slug}/widgets`)
           .catch(() => ({ data: { data: [] } })),
       );
       const widgetsResponses = await Promise.all(widgetsPromises);
@@ -68,7 +68,7 @@ export function DataPrivacySection({
       // Fetch user's testimonials (from all projects)
       const testimonialsPromises = projects.map((project: any) =>
         api
-          .get(`/projects/${project.slug}/testimonials`)
+          .get(`/api/projects/${project.slug}/testimonials`)
           .catch(() => ({ data: { data: [] } })),
       );
       const testimonialsResponses = await Promise.all(testimonialsPromises);

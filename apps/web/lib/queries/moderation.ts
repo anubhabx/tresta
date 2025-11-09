@@ -34,7 +34,7 @@ function useGetModerationQueue(slug: string, filters?: ModerationQueueFilters) {
       if (filters?.limit) params.append("limit", filters.limit.toString());
 
       const response = await api.get<ModerationQueueResponse>(
-        `/projects/${slug}/testimonials/moderation/queue?${params.toString()}`,
+        `/api/projects/${slug}/testimonials/moderation/queue?${params.toString()}`,
       );
       return response.data;
     },
@@ -52,7 +52,7 @@ function useBulkModerationAction(slug: string) {
   return useMutation({
     mutationFn: async (payload: BulkModerationPayload) => {
       const response = await api.post(
-        `/projects/${slug}/testimonials/moderation/bulk`,
+        `/api/projects/${slug}/testimonials/moderation/bulk`,
         payload,
       );
       return response.data.data;

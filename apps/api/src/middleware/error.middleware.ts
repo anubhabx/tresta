@@ -10,7 +10,7 @@ export const errorHandler = (
   error: Error | ApiError,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // Log error for debugging (in production, use a proper logger)
   console.error("Error:", {
@@ -18,7 +18,7 @@ export const errorHandler = (
     stack: error.stack,
     url: req.url,
     method: req.method,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   // Handle ApiError instances (custom errors from errors.ts)
@@ -28,7 +28,7 @@ export const errorHandler = (
       error.statusCode,
       error.message,
       getErrorCode(error.statusCode),
-      process.env.NODE_ENV === "development" ? error.stack : undefined
+      process.env.NODE_ENV === "development" ? error.stack : undefined,
     );
   }
 
@@ -37,7 +37,7 @@ export const errorHandler = (
     return ResponseHandler.validationError(
       res,
       error.message,
-      (error as any).errors
+      (error as any).errors,
     );
   }
 
@@ -51,7 +51,7 @@ export const errorHandler = (
     res,
     process.env.NODE_ENV === "development"
       ? error.message
-      : "An unexpected error occurred"
+      : "An unexpected error occurred",
   );
 };
 
@@ -67,7 +67,7 @@ function getErrorCode(statusCode: number): string {
     409: "CONFLICT",
     422: "VALIDATION_ERROR",
     500: "INTERNAL_ERROR",
-    503: "SERVICE_UNAVAILABLE"
+    503: "SERVICE_UNAVAILABLE",
   };
 
   return errorCodes[statusCode] || `ERROR_${statusCode}`;
@@ -79,12 +79,9 @@ function getErrorCode(statusCode: number): string {
 export const notFoundHandler = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  ResponseHandler.notFound(
-    res,
-    `Route ${req.method} ${req.path} not found`
-  );
+  ResponseHandler.notFound(res, `Route ${req.method} ${req.path} not found`);
 };
 
 /**
@@ -92,7 +89,7 @@ export const notFoundHandler = (
  * Eliminates the need for try-catch blocks in every controller
  */
 export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);

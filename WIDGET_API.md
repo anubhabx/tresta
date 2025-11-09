@@ -266,6 +266,7 @@ Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600
 ```
 
 **Breakdown:**
+
 - `public` - Can be cached by CDN and browsers
 - `max-age=60` - Browser caches for 60 seconds (1 minute)
 - `s-maxage=300` - CDN caches for 300 seconds (5 minutes)
@@ -277,15 +278,16 @@ The widget query hooks implement aggressive caching:
 
 ```typescript
 usePublicWidgetData(widgetId, {
-  staleTime: 1000 * 60 * 5,        // 5 minutes
-  gcTime: 1000 * 60 * 30,          // 30 minutes
-  refetchOnMount: false,            // Don't refetch on mount
-  refetchOnWindowFocus: false,      // Don't refetch on focus
-  refetchOnReconnect: false,        // Don't refetch on reconnect
-})
+  staleTime: 1000 * 60 * 5, // 5 minutes
+  gcTime: 1000 * 60 * 30, // 30 minutes
+  refetchOnMount: false, // Don't refetch on mount
+  refetchOnWindowFocus: false, // Don't refetch on focus
+  refetchOnReconnect: false, // Don't refetch on reconnect
+});
 ```
 
 **Benefits:**
+
 - Reduces API calls by 90%+
 - Faster widget loads (instant from cache)
 - Better user experience
@@ -294,6 +296,7 @@ usePublicWidgetData(widgetId, {
 ### Cache Invalidation
 
 Caches are automatically invalidated when:
+
 - Widget configuration is updated
 - Widget is deleted
 - Testimonials are published/unpublished
@@ -307,6 +310,7 @@ Caches are automatically invalidated when:
 Only widgets from **PUBLIC** and **ACTIVE** projects can be accessed via the public endpoint.
 
 **Checks performed:**
+
 ```typescript
 // Project must exist
 if (!widget.Project) {
@@ -329,6 +333,7 @@ if (widget.Project.visibility !== "PUBLIC") {
 Sensitive data is NEVER exposed in public endpoints:
 
 **Excluded from public response:**
+
 - Author email addresses
 - IP addresses
 - User agent strings
@@ -337,6 +342,7 @@ Sensitive data is NEVER exposed in public endpoints:
 - User IDs
 
 **Only published testimonials are returned:**
+
 ```typescript
 where: {
   isPublished: true,
@@ -347,6 +353,7 @@ where: {
 ### 3. Rate Limiting
 
 Results are limited to prevent abuse:
+
 - Maximum 100 testimonials per widget
 - Aggressive caching reduces request volume
 - Future: IP-based rate limiting
@@ -354,6 +361,7 @@ Results are limited to prevent abuse:
 ### 4. CORS Configuration
 
 Public endpoint allows cross-origin requests:
+
 ```
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, OPTIONS
@@ -396,37 +404,37 @@ function TestimonialWidget({ widgetId }: { widgetId: string }) {
 async function loadWidget(widgetId) {
   try {
     const response = await fetch(
-      `https://api.tresta.com/api/widgets/${widgetId}/public`
+      `https://api.tresta.com/api/widgets/${widgetId}/public`,
     );
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
       const { testimonials } = result.data;
       renderTestimonials(testimonials);
     }
   } catch (error) {
-    console.error('Failed to load widget:', error);
+    console.error("Failed to load widget:", error);
   }
 }
 
 function renderTestimonials(testimonials) {
-  const container = document.getElementById('testimonials');
-  
-  testimonials.forEach(testimonial => {
-    const card = document.createElement('div');
-    card.className = 'testimonial-card';
+  const container = document.getElementById("testimonials");
+
+  testimonials.forEach((testimonial) => {
+    const card = document.createElement("div");
+    card.className = "testimonial-card";
     card.innerHTML = `
       <h3>${testimonial.authorName}</h3>
       <p>${testimonial.content}</p>
-      ${testimonial.rating ? `<div class="rating">${'⭐'.repeat(testimonial.rating)}</div>` : ''}
+      ${testimonial.rating ? `<div class="rating">${"⭐".repeat(testimonial.rating)}</div>` : ""}
     `;
     container.appendChild(card);
   });
 }
 
 // Load widget on page load
-loadWidget('clx456def...');
+loadWidget("clx456def...");
 ```
 
 ### cURL
@@ -482,14 +490,14 @@ curl -X DELETE https://api.tresta.com/api/widgets/clx456def... \
 
 ### Common Error Codes
 
-| Status Code | Error Code | Description |
-|------------|------------|-------------|
-| 400 | BAD_REQUEST | Invalid request parameters |
-| 401 | UNAUTHORIZED | Authentication required |
-| 403 | FORBIDDEN | Widget is not public or project is not active |
-| 404 | NOT_FOUND | Widget or project not found |
-| 429 | TOO_MANY_REQUESTS | Rate limit exceeded |
-| 500 | INTERNAL_SERVER_ERROR | Server error |
+| Status Code | Error Code            | Description                                   |
+| ----------- | --------------------- | --------------------------------------------- |
+| 400         | BAD_REQUEST           | Invalid request parameters                    |
+| 401         | UNAUTHORIZED          | Authentication required                       |
+| 403         | FORBIDDEN             | Widget is not public or project is not active |
+| 404         | NOT_FOUND             | Widget or project not found                   |
+| 429         | TOO_MANY_REQUESTS     | Rate limit exceeded                           |
+| 500         | INTERNAL_SERVER_ERROR | Server error                                  |
 
 ### Handling Errors in Frontend
 
@@ -514,11 +522,13 @@ if (error) {
 ### Current Limits
 
 **Public Endpoint:**
+
 - No explicit rate limiting (relying on caching)
 - Maximum 100 testimonials per request
 - Aggressive HTTP caching reduces requests
 
 **Protected Endpoints:**
+
 - Standard API rate limits apply (future implementation)
 
 ### Best Practices
@@ -555,6 +565,7 @@ if (error) {
 ## 🔄 Changelog
 
 ### v1.0 (Current)
+
 - ✅ Public widget data endpoint
 - ✅ Widget CRUD operations
 - ✅ Aggressive caching strategy
@@ -562,6 +573,7 @@ if (error) {
 - ✅ TanStack Query integration
 
 ### Planned (v1.1)
+
 - ⏳ Rate limiting implementation
 - ⏳ Webhook notifications on widget updates
 - ⏳ Analytics tracking (view counts)
@@ -581,6 +593,7 @@ if (error) {
 ## 🆘 Support
 
 **Issues & Questions:**
+
 - GitHub Issues: [https://github.com/your-org/tresta/issues](https://github.com/your-org/tresta/issues)
 - Email: support@tresta.com
 - Discord: [https://discord.gg/tresta](https://discord.gg/tresta)

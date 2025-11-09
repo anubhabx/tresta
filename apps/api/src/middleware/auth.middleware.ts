@@ -5,7 +5,7 @@ import { clerkClient, getAuth } from "@clerk/express";
 export const attachUser = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { userId } = getAuth(req);

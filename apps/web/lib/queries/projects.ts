@@ -18,7 +18,7 @@ export const projects = {
         queryKey: ["projects", "list", page, limit],
         queryFn: async () => {
           const response = await api.get<PaginatedResponse<Project>>(
-            `/projects`,
+            `/api/projects`,
             {
               params: { page, limit },
             },
@@ -35,7 +35,7 @@ export const projects = {
         queryKey: ["projects", "detail", slug],
         queryFn: async () => {
           const response = await api.get<ApiResponse<Project>>(
-            `/projects/${slug}`,
+            `/api/projects/${slug}`,
           );
           return response.data.data;
         },
@@ -52,7 +52,7 @@ export const projects = {
       return useMutation<Project, Error, CreateProjectPayload>({
         mutationFn: async (data: CreateProjectPayload) => {
           const response = await api.post<ApiResponse<Project>>(
-            "/projects",
+            "/api/projects",
             data,
           );
           return response.data.data;
@@ -75,7 +75,7 @@ export const projects = {
       return useMutation<Project, Error, UpdateProjectPayload>({
         mutationFn: async (data: UpdateProjectPayload) => {
           const response = await api.put<ApiResponse<Project>>(
-            `/projects/${slug}`,
+            `/api/projects/${slug}`,
             data,
           );
           return response.data.data;
@@ -115,7 +115,7 @@ export const projects = {
 
       return useMutation<void, Error, void>({
         mutationFn: async () => {
-          await api.delete(`/projects/${slug}`);
+          await api.delete(`/api/projects/${slug}`);
         },
         onSuccess: () => {
           // Remove from detail cache
