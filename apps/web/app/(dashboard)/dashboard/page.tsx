@@ -10,6 +10,8 @@ import {
   RecentProjectsList,
   DashboardEmptyState,
   GettingStartedCard,
+  PendingActionsCard,
+  QuickInsightsCard,
 } from "@/components/dashboard";
 import { useUser } from "@clerk/nextjs";
 
@@ -43,7 +45,7 @@ const DashboardPage = () => {
     (p) => new Date(p.createdAt) > sevenDaysAgo,
   ).length;
 
-  const recentProjects = projectsList.slice(0, 5);
+  const recentProjects = projectsList.slice(0, 3);
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8 w-full h-full p-4 sm:p-6 max-w-7xl mx-auto">
@@ -61,7 +63,7 @@ const DashboardPage = () => {
           <Link href="/projects/new" className="w-full sm:w-auto">
             <Button size="lg" className="w-full sm:w-auto shadow-sm">
               <span className="mr-2">+</span>
-              Create Project
+              New Project
             </Button>
           </Link>
         )}
@@ -88,15 +90,31 @@ const DashboardPage = () => {
             />
           </section>
 
-          {/* Recent Projects Section */}
-          <section>
-            <div className="mb-3 sm:mb-4">
-              <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                Recent Projects
-              </h2>
-            </div>
-            <RecentProjectsList projects={recentProjects} />
-          </section>
+          {/* Pending Actions - Only shows when there are actionable items */}
+          <PendingActionsCard projects={projectsList} />
+
+          {/* Two Column Layout for Recent Projects and Quick Insights */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Recent Projects - Takes 2 columns */}
+            <section className="lg:col-span-2">
+              <div className="mb-3 sm:mb-4">
+                <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  Recent Projects
+                </h2>
+              </div>
+              <RecentProjectsList projects={recentProjects} />
+            </section>
+
+            {/* Quick Insights - Takes 1 column */}
+            <section>
+              <div className="mb-3 sm:mb-4">
+                <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  Quick Insights
+                </h2>
+              </div>
+              <QuickInsightsCard projects={projectsList} />
+            </section>
+          </div>
 
           {/* Getting Started Section */}
           <section>

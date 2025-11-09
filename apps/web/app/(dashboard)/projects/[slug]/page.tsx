@@ -27,15 +27,19 @@ import {
   ProjectWidgetsTab,
   ProjectApiKeysTab,
 } from "@/components/project-detail";
+import { useSearchParams } from "next/navigation";
 
 interface ProjectPageProps {
   params: Promise<{
     slug: string;
   }>;
+
 }
 
 const ProjectPage = ({ params }: ProjectPageProps) => {
   const { slug } = use(params);
+
+  const tab = useSearchParams().get("tab") as string | undefined;
 
   const { data: project, isLoading: isLoadingProject } =
     projects.queries.useDetail(slug as string);
@@ -77,7 +81,7 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
 
       <ProjectStatsCards project={project} />
 
-      <Tabs defaultValue="overview" className="w-full">
+      <Tabs defaultValue={tab || "overview"} className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
