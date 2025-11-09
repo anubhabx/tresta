@@ -1,7 +1,7 @@
 "use client";
 
 import { EmptyProjects } from "@/components/empty-projects";
-import { LoadingStars } from "@/components/loader";
+import { ProjectsListPageSkeleton } from "@/components/skeletons";
 import { projects } from "@/lib/queries";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -22,11 +22,7 @@ const ProjectsPage = () => {
     projects.queries.useList(1, 100);
 
   if (isLoadingProjects) {
-    return (
-      <div className="flex flex-col gap-4 w-full h-full items-center justify-center">
-        <LoadingStars />
-      </div>
-    );
+    return <ProjectsListPageSkeleton />;
   }
 
   const projectsList = projectsData?.data || [];
