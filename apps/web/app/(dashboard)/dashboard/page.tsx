@@ -90,9 +90,6 @@ const DashboardPage = () => {
             />
           </section>
 
-          {/* Pending Actions - Only shows when there are actionable items */}
-          <PendingActionsCard projects={projectsList} />
-
           {/* Two Column Layout for Recent Projects and Quick Insights */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Recent Projects - Takes 2 columns */}

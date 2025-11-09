@@ -16,20 +16,20 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
   }
 
   // Find top performing project
-  const topProject = projects.reduce((prev, current) => {
+  const topProject = projects.reduce<Project>((prev, current) => {
     const prevCount = prev._count?.testimonials || 0;
     const currentCount = current._count?.testimonials || 0;
     return currentCount > prevCount ? current : prev;
-  }, projects[0]);
+  }, projects[0]!);
 
   const topProjectCount = topProject._count?.testimonials || 0;
 
   // Find most recently updated project
-  const mostRecentProject = projects.reduce((prev, current) => {
+  const mostRecentProject = projects.reduce<Project>((prev, current) => {
     return new Date(current.updatedAt) > new Date(prev.updatedAt)
       ? current
       : prev;
-  }, projects[0]);
+  }, projects[0]!);
 
   // Only show if there's meaningful data
   if (topProjectCount === 0) {
@@ -38,7 +38,7 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
 
   return (
     <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-      <CardContent className="p-4 sm:p-5">
+      <CardContent>
         <div className="space-y-3">
           {/* Top performing project */}
           <Link
@@ -65,7 +65,7 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
           {/* Most recent activity */}
           <Link
             href={`/projects/${mostRecentProject.slug}`}
-            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors group"
+            className="flex items-start gap-3 p-3 rounded-lg transition-colors group"
           >
             <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex-shrink-0 mt-0.5">
               <ClockIcon className="h-4 w-4 text-blue-600 dark:text-blue-500" />
@@ -87,6 +87,6 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
           </Link>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card >
+  )
 }
