@@ -1,424 +1,313 @@
-# Requirements Document - Notification & Email System
+# Requirements Document - Notification & Email System (MVP)
 
 ## Introduction
 
-This document outlines the requirements for implementing a cost-effective notification and email system for the Tresta testimonial management platform. The system will enable users to receive timely notifications about important events while operating within strict service limits.
+This document outlines the MVP requirements for a lean, cost-effective notification and email system for Tresta. The focus is on shipping a polished, maintainable solution that works within free-tier constraints.
 
-### Service Constraints (Launch Phase)
+### Guiding Principle
 
-**Resend (Email Service):**
-- 200 emails per day limit
-- Requires smart email batching and prioritization
+**"Ship something maintainable that feels polished — not enterprise-grade for 200 users."**
 
-**Ably (Real-time Messaging):**
-- 200 concurrent connections limit
-- 6 million messages per month (~200K per day)
-- Requires efficient connection management
+### MVP Goals
+
+✅ Inform users in-app (real-time via Ably)
+✅ Email them only for critical updates
+✅ Respect free-tier limits automatically
+✅ Look branded and professional
+
+### Service Constraints
+
+**Resend:** 200 emails/day
+**Ably:** 200 concurrent connections, 6M messages/month
 
 ### Design Philosophy
 
-Given these constraints, the system prioritizes:
-1. **Email efficiency** - Batch notifications, digest mode by default
-2. **Smart prioritization** - Only critical events trigger immediate emails
-3. **In-app first** - Leverage Ably for most notifications
-4. **User control** - Let users opt-in to emails for specific events
-5. **Graceful degradation** - System works even if limits are reached
+- **In-app first** - Most notifications via Ably
+- **Critical emails only** - High-risk flags, security alerts
+- **Daily digest** - One email per day for non-critical updates
+- **Simple preferences** - Single toggle, not a matrix
+- **Graceful fallback** - Polling if Ably fails
+
+---
 
 ## Glossary
 
 - **System**: The Tresta notification and email system
 - **User**: A registered user of the Tresta platform
 - **Notification**: An in-app message alerting users to events
-- **Email**: An external email message sent to the user's registered email address
-- **Event**: An action or occurrence that triggers a notification
-- **Preference**: User-defined settings for notification delivery
-- **Template**: A reusable email or notification format
-- **Queue**: A system for managing and delivering notifications asynchronously
-- **Digest**: A batched summary of multiple notifications sent as one email
-- **Priority Level**: Classification of events (Critical, High, Normal, Low)
-- **Resend**: Third-party transactional email service provider
-- **Ably**: Third-party real-time messaging service provider
+- **Critical Event**: High-risk testimonial flag or security alert requiring immediate email
+- **Digest**: Daily batched email summary of non-critical notifications
+- **Ably**: Real-time messaging service for in-app notifications
+- **Resend**: Transactional email service provider
+- **BullMQ**: Queue system for async notification processing
+
+---
 
 ## Requirements
 
-### Requirement 1: In-App Notifications
+### Requirement 1: In-App Notifications (Ably)
 
-**User Story:** As a user, I want to receive in-app notifications about important events, so that I stay informed about my projects without leaving the application.
-
-#### Acceptance Criteria
-
-1. WHEN a new testimonial is submitted, THE System SHALL create an in-app notification for the project owner
-2. WHEN a testimonial requires moderation, THE System SHALL create a notification with a direct link to the moderation queue
-3. WHEN the user clicks on a notification, THE System SHALL mark it as read and navigate to the relevant page
-4. THE System SHALL display unread notification count in the application header
-5. THE System SHALL provide a notification center accessible from the header
-
----
-
-### Requirement 2: Email Notifications (Cost-Optimized)
-
-**User Story:** As a user, I want to receive email notifications for critical events, so that I can stay informed even when I'm not actively using the application.
-
-#### Acceptance Criteria
-
-1. WHEN a testimonial is flagged by auto-moderation as high-risk, THE System SHALL send an immediate email alert to the project owner
-2. WHEN the daily email limit is not exceeded, THE System SHALL send email notifications for user-enabled event types
-3. WHEN the daily email limit is reached, THE System SHALL queue emails for next-day delivery
-4. THE System SHALL include relevant details and action links in email notifications
-5. THE System SHALL use professional, branded email templates via Resend
-6. THE System SHALL respect user email preferences before sending
-7. THE System SHALL default users to digest mode to conserve email quota
-
----
-
-### Requirement 3: Notification Preferences (Email-Conscious)
-
-**User Story:** As a user, I want to control which notifications I receive and how, so that I only get alerts that are relevant to me.
-
-#### Acceptance Criteria
-
-1. THE System SHALL provide a notification preferences page in user settings
-2. THE System SHALL allow users to enable or disable in-app notifications per event type
-3. THE System SHALL allow users to enable or disable email notifications per event type
-4. THE System SHALL default new users to "Daily Digest" mode for emails
-5. THE System SHALL allow users to opt-in to immediate emails for specific critical events
-6. WHEN a user disables a notification type, THE System SHALL not send notifications of that type
-7. THE System SHALL save preference changes immediately
-8. THE System SHALL display current email quota usage to users
-
----
-
-### Requirement 4: Notification Types
-
-**User Story:** As a user, I want to receive notifications for different types of events, so that I can respond appropriately to each situation.
-
-#### Acceptance Criteria
-
-1. THE System SHALL support "New Testimonial" notification type
-2. THE System SHALL support "Testimonial Flagged" notification type
-3. THE System SHALL support "Testimonial Approved" notification type
-4. THE System SHALL support "Testimonial Rejected" notification type
-5. THE System SHALL support "Widget Created" notification type
-6. THE System SHALL support "Project Milestone" notification type (e.g., 10, 50, 100 testimonials)
-
----
-
-### Requirement 5: Notification Center
-
-**User Story:** As a user, I want to view all my notifications in one place, so that I can review past alerts and take action on them.
-
-#### Acceptance Criteria
-
-1. THE System SHALL display notifications in reverse chronological order
-2. THE System SHALL visually distinguish read from unread notifications
-3. THE System SHALL allow users to mark individual notifications as read
-4. THE System SHALL allow users to mark all notifications as read
-5. THE System SHALL allow users to delete individual notifications
-6. THE System SHALL paginate notifications when more than 20 exist
-
----
-
-### Requirement 6: Email Templates
-
-**User Story:** As a user, I want to receive well-formatted, professional emails, so that the notifications are easy to read and understand.
-
-#### Acceptance Criteria
-
-1. THE System SHALL use responsive HTML email templates
-2. THE System SHALL include the Tresta branding in email templates
-3. THE System SHALL include clear call-to-action buttons in emails
-4. THE System SHALL include an unsubscribe link in all emails
-5. THE System SHALL support both light and dark mode email rendering
-
----
-
-### Requirement 7: Notification Delivery (Quota-Aware)
-
-**User Story:** As a user, I want notifications to be delivered reliably and quickly, so that I can respond to events in a timely manner.
-
-#### Acceptance Criteria
-
-1. THE System SHALL deliver in-app notifications via Ably within 5 seconds of event occurrence
-2. THE System SHALL queue email notifications for asynchronous delivery via Resend
-3. THE System SHALL track daily email quota usage (200 emails/day limit)
-4. WHEN email quota is exceeded, THE System SHALL defer non-critical emails to next day
-5. THE System SHALL prioritize critical emails (high-risk flags, security alerts) over normal emails
-6. THE System SHALL retry failed email deliveries up to 2 times
-7. THE System SHALL log all notification delivery attempts
-8. THE System SHALL handle email delivery failures gracefully
-
----
-
-### Requirement 8: Notification Grouping
-
-**User Story:** As a user, I want similar notifications to be grouped together, so that I'm not overwhelmed by multiple alerts for the same type of event.
-
-#### Acceptance Criteria
-
-1. WHEN multiple testimonials are submitted within 1 hour, THE System SHALL group them into a single notification
-2. THE System SHALL display the count of grouped events in the notification
-3. WHEN the user clicks a grouped notification, THE System SHALL show all related items
-4. THE System SHALL allow users to expand grouped notifications to see details
-5. THE System SHALL limit grouping to a maximum of 10 events per notification
-
----
-
-### Requirement 9: Real-Time Updates (Ably Integration)
-
-**User Story:** As a user, I want to see new notifications appear in real-time, so that I'm immediately aware of important events.
+**User Story:** As a user, I want to receive real-time in-app notifications, so that I stay informed while using the application.
 
 #### Acceptance Criteria
 
 1. THE System SHALL use Ably for real-time notification delivery
-2. THE System SHALL manage Ably connections efficiently to stay within 200 concurrent connection limit
-3. WHEN a new notification arrives, THE System SHALL update the notification count immediately
-4. WHEN a new notification arrives, THE System SHALL display a brief toast message
-5. THE System SHALL maintain Ably connection across page navigation
-6. THE System SHALL reconnect automatically if the connection is lost
-7. THE System SHALL disconnect idle users after 30 minutes to free connection slots
-8. THE System SHALL use Ably channels per user for targeted message delivery
+2. THE System SHALL create one Ably channel per user for targeted delivery
+3. WHEN a new testimonial is submitted, THE System SHALL send an in-app notification
+4. WHEN a testimonial is flagged by auto-moderation, THE System SHALL send an in-app notification
+5. THE System SHALL display unread notification count in the application header
+6. THE System SHALL disconnect idle users after 30 minutes to conserve connections
+7. THE System SHALL reconnect automatically when user returns to application
 
 ---
 
-### Requirement 10: Notification Actions
+### Requirement 2: Notification Center
 
-**User Story:** As a user, I want to take quick actions directly from notifications, so that I can respond efficiently without navigating through multiple pages.
+**User Story:** As a user, I want to view my notifications in one place, so that I can review and act on them.
 
 #### Acceptance Criteria
 
-1. THE System SHALL provide "View" action for all notifications
-2. THE System SHALL provide "Approve" action for testimonial moderation notifications
-3. THE System SHALL provide "Reject" action for testimonial moderation notifications
-4. WHEN a user takes an action from a notification, THE System SHALL update the notification status
-5. THE System SHALL disable action buttons after an action is taken
+1. THE System SHALL provide a notification center accessible from the header
+2. THE System SHALL display notifications in reverse chronological order
+3. THE System SHALL visually distinguish read from unread notifications
+4. WHEN a user clicks a notification, THE System SHALL mark it as read and navigate to the relevant page
+5. THE System SHALL allow users to mark all notifications as read
+6. THE System SHALL display the last 30 days of notifications
+7. THE System SHALL show a toast message when new notifications arrive
 
 ---
 
-### Requirement 11: Email Service Integration
+### Requirement 3: Critical Email Alerts
 
-**User Story:** As a system administrator, I want the system to integrate with a reliable email service, so that emails are delivered successfully.
+**User Story:** As a user, I want to receive immediate emails for critical events, so that I can respond quickly even when offline.
 
 #### Acceptance Criteria
 
-1. THE System SHALL integrate with a transactional email service provider
-2. THE System SHALL support email service configuration via environment variables
-3. THE System SHALL track email delivery status (sent, delivered, bounced, failed)
-4. THE System SHALL handle email service rate limits appropriately
-5. THE System SHALL provide fallback mechanisms for email delivery failures
+1. WHEN a testimonial is flagged as high-risk by auto-moderation, THE System SHALL send an immediate email
+2. WHEN a security-related event occurs, THE System SHALL send an immediate email
+3. THE System SHALL use Resend for email delivery
+4. THE System SHALL include a direct action link in critical emails
+5. THE System SHALL use a professional, branded HTML email template
+6. THE System SHALL respect user email preferences before sending
 
 ---
 
-### Requirement 12: Notification History
+### Requirement 4: Daily Digest Email
 
-**User Story:** As a user, I want to access my notification history, so that I can review past events and actions.
+**User Story:** As a user, I want to receive a daily summary of non-critical notifications, so that I stay informed without email overload.
 
 #### Acceptance Criteria
 
-1. THE System SHALL retain notifications for 90 days
-2. THE System SHALL allow users to filter notifications by type
-3. THE System SHALL allow users to filter notifications by read/unread status
-4. THE System SHALL allow users to search notifications by content
-5. THE System SHALL archive notifications older than 90 days
+1. THE System SHALL send a daily digest email at 9 AM UTC
+2. THE System SHALL include all non-critical notifications from the past 24 hours in the digest
+3. THE System SHALL group similar notifications (e.g., "5 new testimonials") in the digest
+4. WHEN no notifications exist for the day, THE System SHALL not send a digest email
+5. THE System SHALL limit digest to 50 notifications maximum
+6. THE System SHALL use the same branded template as critical emails
 
 ---
 
-### Requirement 13: Batch Notifications (Default Strategy)
+### Requirement 5: Notification Preferences
 
-**User Story:** As a user, I want to receive a daily or weekly digest of notifications, so that I'm not interrupted frequently but still stay informed.
+**User Story:** As a user, I want to control my email notifications, so that I only receive emails when I want them.
 
 #### Acceptance Criteria
 
-1. THE System SHALL enable daily digest mode by default for all new users
-2. THE System SHALL support daily digest email option
-3. THE System SHALL support weekly digest email option
-4. WHEN digest mode is enabled, THE System SHALL batch non-urgent notifications
-5. THE System SHALL send digest emails at 9 AM user local time
-6. THE System SHALL still send immediate emails for critical events (high-risk flags)
-7. THE System SHALL include up to 50 notifications per digest email
-8. WHEN no notifications exist for a digest period, THE System SHALL not send an email
+1. THE System SHALL provide a notification preferences page in user settings
+2. THE System SHALL provide a single toggle: "Receive email notifications"
+3. WHEN the toggle is disabled, THE System SHALL not send any emails to the user
+4. WHEN the toggle is enabled, THE System SHALL send critical alerts and daily digest
+5. THE System SHALL enable email notifications by default for new users
+6. THE System SHALL save preference changes immediately
 
 ---
 
-### Requirement 14: Notification Security
+### Requirement 6: Notification Queue (BullMQ)
 
-**User Story:** As a user, I want my notifications to be secure and private, so that sensitive information is protected.
+**User Story:** As a system, I want to queue notifications for reliable async delivery, so that the application remains responsive.
 
 #### Acceptance Criteria
 
-1. THE System SHALL only show notifications to the authenticated user who owns them
-2. THE System SHALL include authentication tokens in email notification links
-3. THE System SHALL expire notification action links after 7 days
-4. THE System SHALL sanitize notification content to prevent XSS attacks
-5. THE System SHALL encrypt sensitive data in notification payloads
+1. THE System SHALL use BullMQ with Redis for notification queueing
+2. THE System SHALL queue all notifications for async processing
+3. THE System SHALL process in-app notifications within 5 seconds
+4. THE System SHALL process email notifications within 1 minute
+5. THE System SHALL retry failed Ably publishes up to 2 times
+6. THE System SHALL retry failed email sends up to 2 times
+7. THE System SHALL log all notification processing attempts
 
 ---
 
-### Requirement 15: Mobile Responsiveness
+### Requirement 7: Email Quota Management
 
-**User Story:** As a user, I want to access notifications on my mobile device, so that I can stay informed on the go.
+**User Story:** As a system, I want to track email usage, so that I stay within the 200 emails/day limit.
 
 #### Acceptance Criteria
 
-1. THE System SHALL display notifications in a mobile-friendly format
-2. THE System SHALL provide touch-friendly notification actions
-3. THE System SHALL render email templates responsively on mobile devices
-4. THE System SHALL support mobile push notifications (future enhancement)
-5. THE System SHALL optimize notification center for mobile screens
+1. THE System SHALL track daily email count in the database
+2. THE System SHALL reset the email counter at midnight UTC
+3. WHEN email count reaches 180 (90%), THE System SHALL log a warning
+4. WHEN email count reaches 200, THE System SHALL defer non-critical emails to next day
+5. THE System SHALL always send critical emails regardless of quota
+6. THE System SHALL store deferred emails in the database for next-day delivery
 
 ---
 
-### Requirement 16: Service Quota Management
+### Requirement 8: Fallback Mechanism
 
-**User Story:** As a system administrator, I want to monitor and manage service quotas, so that the system operates reliably within free tier limits.
+**User Story:** As a user, I want to still receive notifications if real-time delivery fails, so that I don't miss important events.
 
 #### Acceptance Criteria
 
-1. THE System SHALL track Resend email quota usage (daily count out of 200)
-2. THE System SHALL track Ably connection count (current out of 200)
-3. THE System SHALL track Ably message count (monthly count out of 6 million)
-4. WHEN email quota reaches 80%, THE System SHALL alert administrators
-5. WHEN email quota reaches 100%, THE System SHALL defer non-critical emails
-6. WHEN Ably connection limit is reached, THE System SHALL queue new connections
-7. THE System SHALL provide an admin dashboard showing quota usage
-8. THE System SHALL reset email quota counter at midnight UTC daily
+1. WHEN Ably connection fails, THE System SHALL fall back to polling every 30 seconds
+2. THE System SHALL automatically resume Ably connection when available
+3. THE System SHALL log fallback activations for monitoring
+4. WHEN polling is active, THE System SHALL display a connection status indicator
+5. THE System SHALL fetch unread notifications via polling API endpoint
 
 ---
 
-### Requirement 17: Development and Testing Mode
+### Requirement 9: Email Templates
 
-**User Story:** As a developer, I want to test notification functionality without consuming production quotas, so that I can develop efficiently and avoid service limits.
+**User Story:** As a user, I want to receive professional, branded emails, so that they are easy to read and trustworthy.
 
 #### Acceptance Criteria
 
-1. WHEN NODE_ENV is set to "development" or "test", THE System SHALL use mock implementations for Ably and Resend
-2. THE System SHALL provide a mock Ably client that logs messages to console instead of sending
-3. THE System SHALL provide a mock Resend client that logs emails to console or file instead of sending
-4. THE System SHALL support Mailtrap integration for email testing in staging environments
-5. THE System SHALL allow environment variable configuration to enable/disable real service calls
-6. THE System SHALL provide a test mode flag that can be toggled per user account
-7. WHEN test mode is enabled for a user, THE System SHALL log notifications instead of sending them
-8. THE System SHALL include comprehensive unit tests using mocked services
+1. THE System SHALL use a single responsive HTML email template
+2. THE System SHALL include Tresta branding (logo, colors) in the template
+3. THE System SHALL include clear call-to-action buttons in emails
+4. THE System SHALL render properly on mobile and desktop email clients
+5. THE System SHALL include an unsubscribe link in all emails
 
 ---
 
-### Requirement 18: Notification Batching and Aggregation
+### Requirement 10: Security
 
-**User Story:** As a system, I want to batch and aggregate similar notifications, so that I minimize service usage while keeping users informed.
+**User Story:** As a user, I want my notifications to be secure and private, so that my information is protected.
 
 #### Acceptance Criteria
 
-1. WHEN multiple testimonials are submitted within 1 hour for the same project, THE System SHALL aggregate them into a single notification
-2. THE System SHALL use a queue system (e.g., BullMQ) to buffer and batch notifications
-3. THE System SHALL publish one Ably message for grouped notifications instead of multiple messages
-4. THE System SHALL send one email for grouped notifications instead of multiple emails
-5. THE System SHALL display the count and summary of grouped events in the notification
-6. THE System SHALL limit batching to a maximum of 50 events per notification
-7. THE System SHALL still send immediate notifications for critical events regardless of batching
+1. THE System SHALL use token-based authentication for Ably connections
+2. THE System SHALL only show notifications to the authenticated user who owns them
+3. THE System SHALL sanitize notification content to prevent XSS attacks
+4. THE System SHALL use secure HTTPS for all notification API endpoints
+5. THE System SHALL expire notification action links after 7 days
 
 ---
 
-### Requirement 19: Rate Limiting and Throttling
+### Requirement 11: Development Mode
 
-**User Story:** As a system, I want to rate limit notification sending, so that I prevent quota exhaustion from sudden spikes.
+**User Story:** As a developer, I want to test notifications without consuming quotas, so that I can develop efficiently.
 
 #### Acceptance Criteria
 
-1. THE System SHALL implement rate limiting using a library like Bottleneck
-2. THE System SHALL limit Ably message publishing to 100 messages per minute
-3. THE System SHALL limit Resend email sending to 10 emails per minute
-4. WHEN rate limits are exceeded, THE System SHALL queue notifications for delayed delivery
-5. THE System SHALL prioritize critical notifications over normal notifications in the queue
-6. THE System SHALL log rate limit events for monitoring
-7. THE System SHALL provide configuration for rate limit thresholds via environment variables
+1. WHEN NODE_ENV is "development" or "test", THE System SHALL use mock implementations
+2. THE System SHALL log mock notifications to console instead of sending
+3. THE System SHALL provide environment variable to enable/disable real services
+4. THE System SHALL support Mailtrap for email testing in staging
+5. THE System SHALL include unit tests with mocked Ably and Resend clients
 
 ---
 
-### Requirement 20: Fallback Mechanisms
+## Notification Types (MVP)
 
-**User Story:** As a user, I want to still receive notifications even if real-time services are unavailable, so that I don't miss important events.
-
-#### Acceptance Criteria
-
-1. WHEN Ably connection fails, THE System SHALL fall back to polling-based notification retrieval
-2. THE System SHALL implement polling with exponential backoff (30s, 1min, 2min intervals)
-3. WHEN Resend quota is exhausted, THE System SHALL store emails in database for manual review
-4. THE System SHALL provide an admin interface to manually send queued emails
-5. THE System SHALL automatically resume normal operation when quotas reset
-6. THE System SHALL log all fallback activations for monitoring
-7. THE System SHALL notify administrators when fallback mode is activated
+1. **New Testimonial** - In-app + daily digest
+2. **Testimonial Flagged (High-Risk)** - In-app + immediate email
+3. **Testimonial Approved** - In-app + daily digest
+4. **Testimonial Rejected** - In-app + daily digest
+5. **Security Alert** - In-app + immediate email
 
 ---
 
 ## Non-Functional Requirements
 
 ### Performance
-- In-app notification delivery latency < 5 seconds via Ably
-- Email queue processing < 5 minutes
+- In-app notification delivery < 5 seconds
+- Email queue processing < 1 minute
 - Notification center load time < 2 seconds
-- Support for 1,000+ notifications per user
 
-### Scalability (Launch Constraints)
-- Handle up to 200 emails per day (Resend free tier)
-- Support up to 200 concurrent Ably connections
-- Stay within 6 million Ably messages per month (~200K per day)
-- Queue capacity for 1,000 pending emails
-- Graceful handling when service limits are reached
+### Scalability (MVP)
+- Support 200 concurrent users (Ably limit)
+- Handle 200 emails/day (Resend limit)
+- Stay within 6M Ably messages/month
 
 ### Reliability
-- 99% in-app notification delivery success rate
-- Automatic retry for failed email deliveries (max 2 retries)
-- Graceful degradation if real-time features fail (fallback to polling)
-- Email quota monitoring and alerting
+- 99% in-app notification delivery
+- Automatic retry for failures (2 attempts)
+- Graceful fallback to polling
 
 ### Cost Optimization
-- Prioritize in-app notifications over emails
-- Batch emails by default (digest mode)
-- Disconnect idle Ably connections after 30 minutes
-- Use efficient Ably channel structure to minimize message count
-- Monitor and alert when approaching service limits
+- Default to daily digest (not immediate emails)
+- Auto-disconnect idle Ably connections
+- Simple rate limiting (10 emails/min hardcoded)
+- Track quota in database
 
 ### Security
-- Secure Ably connections with token authentication
-- Resend API key stored in environment variables
-- Rate limiting to prevent notification spam
-- GDPR-compliant data retention (90 days)
-- Sanitize notification content to prevent XSS
-
-### Usability
-- Intuitive notification center UI
-- Clear, actionable notification messages
-- Easy-to-use preference management
-- Transparent email quota usage display
-- Accessible to users with disabilities (WCAG 2.1 AA)
+- Token-authenticated Ably connections
+- XSS-safe notification rendering
+- Secure API endpoints (HTTPS)
+- 7-day link expiration
 
 ---
 
-## Development and Testing Strategy
+## Technical Stack
 
-### Mock Implementations
+- **Real-time:** Ably (free tier)
+- **Email:** Resend (free tier)
+- **Queue:** BullMQ + Redis
+- **Database:** PostgreSQL (Prisma)
+- **Frontend:** Next.js + React
+- **Backend:** Next.js API routes
 
-**Ably Mock:**
-```typescript
-// Use conditional logic to switch between real and mock
-const ablyClient = process.env.NODE_ENV === 'production' 
-  ? new Ably.Realtime(apiKey)
-  : new MockAblyClient();
+---
+
+## Database Schema
+
+### Notifications Table
+```prisma
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // NEW_TESTIMONIAL, FLAGGED, etc.
+  title       String
+  message     String
+  link        String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
 ```
 
-**Resend Mock:**
-```typescript
-// Mock email sending in development
-const emailClient = process.env.NODE_ENV === 'production'
-  ? new Resend(apiKey)
-  : new MockResendClient();
+### NotificationPreferences Table
+```prisma
+model NotificationPreferences {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  emailEnabled      Boolean  @default(true)
+  updatedAt         DateTime @updatedAt
+  
+  user              User     @relation(fields: [userId], references: [id])
+}
 ```
 
-### Testing Tools
+### EmailUsage Table
+```prisma
+model EmailUsage {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  count       Int      @default(0)
+  
+  @@unique([date])
+}
+```
 
-1. **Unit Tests:** Jest with mocked Ably/Resend SDKs
-2. **Integration Tests:** Mailtrap for email testing (100 emails/month free)
-3. **E2E Tests:** Mock services with in-memory implementations
-4. **Load Tests:** Simulate batching without real sends
+---
+
+## Development Strategy
 
 ### Environment Configuration
 
@@ -442,35 +331,75 @@ ABLY_API_KEY=xxx
 RESEND_API_KEY=xxx
 ```
 
-### Quota Conservation During Development
+### Mock Implementations
 
-1. **Default to Mocks:** All development uses mocks by default
-2. **Selective Testing:** Enable real services only for specific integration tests
-3. **Test Accounts:** Create test user accounts with notifications disabled
-4. **Batch Testing:** Test batching logic to reduce message count
-5. **Clean Up:** Regularly purge test data and notifications
-6. **Monitor Usage:** Check Ably/Resend dashboards daily during development
+```typescript
+// Conditional service switching
+const notificationService = process.env.ENABLE_REAL_NOTIFICATIONS === 'true'
+  ? new AblyNotificationService()
+  : new MockNotificationService();
 
-### Cost-Saving Strategies
-
-1. **Implement Batching Early:** Reduces usage by 50-80%
-2. **Default to Digest Mode:** Cuts email usage significantly
-3. **Strict Preferences:** Only send when explicitly enabled
-4. **Connection Management:** Auto-disconnect idle users
-5. **Rate Limiting:** Prevent accidental quota exhaustion
-6. **Fallback to Polling:** Reduces Ably connection pressure
+const emailService = process.env.ENABLE_REAL_EMAILS === 'true'
+  ? new ResendEmailService()
+  : new MockEmailService();
+```
 
 ---
 
-## Future Enhancements
+## Future Enhancements (Post-MVP)
 
-1. Mobile push notifications (iOS/Android)
-2. SMS notifications for critical events
-3. Slack/Discord integration
-4. Custom notification rules and filters
-5. Notification analytics and insights
-6. Multi-language notification support
-7. Notification scheduling and snoozing
-8. Team notification channels
-9. Self-hosted notification service (e.g., Novu) for unlimited usage
-10. WebSocket fallback for Ably alternative
+### Phase 2 (After 500 users)
+- Per-event notification preferences
+- Weekly digest option
+- Quota dashboard for admins
+- Advanced notification grouping
+- Notification search and filtering
+
+### Phase 3 (Scale-up)
+- Mobile push notifications
+- Slack/Discord integration
+- SMS notifications
+- Self-hosted alternative (Novu)
+- Multi-language support
+- Custom notification rules
+
+---
+
+## Success Criteria
+
+✅ Users receive real-time in-app notifications
+✅ Critical events trigger immediate emails
+✅ Daily digest keeps users informed without spam
+✅ System stays within free-tier limits
+✅ Professional, branded email templates
+✅ Simple, intuitive user preferences
+✅ Graceful fallback when services fail
+✅ Zero quota usage during development
+
+---
+
+## MVP Scope Summary
+
+**What's Included:**
+- Real-time in-app notifications (Ably)
+- Notification center with read/unread
+- Critical email alerts (immediate)
+- Daily digest email (9 AM UTC)
+- Single preference toggle
+- BullMQ queue for reliability
+- Polling fallback
+- Branded email template
+- Basic quota tracking
+- Development mocks
+
+**What's Deferred:**
+- Per-event preferences
+- Weekly digests
+- Admin quota dashboard
+- Advanced grouping
+- Notification search/filter
+- Archive functionality
+- Push notifications
+- Third-party integrations
+
+**Result:** ~⅓ the code, 80% of the user value, ships fast! 🚀

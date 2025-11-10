@@ -21,11 +21,15 @@ model User {
   lastName  String?
   avatar    String? @db.VarChar(1000) // Avatar URL from Azure Blob Storage
 
-  plan         UserPlan      @default(FREE)
+  plan         UserPlan                  @default(FREE)
   projects     Project[]
   testimonials Testimonial[]
   apiKeys      ApiKey[]
   subscription Subscription? // null for free tier users
+
+  // Notification system relations
+  notifications             Notification[]
+  notificationPreferences   NotificationPreferences?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -234,4 +238,102 @@ enum ProjectVisibility {
   PUBLIC
   PRIVATE
   INVITE_ONLY
+}
+
+// ============================================
+// Notification System Models
+// ============================================
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String           @db.Text // Sanitized HTML-safe content
+  link        String?
+  metadata    Json? // Additional data (testimonialId, projectId, etc.)
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  NEW_TESTIMONIAL
+  TESTIMONIAL_FLAGGED
+  TESTIMONIAL_APPROVED
+  TESTIMONIAL_REJECTED
+  SECURITY_ALERT
+}
+
+model NotificationPreferences {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  emailEnabled Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailUsage {
+  id                String   @id @default(cuid())
+  date              String   @unique // Format: YYYY-MM-DD (UTC timezone)
+  count             Int      @default(0)
+  lastSnapshotCount Int      @default(0) // Track last snapshot for reconciliation
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([date])
+}
+
+// Transactional outbox pattern - ensures reliable job enqueuing
+model NotificationOutbox {
+  id             String    @id @default(cuid())
+  notificationId String
+  jobType        String // 'send-notification' or 'send-email'
+  payload        Json
+  status         String    @default("pending") // pending, enqueued, failed
+  attempts       Int       @default(0)
+  createdAt      DateTime  @default(now())
+  enqueuedAt     DateTime?
+
+  @@index([status, createdAt])
+  @@index([notificationId])
+}
+
+// Dead Letter Queue for failed jobs
+model DeadLetterJob {
+  id               String    @id @default(cuid())
+  jobId            String
+  queue            String // 'notifications' or 'send-email'
+  data             Json
+  error            String    @db.Text
+  errorType        String // 'transient' or 'permanent'
+  statusCode       Int?
+  providerResponse String?   @db.Text // Truncated provider response
+  failedAt         DateTime
+  retried          Boolean   @default(false)
+  retriedAt        DateTime?
+  retryHistory     Json? // Array of retry attempts with timestamps
+
+  @@index([queue, failedAt])
+  @@index([retried])
+  @@index([errorType])
+}
+
+// Job idempotency tracking (durable across restarts)
+model JobIdempotency {
+  id          String    @id @default(cuid())
+  jobKey      String    @unique // Format: {jobType}:{entityId}
+  jobId       String // BullMQ job ID
+  status      String // 'processing', 'completed', 'failed'
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([jobKey, status])
+  @@index([createdAt])
 }

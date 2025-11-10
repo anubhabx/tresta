@@ -19,6 +19,9 @@ import { projectRouter } from "./routes/project.route.ts";
 import { mediaRouter } from "./routes/media.route.ts";
 import { widgetRouter } from "./routes/widget.route.ts";
 import apiKeyRouter from "./routes/api-key.route.ts";
+import adminRouter from "./routes/admin/index.ts";
+import notificationsRouter from "./routes/notifications.route.ts";
+import ablyRouter from "./routes/ably/token.route.ts";
 import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
@@ -38,7 +41,7 @@ app.use(express.raw({ type: "application/json" }));
 app.use(clerkMiddleware());
 
 app.get("/health", (req, res) => {
-  res.status(200).send("OK");
+  res.status(200).send(process.env.REDIS_URL);
 });
 
 // Serve widget script (public, CDN-ready with aggressive caching)
@@ -58,6 +61,9 @@ app.use(
   }),
 );
 
+// Health check and admin routes (before other routes)
+app.use("/", adminRouter);
+
 // Webhook routes
 app.use("/api/webhook", webhookRouter);
 
@@ -69,6 +75,8 @@ app.use("/api/projects", attachUser, projectRouter);
 app.use("/api/projects", apiKeyRouter); // API key routes (has its own auth middleware)
 app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
+app.use("/api/notifications", attachUser, notificationsRouter);
+app.use("/api/ably", attachUser, ablyRouter);
 
 // 404 handler for unmatched routes
 app.use(notFoundHandler);
@@ -90,6 +98,53 @@ blobStorageService
     console.error("✗ Failed to initialize Azure Blob Storage:", error);
   });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// Graceful shutdown handlers
+async function gracefulShutdown(signal: string) {
+  console.log(`\n${signal} received, starting graceful shutdown...`);
+  
+  // Stop accepting new connections
+  server.close(async () => {
+    console.log('HTTP server closed');
+    
+    try {
+      // Import disconnect functions (dynamic import to avoid circular dependencies)
+      const { disconnectPrisma } = await import('@workspace/database/prisma');
+      const { disconnectRedis } = await import('./lib/redis.ts');
+      
+      // Disconnect from databases
+      await disconnectPrisma();
+      await disconnectRedis();
+      
+      console.log('Graceful shutdown completed');
+      process.exit(0);
+    } catch (error) {
+      console.error('Error during graceful shutdown:', error);
+      process.exit(1);
+    }
+  });
+  
+  // Force shutdown after 30 seconds
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 30000);
+}
+
+// Listen for termination signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  gracefulShutdown('unhandledRejection');
 });
