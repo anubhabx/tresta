@@ -91,7 +91,7 @@ export function WidgetCard({
   };
 
   return (
-    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200">
+    <Card className="border border-border/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">

@@ -75,7 +75,7 @@ export function FilterPresets({
   ];
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2 flex-no-wrap overflow-x-auto max-w-md no-scrollbar">
       {presets.map((preset) => (
         <Button
           key={preset.id}

@@ -14,7 +14,7 @@
     "build": "tsc && vite build --mode production",
     "build:dev": "tsc && vite build --mode development",
     "preview": "vite preview",
-    "demo": "vite preview --port 3001",
+    "demo": "vite preview --port 3001 ./demo.html",
     "type-check": "tsc --noEmit"
   },
   "keywords": [

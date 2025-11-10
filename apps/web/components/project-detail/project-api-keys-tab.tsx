@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -86,7 +86,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
       }
 
       const data = await response.json();
-      setApiKeys(data.data || []);
+      setApiKeys(Array.isArray(data.data?.keys) ? data.data.keys : []);
     } catch (error) {
       toast.error("Failed to load API keys");
       console.error(error);
@@ -164,9 +164,9 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
   };
 
   // Load keys on mount
-  useState(() => {
+  useEffect(() => {
     fetchApiKeys();
-  });
+  }, [project.slug]);
 
   return (
     <div className="space-y-6">
@@ -288,7 +288,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {apiKeys.map((key) => (
+                {Array.isArray(apiKeys) && apiKeys.map((key) => (
                   <TableRow key={key.id}>
                     <TableCell className="font-medium">{key.name}</TableCell>
                     <TableCell>

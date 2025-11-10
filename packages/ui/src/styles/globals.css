@@ -60,7 +60,8 @@
   --tracking-normal: normal;
   --spacing: 0.25rem;
 
-  --info-bg: oklch(0.98 0.02 60); /* Light mode default */
+  --info-bg: oklch(0.98 0.02 60);
+  /* Light mode default */
   --info-text: oklch(0.25 0.03 60);
   --info-highlight-bg: oklch(0.95 0.08 50);
 }
@@ -193,7 +194,24 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 }
