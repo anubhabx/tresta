@@ -284,6 +284,71 @@ Given these constraints, the system prioritizes:
 
 ---
 
+### Requirement 17: Development and Testing Mode
+
+**User Story:** As a developer, I want to test notification functionality without consuming production quotas, so that I can develop efficiently and avoid service limits.
+
+#### Acceptance Criteria
+
+1. WHEN NODE_ENV is set to "development" or "test", THE System SHALL use mock implementations for Ably and Resend
+2. THE System SHALL provide a mock Ably client that logs messages to console instead of sending
+3. THE System SHALL provide a mock Resend client that logs emails to console or file instead of sending
+4. THE System SHALL support Mailtrap integration for email testing in staging environments
+5. THE System SHALL allow environment variable configuration to enable/disable real service calls
+6. THE System SHALL provide a test mode flag that can be toggled per user account
+7. WHEN test mode is enabled for a user, THE System SHALL log notifications instead of sending them
+8. THE System SHALL include comprehensive unit tests using mocked services
+
+---
+
+### Requirement 18: Notification Batching and Aggregation
+
+**User Story:** As a system, I want to batch and aggregate similar notifications, so that I minimize service usage while keeping users informed.
+
+#### Acceptance Criteria
+
+1. WHEN multiple testimonials are submitted within 1 hour for the same project, THE System SHALL aggregate them into a single notification
+2. THE System SHALL use a queue system (e.g., BullMQ) to buffer and batch notifications
+3. THE System SHALL publish one Ably message for grouped notifications instead of multiple messages
+4. THE System SHALL send one email for grouped notifications instead of multiple emails
+5. THE System SHALL display the count and summary of grouped events in the notification
+6. THE System SHALL limit batching to a maximum of 50 events per notification
+7. THE System SHALL still send immediate notifications for critical events regardless of batching
+
+---
+
+### Requirement 19: Rate Limiting and Throttling
+
+**User Story:** As a system, I want to rate limit notification sending, so that I prevent quota exhaustion from sudden spikes.
+
+#### Acceptance Criteria
+
+1. THE System SHALL implement rate limiting using a library like Bottleneck
+2. THE System SHALL limit Ably message publishing to 100 messages per minute
+3. THE System SHALL limit Resend email sending to 10 emails per minute
+4. WHEN rate limits are exceeded, THE System SHALL queue notifications for delayed delivery
+5. THE System SHALL prioritize critical notifications over normal notifications in the queue
+6. THE System SHALL log rate limit events for monitoring
+7. THE System SHALL provide configuration for rate limit thresholds via environment variables
+
+---
+
+### Requirement 20: Fallback Mechanisms
+
+**User Story:** As a user, I want to still receive notifications even if real-time services are unavailable, so that I don't miss important events.
+
+#### Acceptance Criteria
+
+1. WHEN Ably connection fails, THE System SHALL fall back to polling-based notification retrieval
+2. THE System SHALL implement polling with exponential backoff (30s, 1min, 2min intervals)
+3. WHEN Resend quota is exhausted, THE System SHALL store emails in database for manual review
+4. THE System SHALL provide an admin interface to manually send queued emails
+5. THE System SHALL automatically resume normal operation when quotas reset
+6. THE System SHALL log all fallback activations for monitoring
+7. THE System SHALL notify administrators when fallback mode is activated
+
+---
+
 ## Non-Functional Requirements
 
 ### Performance
@@ -328,6 +393,75 @@ Given these constraints, the system prioritizes:
 
 ---
 
+## Development and Testing Strategy
+
+### Mock Implementations
+
+**Ably Mock:**
+```typescript
+// Use conditional logic to switch between real and mock
+const ablyClient = process.env.NODE_ENV === 'production' 
+  ? new Ably.Realtime(apiKey)
+  : new MockAblyClient();
+```
+
+**Resend Mock:**
+```typescript
+// Mock email sending in development
+const emailClient = process.env.NODE_ENV === 'production'
+  ? new Resend(apiKey)
+  : new MockResendClient();
+```
+
+### Testing Tools
+
+1. **Unit Tests:** Jest with mocked Ably/Resend SDKs
+2. **Integration Tests:** Mailtrap for email testing (100 emails/month free)
+3. **E2E Tests:** Mock services with in-memory implementations
+4. **Load Tests:** Simulate batching without real sends
+
+### Environment Configuration
+
+```env
+# Development
+NODE_ENV=development
+ENABLE_REAL_NOTIFICATIONS=false
+ENABLE_REAL_EMAILS=false
+
+# Staging
+NODE_ENV=staging
+ENABLE_REAL_NOTIFICATIONS=true
+ENABLE_REAL_EMAILS=false
+MAILTRAP_API_KEY=xxx
+
+# Production
+NODE_ENV=production
+ENABLE_REAL_NOTIFICATIONS=true
+ENABLE_REAL_EMAILS=true
+ABLY_API_KEY=xxx
+RESEND_API_KEY=xxx
+```
+
+### Quota Conservation During Development
+
+1. **Default to Mocks:** All development uses mocks by default
+2. **Selective Testing:** Enable real services only for specific integration tests
+3. **Test Accounts:** Create test user accounts with notifications disabled
+4. **Batch Testing:** Test batching logic to reduce message count
+5. **Clean Up:** Regularly purge test data and notifications
+6. **Monitor Usage:** Check Ably/Resend dashboards daily during development
+
+### Cost-Saving Strategies
+
+1. **Implement Batching Early:** Reduces usage by 50-80%
+2. **Default to Digest Mode:** Cuts email usage significantly
+3. **Strict Preferences:** Only send when explicitly enabled
+4. **Connection Management:** Auto-disconnect idle users
+5. **Rate Limiting:** Prevent accidental quota exhaustion
+6. **Fallback to Polling:** Reduces Ably connection pressure
+
+---
+
 ## Future Enhancements
 
 1. Mobile push notifications (iOS/Android)
@@ -338,3 +472,5 @@ Given these constraints, the system prioritizes:
 6. Multi-language notification support
 7. Notification scheduling and snoozing
 8. Team notification channels
+9. Self-hosted notification service (e.g., Novu) for unlimited usage
+10. WebSocket fallback for Ably alternative
