@@ -47,23 +47,23 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-      <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
-        <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
-          <Avatar className="rounded-lg w-10 h-10 sm:w-12 sm:h-12">
+    <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+        <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
+          <Avatar className="rounded-lg w-12 h-12 sm:w-14 sm:h-14">
             <AvatarImage
               src={project.logoUrl!}
               alt={project.name}
               className="object-cover"
             />
             <AvatarFallback className="bg-transparent text-primary rounded-lg">
-              <FolderIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+              <FolderIcon className="h-6 w-6 sm:h-7 sm:w-7" />
             </AvatarFallback>
           </Avatar>
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
               {project.name}
             </h1>
             {!project.isActive && (
@@ -72,11 +72,11 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
               </Badge>
             )}
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-1">
             /{project.slug}
           </p>
           {project.description && (
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2 sm:line-clamp-none">
               {project.description}
             </p>
           )}
@@ -89,19 +89,19 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Link href={`/projects/${slug}/edit`}>
-          <Button variant="outline" size="sm" className="touch-manipulation min-h-[44px] sm:min-h-0">
-            <EditIcon className="h-4 w-4 mr-2" />
-            Edit
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <Link href={`/projects/${slug}/edit`} className="flex-1 sm:flex-none">
+          <Button variant="outline" size="sm" className="w-full touch-manipulation min-h-[44px] sm:min-h-0">
+            <EditIcon className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Edit</span>
           </Button>
         </Link>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm" className="touch-manipulation min-h-[44px] sm:min-h-0">
-              <TrashIcon className="h-4 w-4 mr-2" />
-              Delete
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0">
+              <TrashIcon className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Delete</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

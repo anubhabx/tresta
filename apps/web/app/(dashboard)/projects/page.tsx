@@ -36,18 +36,18 @@ const ProjectsPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8 w-full h-full p-4 sm:p-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full min-w-0 h-full p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto overflow-x-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 min-w-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
             Projects
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-1">
             Manage your testimonial collection projects
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Badge variant="secondary" className="text-xs sm:text-sm">
             {projectsList.length}{" "}
             {projectsList.length === 1 ? "Project" : "Projects"}
@@ -57,12 +57,12 @@ const ProjectsPage = () => {
 
       {/* Projects Grid */}
       <section>
-        <div className="mb-3 sm:mb-4">
+        <div className="mb-2 sm:mb-3 lg:mb-4">
           <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
             All Projects
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {projectsList.map((project) => (
             <Link
               key={project.id}

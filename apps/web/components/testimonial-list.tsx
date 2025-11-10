@@ -547,7 +547,7 @@ export function TestimonialList({
 
       {/* Filter Presets - Only in moderation mode */}
       {moderationMode && (
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <FilterPresets
             activePreset={activePreset}
             onPresetChange={handlePresetChange}

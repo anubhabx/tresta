@@ -1,9 +1,14 @@
 "use client";
 
-import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import { cn } from "@workspace/ui/lib/utils";
-import { AlertTriangle, Clock, Shield, Zap } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import { AlertTriangle, Clock, Shield, Zap, Filter } from "lucide-react";
 
 export type FilterPreset =
   | "all"
@@ -38,7 +43,7 @@ export function FilterPresets({
   const presets = [
     {
       id: "all" as FilterPreset,
-      label: "All",
+      label: "All Testimonials",
       icon: Zap,
       count: counts?.all,
     },
@@ -74,33 +79,43 @@ export function FilterPresets({
     },
   ];
 
+  const activePresetData = presets.find((p) => p.id === activePreset);
+
   return (
-    <div className="flex items-center gap-2 flex-no-wrap overflow-x-auto max-w-md no-scrollbar">
-      {presets.map((preset) => (
-        <Button
-          key={preset.id}
-          onClick={() => onPresetChange(preset.id)}
-          size="sm"
-          variant={activePreset === preset.id ? "secondary" : "outline"}
-          className={cn(
-            "transition-all",
-            activePreset === preset.id && "shadow-sm",
-          )}
-        >
-          {preset.label}
-          {preset.count !== undefined && (
-            <Badge
-              variant="secondary"
-              className={cn(
-                "ml-1.5 px-1.5 py-0.5 text-xs",
-                activePreset === preset.id && "bg-primary-foreground/50",
-              )}
-            >
-              {preset.count}
-            </Badge>
-          )}
-        </Button>
-      ))}
-    </div>
+    <Select value={activePreset} onValueChange={onPresetChange}>
+      <SelectTrigger className="w-full sm:w-[240px] h-11 sm:h-10">
+        <Filter className="h-4 w-4 mr-2 flex-shrink-0" />
+        <SelectValue>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="truncate">{activePresetData?.label}</span>
+            {activePresetData?.count !== undefined && (
+              <Badge variant="secondary" className="text-xs flex-shrink-0">
+                {activePresetData.count}
+              </Badge>
+            )}
+          </div>
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        {presets.map((preset) => {
+          const Icon = preset.icon;
+          return (
+            <SelectItem key={preset.id} value={preset.id}>
+              <div className="flex items-center justify-between gap-3 w-full">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Icon className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  <span className="truncate">{preset.label}</span>
+                </div>
+                {preset.count !== undefined && (
+                  <Badge variant="secondary" className="text-xs flex-shrink-0">
+                    {preset.count}
+                  </Badge>
+                )}
+              </div>
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 }

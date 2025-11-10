@@ -65,10 +65,10 @@ export function ModerationTestimonialCard({
         }
       }}
     >
-      <CardContent className="p-4 h-full">
+      <CardContent className="p-3 sm:p-4 h-full">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3 sm:mb-4">
+          <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
             <CustomAvatar
               src={testimonial.authorAvatar}
               name={testimonial.authorName}
@@ -78,7 +78,7 @@ export function ModerationTestimonialCard({
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold truncate">
+                <h3 className="text-sm sm:text-base font-semibold truncate">
                   {testimonial.authorName}
                 </h3>
                 {testimonial.isOAuthVerified && (
@@ -93,12 +93,12 @@ export function ModerationTestimonialCard({
               </div>
               {testimonial.authorEmail && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                  <Mail className="h-3 w-3" />
+                  <Mail className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate">{testimonial.authorEmail}</span>
                 </div>
               )}
               {(testimonial.authorRole || testimonial.authorCompany) && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1 truncate">
                   {testimonial.authorRole}
                   {testimonial.authorRole && testimonial.authorCompany && " · "}
                   {testimonial.authorCompany}
@@ -112,7 +112,7 @@ export function ModerationTestimonialCard({
             <Badge
               variant="outline"
               className={cn(
-                "ml-2 flex-shrink-0",
+                "flex-shrink-0 self-start sm:ml-2",
                 riskScore >= 0.7 && "border-destructive/30 text-destructive",
               )}
             >
@@ -122,19 +122,19 @@ export function ModerationTestimonialCard({
         </div>
 
         {/* Content */}
-        <p className="text-sm mb-4 whitespace-pre-wrap">
+        <p className="text-xs sm:text-sm mb-3 sm:mb-4 whitespace-pre-wrap leading-relaxed">
           {testimonial.content}
         </p>
 
         {/* Metadata */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs text-muted-foreground mb-3 sm:mb-4 flex-wrap">
           {testimonial.rating && (
             <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-current" />
+              <Star className="h-3 w-3 fill-current flex-shrink-0" />
               <span>{testimonial.rating}/5</span>
             </div>
           )}
-          <span>
+          <span className="truncate">
             {formatDistanceToNow(new Date(testimonial.createdAt), {
               addSuffix: true,
             })}
@@ -143,13 +143,14 @@ export function ModerationTestimonialCard({
 
         {/* Moderation Notes */}
         {flags.length > 0 && (
-          <div className="mb-4 p-3 rounded-md bg-muted/50 border">
-            <p className="text-xs font-medium mb-2">Moderation Notes:</p>
+          <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-muted/50 border">
+            <p className="text-xs font-medium mb-1.5 sm:mb-2">Moderation Notes:</p>
             <ul className="space-y-1">
               {flags.map((flag, index) => (
                 <li key={index} className="text-xs flex items-start gap-2">
                   <span
                     className={cn(
+                      "flex-shrink-0",
                       flag.toLowerCase().includes("positive") ||
                         flag.toLowerCase().includes("auto-approved")
                         ? "text-green-600"
@@ -158,7 +159,7 @@ export function ModerationTestimonialCard({
                   >
                     •
                   </span>
-                  <span className="flex-1">{flag}</span>
+                  <span className="flex-1 break-words">{flag}</span>
                 </li>
               ))}
             </ul>
@@ -166,13 +167,15 @@ export function ModerationTestimonialCard({
         )}
 
         {/* Status Badges */}
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <Badge variant="outline">{testimonial.moderationStatus}</Badge>
+        <div className="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
+          <Badge variant="outline" className="text-xs">
+            {testimonial.moderationStatus}
+          </Badge>
           {testimonial.isPublished && (
-            <Badge variant="secondary">Published</Badge>
+            <Badge variant="secondary" className="text-xs">Published</Badge>
           )}
           {testimonial.autoPublished && (
-            <Badge variant="secondary">Auto-Approved</Badge>
+            <Badge variant="secondary" className="text-xs">Auto-Approved</Badge>
           )}
         </div>
 
@@ -183,13 +186,13 @@ export function ModerationTestimonialCard({
               onClick={() => onApprove(testimonial.id)}
               size="sm"
               variant="default"
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               disabled={loadingAction === "approve"}
             >
               {loadingAction === "approve" ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
               ) : (
-                <CheckCircle2 className="h-4 w-4 mr-1" />
+                <CheckCircle2 className="h-4 w-4 mr-1.5" />
               )}
               Approve
             </Button>
@@ -200,12 +203,13 @@ export function ModerationTestimonialCard({
               onClick={() => onReject(testimonial.id)}
               size="sm"
               variant="outline"
+              className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               disabled={loadingAction === "reject"}
             >
               {loadingAction === "reject" ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
               ) : (
-                <XCircle className="h-4 w-4 mr-1" />
+                <XCircle className="h-4 w-4 mr-1.5" />
               )}
               Reject
             </Button>
@@ -216,7 +220,7 @@ export function ModerationTestimonialCard({
             onClick={() => onDelete(testimonial.id)}
             size="sm"
             variant="ghost"
-            className="ml-auto"
+            className="sm:ml-auto touch-manipulation min-h-[44px] sm:min-h-0"
             disabled={loadingAction === "delete"}
           >
             {loadingAction === "delete" ? (

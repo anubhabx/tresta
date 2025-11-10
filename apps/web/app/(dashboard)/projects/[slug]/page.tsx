@@ -76,11 +76,11 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8 w-full h-full p-4 sm:p-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full min-w-0 h-full p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto overflow-x-hidden">
       <ProjectHeader project={project} slug={slug} onDelete={handleDelete} />
 
       <section>
-        <div className="mb-3 sm:mb-4">
+        <div className="mb-2 sm:mb-3 lg:mb-4">
           <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
             Project Statistics
           </h2>
@@ -89,14 +89,16 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
       </section>
 
       <Tabs defaultValue={tab || "overview"} className="w-full">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
-          <TabsTrigger value="testimonials" className="text-xs sm:text-sm">Testimonials</TabsTrigger>
-          <TabsTrigger value="moderation" className="text-xs sm:text-sm">Moderation</TabsTrigger>
-          <TabsTrigger value="widgets" className="text-xs sm:text-sm">Widgets</TabsTrigger>
-          <TabsTrigger value="api-keys" className="text-xs sm:text-sm">API Keys</TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs sm:text-sm">Settings</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0">
+          <TabsList className="w-max sm:w-auto inline-flex">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm whitespace-nowrap">Overview</TabsTrigger>
+            <TabsTrigger value="testimonials" className="text-xs sm:text-sm whitespace-nowrap">Testimonials</TabsTrigger>
+            <TabsTrigger value="moderation" className="text-xs sm:text-sm whitespace-nowrap">Moderation</TabsTrigger>
+            <TabsTrigger value="widgets" className="text-xs sm:text-sm whitespace-nowrap">Widgets</TabsTrigger>
+            <TabsTrigger value="api-keys" className="text-xs sm:text-sm whitespace-nowrap">API Keys</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm whitespace-nowrap">Settings</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
           <ProjectOverviewTab project={project} collectionUrl={collectionUrl} />

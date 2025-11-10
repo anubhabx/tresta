@@ -38,20 +38,35 @@ export function BulkActionsBar({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 slide-out-to-bottom-4 w-[90%] max-w-3xl">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 slide-out-to-bottom-4 w-[95%] sm:w-[90%] max-w-3xl">
       <Card className="shadow-2xl border-2">
-        <CardContent className="px-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Badge
-                variant="secondary"
-                className="text-base font-semibold w-12"
+        <CardContent className="p-3 sm:px-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            {/* Selection Count */}
+            <div className="flex items-center justify-between sm:justify-start gap-2">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className="text-sm sm:text-base font-semibold w-10 sm:w-12 justify-center"
+                >
+                  {selectedCount}
+                </Badge>
+                <span className="text-xs sm:text-sm font-medium">selected</span>
+              </div>
+              {/* Clear button on mobile */}
+              <Button
+                onClick={onClear}
+                size="sm"
+                variant="ghost"
+                className="sm:hidden text-xs"
               >
-                {selectedCount}
-              </Badge>
-              <span className="text-sm font-medium">selected</span>
+                Clear
+              </Button>
             </div>
-            <div className="h-6 w-px bg-border" />
+            
+            <div className="hidden sm:block h-6 w-px bg-border" />
+            
+            {/* Action Buttons */}
             <div className="flex items-center gap-2 flex-1">
               <TooltipProvider>
                 <Tooltip>
@@ -62,11 +77,11 @@ export function BulkActionsBar({
                         disabled={isPending || validForApprove === 0}
                         size="sm"
                         variant="default"
-                        className="bg-green-500 hover:bg-green-600 w-full flex items-center justify-center gap-2"
+                        className="bg-green-500 hover:bg-green-600 w-full flex items-center justify-center gap-1 sm:gap-2 touch-manipulation min-h-[44px] sm:min-h-0"
                       >
                         <div className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-2" />
-                          Approve
+                          <CheckCircle2 className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Approve</span>
                           {validForApprove > 0 &&
                             validForApprove < selectedCount && (
                               <span className="ml-1 text-xs opacity-75">
@@ -74,7 +89,7 @@ export function BulkActionsBar({
                               </span>
                             )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="A" />
+                        <KeyboardShortcutBadge shortcut="A" className="hidden sm:flex" />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -105,18 +120,18 @@ export function BulkActionsBar({
                         disabled={isPending || validForFlag === 0}
                         size="sm"
                         variant="secondary"
-                        className="w-full flex items-center justify-center gap-2"
+                        className="w-full flex items-center justify-center gap-1 sm:gap-2 touch-manipulation min-h-[44px] sm:min-h-0"
                       >
                         <div className="flex items-center">
-                          <AlertTriangle className="h-4 w-4 mr-2" />
-                          Flag
+                          <AlertTriangle className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Flag</span>
                           {validForFlag > 0 && validForFlag < selectedCount && (
                             <span className="ml-1 text-xs opacity-75">
                               ({validForFlag})
                             </span>
                           )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="F" />
+                        <KeyboardShortcutBadge shortcut="F" className="hidden sm:flex" />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -147,11 +162,11 @@ export function BulkActionsBar({
                         disabled={isPending || validForReject === 0}
                         size="sm"
                         variant="destructive"
-                        className="w-full flex items-center justify-center gap-2"
+                        className="w-full flex items-center justify-center gap-1 sm:gap-2 touch-manipulation min-h-[44px] sm:min-h-0"
                       >
                         <div className="flex items-center">
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject
+                          <XCircle className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">Reject</span>
                           {validForReject > 0 &&
                             validForReject < selectedCount && (
                               <span className="ml-1 text-xs opacity-75">
@@ -159,7 +174,7 @@ export function BulkActionsBar({
                               </span>
                             )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="R" />
+                        <KeyboardShortcutBadge shortcut="R" className="hidden sm:flex" />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -181,15 +196,18 @@ export function BulkActionsBar({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="h-6 w-px bg-border" />
+            
+            <div className="hidden sm:block h-6 w-px bg-border" />
+            
+            {/* Clear button - desktop only */}
             <Button
               onClick={onClear}
               size="sm"
               variant="ghost"
-              className="flex items-center gap-2"
+              className="hidden sm:flex items-center gap-2"
             >
               Clear
-              <KeyboardShortcutBadge shortcut="X" />
+              <KeyboardShortcutBadge shortcut="X" className="sm:inline-flex" />
             </Button>
           </div>
         </CardContent>

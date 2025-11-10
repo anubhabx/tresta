@@ -43,22 +43,24 @@ export function DashboardShell({ children }: DashboardShellProps) {
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={toggleSidebar}>
       <TooltipProvider>
-        <div className="flex items-center justify-center min-h-svh w-full">
+        <div className="flex min-h-svh w-full overflow-x-hidden">
           <UISidebar />
-          <div className="flex-1 h-full p-2">
-            <div className="w-full h-full flex flex-col bg-background rounded-md px-4 shadow-lg relative">
-              <div className="w-full bg-background z-10">
+          <div className="flex-1 w-full min-w-0 p-0 sm:p-2">
+            <div className="w-full h-full flex flex-col bg-background sm:rounded-md px-2 sm:px-4 sm:shadow-lg relative overflow-x-hidden">
+              <div className="w-full bg-background z-10 sticky top-0">
                 <div className="border-b border-border py-2 flex gap-2 items-center text-sm relative">
                   <SidebarTrigger />
                   <UIBreadcrumb />
                 </div>
               </div>
-              {children}
+              <div className="w-full min-w-0 overflow-x-hidden">
+                {children}
+              </div>
               {showNewProjectButton && (
-                <Link href="/projects/new" className="fixed bottom-6 right-6">
-                  <Button className="flex items-center gap-2">
-                    <PlusIcon className="h-4 w-4" />
-                    <span>New Project</span>
+                <Link href="/projects/new" className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+                  <Button className="flex items-center gap-2 shadow-lg h-12 sm:h-10 px-4 sm:px-4">
+                    <PlusIcon className="h-5 w-5 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">New Project</span>
                   </Button>
                 </Link>
               )}

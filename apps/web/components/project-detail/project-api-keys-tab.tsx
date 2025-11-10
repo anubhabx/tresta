@@ -275,54 +275,111 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
               No API keys yet. Create one to start embedding widgets.
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Usage</TableHead>
-                  <TableHead>Rate Limit</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Used</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Mobile Card View */}
+              <div className="space-y-4 md:hidden">
                 {Array.isArray(apiKeys) && apiKeys.map((key) => (
-                  <TableRow key={key.id}>
-                    <TableCell className="font-medium">{key.name}</TableCell>
-                    <TableCell>
-                      <code className="text-sm">{key.keyPrefix}••••••••</code>
-                    </TableCell>
-                    <TableCell>
-                      {key.usageCount} {key.usageLimit ? `/ ${key.usageLimit}` : ""}
-                    </TableCell>
-                    <TableCell>{key.rateLimit}/hour</TableCell>
-                    <TableCell>
-                      {key.isActive ? (
-                        <Badge variant="default">Active</Badge>
-                      ) : (
-                        <Badge variant="secondary">Revoked</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {key.lastUsedAt ? format(new Date(key.lastUsedAt), "PP") : "Never"}
-                    </TableCell>
-                    <TableCell className="text-right">
+                  <Card key={key.id} className="border border-border/50">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{key.name}</h4>
+                          <code className="text-xs text-muted-foreground">{key.keyPrefix}••••••••</code>
+                        </div>
+                        {key.isActive ? (
+                          <Badge variant="default" className="flex-shrink-0">Active</Badge>
+                        ) : (
+                          <Badge variant="secondary" className="flex-shrink-0">Revoked</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="text-muted-foreground">Usage</span>
+                          <p className="font-medium mt-0.5">
+                            {key.usageCount} {key.usageLimit ? `/ ${key.usageLimit}` : ""}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Rate Limit</span>
+                          <p className="font-medium mt-0.5">{key.rateLimit}/hour</p>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Last Used</span>
+                          <p className="font-medium mt-0.5">
+                            {key.lastUsedAt ? format(new Date(key.lastUsedAt), "PP") : "Never"}
+                          </p>
+                        </div>
+                      </div>
+
                       {key.isActive && (
                         <Button
                           size="sm"
-                          variant="ghost"
+                          variant="outline"
                           onClick={() => setKeyToRevoke(key.id)}
+                          className="w-full text-destructive hover:text-destructive touch-manipulation min-h-[44px]"
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Revoke Key
                         </Button>
                       )}
-                    </TableCell>
-                  </TableRow>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Key</TableHead>
+                      <TableHead>Usage</TableHead>
+                      <TableHead>Rate Limit</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Last Used</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.isArray(apiKeys) && apiKeys.map((key) => (
+                      <TableRow key={key.id}>
+                        <TableCell className="font-medium">{key.name}</TableCell>
+                        <TableCell>
+                          <code className="text-sm">{key.keyPrefix}••••••••</code>
+                        </TableCell>
+                        <TableCell>
+                          {key.usageCount} {key.usageLimit ? `/ ${key.usageLimit}` : ""}
+                        </TableCell>
+                        <TableCell>{key.rateLimit}/hour</TableCell>
+                        <TableCell>
+                          {key.isActive ? (
+                            <Badge variant="default">Active</Badge>
+                          ) : (
+                            <Badge variant="secondary">Revoked</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {key.lastUsedAt ? format(new Date(key.lastUsedAt), "PP") : "Never"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {key.isActive && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setKeyToRevoke(key.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
