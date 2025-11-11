@@ -38,6 +38,34 @@ cd packages/database
 pnpm prisma migrate dev
 ```
 
+## Important: Getting the JWT Token
+
+The API uses Clerk JWT tokens for authentication (not session cookies). To get your token:
+
+**Method 1: Browser Console (Easiest)**
+```javascript
+// Open DevTools (F12) and run:
+await window.Clerk.session.getToken()
+// Copy the returned token
+```
+
+**Method 2: Helper Function**
+```javascript
+// Save this in console for easy access:
+async function getToken() {
+  const token = await window.Clerk.session.getToken();
+  console.log('Token:', token);
+  navigator.clipboard.writeText(token);
+  console.log('✅ Token copied to clipboard!');
+  return token;
+}
+
+// Usage:
+await getToken(); // Copies token to clipboard
+```
+
+**Note:** The token expires after 1 hour. If you get 401 errors, get a fresh token.
+
 ## Testing Steps
 
 ### 1. Start the Services
@@ -65,15 +93,54 @@ Wait for all services to start successfully.
 
 With `ENABLE_REAL_NOTIFICATIONS=false`, test the basic flow:
 
-**A. Create a Test Notification via API:**
+**A. Create a Test Notification via Browser Console:**
+
+Open your browser DevTools console (F12) and run:
+
+```javascript
+// Get JWT token from Clerk and create notification
+async function createTestNotification() {
+  try {
+    // Get the Clerk JWT token (not the session cookie!)
+    const token = await window.Clerk.session.getToken();
+    
+    // Create test notification
+    const response = await fetch('http://localhost:8000/api/test/create-notification', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: 'NEW_TESTIMONIAL',
+        title: 'Test Notification',
+        message: 'This is a test notification',
+        link: '/dashboard'
+      })
+    });
+    
+    const result = await response.json();
+    console.log('✅ Notification created:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
+
+// Run the test
+createTestNotification();
+```
+
+**Alternative: Using curl (get token first):**
 
 ```bash
-# Get your auth token from the browser (Clerk)
-# Open DevTools > Application > Cookies > __session
+# 1. Get JWT token from browser console:
+# Run in DevTools: await window.Clerk.session.getToken()
+# Copy the token
 
-# Create a notification
+# 2. Create notification with the JWT token:
 curl -X POST http://localhost:8000/api/test/create-notification \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
   -H "Content-Type: application/json" \
   -d '{
     "type": "NEW_TESTIMONIAL",
@@ -104,22 +171,24 @@ curl -X POST http://localhost:8000/api/test/create-notification \
 
 ### 3. Test Notification API Endpoints
 
+**Note:** Replace `YOUR_JWT_TOKEN` with the token from `await window.Clerk.session.getToken()`
+
 **A. List Notifications:**
 ```bash
 curl http://localhost:8000/api/notifications \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **B. Get Unread Count:**
 ```bash
 curl http://localhost:8000/api/notifications/unread-count \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **C. Mark as Read:**
 ```bash
 curl -X PATCH http://localhost:8000/api/notifications/NOTIFICATION_ID \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"isRead": true}'
 ```
@@ -127,19 +196,19 @@ curl -X PATCH http://localhost:8000/api/notifications/NOTIFICATION_ID \
 **D. Mark All as Read:**
 ```bash
 curl -X POST http://localhost:8000/api/notifications/mark-all-read \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **E. Get Preferences:**
 ```bash
 curl http://localhost:8000/api/notifications/preferences \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **F. Update Preferences:**
 ```bash
 curl -X PUT http://localhost:8000/api/notifications/preferences \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"emailEnabled": false}'
 ```
