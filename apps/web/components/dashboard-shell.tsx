@@ -52,7 +52,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 <div className="border-b border-border py-2 flex gap-2 items-center text-sm relative">
                   <SidebarTrigger />
                   <UIBreadcrumb />
-                  <div className="ml-auto flex items-center gap-2">
+                  <div className="ml-auto flex items-center gap-2 sm:hidden">
                     <NotificationBadge />
                   </div>
                 </div>
