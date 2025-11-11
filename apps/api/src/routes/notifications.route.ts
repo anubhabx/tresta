@@ -3,8 +3,12 @@ import type { Request, Response, NextFunction } from 'express';
 import { prisma } from '@workspace/database/prisma';
 import { ResponseHandler } from '../lib/response.ts';
 import { BadRequestError, NotFoundError } from '../lib/errors.ts';
+import { rateLimitMiddleware } from '../middleware/rate-limiter.ts';
 
 const router: Router = Router();
+
+// Apply rate limiting to all notification routes
+router.use(rateLimitMiddleware);
 
 /**
  * GET /api/notifications
