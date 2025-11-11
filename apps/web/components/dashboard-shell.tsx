@@ -13,6 +13,7 @@ import { TooltipProvider } from "@workspace/ui/components/tooltip";
 import { Button } from "@workspace/ui/components/button";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { NotificationBadge, NotificationCenter } from "@/components/notifications";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -51,8 +52,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 <div className="border-b border-border py-2 flex gap-2 items-center text-sm relative">
                   <SidebarTrigger />
                   <UIBreadcrumb />
+                  <div className="ml-auto flex items-center gap-2">
+                    <NotificationBadge />
+                  </div>
                 </div>
               </div>
+              <NotificationCenter />
               <div className="w-full min-w-0 overflow-x-hidden">
                 {children}
               </div>
