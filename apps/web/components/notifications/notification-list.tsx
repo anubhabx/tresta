@@ -3,7 +3,7 @@
 import { useNotificationList } from "@/lib/queries/notifications";
 import { NotificationItem } from "./notification-item";
 import { NotificationEmptyState } from "./notification-empty-state";
-import { Button } from "@/components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 import { Loader2 } from "lucide-react";
 
 interface NotificationListProps {

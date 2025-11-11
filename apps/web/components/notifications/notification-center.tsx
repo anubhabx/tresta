@@ -5,8 +5,8 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+} from "@workspace/ui/components/sheet";
+import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
 import { useMarkAllAsRead, useUnreadCount } from "@/lib/queries/notifications";
 import { NotificationList } from "./notification-list";

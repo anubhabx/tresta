@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@workspace/ui/lib/utils";
 import { useMarkAsRead } from "@/lib/queries/notifications";
 
 interface NotificationItemProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
 import { useUnreadCount } from "@/lib/queries/notifications";
 import { useAbly } from "@/components/ably-provider";
