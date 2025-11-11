@@ -127,6 +127,10 @@ export const dailyDigestJob = new CronJob(
 
           sentCount++;
           console.log(`✅ Digest sent to ${user.email}: ${notifications.length} notifications (${count}/200)`);
+          
+          // Check for quota alerts
+          const { checkAndAlertQuota } = await import('../utils/alerts.ts');
+          await checkAndAlertQuota(count);
         } catch (error) {
           console.error(`❌ Failed to send digest to ${user.email}:`, error);
           // Continue with other users
