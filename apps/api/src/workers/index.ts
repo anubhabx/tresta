@@ -18,20 +18,33 @@ import { disconnectRedis } from '../lib/redis.ts';
 import { outboxWorker } from './outbox.worker.ts';
 import { notificationWorker } from './notification.worker.ts';
 import { emailWorker } from './email.worker.ts';
+import { startDailyDigestJob } from '../jobs/daily-digest.job.ts';
+import { startReconciliationJob } from '../jobs/reconciliation.job.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env from apps/api directory
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-console.log('Starting workers...');
+console.log('Starting workers and cron jobs...');
+
+// Start cron jobs
+startDailyDigestJob();
+startReconciliationJob();
 
 // Graceful shutdown handler
 async function gracefulShutdown(signal: string) {
   console.log(`\n${signal} received, shutting down workers...`);
 
   try {
+    // Stop cron jobs
+    const { dailyDigestJob } = await import('../jobs/daily-digest.job.ts');
+    const { reconciliationJob } = await import('../jobs/reconciliation.job.ts');
+    dailyDigestJob.stop();
+    reconciliationJob.stop();
+    console.log('Cron jobs stopped');
+
     // Close all workers
     await Promise.all([
       outboxWorker.close(),

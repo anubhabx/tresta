@@ -84,6 +84,7 @@ export const emailWorker = new Worker(
       });
 
       // Check for quota alerts
+      const { checkAndAlertQuota } = await import('../utils/alerts.ts');
       await checkAndAlertQuota(count);
       
       console.log(`Email sent successfully: ${notificationId} (${count}/200 today)`);
@@ -164,28 +165,7 @@ emailWorker.on('failed', async (job, err) => {
   });
 });
 
-/**
- * Check email quota and send alerts at key thresholds
- */
-async function checkAndAlertQuota(count: number): Promise<void> {
-  // Alert at 80% (160 emails)
-  if (count === 160) {
-    console.warn(`⚠️ Email quota at 80% (${count}/200)`);
-    // TODO: Implement Slack alerts
-  }
-  
-  // Alert at 90% (180 emails)
-  if (count === 180) {
-    console.warn(`⚠️ Email quota at 90% (${count}/200) - approaching limit`);
-    // TODO: Implement Slack alerts
-  }
-  
-  // Alert at 100% (200 emails)
-  if (count === 200) {
-    console.warn(`🚨 Email quota exhausted (200/200) - non-critical emails deferred`);
-    // TODO: Implement Slack alerts
-  }
-}
+
 
 // Call reconciliation on boot
 NotificationService.reconcileEmailUsageOnBoot()
