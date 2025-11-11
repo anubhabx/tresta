@@ -83,9 +83,9 @@ export function ProjectOverviewTab({
               </a>
             </div>
           </div>
-          <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-blue-100/50 dark:bg-blue-900/20 border border-border/50 rounded-lg">
-            <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex-shrink-0">
-              <LinkIcon className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+          <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-blue-100/50 dark:bg-primary/10 border border-border/50 rounded-lg">
+            <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 flex-shrink-0">
+              <LinkIcon className="h-4 w-4 text-primary dark:text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-medium">
@@ -134,9 +134,9 @@ export function ProjectOverviewTab({
             )}
 
             {!hasWidgets && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg bg-blue-50/50 dark:bg-blue-950/20">
+              <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
                 <div className="flex items-start gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <TrendingUp className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs sm:text-sm font-medium">Create a widget</h4>
                     <p className="text-xs text-muted-foreground mt-1">

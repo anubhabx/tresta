@@ -28,9 +28,9 @@ export function NotificationSidebarSection() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton onClick={toggleCenter} className="px-3">
+        <SidebarMenuButton onClick={toggleCenter} className="">
           <Button
-            className="justify-start w-full has-[>svg]:px-0 relative"
+            className="justify-start w-full has-[>svg]:px-0 group-data-[collapsible=icon]:px-0 relative"
             variant="ghost"
           >
             <div className="relative">

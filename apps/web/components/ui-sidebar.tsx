@@ -87,7 +87,7 @@ const UISidebar = () => {
 
             <SidebarMenuAction asChild>
               <Link href="/projects/new" title="Create New Project">
-                <PlusIcon className="h-6 w-6 cursor-pointer hover:bg-primary/50 transition-colors rounded-[2px]" />
+                <PlusIcon className="h-6 w-6 cursor-pointer transition-colors rounded-[2px]" />
               </Link>
             </SidebarMenuAction>
 
@@ -154,7 +154,7 @@ const UISidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  className="justify-start w-full truncate overflow-ellipsis"
+                  className="justify-start w-full truncate overflow-ellipsis has-[>svg:px-0] group-data-[collapsible=icon]:px-0"
                   variant="ghost"
                 >
                   <CustomAvatar

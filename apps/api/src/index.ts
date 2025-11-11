@@ -22,6 +22,7 @@ import apiKeyRouter from "./routes/api-key.route.ts";
 import adminRouter from "./routes/admin/index.ts";
 import notificationsRouter from "./routes/notifications.route.ts";
 import ablyRouter from "./routes/ably/token.route.ts";
+import testRouter from "./routes/test.route.ts";
 import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
@@ -77,6 +78,11 @@ app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
 app.use("/api/notifications", attachUser, notificationsRouter);
 app.use("/api/ably", attachUser, ablyRouter);
+
+// Test routes (remove in production)
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api/test", attachUser, testRouter);
+}
 
 // 404 handler for unmatched routes
 app.use(notFoundHandler);
