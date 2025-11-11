@@ -67,20 +67,16 @@ export const emailWorker = new Worker(
     }
 
     try {
-      // TODO: Implement email templates
-      // For now, send a simple email
+      // Import email templates
+      const { renderEmailTemplate, renderPlainTextTemplate } = await import('../templates/notification-email.ts');
+      
+      // Send email with templates
       await resend.emails.send({
         from: process.env.EMAIL_FROM || 'Tresta <notifications@tresta.app>',
         to: notification.user.email,
         subject: notification.title,
-        html: `
-          <div>
-            <h2>${notification.title}</h2>
-            <p>${notification.message}</p>
-            ${notification.link ? `<a href="${notification.link}">View Details</a>` : ''}
-          </div>
-        `,
-        text: `${notification.title}\n\n${notification.message}${notification.link ? `\n\nView Details: ${notification.link}` : ''}`,
+        html: renderEmailTemplate(notification),
+        text: renderPlainTextTemplate(notification),
         headers: {
           'List-Unsubscribe': `<${process.env.APP_URL}/settings/notifications>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
