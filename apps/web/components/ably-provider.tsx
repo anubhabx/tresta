@@ -1,14 +1,19 @@
 "use client";
 
 import * as React from "react";
-import * as Ably from "ably";
 import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+// Dynamic import to avoid SSR issues
+let Ably: typeof import("ably") | null = null;
+if (typeof window !== "undefined") {
+  Ably = require("ably");
+}
+
 interface AblyContextValue {
   isConnected: boolean;
-  connectionState: Ably.ConnectionState;
+  connectionState: string;
 }
 
 const AblyContext = React.createContext<AblyContextValue>({
@@ -27,9 +32,9 @@ export function useAbly() {
 export function AblyProvider({ children }: { children: React.ReactNode }) {
   const { userId, getToken } = useAuth();
   const queryClient = useQueryClient();
-  const [ablyClient, setAblyClient] = React.useState<Ably.Realtime | null>(null);
+  const [ablyClient, setAblyClient] = React.useState<any>(null);
   const [isConnected, setIsConnected] = React.useState(false);
-  const [connectionState, setConnectionState] = React.useState<Ably.ConnectionState>("initialized");
+  const [connectionState, setConnectionState] = React.useState<string>("initialized");
   const inactivityTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const wasManuallyDisconnectedRef = React.useRef(false);
 
@@ -38,7 +43,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize Ably client
   React.useEffect(() => {
-    if (!userId || !isEnabled) {
+    if (!userId || !isEnabled || !Ably) {
       return;
     }
 
