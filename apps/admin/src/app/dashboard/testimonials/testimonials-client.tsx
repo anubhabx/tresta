@@ -5,6 +5,7 @@ import { useTestimonials } from '@/lib/hooks/use-testimonials';
 import { DataTable } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { ModerationBadge } from '@/components/testimonials/moderation-badge';
+import { ModerationActions } from '@/components/testimonials/moderation-actions';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Filter, Star } from 'lucide-react';
 import { formatDate, formatNumber } from '@/lib/utils/format';
@@ -79,6 +80,18 @@ export function TestimonialsClient() {
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {formatDate(testimonial.createdAt)}
         </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (testimonial: any) => (
+        <ModerationActions
+          testimonialId={testimonial.id}
+          currentStatus={testimonial.moderationStatus}
+          testimonialContent={testimonial.content}
+          authorName={testimonial.authorName}
+        />
       ),
     },
   ];
