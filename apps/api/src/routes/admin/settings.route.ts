@@ -4,8 +4,15 @@ import { ResponseHandler } from '../../lib/response.ts';
 import { getRedisClient } from '../../lib/redis.ts';
 import { AppError } from '../../lib/errors.ts';
 import { auditLog } from '../../middleware/audit-log.middleware.ts';
+import crypto from 'crypto';
 
 const router: Router = Router();
+
+// Settings change event channel
+const SETTINGS_CHANGE_CHANNEL = 'settings:changes';
+
+// HMAC secret for signing settings changes (should be in env)
+const SETTINGS_HMAC_SECRET = process.env.SETTINGS_HMAC_SECRET || 'default-secret-change-in-production';
 
 // Settings keys in Redis
 const SETTINGS_KEYS = {
@@ -135,8 +142,31 @@ router.put(
       
       await multi.exec();
       
-      // TODO: Publish signed change event to Redis pub/sub
-      // TODO: Log settings change in audit log
+      // Publish signed change event to Redis pub/sub
+      const changeEvent = {
+        version: newVersion,
+        changes: {
+          ...(emailQuotaLimit !== undefined && { emailQuotaLimit }),
+          ...(ablyConnectionLimit !== undefined && { ablyConnectionLimit }),
+          ...(autoModerationEnabled !== undefined && { autoModerationEnabled }),
+        },
+        timestamp: new Date().toISOString(),
+        updatedBy: req.auth?.userId || 'unknown',
+      };
+      
+      // Generate HMAC signature
+      const signature = crypto
+        .createHmac('sha256', SETTINGS_HMAC_SECRET)
+        .update(JSON.stringify(changeEvent))
+        .digest('hex');
+      
+      const signedEvent = {
+        ...changeEvent,
+        signature,
+      };
+      
+      // Publish to Redis pub/sub
+      await redis.publish(SETTINGS_CHANGE_CHANNEL, JSON.stringify(signedEvent));
       
       // Fetch updated settings
       const [
