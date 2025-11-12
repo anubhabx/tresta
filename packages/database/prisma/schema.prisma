@@ -21,47 +21,50 @@ model User {
   lastName  String?
   avatar    String? @db.VarChar(1000) // Avatar URL from Azure Blob Storage
 
-  plan         UserPlan                  @default(FREE)
+  plan         UserPlan      @default(FREE)
   projects     Project[]
   testimonials Testimonial[]
   apiKeys      ApiKey[]
   subscription Subscription? // null for free tier users
 
   // Notification system relations
-  notifications             Notification[]
-  notificationPreferences   NotificationPreferences?
+  notifications           Notification[]
+  notificationPreferences NotificationPreferences?
+
+  // Admin tracking
+  lastLogin DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Project {
-  id                   String             @id @default(cuid())
-  userId               String
-  name                 String             @db.VarChar(255)
-  shortDescription     String?            @db.VarChar(500)
-  description          String?            @db.Text
-  slug                 String             @unique @db.VarChar(255)
-  logoUrl              String?            @db.VarChar(1000)
-  projectType          ProjectType?       @default(OTHER)
-  websiteUrl           String?            @db.VarChar(1000)
-  collectionFormUrl    String?            @db.VarChar(1000)
-  brandColorPrimary    String?            @db.VarChar(7) // Hex color code
-  brandColorSecondary  String?            @db.VarChar(7) // Hex color code
-  socialLinks          Json? // { twitter: "...", linkedin: "...", github: "..." }
-  tags                 String[] // Array of tags for internal categorization
-  visibility           ProjectVisibility  @default(PRIVATE)
-  isActive             Boolean            @default(true)
-  
+  id                  String            @id @default(cuid())
+  userId              String
+  name                String            @db.VarChar(255)
+  shortDescription    String?           @db.VarChar(500)
+  description         String?           @db.Text
+  slug                String            @unique @db.VarChar(255)
+  logoUrl             String?           @db.VarChar(1000)
+  projectType         ProjectType?      @default(OTHER)
+  websiteUrl          String?           @db.VarChar(1000)
+  collectionFormUrl   String?           @db.VarChar(1000)
+  brandColorPrimary   String?           @db.VarChar(7) // Hex color code
+  brandColorSecondary String?           @db.VarChar(7) // Hex color code
+  socialLinks         Json? // { twitter: "...", linkedin: "...", github: "..." }
+  tags                String[] // Array of tags for internal categorization
+  visibility          ProjectVisibility @default(PRIVATE)
+  isActive            Boolean           @default(true)
+
   // Auto-Moderation Settings
-  autoModeration       Boolean            @default(true) // Enable auto-moderation
-  autoApproveVerified  Boolean            @default(false) // Auto-approve verified users
-  profanityFilterLevel String?            @default("MODERATE") // STRICT, MODERATE, LENIENT
-  moderationSettings   Json?              // Custom moderation rules
-  
-  testimonials         Testimonial[]
-  widgets              Widget[]
-  apiKeys              ApiKey[]
+  autoModeration       Boolean @default(true) // Enable auto-moderation
+  autoApproveVerified  Boolean @default(false) // Auto-approve verified users
+  profanityFilterLevel String? @default("MODERATE") // STRICT, MODERATE, LENIENT
+  moderationSettings   Json? // Custom moderation rules
+
+  testimonials Testimonial[]
+  widgets      Widget[]
+  apiKeys      ApiKey[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,7 +92,7 @@ model Subscription {
   currentPeriodEnd       DateTime?
   cancelAtPeriodEnd      Boolean   @default(false)
 
-  amount   Int?    // Amount in smallest currency units
+  amount   Int? // Amount in smallest currency units
   currency String? @default("INR") // Currency Code
   interval String? // "month", "year"
 
@@ -97,37 +100,37 @@ model Subscription {
 }
 
 model Testimonial {
-  id          String          @id @default(cuid())
-  userId      String?
-  projectId   String?
-  authorName  String          @db.VarChar(255)
-  authorEmail String?         @db.VarChar(255)
-  authorRole  String?         @db.VarChar(255) // e.g., "CEO", "Marketing Manager"
-  authorCompany String?       @db.VarChar(255) // e.g., "Acme Inc."
-  authorAvatar String?        @db.VarChar(1000) // Avatar URL from Azure Blob Storage
-  content     String          @db.Text
-  type        TestimonialType @default(TEXT)
-  videoUrl    String?
-  mediaUrl    String?
-  source      String?         @db.VarChar(100) // e.g., "manual", "twitter", etc.
-  sourceUrl   String?         @db.VarChar(500) // e.g., URL of the tweet if sourced from Twitter
-  oembedData  Json? // Store oEmbed (Extracted Embed Info)
-  isPublished Boolean         @default(false)
-  rating      Int?            @db.SmallInt // e.g., 1 to 5 stars
-  isApproved  Boolean         @default(false) // For moderation purposes
-  ipAddress   String?         @db.VarChar(45) // To store IPv6 addresses if needed
-  userAgent   String?         @db.Text // To store user agent string if needed
-  
+  id            String          @id @default(cuid())
+  userId        String?
+  projectId     String?
+  authorName    String          @db.VarChar(255)
+  authorEmail   String?         @db.VarChar(255)
+  authorRole    String?         @db.VarChar(255) // e.g., "CEO", "Marketing Manager"
+  authorCompany String?         @db.VarChar(255) // e.g., "Acme Inc."
+  authorAvatar  String?         @db.VarChar(1000) // Avatar URL from Azure Blob Storage
+  content       String          @db.Text
+  type          TestimonialType @default(TEXT)
+  videoUrl      String?
+  mediaUrl      String?
+  source        String?         @db.VarChar(100) // e.g., "manual", "twitter", etc.
+  sourceUrl     String?         @db.VarChar(500) // e.g., URL of the tweet if sourced from Twitter
+  oembedData    Json? // Store oEmbed (Extracted Embed Info)
+  isPublished   Boolean         @default(false)
+  rating        Int?            @db.SmallInt // e.g., 1 to 5 stars
+  isApproved    Boolean         @default(false) // For moderation purposes
+  ipAddress     String?         @db.VarChar(45) // To store IPv6 addresses if needed
+  userAgent     String?         @db.Text // To store user agent string if needed
+
   // OAuth Verification
-  isOAuthVerified Boolean       @default(false) // True if verified via OAuth
-  oauthProvider   String?       @db.VarChar(50) // e.g., "google", "github"
-  oauthSubject    String?       @db.VarChar(255) // OAuth subject/user ID for verification
+  isOAuthVerified Boolean @default(false) // True if verified via OAuth
+  oauthProvider   String? @db.VarChar(50) // e.g., "google", "github"
+  oauthSubject    String? @db.VarChar(255) // OAuth subject/user ID for verification
 
   // Auto-Moderation
-  moderationStatus  ModerationStatus @default(PENDING)
-  moderationScore   Float?           // 0-1, higher = more likely spam
-  moderationFlags   Json?            // Array of detected issues
-  autoPublished     Boolean          @default(false) // True if auto-approved by moderation
+  moderationStatus ModerationStatus @default(PENDING)
+  moderationScore  Float? // 0-1, higher = more likely spam
+  moderationFlags  Json? // Array of detected issues
+  autoPublished    Boolean          @default(false) // True if auto-approved by moderation
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -167,32 +170,32 @@ model Widget {
 }
 
 model ApiKey {
-  id          String   @id @default(cuid())
-  name        String   @db.VarChar(255) // e.g., "Production Widget Key", "Development Key"
-  keyHash     String   @unique @db.VarChar(255) // Hashed API key (bcrypt)
-  keyPrefix   String   @db.VarChar(20) // Visible prefix for identification (e.g., "tresta_live_abcd1234")
-  
-  // Relations
-  userId      String
-  projectId   String
-  
-  // Permissions & Limits
-  permissions Json?    // { widgets: true, testimonials: false, analytics: false }
-  usageCount  Int      @default(0) // Total number of requests
-  usageLimit  Int?     // Maximum allowed requests (null = unlimited)
-  rateLimit   Int      @default(100) // Requests per hour
-  
-  // Status & Lifecycle
-  isActive    Boolean  @default(true)
-  lastUsedAt  DateTime?
-  expiresAt   DateTime? // null = never expires
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String @id @default(cuid())
+  name      String @db.VarChar(255) // e.g., "Production Widget Key", "Development Key"
+  keyHash   String @unique @db.VarChar(255) // Hashed API key (bcrypt)
+  keyPrefix String @db.VarChar(20) // Visible prefix for identification (e.g., "tresta_live_abcd1234")
 
   // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  projectId String
+
+  // Permissions & Limits
+  permissions Json? // { widgets: true, testimonials: false, analytics: false }
+  usageCount  Int   @default(0) // Total number of requests
+  usageLimit  Int? // Maximum allowed requests (null = unlimited)
+  rateLimit   Int   @default(100) // Requests per hour
+
+  // Status & Lifecycle
+  isActive   Boolean   @default(true)
+  lastUsedAt DateTime?
+  expiresAt  DateTime? // null = never expires
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([projectId])
@@ -245,15 +248,15 @@ enum ProjectVisibility {
 // ============================================
 
 model Notification {
-  id          String           @id @default(cuid())
-  userId      String
-  type        NotificationType
-  title       String
-  message     String           @db.Text // Sanitized HTML-safe content
-  link        String?
-  metadata    Json? // Additional data (testimonialId, projectId, etc.)
-  isRead      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text // Sanitized HTML-safe content
+  link      String?
+  metadata  Json? // Additional data (testimonialId, projectId, etc.)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -336,4 +339,116 @@ model JobIdempotency {
 
   @@index([jobKey, status])
   @@index([createdAt])
+}
+
+// ============================================
+// Admin Panel Models
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminId     String // Clerk user ID of admin
+  action      String // e.g., "PATCH /admin/testimonials/:id/status"
+  method      String // HTTP method (GET, POST, PUT, PATCH, DELETE)
+  path        String // Request path
+  targetType  String? // e.g., "user", "project", "testimonial"
+  targetId    String? // ID of the affected resource
+  requestBody Json? // Sanitized request body
+  statusCode  Int? // HTTP response status code
+  success     Boolean  @default(true)
+  requestId   String // X-Request-ID for correlation with Sentry
+  ipAddress   String?
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+  @@index([requestId])
+  @@index([createdAt])
+}
+
+model SystemSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "email_quota_limit", "ably_connection_limit"
+  value     String   @db.Text // JSON-encoded value
+  version   Int      @default(1) // For optimistic locking
+  updatedBy String? // Admin user ID who last updated
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([key])
+}
+
+model AlertConfig {
+  id                     String   @id @default(cuid())
+  emailQuotaThreshold    Int      @default(80) // Percentage (0-100)
+  dlqCountThreshold      Int      @default(100)
+  failedJobRateThreshold Float    @default(0.1) // 0-1 (10%)
+  updatedBy              String? // Admin user ID
+  updatedAt              DateTime @updatedAt
+  createdAt              DateTime @default(now())
+}
+
+model AlertHistory {
+  id         String        @id @default(cuid())
+  alertType  String // e.g., "EMAIL_QUOTA_EXCEEDED", "DLQ_THRESHOLD_EXCEEDED"
+  severity   AlertSeverity
+  message    String        @db.Text
+  metadata   Json? // Additional context
+  resolved   Boolean       @default(false)
+  resolvedAt DateTime?
+  resolvedBy String? // Admin user ID
+  createdAt  DateTime      @default(now())
+
+  @@index([alertType, createdAt])
+  @@index([resolved])
+  @@index([createdAt])
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+model ErrorLog {
+  id            String        @id @default(cuid())
+  severity      ErrorSeverity
+  errorType     String // e.g., "DatabaseError", "ValidationError"
+  message       String        @db.Text
+  stackTrace    String?       @db.Text
+  requestId     String? // X-Request-ID for correlation
+  sentryEventId String? // Sentry event ID
+  userId        String? // Affected user ID
+  metadata      Json? // Additional context
+  archived      Boolean       @default(false)
+  archivedAt    DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@index([severity, createdAt])
+  @@index([errorType])
+  @@index([requestId])
+  @@index([sentryEventId])
+  @@index([archived, createdAt])
+}
+
+enum ErrorSeverity {
+  ERROR
+  WARNING
+  CRITICAL
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g., "auto_moderation", "bulk_operations"
+  name        String // Human-readable name
+  description String?  @db.Text
+  enabled     Boolean  @default(false)
+  metadata    Json? // Additional configuration
+  updatedBy   String? // Admin user ID
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([key])
+  @@index([enabled])
 }

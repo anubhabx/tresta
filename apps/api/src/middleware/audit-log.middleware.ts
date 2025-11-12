@@ -127,20 +127,26 @@ function sanitizeRequestBody(body: any): any {
 
 /**
  * Write audit log to database
- * 
- * Note: This is a placeholder. Requires AuditLog table in database.
- * For now, we'll write to Redis as a temporary store.
  */
 async function writeAuditLog(entry: any): Promise<void> {
-  const redis = getRedisClient();
+  const { prisma } = await import('@workspace/database/prisma');
   
-  // Store in Redis list (temporary until database table is created)
-  await redis.lpush('audit_logs', JSON.stringify(entry));
-  
-  // Keep only last 10000 entries in Redis
-  await redis.ltrim('audit_logs', 0, 9999);
-  
-  // TODO: Write to database AuditLog table when migration is complete
+  await prisma.auditLog.create({
+    data: {
+      adminId: entry.adminId,
+      action: entry.action,
+      method: entry.method,
+      path: entry.path,
+      targetType: entry.targetType,
+      targetId: entry.targetId,
+      requestBody: entry.requestBody,
+      statusCode: entry.statusCode,
+      success: entry.success,
+      requestId: entry.requestId,
+      ipAddress: entry.ipAddress,
+      userAgent: entry.userAgent,
+    },
+  });
 }
 
 /**
