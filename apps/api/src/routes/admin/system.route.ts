@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { ResponseHandler } from '../../lib/response.ts';
 import { getRedisClient } from '../../lib/redis.ts';
+import { getAllFeatureFlags } from '../../services/feature-flags.service.ts';
 
 const router: Router = Router();
 
@@ -26,6 +27,13 @@ router.get(
       const redisVersionMatch = redisInfo.match(/redis_version:([^\r\n]+)/);
       const redisVersion = redisVersionMatch ? redisVersionMatch[1] : 'unknown';
       
+      // Get feature flags
+      const featureFlags = await getAllFeatureFlags();
+      const featureFlagsMap = featureFlags.reduce((acc, flag) => {
+        acc[flag.key] = flag.enabled;
+        return acc;
+      }, {} as Record<string, boolean>);
+      
       return ResponseHandler.success(res, {
         data: {
           environment: process.env.NODE_ENV || 'development',
@@ -35,12 +43,7 @@ router.get(
             redis: redisVersion,
             database: 'PostgreSQL (version check not implemented)',
           },
-          featureFlags: {
-            autoModeration: true,
-            bulkOperations: true,
-            csvExport: true,
-            // TODO: Fetch from database/Redis
-          },
+          featureFlags: featureFlagsMap,
           externalServices: {
             clerk: {
               status: 'operational',

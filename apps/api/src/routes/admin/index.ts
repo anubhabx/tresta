@@ -12,6 +12,7 @@ import sessionsRouter from './sessions.route.ts';
 import alertsRouter from './alerts.route.ts';
 import errorsRouter from './errors.route.ts';
 import systemRouter from './system.route.ts';
+import featureFlagsRouter from './feature-flags.route.ts';
 
 const router: Router = Router();
 
@@ -31,5 +32,6 @@ router.use('/admin', sessionsRouter);
 router.use('/admin', alertsRouter);
 router.use('/admin', errorsRouter);
 router.use('/admin', systemRouter);
+router.use('/admin', featureFlagsRouter);
 
 export default router;
