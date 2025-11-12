@@ -70,3 +70,49 @@ export function useUpdateTestimonialStatus() {
     },
   });
 }
+
+interface BulkUpdateTestimonialsParams {
+  testimonialIds: string[];
+  status: 'APPROVED' | 'REJECTED' | 'FLAGGED';
+  dryRun?: boolean;
+}
+
+interface BulkUpdatePreview {
+  id: string;
+  currentStatus: string;
+  newStatus: string;
+  authorName: string;
+  projectName: string;
+  content: string;
+}
+
+interface BulkUpdateResponse {
+  success: boolean;
+  data: {
+    affectedCount?: number;
+    preview?: BulkUpdatePreview[];
+    updated?: number;
+    failed?: number;
+    errors?: Array<{ id: string; error: string }>;
+  };
+}
+
+export function useBulkUpdateTestimonials() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ testimonialIds, status, dryRun = false }: BulkUpdateTestimonialsParams) => {
+      const response = await apiClient.post<BulkUpdateResponse>(
+        '/admin/testimonials/bulk-update',
+        { testimonialIds, status, dryRun }
+      );
+      return response.data.data;
+    },
+    onSuccess: (data, variables) => {
+      // Only invalidate if not a dry run
+      if (!variables.dryRun) {
+        queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      }
+    },
+  });
+}

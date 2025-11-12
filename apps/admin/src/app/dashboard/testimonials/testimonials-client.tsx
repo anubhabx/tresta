@@ -6,14 +6,20 @@ import { DataTable } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { ModerationBadge } from '@/components/testimonials/moderation-badge';
 import { ModerationActions } from '@/components/testimonials/moderation-actions';
+import { BulkActionsBar } from '@/components/testimonials/bulk-actions-bar';
+import { BulkConfirmationDialog } from '@/components/testimonials/bulk-confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Filter, Star } from 'lucide-react';
 import { formatDate, formatNumber } from '@/lib/utils/format';
+import { toast } from 'sonner';
 
 export function TestimonialsClient() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [rating, setRating] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<'APPROVED' | 'REJECTED' | 'FLAGGED' | null>(null);
 
   const params = {
     ...(search && { search }),
@@ -24,6 +30,22 @@ export function TestimonialsClient() {
   const { data, isLoading, error, refetch } = useTestimonials(
     Object.keys(params).length > 0 ? params : undefined
   );
+
+  const handleBulkAction = (action: 'APPROVED' | 'REJECTED' | 'FLAGGED') => {
+    setBulkAction(action);
+    setBulkDialogOpen(true);
+  };
+
+  const handleBulkSuccess = () => {
+    const actionLabels = {
+      APPROVED: 'approved',
+      REJECTED: 'rejected',
+      FLAGGED: 'flagged',
+    };
+    toast.success(`Successfully ${actionLabels[bulkAction!]} ${selectedIds.size} testimonials`);
+    setSelectedIds(new Set());
+    setBulkAction(null);
+  };
 
   const columns = [
     {
@@ -113,6 +135,18 @@ export function TestimonialsClient() {
           Refresh
         </Button>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <BulkActionsBar
+          selectedCount={selectedIds.size}
+          maxSelection={100}
+          onApprove={() => handleBulkAction('APPROVED')}
+          onReject={() => handleBulkAction('REJECTED')}
+          onFlag={() => handleBulkAction('FLAGGED')}
+          onClear={() => setSelectedIds(new Set())}
+        />
+      )}
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
@@ -228,6 +262,21 @@ export function TestimonialsClient() {
           data={data.testimonials}
           columns={columns}
           emptyMessage="No testimonials found"
+          selectable={true}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          maxSelection={100}
+        />
+      )}
+
+      {/* Bulk Confirmation Dialog */}
+      {bulkAction && (
+        <BulkConfirmationDialog
+          open={bulkDialogOpen}
+          onOpenChange={setBulkDialogOpen}
+          testimonialIds={Array.from(selectedIds)}
+          action={bulkAction}
+          onSuccess={handleBulkSuccess}
         />
       )}
     </div>
