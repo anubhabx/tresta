@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
+import { getAuth } from '@clerk/express';
 import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS, REDIS_TTL } from '../lib/redis-keys.ts';
 
 /**
  * Rate limiter instances
@@ -39,7 +39,7 @@ export async function rateLimitMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const userId = req.auth?.userId;
+  const { userId } = getAuth(req);
 
   if (!userId) {
     // Skip rate limiting for unauthenticated requests
@@ -96,7 +96,7 @@ export async function emailRateLimitMiddleware(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const userId = req.auth?.userId;
+  const { userId } = getAuth(req);
 
   if (!userId) {
     return next();
@@ -163,7 +163,7 @@ export function createRateLimiter(
   });
 
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const userId = req.auth?.userId;
+    const { userId } = getAuth(req);
 
     if (!userId) {
       return next();
