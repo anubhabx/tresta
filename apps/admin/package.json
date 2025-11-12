@@ -14,12 +14,16 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "axios": "^1.7.9",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "@workspace/types": "workspace:*",
+    "@workspace/ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/typescript-config": "workspace:*"
   }
 }
