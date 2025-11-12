@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import "@workspace/ui/globals.css"
+import type { Metadata } from 'next';
+import { ClerkProvider } from '@clerk/nextjs';
+import '@workspace/ui/globals.css';
 
 export const metadata: Metadata = {
   title: "Tresta Admin",

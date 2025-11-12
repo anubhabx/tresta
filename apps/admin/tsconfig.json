@@ -5,6 +5,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@workspace/ui/*": [
+        "../../packages/ui/src/*"
       ]
     },
     "plugins": [
