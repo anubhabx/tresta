@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTestimonials } from '@/lib/hooks/use-testimonials';
+import { useExport } from '@/lib/hooks/use-export';
 import { DataTable } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { ModerationBadge } from '@/components/testimonials/moderation-badge';
@@ -9,7 +10,7 @@ import { ModerationActions } from '@/components/testimonials/moderation-actions'
 import { BulkActionsBar } from '@/components/testimonials/bulk-actions-bar';
 import { BulkConfirmationDialog } from '@/components/testimonials/bulk-confirmation-dialog';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Filter, Star } from 'lucide-react';
+import { RefreshCw, Filter, Star, Download } from 'lucide-react';
 import { formatDate, formatNumber } from '@/lib/utils/format';
 import { toast } from 'sonner';
 
@@ -31,6 +32,8 @@ export function TestimonialsClient() {
     Object.keys(params).length > 0 ? params : undefined
   );
 
+  const exportMutation = useExport();
+
   const handleBulkAction = (action: 'APPROVED' | 'REJECTED' | 'FLAGGED') => {
     setBulkAction(action);
     setBulkDialogOpen(true);
@@ -45,6 +48,42 @@ export function TestimonialsClient() {
     toast.success(`Successfully ${actionLabels[bulkAction!]} ${selectedIds.size} testimonials`);
     setSelectedIds(new Set());
     setBulkAction(null);
+  };
+
+  const handleExport = () => {
+    if (!data || data.testimonials.length === 0) {
+      toast.error('No data to export');
+      return;
+    }
+
+    const exportData = data.testimonials.map((t) => ({
+      id: t.id,
+      content: t.content,
+      authorName: t.authorName,
+      authorEmail: t.authorEmail || '',
+      rating: t.rating,
+      moderationStatus: t.moderationStatus,
+      projectName: t.project.name,
+      projectSlug: t.project.slug,
+      createdAt: formatDate(t.createdAt),
+    }));
+
+    exportMutation.mutate({
+      entityType: 'testimonials',
+      data: exportData,
+      columns: [
+        'id',
+        'content',
+        'authorName',
+        'authorEmail',
+        'rating',
+        'moderationStatus',
+        'projectName',
+        'projectSlug',
+        'createdAt',
+      ],
+      filenamePrefix: 'testimonials',
+    });
   };
 
   const columns = [
@@ -130,10 +169,20 @@ export function TestimonialsClient() {
             Manage and moderate testimonials across all projects
           </p>
         </div>
-        <Button onClick={() => refetch()} disabled={isLoading}>
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={isLoading || !data || data.testimonials.length === 0 || exportMutation.isPending}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button onClick={() => refetch()} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Bulk Actions Bar */}

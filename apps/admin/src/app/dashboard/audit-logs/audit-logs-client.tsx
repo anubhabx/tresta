@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { useAuditLogs } from '@/lib/hooks/use-audit-logs';
+import { useExport } from '@/lib/hooks/use-export';
 import { DataTable } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { AuditDetailModal } from '@/components/audit/audit-detail-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Filter, Eye } from 'lucide-react';
+import { RefreshCw, Filter, Eye, Download } from 'lucide-react';
 import { formatDate, formatNumber } from '@/lib/utils/format';
+import { toast } from 'sonner';
 
 export function AuditLogsClient() {
   const [search, setSearch] = useState('');
@@ -33,9 +35,45 @@ export function AuditLogsClient() {
     Object.keys(params).length > 0 ? params : undefined
   );
 
+  const exportMutation = useExport();
+
   const handleViewDetails = (log: any) => {
     setSelectedLog(log);
     setDetailModalOpen(true);
+  };
+
+  const handleExport = () => {
+    if (!data || data.logs.length === 0) {
+      toast.error('No data to export');
+      return;
+    }
+
+    const exportData = data.logs.map((log) => ({
+      id: log.id,
+      requestId: log.requestId,
+      adminName: log.adminName,
+      adminEmail: log.adminEmail,
+      actionType: log.actionType,
+      targetType: log.targetType,
+      targetId: log.targetId,
+      createdAt: formatDate(log.createdAt),
+    }));
+
+    exportMutation.mutate({
+      entityType: 'audit-logs',
+      data: exportData,
+      columns: [
+        'id',
+        'requestId',
+        'adminName',
+        'adminEmail',
+        'actionType',
+        'targetType',
+        'targetId',
+        'createdAt',
+      ],
+      filenamePrefix: 'audit-logs',
+    });
   };
 
   const columns = [
@@ -110,10 +148,20 @@ export function AuditLogsClient() {
             Track all administrative actions and changes
           </p>
         </div>
-        <Button onClick={() => refetch()} disabled={isLoading}>
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={isLoading || !data || data.logs.length === 0 || exportMutation.isPending}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button onClick={() => refetch()} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
