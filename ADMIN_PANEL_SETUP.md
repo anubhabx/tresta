@@ -40,8 +40,16 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
 
 ### 3. Set Up Admin User
 
-**In Clerk Dashboard:**
+**Option A: Automatic (First User)**
 
+The first user to sign up will automatically be promoted to admin. Just:
+1. Start the admin panel
+2. Sign up with your account
+3. You'll be granted admin access automatically
+
+**Option B: Manual (Subsequent Users)**
+
+For additional admin users, use Clerk Dashboard:
 1. Go to **Users** → Select your user
 2. Click **Metadata** tab
 3. Click **Edit** next to "Public metadata"
@@ -52,6 +60,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
    }
    ```
 5. Click **Save**
+6. User must sign out and sign back in
 
 ### 4. Start Admin Panel
 
@@ -293,6 +302,13 @@ export function InteractiveComponent() {
 **Problem:** User sees access denied page
 
 **Solution:**
+
+**For First User:**
+- The first user should be auto-promoted to admin
+- If not working, check console logs for errors
+- Verify Clerk API keys are correct
+
+**For Additional Users:**
 1. Check Clerk Dashboard → Users → Metadata
 2. Ensure `publicMetadata.role === "admin"`
 3. User must sign out and sign back in for changes to take effect
