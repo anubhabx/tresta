@@ -24,6 +24,30 @@ const emailRateLimiter = new RateLimiterRedis({
   duration: 3600, // Per hour
 });
 
+// Admin read operations: 100 requests per minute per admin
+const adminReadRateLimiter = new RateLimiterRedis({
+  storeClient: getRedisClient(),
+  keyPrefix: 'tresta:ratelimit:admin:read',
+  points: 100,
+  duration: 60,
+});
+
+// Admin write operations: 30 requests per minute per admin
+const adminWriteRateLimiter = new RateLimiterRedis({
+  storeClient: getRedisClient(),
+  keyPrefix: 'tresta:ratelimit:admin:write',
+  points: 30,
+  duration: 60,
+});
+
+// Admin heavy operations (bulk, exports): 10 requests per 5 minutes per admin
+const adminHeavyRateLimiter = new RateLimiterRedis({
+  storeClient: getRedisClient(),
+  keyPrefix: 'tresta:ratelimit:admin:heavy',
+  points: 10,
+  duration: 300, // 5 minutes
+});
+
 /**
  * Express middleware for API rate limiting
  * 
@@ -201,4 +225,154 @@ export function createRateLimiter(
       }
     }
   };
+}
+
+/**
+ * Admin read operations rate limiting middleware
+ * 
+ * Limits admin users to 100 read requests per minute
+ * Used for GET endpoints in admin panel
+ */
+export async function adminReadRateLimitMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return next();
+  }
+
+  try {
+    const rateLimitRes = await adminReadRateLimiter.consume(userId);
+
+    res.setHeader('X-RateLimit-Limit', '100');
+    res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+    res.setHeader(
+      'X-RateLimit-Reset',
+      new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+    );
+
+    next();
+  } catch (error: any) {
+    if (error.remainingPoints !== undefined) {
+      res.setHeader('X-RateLimit-Limit', '100');
+      res.setHeader('X-RateLimit-Remaining', '0');
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + error.msBeforeNext).toISOString()
+      );
+      res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+
+      res.status(429).json({
+        success: false,
+        error: 'Too many admin read requests',
+        retryAfter: Math.ceil(error.msBeforeNext / 1000),
+      });
+    } else {
+      console.error('Admin read rate limiter error:', error);
+      next();
+    }
+  }
+}
+
+/**
+ * Admin write operations rate limiting middleware
+ * 
+ * Limits admin users to 30 write requests per minute
+ * Used for POST, PUT, PATCH, DELETE endpoints in admin panel
+ */
+export async function adminWriteRateLimitMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return next();
+  }
+
+  try {
+    const rateLimitRes = await adminWriteRateLimiter.consume(userId);
+
+    res.setHeader('X-RateLimit-Limit', '30');
+    res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+    res.setHeader(
+      'X-RateLimit-Reset',
+      new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+    );
+
+    next();
+  } catch (error: any) {
+    if (error.remainingPoints !== undefined) {
+      res.setHeader('X-RateLimit-Limit', '30');
+      res.setHeader('X-RateLimit-Remaining', '0');
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + error.msBeforeNext).toISOString()
+      );
+      res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+
+      res.status(429).json({
+        success: false,
+        error: 'Too many admin write requests',
+        retryAfter: Math.ceil(error.msBeforeNext / 1000),
+      });
+    } else {
+      console.error('Admin write rate limiter error:', error);
+      next();
+    }
+  }
+}
+
+/**
+ * Admin heavy operations rate limiting middleware
+ * 
+ * Limits admin users to 10 heavy operations per 5 minutes
+ * Used for bulk operations, exports, and other resource-intensive endpoints
+ */
+export async function adminHeavyRateLimitMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return next();
+  }
+
+  try {
+    const rateLimitRes = await adminHeavyRateLimiter.consume(userId);
+
+    res.setHeader('X-RateLimit-Limit', '10');
+    res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+    res.setHeader(
+      'X-RateLimit-Reset',
+      new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+    );
+
+    next();
+  } catch (error: any) {
+    if (error.remainingPoints !== undefined) {
+      res.setHeader('X-RateLimit-Limit', '10');
+      res.setHeader('X-RateLimit-Remaining', '0');
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + error.msBeforeNext).toISOString()
+      );
+      res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+
+      res.status(429).json({
+        success: false,
+        error: 'Too many heavy admin operations. Please wait before retrying.',
+        retryAfter: Math.ceil(error.msBeforeNext / 1000),
+      });
+    } else {
+      console.error('Admin heavy rate limiter error:', error);
+      next();
+    }
+  }
 }

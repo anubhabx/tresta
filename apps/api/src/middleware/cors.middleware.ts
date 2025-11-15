@@ -26,11 +26,14 @@ function isPublicPath(path: string): boolean {
  * Restrictive CORS Configuration
  *
  * Used for authenticated endpoints (dashboard, project management, media uploads)
- * Only allows requests from the frontend application
+ * Only allows requests from the frontend application and admin panel
  * Supports credentials (cookies, authorization headers)
  */
 const restrictiveCorsConfig = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: [
+    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.ADMIN_URL || "http://localhost:3001"
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
