@@ -46,13 +46,13 @@ export function ActionHistoryPanel({
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     {action.action === "approve" && (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 text-success" />
                     )}
                     {action.action === "reject" && (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <XCircle className="h-4 w-4 text-destructive" />
                     )}
                     {action.action === "flag" && (
-                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                     <span className="text-sm font-medium capitalize">
                       {action.action}d {action.count} testimonial

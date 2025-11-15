@@ -153,7 +153,7 @@ export function ModerationTestimonialCard({
                       "flex-shrink-0",
                       flag.toLowerCase().includes("positive") ||
                         flag.toLowerCase().includes("auto-approved")
-                        ? "text-green-600"
+                        ? "text-success"
                         : "text-muted-foreground",
                     )}
                   >

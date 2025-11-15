@@ -83,7 +83,7 @@ export function ProjectOverviewTab({
               </a>
             </div>
           </div>
-          <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-blue-100/50 dark:bg-primary/10 border border-border/50 rounded-lg">
+          <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-info-highlight-bg border border-border/50 rounded-lg">
             <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 flex-shrink-0">
               <LinkIcon className="h-4 w-4 text-primary dark:text-primary" />
             </div>
@@ -111,9 +111,9 @@ export function ProjectOverviewTab({
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {!hasTestimonials && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg bg-amber-50/50 dark:bg-amber-950/20">
+              <div className="p-3 sm:p-4 border border-border/50 rounded-lg bg-warning-muted">
                 <div className="flex items-start gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs sm:text-sm font-medium">No testimonials yet</h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -136,7 +136,7 @@ export function ProjectOverviewTab({
             {!hasWidgets && (
               <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
                 <div className="flex items-start gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <TrendingUp className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs sm:text-sm font-medium">Create a widget</h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -160,7 +160,7 @@ export function ProjectOverviewTab({
             {hasTestimonials && (
               <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
                 <div className="flex items-start gap-2 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs sm:text-sm font-medium">Review testimonials</h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -213,7 +213,7 @@ export function ProjectOverviewTab({
         <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <CheckCircle2 className="h-5 w-5 text-success" />
               Auto-Moderation Active
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm">

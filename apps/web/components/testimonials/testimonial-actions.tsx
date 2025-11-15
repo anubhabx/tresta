@@ -66,7 +66,7 @@ export function TestimonialActions({
                 onClick={() => onApprove(testimonialId)}
                 disabled={isLoading}
               >
-                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                <CheckCircle className="mr-2 h-4 w-4 text-success" />
                 Approve
               </DropdownMenuItem>
             )}
@@ -75,7 +75,7 @@ export function TestimonialActions({
                 onClick={() => onReject(testimonialId)}
                 disabled={isLoading}
               >
-                <XCircle className="mr-2 h-4 w-4 text-red-600" />
+                <XCircle className="mr-2 h-4 w-4 text-destructive" />
                 Reject
               </DropdownMenuItem>
             )}
@@ -121,7 +121,7 @@ export function TestimonialActions({
             <DropdownMenuItem
               onClick={() => onDelete(testimonialId)}
               disabled={isLoading}
-              className="text-red-600 focus:text-red-600"
+              className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete

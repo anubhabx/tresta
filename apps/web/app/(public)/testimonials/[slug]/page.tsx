@@ -210,8 +210,8 @@ export default function TestimonialSubmissionPage({
         <Card className="max-w-lg w-full">
           <CardContent className="pt-12 pb-12 text-center">
             <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-full bg-green-500/10">
-                <CheckCircle2 className="h-16 w-16 text-green-500" />
+              <div className="p-4 rounded-full bg-success-muted">
+                <CheckCircle2 className="h-16 w-16 text-success" />
               </div>
             </div>
             <h1 className="text-3xl font-bold mb-3">Thank You!</h1>
@@ -281,19 +281,19 @@ export default function TestimonialSubmissionPage({
 
                 {/* Verified Badge */}
                 {isGoogleVerified && (
-                  <div className="bg-slate-950 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
-                    <ShieldCheck className="h-5 w-5 text-white" />
+                  <div className="bg-success-muted border border-border rounded-lg p-4 flex items-center gap-3">
+                    <ShieldCheck className="h-5 w-5 text-success" />
                     <div className="flex-1">
-                      <p className="font-medium text-white">
+                      <p className="font-medium">
                         Verified with Google
                       </p>
-                      <p className="text-sm text-slate-300">
+                      <p className="text-sm text-muted-foreground">
                         Your testimonial will display a verified badge
                       </p>
                     </div>
                     <Badge
                       variant="secondary"
-                      className="bg-slate-300 text-primary-foreground hover:bg-green-100"
+                      className="bg-success text-success-foreground"
                     >
                       Verified
                     </Badge>

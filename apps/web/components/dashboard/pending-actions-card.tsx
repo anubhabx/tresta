@@ -45,10 +45,10 @@ export function PendingActionsCard({ projects }: PendingActionsCardProps) {
           {projectsNeedingTestimonials.length > 0 && (
             <Link
               href="/projects"
-              className="flex items-start gap-3 p-3 rounded-lg hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors group"
+              className="flex items-start gap-3 p-3 rounded-lg hover:bg-info-highlight-bg/50 transition-colors group"
             >
-              <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex-shrink-0 mt-0.5">
-                <AlertCircleIcon className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+              <div className="p-1.5 rounded-lg bg-warning-muted flex-shrink-0 mt-0.5">
+                <AlertCircleIcon className="h-4 w-4 text-warning" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">
@@ -69,8 +69,8 @@ export function PendingActionsCard({ projects }: PendingActionsCardProps) {
               href="/projects"
               className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
             >
-              <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30 flex-shrink-0 mt-0.5">
-                <TrendingUpIcon className="h-4 w-4 text-green-600 dark:text-green-500" />
+              <div className="p-1.5 rounded-lg bg-success-muted flex-shrink-0 mt-0.5">
+                <TrendingUpIcon className="h-4 w-4 text-success" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">

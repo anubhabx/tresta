@@ -12,7 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AblyProvider>
         <NextThemesProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
           enableColorScheme

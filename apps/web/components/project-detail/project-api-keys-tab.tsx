@@ -196,7 +196,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
                   <>
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <CheckCircle2 className="h-5 w-5 text-success" />
                         API Key Created
                       </DialogTitle>
                       <DialogDescription>
@@ -216,7 +216,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
                           </Button>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
+                      <div className="flex items-start gap-2 text-sm text-warning bg-warning-muted p-3 rounded-lg">
                         <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
                         <p>
                           Make sure to copy your API key now. You won't be able to see it again!

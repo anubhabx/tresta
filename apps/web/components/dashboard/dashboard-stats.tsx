@@ -52,7 +52,7 @@ export function DashboardStats({
               {totalProjects}
             </div>
             {hasRecentActivity && (
-              <div className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-500">
+              <div className="flex items-center gap-1 text-xs font-medium text-success">
                 <ArrowUpIcon className="h-3 w-3" />
                 <span className="hidden xs:inline">+{recentProjectsCount} this week</span>
                 <span className="xs:hidden">+{recentProjectsCount}</span>

@@ -376,7 +376,7 @@ const DataCollectionInfo = () => {
           <ul className="space-y-2 text-sm text-muted-foreground">
             {DATA_RIGHTS.map((right) => (
               <li key={right.label} className="flex items-start gap-2">
-                <CheckCircle2Icon className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <CheckCircle2Icon className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                 <span>
                   <strong>{right.label}</strong> - {right.description}
                 </span>

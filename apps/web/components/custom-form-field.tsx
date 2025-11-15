@@ -290,7 +290,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
                         <Star
                           className={`h-8 w-8 px-0.5 transition-colors ${
                             rating <= (hoveredRating || selectedRating)
-                              ? "fill-yellow-400 text-yellow-400"
+                              ? "fill-warning text-warning"
                               : "text-muted-foreground/30"
                           }`}
                         />

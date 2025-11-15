@@ -207,7 +207,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                         />
                       ) : (
                         <div className="w-16 h-16 flex items-center justify-center bg-muted rounded">
-                          <CheckCircle2 className="h-8 w-8 text-green-600" />
+                          <CheckCircle2 className="h-8 w-8 text-success" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">

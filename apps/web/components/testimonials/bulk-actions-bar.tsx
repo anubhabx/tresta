@@ -77,7 +77,7 @@ export function BulkActionsBar({
                         disabled={isPending || validForApprove === 0}
                         size="sm"
                         variant="default"
-                        className="bg-green-500 hover:bg-green-600 w-full flex items-center justify-center gap-1 sm:gap-2 touch-manipulation min-h-[44px] sm:min-h-0"
+                        className="bg-success hover:bg-success/90 w-full flex items-center justify-center gap-1 sm:gap-2 touch-manipulation min-h-[44px] sm:min-h-0"
                       >
                         <div className="flex items-center">
                           <CheckCircle2 className="h-4 w-4 sm:mr-2" />

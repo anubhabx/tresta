@@ -37,6 +37,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { FaGithub } from "react-icons/fa";
 import { projects } from "@/lib/queries";
 import { NotificationSidebarSection } from "@/components/notifications/notification-sidebar-section";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
@@ -143,6 +144,11 @@ const UISidebar = () => {
       <SidebarFooter className="px-2 py-2 border-t border-border space-y-2">
         {/* Notifications Section */}
         <NotificationSidebarSection />
+
+        <Separator />
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
         <Separator />
 

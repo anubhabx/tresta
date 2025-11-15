@@ -54,7 +54,7 @@ export function ConnectedAccountsSection({
           </div>
           {hasGoogleAccount ? (
             <Badge variant="outline" className="gap-1.5">
-              <CheckCircle2Icon className="h-3 w-3 text-green-500" />
+              <CheckCircle2Icon className="h-3 w-3 text-success" />
               Connected
             </Badge>
           ) : (
@@ -80,7 +80,7 @@ export function ConnectedAccountsSection({
           </div>
           {hasGithubAccount ? (
             <Badge variant="outline" className="gap-1.5">
-              <CheckCircle2Icon className="h-3 w-3 text-green-500" />
+              <CheckCircle2Icon className="h-3 w-3 text-success" />
               Connected
             </Badge>
           ) : (

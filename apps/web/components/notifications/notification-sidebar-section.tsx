@@ -28,7 +28,7 @@ export function NotificationSidebarSection() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton onClick={toggleCenter} className="">
+        <SidebarMenuButton asChild onClick={toggleCenter} className="">
           <Button
             className="justify-start w-full has-[>svg]:px-0 group-data-[collapsible=icon]:px-0 relative"
             variant="ghost"
@@ -36,7 +36,7 @@ export function NotificationSidebarSection() {
             <div className="relative">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-destructive text-[8px] font-bold text-destructive-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -58,12 +58,12 @@ export function NotificationSidebarSection() {
                   onClick={toggleCenter}
                   className={cn(
                     "flex-col items-start gap-1 py-2 h-auto",
-                    !notification.isRead && "bg-blue-50 dark:bg-blue-950/20"
+                    !notification.isRead && "bg-info-highlight-bg"
                   )}
                 >
                   <div className="flex items-start gap-2 w-full">
                     {!notification.isRead && (
-                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">

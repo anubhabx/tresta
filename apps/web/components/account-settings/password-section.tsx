@@ -76,8 +76,8 @@ export function PasswordSection({ user, hasPassword }: PasswordSectionProps) {
           <CardDescription>You signed in with a social account</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-start gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-            <ShieldCheckIcon className="h-5 w-5 text-blue-500 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 bg-info-highlight-bg border border-border/50 rounded-lg">
+            <ShieldCheckIcon className="h-5 w-5 text-info-text mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-medium">OAuth Authentication Active</p>
               <p className="text-xs text-muted-foreground mt-1">

@@ -41,12 +41,12 @@ export function NotificationItem({ notification, onClose }: NotificationItemProp
       onClick={handleClick}
       className={cn(
         "w-full text-left p-4 hover:bg-accent transition-colors border-b last:border-b-0",
-        !notification.isRead && "bg-blue-50 dark:bg-blue-950/20"
+        !notification.isRead && "bg-info-highlight-bg"
       )}
     >
       <div className="flex items-start gap-3">
         {!notification.isRead && (
-          <div className="mt-2 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+          <div className="mt-2 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
         )}
         <div className="flex-1 min-w-0">
           <p className={cn(

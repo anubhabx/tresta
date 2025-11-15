@@ -67,8 +67,8 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
                                 href={`/projects/${topProject.slug}`}
                                 className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
                             >
-                                <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex-shrink-0 mt-0.5">
-                                    <TrophyIcon className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                                <div className="p-1.5 rounded-lg bg-warning-muted flex-shrink-0 mt-0.5">
+                                    <TrophyIcon className="h-4 w-4 text-warning" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xs text-muted-foreground mb-1">
@@ -89,8 +89,8 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
                                 href={`/projects/${mostRecentProject.slug}`}
                                 className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:border-border transition-colors group"
                             >
-                                <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex-shrink-0 mt-0.5">
-                                    <ClockIcon className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+                                <div className="p-1.5 rounded-lg bg-info-highlight-bg flex-shrink-0 mt-0.5">
+                                    <ClockIcon className="h-4 w-4 text-info-text" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xs text-muted-foreground mb-1">
@@ -148,7 +148,7 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-24 bg-muted rounded-full overflow-hidden">
                                             <div
-                                                className="h-full bg-slate-300"
+                                                className="h-full bg-muted-foreground/40"
                                                 style={{
                                                     width: `${projects.length > 0 ? (inactiveProjects / projects.length) * 100 : 0}%`,
                                                 }}
@@ -197,7 +197,7 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
                                         <div className="flex items-center gap-2">
                                             <div className="h-2 w-24 bg-muted rounded-full overflow-hidden">
                                                 <div
-                                                    className="h-full bg-gray-400"
+                                                    className="h-full bg-muted-foreground/40"
                                                     style={{
                                                         width: `${totalTestimonials > 0 ? ((totalTestimonials - publishedTestimonials) / totalTestimonials) * 100 : 0}%`,
                                                     }}

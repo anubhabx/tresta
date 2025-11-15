@@ -121,25 +121,25 @@ export function SearchAndFilters({
                   <SelectItem value="all">All Moderation</SelectItem>
                   <SelectItem value="PENDING">
                     <div className="flex items-center">
-                      <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2 flex-shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-warning mr-2 flex-shrink-0" />
                       Pending
                     </div>
                   </SelectItem>
                   <SelectItem value="APPROVED">
                     <div className="flex items-center">
-                      <span className="h-2 w-2 rounded-full bg-green-500 mr-2 flex-shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-success mr-2 flex-shrink-0" />
                       Approved
                     </div>
                   </SelectItem>
                   <SelectItem value="FLAGGED">
                     <div className="flex items-center">
-                      <span className="h-2 w-2 rounded-full bg-red-500 mr-2 flex-shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-destructive mr-2 flex-shrink-0" />
                       Flagged
                     </div>
                   </SelectItem>
                   <SelectItem value="REJECTED">
                     <div className="flex items-center">
-                      <span className="h-2 w-2 rounded-full bg-gray-500 mr-2 flex-shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground mr-2 flex-shrink-0" />
                       Rejected
                     </div>
                   </SelectItem>
