@@ -8,23 +8,43 @@ export function formatNumber(num: number): string {
 /**
  * Format a date to a readable string
  */
-export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
+export function formatDate(date: string | Date | null | undefined): string {
+  if (!date) return 'N/A';
+  
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(dateObj);
+  } catch (error) {
+    console.error('Error formatting date:', date, error);
+    return 'Invalid Date';
+  }
 }
 
 /**
  * Format a date to relative time (e.g., "2 hours ago")
  */
-export function formatRelativeTime(date: string | Date): string {
-  const now = new Date();
-  const then = new Date(date);
-  const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+export function formatRelativeTime(date: string | Date | null | undefined): string {
+  if (!date) return 'N/A';
+  
+  try {
+    const now = new Date();
+    const then = new Date(date);
+    
+    if (isNaN(then.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return 'just now';
@@ -52,6 +72,10 @@ export function formatRelativeTime(date: string | Date): string {
 
   const diffInYears = Math.floor(diffInMonths / 12);
   return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
+  } catch (error) {
+    console.error('Error formatting relative time:', date, error);
+    return 'Invalid Date';
+  }
 }
 
 /**

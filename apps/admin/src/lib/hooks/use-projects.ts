@@ -54,22 +54,51 @@ interface ProjectDetail {
   name: string;
   slug: string;
   description: string | null;
-  type: string;
+  shortDescription: string | null;
+  logoUrl: string | null;
+  projectType: string;
+  websiteUrl: string | null;
   visibility: string;
+  isActive: boolean;
+  autoModeration: boolean;
+  autoApproveVerified: boolean;
+  profanityFilterLevel: string;
+  brandColorPrimary: string | null;
+  brandColorSecondary: string | null;
+  socialLinks: any;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
   owner: {
     id: string;
     name: string;
     email: string;
+    avatar: string | null;
+    plan: string;
   };
-  createdAt: string;
-  updatedAt: string;
-  testimonials: Array<{
+  stats: {
+    testimonialCounts: {
+      total: number;
+      pending: number;
+      approved: number;
+      rejected: number;
+      flagged: number;
+    };
+    widgetCount: number;
+    apiKeyCount: number;
+  };
+  recentTestimonials: Array<{
     id: string;
     content: string;
     authorName: string;
     rating: number;
     moderationStatus: string;
     createdAt: string;
+    user: {
+      id: string;
+      email: string;
+      name: string;
+    } | null;
   }>;
 }
 
@@ -78,7 +107,7 @@ export function useProject(projectId: string) {
     queryKey: ['projects', projectId],
     queryFn: async () => {
       const response = await apiClient.get(`/admin/projects/${projectId}`);
-      return response.data.data.project;
+      return response.data.data;
     },
     enabled: !!projectId,
   });

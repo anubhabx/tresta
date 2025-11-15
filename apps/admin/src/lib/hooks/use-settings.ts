@@ -7,18 +7,12 @@ interface SystemSettings {
   emailQuotaLimit: number;
   ablyConnectionLimit: number;
   autoModerationEnabled: boolean;
-  autoModerationThreshold: number;
-  maintenanceMode: boolean;
-  updatedAt: string;
-  updatedBy: string;
   version: number;
 }
 
 interface SettingsResponse {
   success: boolean;
-  data: {
-    settings: SystemSettings;
-  };
+  data: SystemSettings;
 }
 
 export function useSettings() {
@@ -26,7 +20,7 @@ export function useSettings() {
     queryKey: ['settings'],
     queryFn: async () => {
       const response = await apiClient.get<SettingsResponse>('/admin/settings');
-      return response.data.data.settings;
+      return response.data.data;
     },
   });
 }

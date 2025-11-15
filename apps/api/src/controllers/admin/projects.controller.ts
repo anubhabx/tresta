@@ -102,7 +102,7 @@ export const listProjects = async (
             projectType: project.projectType,
             visibility: project.visibility,
             isActive: project.isActive,
-            createdAt: project.createdAt,
+            createdAt: project.createdAt.toISOString(),
             owner: {
               id: project.user.id,
               email: project.user.email,

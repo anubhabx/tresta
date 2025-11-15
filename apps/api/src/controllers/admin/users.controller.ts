@@ -74,7 +74,7 @@ export const listUsers = async (
           plan: user.plan,
           projectCount: user._count.projects,
           testimonialCount: user._count.testimonials,
-          joinedAt: user.createdAt,
+          joinedAt: user.createdAt.toISOString(),
         })),
         nextCursor,
         hasMore,
@@ -147,7 +147,7 @@ export const getUserById = async (
         visibility: project.visibility,
         projectType: project.projectType,
         isActive: project.isActive,
-        createdAt: project.createdAt,
+        createdAt: project.createdAt.toISOString(),
         testimonialCounts: {
           total: project._count.testimonials,
           pending: statusCounts.PENDING || 0,
@@ -166,11 +166,11 @@ export const getUserById = async (
         lastName: user.lastName,
         avatar: user.avatar,
         plan: user.plan,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
         subscription: user.subscription ? {
           status: user.subscription.status,
-          currentPeriodEnd: user.subscription.currentPeriodEnd,
+          currentPeriodEnd: user.subscription.currentPeriodEnd?.toISOString() || null,
           cancelAtPeriodEnd: user.subscription.cancelAtPeriodEnd,
         } : null,
         projects: projectsWithStats,
@@ -197,6 +197,7 @@ export const exportUserData = async (
 ) => {
   try {
     const { id } = req.params;
+    const adminId = (req as any).auth?.userId;
     
     // Fetch all user data
     let user;
@@ -236,23 +237,102 @@ export const exportUserData = async (
       throw new NotFoundError('User not found');
     }
     
-    // TODO: Generate export file and upload to S3
-    // TODO: Generate signed URL with 1-hour expiry
-    // TODO: Log export action in audit log
-    
-    // For now, return a placeholder response
-    return ResponseHandler.success(res, {
-      data: {
-        message: 'Export generation not yet implemented',
-        userData: {
-          id: user.id,
-          email: user.email,
-          plan: user.plan,
-          projectCount: user.projects.length,
-          testimonialCount: user.testimonials.length,
-        },
+    // Generate export data (GDPR/DSAR compliant)
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      exportedBy: adminId,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: user.avatar,
+        plan: user.plan,
+        lastLogin: user.lastLogin?.toISOString() || null,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
       },
-    });
+      subscription: user.subscription ? {
+        status: user.subscription.status,
+        plan: user.subscription.plan,
+        currentPeriodStart: user.subscription.currentPeriodStart?.toISOString() || null,
+        currentPeriodEnd: user.subscription.currentPeriodEnd?.toISOString() || null,
+        cancelAtPeriodEnd: user.subscription.cancelAtPeriodEnd,
+        createdAt: user.subscription.createdAt.toISOString(),
+      } : null,
+      projects: user.projects.map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        projectType: p.projectType,
+        visibility: p.visibility,
+        createdAt: p.createdAt.toISOString(),
+        testimonialCount: p.testimonials.length,
+        widgetCount: p.widgets.length,
+        apiKeyCount: p.apiKeys.length,
+      })),
+      testimonials: user.testimonials.map(t => ({
+        id: t.id,
+        projectId: t.projectId,
+        authorName: t.authorName,
+        authorEmail: t.authorEmail,
+        content: t.content,
+        rating: t.rating,
+        moderationStatus: t.moderationStatus,
+        createdAt: t.createdAt.toISOString(),
+      })),
+      notifications: user.notifications.map(n => ({
+        id: n.id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        isRead: n.isRead,
+        createdAt: n.createdAt.toISOString(),
+      })),
+      notificationPreferences: user.notificationPreferences ? {
+        emailEnabled: user.notificationPreferences.emailEnabled,
+        updatedAt: user.notificationPreferences.updatedAt.toISOString(),
+      } : null,
+      statistics: {
+        totalProjects: user.projects.length,
+        totalTestimonials: user.testimonials.length,
+        totalNotifications: user.notifications.length,
+      },
+    };
+
+    // Convert to JSON string
+    const exportJson = JSON.stringify(exportData, null, 2);
+    const filename = `user-export-${user.id}-${Date.now()}.json`;
+
+    // TODO: Upload to Azure Blob Storage and generate signed URL
+    // For now, return the data directly with a download instruction
+    
+    // Log export action in audit log
+    try {
+      await prisma.auditLog.create({
+        data: {
+          adminId: adminId || 'system',
+          action: 'POST /admin/users/:id/export',
+          method: 'POST',
+          path: `/admin/users/${id}/export`,
+          targetType: 'user',
+          targetId: id,
+          statusCode: 200,
+          success: true,
+          requestId: (req as any).id || 'unknown',
+          ipAddress: req.ip || req.socket.remoteAddress || null,
+          userAgent: req.get('user-agent') || null,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to log export action:', error);
+    }
+
+    // Return export data as downloadable JSON
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(exportJson);
   } catch (error) {
     next(error);
   }

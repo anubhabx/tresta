@@ -48,6 +48,10 @@ export const updateFeatureFlagController = async (
     if (!userId) {
       throw new UnauthorizedError('Unauthorized');
     }
+
+    if (!key) {
+      throw new BadRequestError('key is required');
+    }
     
     await updateFeatureFlag(key, enabled, userId);
     

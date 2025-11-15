@@ -108,25 +108,25 @@ export function SystemClient() {
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">API Version</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {systemInfo.apiVersion}
+              {systemInfo.versions.api}
             </p>
           </div>
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Database</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {systemInfo.databaseVersion}
+              {systemInfo.versions.database}
             </p>
           </div>
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Redis</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {systemInfo.redisVersion}
+              {systemInfo.versions.redis}
             </p>
           </div>
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Node.js</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {systemInfo.nodeVersion}
+              {systemInfo.versions.node}
             </p>
           </div>
         </div>
@@ -141,23 +141,22 @@ export function SystemClient() {
           </h2>
         </div>
         <div className="space-y-3">
-          {systemInfo.featureFlags.map((flag) => (
+          {Object.entries(systemInfo.featureFlags).map(([key, enabled]) => (
             <div
-              key={flag.key}
+              key={key}
               className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
             >
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {flag.key}
+                  {key}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{flag.description}</p>
               </div>
-              <Badge variant={flag.enabled ? 'default' : 'secondary'}>
-                {flag.enabled ? 'Enabled' : 'Disabled'}
+              <Badge variant={enabled ? 'default' : 'secondary'}>
+                {enabled ? 'Enabled' : 'Disabled'}
               </Badge>
             </div>
           ))}
-          {systemInfo.featureFlags.length === 0 && (
+          {Object.keys(systemInfo.featureFlags).length === 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
               No feature flags configured
             </p>
@@ -174,23 +173,25 @@ export function SystemClient() {
           </h2>
         </div>
         <div className="space-y-3">
-          {systemInfo.externalServices.map((service) => (
+          {Object.entries(systemInfo.externalServices).map(([name, service]) => (
             <div
-              key={service.name}
+              key={name}
               className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
             >
               <div className="flex items-center gap-3 flex-1">
-                {serviceStatusIcons[service.status]}
+                {serviceStatusIcons[service.status as keyof typeof serviceStatusIcons] || serviceStatusIcons.operational}
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {service.name}
+                    {name.charAt(0).toUpperCase() + name.slice(1)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Last checked: {new Date(service.lastChecked).toLocaleString()}
-                  </p>
+                  {'provider' in service && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Provider: {service.provider}
+                    </p>
+                  )}
                 </div>
               </div>
-              <Badge variant={serviceStatusColors[service.status]}>
+              <Badge variant={serviceStatusColors[service.status as keyof typeof serviceStatusColors] || 'default'}>
                 {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
               </Badge>
             </div>

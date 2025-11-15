@@ -42,20 +42,39 @@ export function useUsers(params?: UseUsersParams) {
 
 interface UserDetail {
   id: string;
-  name: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string | null;
   plan: 'FREE' | 'PRO';
   createdAt: string;
-  lastLogin: string | null;
-  projectsCount: number;
-  testimonialsCount: number;
+  updatedAt: string;
+  lastLogin?: string | null;
+  subscription: {
+    status: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+  } | null;
+  stats: {
+    projectCount: number;
+    testimonialCount: number;
+    apiKeyCount: number;
+  };
   projects: Array<{
     id: string;
     name: string;
     slug: string;
-    testimonialsCount: number;
-    pendingCount: number;
-    approvedCount: number;
+    visibility: string;
+    projectType: string;
+    isActive: boolean;
+    createdAt: string;
+    testimonialCounts: {
+      total: number;
+      pending: number;
+      approved: number;
+      rejected: number;
+      flagged: number;
+    };
   }>;
 }
 
@@ -64,7 +83,7 @@ export function useUser(userId: string) {
     queryKey: ['users', userId],
     queryFn: async () => {
       const response = await apiClient.get(`/admin/users/${userId}`);
-      return response.data.data.user;
+      return response.data.data;
     },
     enabled: !!userId,
   });

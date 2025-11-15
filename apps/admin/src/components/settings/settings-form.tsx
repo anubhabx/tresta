@@ -15,8 +15,6 @@ export function SettingsForm() {
     emailQuotaLimit: 0,
     ablyConnectionLimit: 0,
     autoModerationEnabled: false,
-    autoModerationThreshold: 0,
-    maintenanceMode: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -28,8 +26,6 @@ export function SettingsForm() {
         emailQuotaLimit: settings.emailQuotaLimit,
         ablyConnectionLimit: settings.ablyConnectionLimit,
         autoModerationEnabled: settings.autoModerationEnabled,
-        autoModerationThreshold: settings.autoModerationThreshold,
-        maintenanceMode: settings.maintenanceMode,
       });
     }
   }, [settings]);
@@ -46,11 +42,7 @@ export function SettingsForm() {
           return 'Ably connection limit must be between 0 and 10,000';
         }
         break;
-      case 'autoModerationThreshold':
-        if (value < 0 || value > 100) {
-          return 'Auto-moderation threshold must be between 0 and 100';
-        }
-        break;
+
     }
     return null;
   };
@@ -262,88 +254,16 @@ export function SettingsForm() {
             </button>
           </div>
 
-          {formData.autoModerationEnabled && (
-            <div>
-              <label
-                htmlFor="autoModerationThreshold"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Auto-Moderation Threshold
-              </label>
-              <input
-                type="number"
-                id="autoModerationThreshold"
-                value={formData.autoModerationThreshold}
-                onChange={(e) =>
-                  handleChange('autoModerationThreshold', parseInt(e.target.value) || 0)
-                }
-                className={`block w-full rounded-md border ${
-                  errors.autoModerationThreshold
-                    ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-300 dark:border-gray-600'
-                } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                min="0"
-                max="100"
-              />
-              {errors.autoModerationThreshold && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.autoModerationThreshold}
-                </p>
-              )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Confidence threshold for auto-approval (0-100)
-              </p>
-            </div>
-          )}
+
         </div>
       </div>
 
-      {/* Maintenance Mode */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          System Settings
-        </h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <label
-                htmlFor="maintenanceMode"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Maintenance Mode
-              </label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Block all non-admin traffic to the application
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={formData.maintenanceMode}
-              onClick={() => handleChange('maintenanceMode', !formData.maintenanceMode)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.maintenanceMode ? 'bg-red-600' : 'bg-gray-200 dark:bg-gray-700'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  formData.maintenanceMode ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
+
 
       {/* Metadata */}
       {settings && (
         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Last updated by <span className="font-medium">{settings.updatedBy}</span> on{' '}
-            {formatDate(settings.updatedAt)}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-500">
             Version: {settings.version}
           </p>
         </div>

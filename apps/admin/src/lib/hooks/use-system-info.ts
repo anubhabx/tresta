@@ -3,33 +3,38 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface FeatureFlag {
-  key: string;
-  enabled: boolean;
-  description: string;
-}
-
-interface ExternalService {
-  name: string;
-  status: 'operational' | 'degraded' | 'down';
-  lastChecked: string;
-}
-
 interface SystemInfo {
-  environment: 'development' | 'staging' | 'production';
-  apiVersion: string;
-  databaseVersion: string;
-  redisVersion: string;
-  nodeVersion: string;
-  featureFlags: FeatureFlag[];
-  externalServices: ExternalService[];
+  environment: string;
+  versions: {
+    api: string;
+    node: string;
+    redis: string;
+    database: string;
+  };
+  featureFlags: Record<string, boolean>;
+  externalServices: {
+    clerk: {
+      status: string;
+    };
+    ably: {
+      status: string;
+    };
+    email: {
+      provider: string;
+      status: string;
+    };
+  };
+  config: {
+    emailQuotaLimit: string;
+    ablyConnectionLimit: string;
+    databaseUrl: string;
+    redisUrl: string;
+  };
 }
 
 interface SystemInfoResponse {
   success: boolean;
-  data: {
-    systemInfo: SystemInfo;
-  };
+  data: SystemInfo;
 }
 
 export function useSystemInfo() {
@@ -37,7 +42,7 @@ export function useSystemInfo() {
     queryKey: ['system-info'],
     queryFn: async () => {
       const response = await apiClient.get<SystemInfoResponse>('/admin/system');
-      return response.data.data.systemInfo;
+      return response.data.data;
     },
   });
 }

@@ -59,7 +59,7 @@ export function ProjectsClient() {
       key: 'type',
       header: 'Type',
       render: (project: any) => (
-        <Badge variant="outline">{project.type}</Badge>
+        <Badge variant="outline">{project.projectType}</Badge>
       ),
     },
     {
@@ -77,11 +77,11 @@ export function ProjectsClient() {
       render: (project: any) => (
         <div className="text-sm">
           <div className="text-gray-900 dark:text-gray-100">
-            Total: {formatNumber(project.testimonialsCount)}
+            Total: {formatNumber(project.testimonialCounts.total)}
           </div>
           <div className="text-gray-500 dark:text-gray-400">
-            Pending: {formatNumber(project.pendingCount)} | Approved:{' '}
-            {formatNumber(project.approvedCount)}
+            Pending: {formatNumber(project.testimonialCounts.pending)} | Approved:{' '}
+            {formatNumber(project.testimonialCounts.approved)}
           </div>
         </div>
       ),
@@ -212,7 +212,7 @@ export function ProjectsClient() {
             </p>
             <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
               {formatNumber(
-                data.projects.reduce((sum, p) => sum + p.testimonialsCount, 0)
+                data.projects.reduce((sum, p) => sum + p.testimonialCounts.total, 0)
               )}
             </p>
           </div>

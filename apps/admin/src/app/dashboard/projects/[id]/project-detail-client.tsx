@@ -60,16 +60,7 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
     );
   }
 
-  const statusCounts = {
-    pending: project.testimonials.filter((t) => t.moderationStatus === 'PENDING')
-      .length,
-    approved: project.testimonials.filter((t) => t.moderationStatus === 'APPROVED')
-      .length,
-    rejected: project.testimonials.filter((t) => t.moderationStatus === 'REJECTED')
-      .length,
-    flagged: project.testimonials.filter((t) => t.moderationStatus === 'FLAGGED')
-      .length,
-  };
+  const statusCounts = project.stats.testimonialCounts;
 
   return (
     <div className="space-y-6">
@@ -158,7 +149,7 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
           <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-            {formatNumber(project.testimonials.length)}
+            {formatNumber(project.stats.testimonialCounts.total)}
           </p>
         </div>
         <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg shadow p-4">
@@ -184,15 +175,15 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
       {/* Testimonials List */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Recent Testimonials ({project.testimonials.length})
+          Recent Testimonials ({project.recentTestimonials.length})
         </h2>
-        {project.testimonials.length === 0 ? (
+        {project.recentTestimonials.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-400 text-center py-8">
             No testimonials yet
           </p>
         ) : (
           <div className="space-y-4">
-            {project.testimonials.slice(0, 10).map((testimonial) => (
+            {project.recentTestimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
@@ -226,9 +217,9 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
                 </div>
               </div>
             ))}
-            {project.testimonials.length > 10 && (
+            {project.stats.testimonialCounts.total > 10 && (
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                Showing 10 of {project.testimonials.length} testimonials
+                Showing {project.recentTestimonials.length} of {project.stats.testimonialCounts.total} testimonials
               </p>
             )}
           </div>

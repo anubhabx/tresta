@@ -51,7 +51,7 @@ export function UsersClient() {
       header: 'Projects',
       render: (user: any) => (
         <span className="text-sm text-gray-900 dark:text-gray-100">
-          {formatNumber(user.projectsCount)}
+          {formatNumber(user.projectCount)}
         </span>
       ),
     },
@@ -60,7 +60,7 @@ export function UsersClient() {
       header: 'Testimonials',
       render: (user: any) => (
         <span className="text-sm text-gray-900 dark:text-gray-100">
-          {formatNumber(user.testimonialsCount)}
+          {formatNumber(user.testimonialCount)}
         </span>
       ),
     },
@@ -74,11 +74,11 @@ export function UsersClient() {
       ),
     },
     {
-      key: 'createdAt',
+      key: 'joinedAt',
       header: 'Joined',
       render: (user: any) => (
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatDate(user.createdAt)}
+          {formatDate(user.joinedAt)}
         </span>
       ),
     },

@@ -1,12 +1,12 @@
 'use client';
 
 import { useUser } from '@/lib/hooks/use-users';
-import { useExportUserData } from '@/lib/hooks/use-export';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, RefreshCw, Download, Loader2 } from 'lucide-react';
 import { formatDate, formatNumber, formatRelativeTime } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface UserDetailClientProps {
   userId: string;
@@ -15,7 +15,10 @@ interface UserDetailClientProps {
 export function UserDetailClient({ userId }: UserDetailClientProps) {
   const router = useRouter();
   const { data: user, isLoading, error, refetch } = useUser(userId);
-  const { mutate: exportData, isPending: isExporting } = useExportUserData();
+  
+  const handleExport = () => {
+    toast.info('Export functionality not yet implemented');
+  };
 
   if (isLoading) {
     return (
@@ -73,7 +76,7 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              {user.name}
+              {[user.firstName, user.lastName].filter(Boolean).join(' ') || 'N/A'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">{user.email}</p>
           </div>
@@ -81,14 +84,9 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => exportData(userId)}
-            disabled={isExporting}
+            onClick={handleExport}
           >
-            {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
+            <Download className="h-4 w-4" />
             Export Data
           </Button>
           <Button onClick={() => refetch()}>
@@ -121,13 +119,13 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Projects</p>
             <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
-              {formatNumber(user.projectsCount)} projects
+              {formatNumber(user.stats.projectCount)} projects
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Testimonials</p>
             <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
-              {formatNumber(user.testimonialsCount)} testimonials
+              {formatNumber(user.stats.testimonialCount)} testimonials
             </p>
           </div>
           <div>
@@ -179,16 +177,16 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Total: {formatNumber(project.testimonialsCount)}
+                      Total: {formatNumber(project.testimonialCounts.total)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 mt-3 text-sm">
                   <span className="text-yellow-600 dark:text-yellow-400">
-                    Pending: {formatNumber(project.pendingCount)}
+                    Pending: {formatNumber(project.testimonialCounts.pending)}
                   </span>
                   <span className="text-green-600 dark:text-green-400">
-                    Approved: {formatNumber(project.approvedCount)}
+                    Approved: {formatNumber(project.testimonialCounts.approved)}
                   </span>
                 </div>
               </div>
