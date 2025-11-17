@@ -84,6 +84,31 @@ const widget = TrestaWidget.mount('#container', {
 TrestaWidget.unmount('#container');
 ```
 
+## Security & Compliance
+
+### Content Security Policy (CSP)
+
+The widget is fully CSP-compliant and works in strict CSP environments. See [CSP_COMPLIANCE.md](./CSP_COMPLIANCE.md) for:
+
+- Required CSP directives
+- CSP-friendly embed code examples
+- Nonce and SRI support
+- Troubleshooting guide
+
+### CSP Audit
+
+Run the automated CSP compliance audit:
+
+```bash
+pnpm audit-csp
+```
+
+This checks for:
+- No `eval()` or `Function()` constructor usage
+- No inline scripts or event handlers
+- No `javascript:` URLs
+- All resources from allowed domains
+
 ## Development
 
 ### Requirements
@@ -102,15 +127,24 @@ pnpm dev
 
 # Build for production
 pnpm build
+
+# Run tests
+pnpm test
+
+# Run CSP audit
+pnpm audit-csp
 ```
 
 ## CI/CD Integration
 
-The bundle size check script is designed to be used in CI pipelines:
+The bundle size check and CSP audit scripts are designed for CI pipelines:
 
 ```yaml
 - name: Check bundle size
   run: pnpm check-budgets
+
+- name: Audit CSP compliance
+  run: pnpm audit-csp
 ```
 
-The script will exit with code 1 if any budget is exceeded, failing the CI build.
+Both scripts will exit with code 1 if violations are found, failing the CI build.

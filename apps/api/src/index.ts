@@ -23,6 +23,7 @@ import adminRouter from "./routes/admin/index.ts";
 import notificationsRouter from "./routes/notifications.route.ts";
 import ablyRouter from "./routes/ably/token.route.ts";
 import testRouter from "./routes/test.route.ts";
+import widgetAnalyticsRouter from "./routes/widget-analytics.route.ts";
 import { blobStorageService } from "./services/blob-storage.service.ts";
 
 dotenv.config();
@@ -76,6 +77,7 @@ app.use("/api/projects", attachUser, projectRouter);
 app.use("/api/projects", apiKeyRouter); // API key routes (has its own auth middleware)
 app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
+app.use("/api/widget-analytics", widgetAnalyticsRouter);
 app.use("/api/notifications", attachUser, notificationsRouter);
 app.use("/api/ably", attachUser, ablyRouter);
 

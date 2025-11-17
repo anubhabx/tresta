@@ -452,3 +452,49 @@ model FeatureFlag {
   @@index([key])
   @@index([enabled])
 }
+
+// ============================================
+// Widget Analytics Models
+// ============================================
+
+model WidgetAnalytics {
+  id           String   @id @default(cuid())
+  widgetId     String
+  projectId    String
+  loadTime     Int // Load time in milliseconds
+  layoutType   String // carousel, grid, masonry, wall, list
+  browser      String? // Browser name
+  device       String? // desktop, mobile, tablet
+  country      String? // ISO country code
+  errorCode    String? // Error code if load failed
+  version      String // Widget version
+  timestamp    DateTime @default(now())
+
+  @@index([widgetId, timestamp])
+  @@index([projectId, timestamp])
+  @@index([timestamp])
+  @@index([errorCode])
+}
+
+model WidgetPerformanceAlert {
+  id          String              @id @default(cuid())
+  widgetId    String
+  projectId   String
+  alertType   WidgetAlertType
+  severity    AlertSeverity
+  message     String              @db.Text
+  threshold   Float // The threshold that was exceeded
+  actualValue Float // The actual value that triggered the alert
+  resolved    Boolean             @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([widgetId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([resolved])
+}
+
+enum WidgetAlertType {
+  LOAD_TIME_EXCEEDED
+  ERROR_RATE_EXCEEDED
+}

@@ -1,5 +1,5 @@
 /**
- * Security module - XSS protection and content sanitization
+ * Security module - XSS protection, content sanitization, and CSP compliance
  */
 
 export {
@@ -9,3 +9,13 @@ export {
   sanitizePlainText,
   sanitizeURL
 } from './sanitizer';
+
+export { 
+  CSPValidator, 
+  defaultCSPValidator, 
+  getRequiredCSPDirectives, 
+  generateCSPFriendlyEmbedCode,
+  type CSPConfig,
+  type CSPViolation,
+  type CSPValidationResult
+} from './csp-validator';

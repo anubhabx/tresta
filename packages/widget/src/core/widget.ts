@@ -12,6 +12,7 @@ import { TelemetryTracker } from '../telemetry';
 import { LayoutEngine } from '../layouts';
 import { limitTestimonials } from '../utils/testimonial-limiter';
 import { Logger } from '../utils/logger';
+import { CSPValidator } from '../security/csp-validator';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -30,6 +31,7 @@ export class Widget implements WidgetInstance {
   private storageManager: StorageManager;
   private telemetryTracker: TelemetryTracker;
   private logger: Logger;
+  private cspValidator: CSPValidator;
 
   constructor(config: WidgetConfig) {
     this.config = config;
@@ -60,6 +62,11 @@ export class Widget implements WidgetInstance {
         enabled: config.telemetry !== false,
       }
     );
+
+    // Initialize CSP validator
+    this.cspValidator = new CSPValidator({
+      reportViolations: config.debug || false,
+    });
 
     this.logger.debug('Initialized with config:', {
       widgetId: config.widgetId,
@@ -286,6 +293,16 @@ export class Widget implements WidgetInstance {
     this.currentLayout = layout;
 
     this.logger.debug(`Widget rendered successfully with ${data.config.layout.type} layout`);
+
+    // Validate CSP compliance in debug mode
+    if (this.config.debug && this.contentRoot) {
+      const cspResult = this.cspValidator.validateResources(this.contentRoot);
+      if (!cspResult.valid) {
+        this.logger.warn('CSP violations detected:', cspResult.violations);
+      } else {
+        this.logger.debug('CSP validation passed');
+      }
+    }
   }
 
   /**

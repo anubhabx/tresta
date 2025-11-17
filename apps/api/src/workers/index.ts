@@ -20,6 +20,7 @@ import { notificationWorker } from './notification.worker.ts';
 import { emailWorker } from './email.worker.ts';
 import { startDailyDigestJob } from '../jobs/daily-digest.job.ts';
 import { startReconciliationJob } from '../jobs/reconciliation.job.ts';
+import { scheduleWidgetAnalyticsJobs } from '../jobs/widget-analytics.job.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,7 @@ console.log('Starting workers and cron jobs...');
 // Start cron jobs
 startDailyDigestJob();
 startReconciliationJob();
+scheduleWidgetAnalyticsJobs();
 
 // Graceful shutdown handler
 async function gracefulShutdown(signal: string) {
@@ -41,8 +43,11 @@ async function gracefulShutdown(signal: string) {
     // Stop cron jobs
     const { dailyDigestJob } = await import('../jobs/daily-digest.job.ts');
     const { reconciliationJob } = await import('../jobs/reconciliation.job.ts');
+    const { performanceCheckJob, analyticsCleanupJob } = await import('../jobs/widget-analytics.job.ts');
     dailyDigestJob.stop();
     reconciliationJob.stop();
+    performanceCheckJob.stop();
+    analyticsCleanupJob.stop();
     console.log('Cron jobs stopped');
 
     // Close all workers

@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "check-budgets": "node scripts/check-bundle-budgets.js",
+    "audit-csp": "node scripts/audit-csp-compliance.js",
     "analyze": "vite build --mode analyze",
     "test": "vitest --run",
     "test:watch": "vitest",
