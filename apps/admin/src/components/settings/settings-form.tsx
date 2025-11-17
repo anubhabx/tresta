@@ -106,8 +106,6 @@ export function SettingsForm() {
         emailQuotaLimit: settings.emailQuotaLimit,
         ablyConnectionLimit: settings.ablyConnectionLimit,
         autoModerationEnabled: settings.autoModerationEnabled,
-        autoModerationThreshold: settings.autoModerationThreshold,
-        maintenanceMode: settings.maintenanceMode,
       });
       setErrors({});
       setHasChanges(false);

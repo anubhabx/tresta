@@ -100,7 +100,7 @@ export function DataTable<T extends { id: string }>({
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {data.map((item) => {
               const isSelected = selectedIds.has(item.id);
-              const isDisabled = maxSelection && !isSelected && selectedIds.size >= maxSelection;
+              const isDisabled = !!(maxSelection && !isSelected && selectedIds.size >= maxSelection);
               
               return (
                 <tr

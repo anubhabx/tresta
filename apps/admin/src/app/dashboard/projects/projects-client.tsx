@@ -212,7 +212,7 @@ export function ProjectsClient() {
             </p>
             <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
               {formatNumber(
-                data.projects.reduce((sum, p) => sum + p.testimonialCounts.total, 0)
+                data.projects.reduce((sum, p) => sum + p.testimonialsCount, 0)
               )}
             </p>
           </div>

@@ -90,7 +90,7 @@ export function SystemClient() {
           </h2>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant={environmentColors[systemInfo.environment]} className="text-lg px-4 py-2">
+          <Badge variant={environmentColors[systemInfo.environment as keyof typeof environmentColors] || 'default'} className="text-lg px-4 py-2">
             {systemInfo.environment.toUpperCase()}
           </Badge>
         </div>

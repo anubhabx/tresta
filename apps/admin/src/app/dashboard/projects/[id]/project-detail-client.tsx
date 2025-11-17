@@ -78,10 +78,18 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
             <p className="text-gray-600 dark:text-gray-400 mt-1">/{project.slug}</p>
           </div>
         </div>
-        <Button onClick={() => refetch()}>
-          <RefreshCw className="h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push(`/dashboard/projects/${projectId}/widgets`)}>
+            Manage Widgets
+          </Button>
+          <Button variant="outline" onClick={() => router.push(`/dashboard/projects/${projectId}/settings`)}>
+            Settings
+          </Button>
+          <Button onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Project Info Card */}
@@ -99,7 +107,7 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
             <div className="mt-1">
-              <Badge variant="outline">{project.type}</Badge>
+              <Badge variant="outline">{project.projectType}</Badge>
             </div>
           </div>
           <div>
