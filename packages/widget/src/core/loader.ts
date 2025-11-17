@@ -60,7 +60,7 @@ function initializeWidget(script: HTMLScriptElement): void {
     const existingInstance = Widget.getInstance(container);
     if (existingInstance) {
       if (config.debug) {
-        console.log(`[TrestaWidget] Widget ${config.widgetId} already initialized in container`);
+        console.debug(`[TrestaWidget v${config.version || '1.0.0'}] Widget ${config.widgetId} already initialized in container`);
       }
       return;
     }

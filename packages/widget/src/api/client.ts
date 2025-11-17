@@ -8,6 +8,7 @@ import { NetworkClient } from './network';
 import { retry } from './retry';
 import { RateLimiter } from './rate-limiter';
 import type { APIClientConfig } from './types';
+import { Logger } from '../utils/logger';
 
 const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
   baseURL: 'http://localhost:8000',
@@ -23,8 +24,9 @@ export class APIClient {
   private networkClient: NetworkClient;
   private rateLimiter: RateLimiter;
   private apiKey: string | undefined;
+  private logger: Logger | null = null;
 
-  constructor(config: Partial<APIClientConfig> = {}, apiKey?: string) {
+  constructor(config: Partial<APIClientConfig> = {}, apiKey?: string, logger?: Logger) {
     this.config = { ...DEFAULT_API_CLIENT_CONFIG, ...config };
     this.networkClient = new NetworkClient();
     this.rateLimiter = new RateLimiter({
@@ -32,6 +34,7 @@ export class APIClient {
       windowMs: 60000, // 100 requests per minute
     });
     this.apiKey = apiKey;
+    this.logger = logger || null;
   }
 
   /**
@@ -50,9 +53,12 @@ export class APIClient {
     // Check rate limit
     if (!this.rateLimiter.isAllowed(widgetId)) {
       const retryAfter = this.rateLimiter.getRetryAfter(widgetId);
-      console.warn(
-        `[TrestaWidget] Rate limit exceeded for widget ${widgetId}. Retry after ${Math.ceil(retryAfter / 1000)}s`
-      );
+      const message = `Rate limit exceeded for widget ${widgetId}. Retry after ${Math.ceil(retryAfter / 1000)}s`;
+      if (this.logger) {
+        this.logger.warn(message);
+      } else {
+        console.warn(`[TrestaWidget] ${message}`);
+      }
       throw new WidgetError(
         WidgetErrorCode.RATE_LIMITED,
         `Rate limit exceeded. Please try again in ${Math.ceil(retryAfter / 1000)} seconds.`,
@@ -65,8 +71,10 @@ export class APIClient {
       async () => {
         const url = `${this.config.baseURL}/api/widgets/${widgetId}/public`;
 
-        console.log(`[TrestaWidget] Fetching widget data from: ${url}`);
-        console.log(`[TrestaWidget] Using API key: ${this.apiKey?.substring(0, 15)}...`);
+        if (this.logger) {
+          this.logger.debug(`Fetching widget data from: ${url}`);
+          this.logger.debug(`Using API key: ${this.apiKey?.substring(0, 15)}...`);
+        }
 
         try {
           const response = await this.networkClient.request<any>(url, {
@@ -78,7 +86,9 @@ export class APIClient {
             },
           });
 
-          console.log(`[TrestaWidget] Received response:`, response.status);
+          if (this.logger) {
+            this.logger.debug('Received response:', response.status);
+          }
 
           // Handle HTTP status codes and transform response
           const rawData = this.handleResponse(response, widgetId);
@@ -92,7 +102,12 @@ export class APIClient {
           }
 
           // Wrap unknown errors
-          console.error(`[TrestaWidget] Unexpected error for widget ${widgetId}:`, error);
+          const errorMessage = `Unexpected error for widget ${widgetId}:`;
+          if (this.logger) {
+            this.logger.error(errorMessage, error);
+          } else {
+            console.error(`[TrestaWidget] ${errorMessage}`, error);
+          }
           throw new WidgetError(
             WidgetErrorCode.API_ERROR,
             'An unexpected error occurred while fetching widget data',
@@ -108,12 +123,19 @@ export class APIClient {
    * Transform API response to WidgetData format
    */
   private transformApiResponse(apiResponse: any): WidgetData {
-    console.log('[TrestaWidget] Raw API response:', apiResponse);
+    if (this.logger) {
+      this.logger.debug('Raw API response:', apiResponse);
+    }
     
     const { data } = apiResponse;
 
     if (!data || !data.widget) {
-      console.error('[TrestaWidget] Invalid API response structure:', { hasData: !!data, hasWidget: !!(data?.widget) });
+      const errorDetails = { hasData: !!data, hasWidget: !!(data?.widget) };
+      if (this.logger) {
+        this.logger.error('Invalid API response structure:', errorDetails);
+      } else {
+        console.error('[TrestaWidget] Invalid API response structure:', errorDetails);
+      }
       throw new WidgetError(
         WidgetErrorCode.PARSE_ERROR,
         'Invalid API response format',
@@ -121,10 +143,12 @@ export class APIClient {
       );
     }
 
-    console.log('[TrestaWidget] Transforming widget data:', {
-      widgetId: data.widget.id,
-      testimonialCount: data.testimonials?.length || 0,
-    });
+    if (this.logger) {
+      this.logger.debug('Transforming widget data:', {
+        widgetId: data.widget.id,
+        testimonialCount: data.testimonials?.length || 0,
+      });
+    }
 
     // Transform to WidgetData format
     return {
@@ -195,23 +219,33 @@ export class APIClient {
     // Handle specific error status codes
     switch (status) {
       case 401:
-      case 403:
-        console.error(
-          `[TrestaWidget] Unauthorized access for widget ${widgetId} (${status})`
-        );
+      case 403: {
+        const message = `Unauthorized access for widget ${widgetId} (${status})`;
+        if (this.logger) {
+          this.logger.error(message);
+        } else {
+          console.error(`[TrestaWidget] ${message}`);
+        }
         throw new WidgetError(
           WidgetErrorCode.UNAUTHORIZED,
           'Unable to load testimonials. Please check your widget configuration.',
           false // Not recoverable
         );
+      }
 
-      case 404:
-        console.error(`[TrestaWidget] Widget ${widgetId} not found (404)`);
+      case 404: {
+        const message = `Widget ${widgetId} not found (404)`;
+        if (this.logger) {
+          this.logger.error(message);
+        } else {
+          console.error(`[TrestaWidget] ${message}`);
+        }
         throw new WidgetError(
           WidgetErrorCode.INVALID_WIDGET_ID,
           'Widget not found. Please check your widget ID.',
           false // Not recoverable
         );
+      }
 
       case 429: {
         // Rate limited by server
@@ -220,9 +254,12 @@ export class APIClient {
           ? parseInt(retryAfterHeader, 10) * 1000
           : 60000; // Default to 60 seconds
 
-        console.warn(
-          `[TrestaWidget] Server rate limit for widget ${widgetId}. Retry after ${retryAfter / 1000}s`
-        );
+        const message = `Server rate limit for widget ${widgetId}. Retry after ${retryAfter / 1000}s`;
+        if (this.logger) {
+          this.logger.warn(message);
+        } else {
+          console.warn(`[TrestaWidget] ${message}`);
+        }
 
         throw new WidgetError(
           WidgetErrorCode.RATE_LIMITED,
@@ -234,25 +271,33 @@ export class APIClient {
       case 500:
       case 502:
       case 503:
-      case 504:
-        console.error(
-          `[TrestaWidget] Server error for widget ${widgetId} (${status})`
-        );
+      case 504: {
+        const message = `Server error for widget ${widgetId} (${status})`;
+        if (this.logger) {
+          this.logger.error(message);
+        } else {
+          console.error(`[TrestaWidget] ${message}`);
+        }
         throw new WidgetError(
           WidgetErrorCode.API_ERROR,
           'Server error. Please try again later.',
           true // Recoverable with retry
         );
+      }
 
-      default:
-        console.error(
-          `[TrestaWidget] Unexpected status code ${status} for widget ${widgetId}`
-        );
+      default: {
+        const message = `Unexpected status code ${status} for widget ${widgetId}`;
+        if (this.logger) {
+          this.logger.error(message);
+        } else {
+          console.error(`[TrestaWidget] ${message}`);
+        }
         throw new WidgetError(
           WidgetErrorCode.API_ERROR,
           `Unexpected error (${status}). Please try again later.`,
           status >= 500 // 5xx errors are recoverable
         );
+      }
     }
   }
 
