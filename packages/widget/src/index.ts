@@ -15,7 +15,7 @@ export const TrestaWidget = {
    * @param config - Widget configuration
    * @returns Widget instance
    */
-  mount(element: string | HTMLElement, config: WidgetConfig): WidgetInstance {
+  async mount(element: string | HTMLElement, config: WidgetConfig): Promise<WidgetInstance> {
     const container = typeof element === 'string' 
       ? document.querySelector(element) 
       : element;
@@ -25,7 +25,7 @@ export const TrestaWidget = {
     }
 
     const widget = new Widget(config);
-    widget.mount(container as HTMLElement);
+    await widget.mount(container as HTMLElement);
     return widget;
   },
 

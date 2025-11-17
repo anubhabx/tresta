@@ -3,7 +3,7 @@
  */
 
 import type { WidgetConfig, WidgetInstance, WidgetState, WidgetData } from '../types';
-import { WidgetError, WidgetErrorCode } from '../types';
+import { WidgetError } from '../types';
 import { StyleManager } from '../styles/style-manager';
 import { APIClient } from '../api/client';
 import { StorageManager } from '../storage/cache-manager';
@@ -22,6 +22,7 @@ export class Widget implements WidgetInstance {
   private styleManager: StyleManager | null = null;
   private contentRoot: HTMLElement | null = null;
   private eventListeners: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
+  private currentLayout: { destroy: () => void } | null = null;
   private apiClient: APIClient;
   private storageManager: StorageManager;
   private telemetryTracker: TelemetryTracker;
@@ -107,17 +108,17 @@ export class Widget implements WidgetInstance {
     } catch (error) {
       this.state.loading = false;
       this.state.error = error as Error;
-      
+
       // Track error in telemetry
       if (error instanceof WidgetError) {
         this.telemetryTracker.trackError(error.code);
       } else {
         this.telemetryTracker.trackError('MOUNT_ERROR');
       }
-      
+
       // Log error with widget ID and version
       this.logError('Mount failed', error);
-      
+
       // Render error state - don't throw to prevent breaking host page
       this.renderErrorState(error);
     }
@@ -133,10 +134,10 @@ export class Widget implements WidgetInstance {
       }
 
       this.state.loading = true;
-      
+
       // Try to fetch from API
       const data = await this.fetchWithFallback();
-      
+
       if (this.config.debug) {
         console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Data fetched successfully:`, {
           widgetId: data.widgetId,
@@ -147,27 +148,27 @@ export class Widget implements WidgetInstance {
       this.state.data = data;
       this.state.error = null;
       this.state.loading = false;
-      
+
       // Render the widget content
       this.renderContent(data);
-      
+
       // Track successful load with layout type
       this.telemetryTracker.trackLoad(data.config?.layout?.type);
-      
+
     } catch (error) {
       this.state.loading = false;
       this.state.error = error as Error;
-      
+
       // Track error in telemetry
       if (error instanceof WidgetError) {
         this.telemetryTracker.trackError(error.code);
       } else {
         this.telemetryTracker.trackError('FETCH_ERROR');
       }
-      
+
       // Log error with widget ID and version
       this.logError('Failed to fetch widget data', error);
-      
+
       // Render error state
       this.renderErrorState(error);
     }
@@ -180,24 +181,24 @@ export class Widget implements WidgetInstance {
     try {
       // Fetch from API
       const data = await this.apiClient.fetchWidgetData(this.config.widgetId);
-      
+
       // Cache the successful response
       await this.storageManager.set(this.config.widgetId, data);
-      
+
       if (this.config.debug) {
         console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Fetched widget data from API`);
       }
-      
+
       return data;
     } catch (error) {
       // Try to use cached data as fallback
       const cached = await this.storageManager.get(this.config.widgetId);
-      
+
       if (cached) {
         console.warn(`[TrestaWidget v${this.config.version || '1.0.0'}] Using cached data due to API error`);
         return cached;
       }
-      
+
       // No cache available, re-throw the error
       throw error;
     }
@@ -236,6 +237,12 @@ export class Widget implements WidgetInstance {
       console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Rendering ${data.testimonials.length} testimonials with layout: ${data.config.layout.type}`);
     }
 
+    // Clean up previous layout if exists
+    if (this.currentLayout) {
+      this.currentLayout.destroy();
+      this.currentLayout = null;
+    }
+
     // Use LayoutEngine to render the testimonials
     const layout = LayoutEngine.create({
       testimonials: data.testimonials,
@@ -246,6 +253,9 @@ export class Widget implements WidgetInstance {
 
     const layoutElement = layout.render();
     this.contentRoot.appendChild(layoutElement);
+
+    // Track the current layout for cleanup
+    this.currentLayout = layout;
 
     if (this.config.debug) {
       console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Widget rendered successfully with ${data.config.layout.type} layout`);
@@ -263,7 +273,7 @@ export class Widget implements WidgetInstance {
 
     // Determine error message
     let message = this.config.errorMessage;
-    
+
     if (!message) {
       if (error instanceof WidgetError) {
         message = error.message;
@@ -277,7 +287,7 @@ export class Widget implements WidgetInstance {
       type: 'error',
       message,
       widgetId: this.config.widgetId,
-      version: this.config.version,
+      version: this.config.version || "N/A",
     });
 
     this.contentRoot.appendChild(errorState);
@@ -304,7 +314,7 @@ export class Widget implements WidgetInstance {
   private logError(context: string, error: unknown): void {
     const version = this.config.version || '1.0.0';
     const widgetId = this.config.widgetId;
-    
+
     if (error instanceof WidgetError) {
       console.error(
         `[TrestaWidget v${version}] ${context} for widget ${widgetId}:`,
@@ -326,6 +336,12 @@ export class Widget implements WidgetInstance {
 
   unmount(): void {
     try {
+      // Clean up current layout (timers, event listeners, etc.)
+      if (this.currentLayout) {
+        this.currentLayout.destroy();
+        this.currentLayout = null;
+      }
+
       // Remove all event listeners
       this.cleanupEventListeners();
 
@@ -349,7 +365,7 @@ export class Widget implements WidgetInstance {
       this.state.mounted = false;
       this.container = null;
       this.contentRoot = null;
-      
+
       if (this.config.debug) {
         console.log(`[TrestaWidget] Unmounted successfully`);
       }
@@ -363,12 +379,12 @@ export class Widget implements WidgetInstance {
       if (this.config.debug) {
         console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Refresh requested`);
       }
-      
+
       if (!this.state.mounted) {
         console.warn(`[TrestaWidget v${this.config.version || '1.0.0'}] Cannot refresh: widget not mounted`);
         return;
       }
-      
+
       // Fetch and render fresh data
       await this.fetchAndRender();
     } catch (error) {
@@ -398,7 +414,7 @@ export class Widget implements WidgetInstance {
    * Generate a unique instance ID for this widget
    */
   private generateInstanceId(): string {
-    return `${this.config.widgetId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${this.config.widgetId}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**
