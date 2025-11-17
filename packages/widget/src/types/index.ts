@@ -8,6 +8,9 @@ export interface WidgetConfig {
   debug?: boolean;
   telemetry?: boolean;
   version?: string;
+  theme?: ThemeConfig;
+  errorMessage?: string;
+  emptyMessage?: string;
 }
 
 export interface WidgetInstance {

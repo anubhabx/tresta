@@ -388,7 +388,25 @@ describe('Widget', () => {
       await widget.refresh();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget] Refresh requested')
+        expect.stringContaining('[TrestaWidget v1.0.0] Refresh requested')
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should warn when refreshing unmounted widget', async () => {
+      const consoleSpy = vi.spyOn(console, 'warn');
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      await widget.refresh();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Cannot refresh: widget not mounted')
       );
 
       consoleSpy.mockRestore();
@@ -490,6 +508,378 @@ describe('Widget', () => {
 
       expect(widget.getStyleManager()).toBeNull();
       expect(widget.getContentRoot()).toBeNull();
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should render error state when API fails', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      const state = widget.getState();
+      expect(state.error).not.toBeNull();
+
+      // Check that error state is rendered
+      const contentRoot = widget.getContentRoot();
+      const errorState = contentRoot?.querySelector('.tresta-widget-error-state');
+      expect(errorState).toBeDefined();
+      expect(errorState?.textContent).toContain('Unable to load testimonials');
+    });
+
+    it('should use custom error message when provided', async () => {
+      const customMessage = 'Custom error message for testing';
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+        errorMessage: customMessage,
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      const errorState = contentRoot?.querySelector('.tresta-widget-error-state');
+      expect(errorState?.textContent).toContain(customMessage);
+    });
+
+    it('should render empty state when no testimonials', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to return empty testimonials
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [],
+      });
+
+      await widget.mount(container);
+
+      const state = widget.getState();
+      expect(state.error).toBeNull();
+
+      // Check that empty state is rendered
+      const contentRoot = widget.getContentRoot();
+      const emptyState = contentRoot?.querySelector('.tresta-widget-empty-state');
+      expect(emptyState).toBeDefined();
+      expect(emptyState?.textContent).toContain('No testimonials yet');
+    });
+
+    it('should use custom empty message when provided', async () => {
+      const customMessage = 'Custom empty message';
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+        emptyMessage: customMessage,
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to return empty testimonials
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [],
+      });
+
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      const emptyState = contentRoot?.querySelector('.tresta-widget-empty-state');
+      expect(emptyState?.textContent).toContain(customMessage);
+    });
+
+    it('should log errors with widget ID and version', async () => {
+      const consoleSpy = vi.spyOn(console, 'error');
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock storage manager to return null (no cache)
+      const storageManager = (widget as any).storageManager;
+      vi.spyOn(storageManager, 'get').mockResolvedValue(null);
+      
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      // Check that error was logged with widget ID and version
+      expect(consoleSpy).toHaveBeenCalled();
+      const errorCall = consoleSpy.mock.calls[0];
+      expect(errorCall[0]).toContain('[TrestaWidget v1.0.0]');
+      expect(errorCall[0]).toContain('widget test-123');
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should not throw uncaught exceptions on mount error', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      // Should not throw
+      await expect(widget.mount(container)).resolves.not.toThrow();
+    });
+
+    it('should add ARIA live region to error state', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock storage manager to return null (no cache)
+      const storageManager = (widget as any).storageManager;
+      vi.spyOn(storageManager, 'get').mockResolvedValue(null);
+      
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      const errorState = contentRoot?.querySelector('.tresta-widget-error-state');
+      expect(errorState?.getAttribute('role')).toBe('alert');
+      expect(errorState?.getAttribute('aria-live')).toBe('polite');
+    });
+
+    it('should log empty state in debug mode', async () => {
+      const consoleSpy = vi.spyOn(console, 'log');
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: true,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Mock API client to return empty testimonials
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [],
+      });
+
+      await widget.mount(container);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[TrestaWidget v1.0.0] empty')
+      );
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Cache Fallback', () => {
+    it('should use cached data when API fails', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const cachedData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Cached testimonial',
+            rating: 5,
+            createdAt: '2024-01-01',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'Test User' },
+          },
+        ],
+      };
+
+      // Mock storage manager to return cached data
+      const storageManager = (widget as any).storageManager;
+      vi.spyOn(storageManager, 'get').mockResolvedValue(cachedData);
+
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      const state = widget.getState();
+      expect(state.error).toBeNull();
+      expect(state.data).toEqual(cachedData);
+
+      // Should render content, not error state
+      const contentRoot = widget.getContentRoot();
+      const errorState = contentRoot?.querySelector('.tresta-widget-error-state');
+      expect(errorState).toBeNull();
+    });
+
+    it('should log when using cached data', async () => {
+      const consoleSpy = vi.spyOn(console, 'warn');
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const cachedData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Cached testimonial',
+            rating: 5,
+            createdAt: '2024-01-01',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'Test User' },
+          },
+        ],
+      };
+
+      // Mock storage manager to return cached data
+      const storageManager = (widget as any).storageManager;
+      vi.spyOn(storageManager, 'get').mockResolvedValue(cachedData);
+
+      // Mock API client to throw error
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
+        new Error('Network error')
+      );
+
+      await widget.mount(container);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Using cached data due to API error')
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should cache successful API responses', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Fresh testimonial',
+            rating: 5,
+            createdAt: '2024-01-01',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'Test User' },
+          },
+        ],
+      };
+
+      // Mock API client to return data
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      // Mock storage manager
+      const storageManager = (widget as any).storageManager;
+      const setSpy = vi.spyOn(storageManager, 'set').mockResolvedValue(undefined);
+
+      await widget.mount(container);
+
+      // Should cache the API response
+      expect(setSpy).toHaveBeenCalledWith('test-123', apiData);
     });
   });
 });

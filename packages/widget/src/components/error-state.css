@@ -1,0 +1,30 @@
+/**
+ * Error and Empty State Styles
+ */
+
+.tresta-widget-error-state,
+.tresta-widget-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 200px;
+  text-align: center;
+}
+
+.tresta-widget-state-message {
+  margin: 0;
+  color: var(--tresta-secondary-color, #666);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-family: var(--tresta-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+}
+
+.tresta-widget-error-state .tresta-widget-state-message {
+  color: var(--tresta-error-color, #d32f2f);
+}
+
+.tresta-widget-empty-state .tresta-widget-state-message {
+  color: var(--tresta-secondary-color, #999);
+  font-style: italic;
+}

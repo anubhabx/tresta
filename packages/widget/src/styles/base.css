@@ -19,6 +19,13 @@
   --tresta-theme-bg: #ffffff;
   --tresta-theme-text: #1e293b;
   --tresta-theme-border: #e2e8f0;
+  --tresta-theme-shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Card styles */
+  --tresta-card-bg: #ffffff;
+  --tresta-card-border: #e2e8f0;
+  --tresta-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --tresta-card-padding: 16px;
 }
 
 /* Dark theme support */
@@ -26,6 +33,15 @@
   --tresta-theme-bg: #1e293b;
   --tresta-theme-text: #f1f5f9;
   --tresta-theme-border: #334155;
+  --tresta-theme-shadow: rgba(0, 0, 0, 0.3);
+  
+  --tresta-card-bg: #334155;
+  --tresta-card-border: #475569;
+  --tresta-card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  
+  --tresta-text-color: #f1f5f9;
+  --tresta-bg-color: #1e293b;
+  --tresta-border-color: #334155;
 }
 
 /* Base widget styles */
@@ -111,4 +127,80 @@
   text-align: center;
   color: var(--tresta-secondary-color);
   padding: var(--tresta-spacing);
+}
+
+/* Card style variations */
+[data-tresta-widget][data-card-style="default"] .testimonial-card {
+  background-color: var(--tresta-card-bg);
+  border: 1px solid var(--tresta-card-border);
+  border-radius: var(--tresta-border-radius);
+  box-shadow: var(--tresta-card-shadow);
+  padding: var(--tresta-card-padding);
+}
+
+[data-tresta-widget][data-card-style="minimal"] .testimonial-card {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--tresta-card-padding);
+}
+
+[data-tresta-widget][data-card-style="bordered"] .testimonial-card {
+  background-color: var(--tresta-card-bg);
+  border: 2px solid var(--tresta-primary-color);
+  border-radius: var(--tresta-border-radius);
+  box-shadow: none;
+  padding: var(--tresta-card-padding);
+}
+
+/* Responsive styles - Mobile first approach */
+/* Base styles are for mobile (320px+) */
+
+/* Small tablets and large phones (576px+) */
+@media (min-width: 576px) {
+  :root {
+    --tresta-spacing: 20px;
+    --tresta-card-padding: 20px;
+  }
+  
+  [data-tresta-widget] {
+    font-size: 16px;
+  }
+}
+
+/* Tablets (768px+) */
+@media (min-width: 768px) {
+  :root {
+    --tresta-spacing: 24px;
+    --tresta-card-padding: 24px;
+  }
+}
+
+/* Desktops (1024px+) */
+@media (min-width: 1024px) {
+  :root {
+    --tresta-spacing: 32px;
+    --tresta-card-padding: 28px;
+  }
+}
+
+/* Large desktops (1440px+) */
+@media (min-width: 1440px) {
+  :root {
+    --tresta-spacing: 32px;
+    --tresta-card-padding: 32px;
+  }
+}
+
+/* 4K displays (2560px+) */
+@media (min-width: 2560px) {
+  [data-tresta-widget] {
+    font-size: 18px;
+  }
+  
+  :root {
+    --tresta-spacing: 40px;
+    --tresta-card-padding: 40px;
+  }
 }

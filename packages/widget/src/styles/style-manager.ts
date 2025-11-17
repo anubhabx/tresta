@@ -4,24 +4,34 @@
 
 import baseStyles from './base.css?inline';
 import testimonialCardStyles from '../components/testimonial-card.css?inline';
+import errorStateStyles from '../components/error-state.css?inline';
 import carouselStyles from '../layouts/carousel.css?inline';
+import { ThemeManager, type ThemeManagerConfig } from './theme-manager';
 
 // Combine all styles
-const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}\n\n${carouselStyles}`.trim();
+const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}\n\n${errorStateStyles}\n\n${carouselStyles}`.trim();
 
 export interface StyleManagerConfig {
   useShadowDOM?: boolean;
   debug?: boolean;
+  theme?: ThemeManagerConfig['theme'];
 }
 
 export class StyleManager {
   private shadowRoot: ShadowRoot | null = null;
   private useShadowDOM: boolean;
   private debug: boolean;
+  private themeManager: ThemeManager;
 
   constructor(config: StyleManagerConfig = {}) {
     this.useShadowDOM = config.useShadowDOM ?? this.detectShadowDOMSupport();
     this.debug = config.debug ?? false;
+    
+    const themeConfig: ThemeManagerConfig = { debug: this.debug };
+    if (config.theme) {
+      themeConfig.theme = config.theme;
+    }
+    this.themeManager = new ThemeManager(themeConfig);
 
     if (this.debug) {
       console.log(`[TrestaWidget] StyleManager initialized with Shadow DOM: ${this.useShadowDOM}`);
@@ -62,7 +72,11 @@ export class StyleManager {
     // Create content wrapper
     const contentWrapper = document.createElement('div');
     contentWrapper.setAttribute('data-tresta-widget-root', 'true');
+    contentWrapper.setAttribute('data-tresta-widget', 'true');
     this.shadowRoot.appendChild(contentWrapper);
+
+    // Apply theme
+    this.themeManager.applyTheme(contentWrapper);
 
     if (this.debug) {
       console.log('[TrestaWidget] Shadow DOM initialized');
@@ -89,8 +103,12 @@ export class StyleManager {
     // Create content wrapper
     const contentWrapper = document.createElement('div');
     contentWrapper.setAttribute('data-tresta-widget-root', 'true');
+    contentWrapper.setAttribute('data-tresta-widget', 'true');
     contentWrapper.classList.add('tresta-widget-root');
     container.appendChild(contentWrapper);
+
+    // Apply theme
+    this.themeManager.applyTheme(contentWrapper);
 
     if (this.debug) {
       console.log('[TrestaWidget] Namespaced CSS initialized');
@@ -131,6 +149,13 @@ export class StyleManager {
     
     // Note: We don't remove the global style element in namespaced mode
     // because other widget instances might be using it
+  }
+
+  /**
+   * Get the theme manager
+   */
+  getThemeManager(): ThemeManager {
+    return this.themeManager;
   }
 
   /**
