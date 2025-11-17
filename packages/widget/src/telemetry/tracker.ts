@@ -73,7 +73,7 @@ export class TelemetryTracker {
     if (!this.config.enabled) return;
     if (!this.sampler.shouldSample()) return;
 
-    this.layoutType = layoutType;
+    this.layoutType = layoutType || 'unknown';
     const loadTime = this.loadStartTime > 0 ? performance.now() - this.loadStartTime : 0;
 
     const event: TelemetryEvent = {
@@ -81,7 +81,7 @@ export class TelemetryTracker {
       version: this.version,
       eventType: 'load',
       loadTime: Math.round(loadTime),
-      layoutType,
+      layoutType: layoutType || 'unknown',
       timestamp: Date.now(),
     };
 
@@ -123,7 +123,7 @@ export class TelemetryTracker {
       widgetId: this.widgetId,
       version: this.version,
       eventType: 'interaction',
-      layoutType: layoutType || this.layoutType,
+      layoutType: layoutType || this.layoutType || 'unknown',
       timestamp: Date.now(),
     };
 
@@ -145,7 +145,7 @@ export class TelemetryTracker {
       widgetId: this.widgetId,
       version: this.version,
       loadTime: Math.round(loadTime),
-      layoutType: this.layoutType,
+      layoutType: this.layoutType || 'unknown',
       errorCounts,
     };
   }

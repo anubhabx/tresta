@@ -128,7 +128,12 @@ export class TestimonialCard {
     const provider = this.escapeHtml(this.testimonial.oauthProvider!);
     
     return `
-      <span class="tresta-verification-badge" title="Verified via ${provider}">
+      <span 
+        class="tresta-verification-badge" 
+        role="img" 
+        aria-label="Verified via ${provider}"
+        title="Verified via ${provider}"
+      >
         <svg 
           class="tresta-verification-icon" 
           width="16" 
@@ -137,6 +142,7 @@ export class TestimonialCard {
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
+          focusable="false"
         >
           <circle cx="8" cy="8" r="8" fill="currentColor"/>
           <path 
@@ -147,7 +153,6 @@ export class TestimonialCard {
             stroke-linejoin="round"
           />
         </svg>
-        <span class="tresta-sr-only">Verified via ${provider}</span>
       </span>
     `;
   }
@@ -193,7 +198,7 @@ export class TestimonialCard {
     
     if (type === 'half') {
       return `
-        <svg class="tresta-star ${fillClass}" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="tresta-star ${fillClass}" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
           <defs>
             <linearGradient id="half-fill-${this.testimonial.id}">
               <stop offset="50%" stop-color="currentColor"/>
@@ -211,7 +216,7 @@ export class TestimonialCard {
     }
 
     return `
-      <svg class="tresta-star ${fillClass}" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg class="tresta-star ${fillClass}" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <path 
           d="M10 1L12.5 7.5L19 8.5L14.5 13L15.5 19L10 16L4.5 19L5.5 13L1 8.5L7.5 7.5L10 1Z" 
           fill="${type === 'full' ? 'currentColor' : 'transparent'}"

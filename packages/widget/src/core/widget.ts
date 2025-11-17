@@ -21,6 +21,7 @@ export class Widget implements WidgetInstance {
   private root: HTMLElement | null = null;
   private styleManager: StyleManager | null = null;
   private contentRoot: HTMLElement | null = null;
+  private liveRegion: HTMLElement | null = null;
   private eventListeners: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
   private currentLayout: { destroy: () => void } | null = null;
   private apiClient: APIClient;
@@ -86,13 +87,31 @@ export class Widget implements WidgetInstance {
       this.root.setAttribute('data-tresta-widget', this.config.widgetId);
       this.root.setAttribute('data-version', this.config.version || '1.0.0');
       this.root.setAttribute('data-instance-id', this.generateInstanceId());
+      
+      // Add lang attribute for localization support
+      if (this.config.lang) {
+        this.root.setAttribute('lang', this.config.lang);
+      }
+      
+      // Add role for semantic structure
+      this.root.setAttribute('role', 'region');
+      this.root.setAttribute('aria-label', 'Testimonials widget');
 
       // Initialize style manager and get content root
       this.styleManager = new StyleManager({
         debug: this.config.debug ?? false,
         theme: this.config.theme,
+        ...(this.config.useShadowDOM !== undefined && { useShadowDOM: this.config.useShadowDOM }),
       });
       this.contentRoot = this.styleManager.initializeStyles(this.root);
+      
+      // Create ARIA live region for dynamic content announcements
+      this.liveRegion = document.createElement('div');
+      this.liveRegion.setAttribute('role', 'status');
+      this.liveRegion.setAttribute('aria-live', 'polite');
+      this.liveRegion.setAttribute('aria-atomic', 'true');
+      this.liveRegion.className = 'tresta-sr-only';
+      this.contentRoot.appendChild(this.liveRegion);
 
       container.appendChild(this.root);
 
@@ -134,6 +153,9 @@ export class Widget implements WidgetInstance {
       }
 
       this.state.loading = true;
+      
+      // Announce loading state to screen readers
+      this.announceToScreenReader('Loading testimonials');
 
       // Try to fetch from API
       const data = await this.fetchWithFallback();
@@ -154,6 +176,10 @@ export class Widget implements WidgetInstance {
 
       // Track successful load with layout type
       this.telemetryTracker.trackLoad(data.config?.layout?.type);
+      
+      // Announce successful load to screen readers
+      const count = data.testimonials?.length || 0;
+      this.announceToScreenReader(`${count} testimonial${count !== 1 ? 's' : ''} loaded`);
 
     } catch (error) {
       this.state.loading = false;
@@ -171,6 +197,9 @@ export class Widget implements WidgetInstance {
 
       // Render error state
       this.renderErrorState(error);
+      
+      // Announce error to screen readers
+      this.announceToScreenReader('Failed to load testimonials', 'assertive');
     }
   }
 
@@ -415,6 +444,29 @@ export class Widget implements WidgetInstance {
    */
   private generateInstanceId(): string {
     return `${this.config.widgetId}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+  }
+
+  /**
+   * Announces a message to screen readers via ARIA live region
+   */
+  private announceToScreenReader(
+    message: string,
+    priority: 'polite' | 'assertive' = 'polite'
+  ): void {
+    if (!this.liveRegion) return;
+
+    // Update the priority if needed
+    this.liveRegion.setAttribute('aria-live', priority);
+
+    // Update the message
+    this.liveRegion.textContent = message;
+
+    // Clear the message after a delay to allow for repeated announcements
+    setTimeout(() => {
+      if (this.liveRegion) {
+        this.liveRegion.textContent = '';
+      }
+    }, 1000);
   }
 
   /**

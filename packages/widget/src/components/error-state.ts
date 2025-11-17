@@ -16,8 +16,17 @@ export interface ErrorStateConfig {
 export function createErrorState(config: ErrorStateConfig): HTMLElement {
   const container = document.createElement('div');
   container.className = `tresta-widget-${config.type}-state`;
-  container.setAttribute('role', 'alert');
-  container.setAttribute('aria-live', 'polite');
+  
+  // Use 'alert' role for errors (assertive) and 'status' for empty state (polite)
+  if (config.type === 'error') {
+    container.setAttribute('role', 'alert');
+    container.setAttribute('aria-live', 'assertive');
+  } else {
+    container.setAttribute('role', 'status');
+    container.setAttribute('aria-live', 'polite');
+  }
+  
+  container.setAttribute('aria-atomic', 'true');
 
   const message = document.createElement('p');
   message.className = 'tresta-widget-state-message';
@@ -42,6 +51,6 @@ export function createErrorState(config: ErrorStateConfig): HTMLElement {
 export function createEmptyState(message?: string): HTMLElement {
   return createErrorState({
     type: 'empty',
-    message,
+    ...(message && { message }),
   });
 }

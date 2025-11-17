@@ -204,3 +204,95 @@
     --tresta-card-padding: 40px;
   }
 }
+
+
+/* ========================================
+   Accessibility Styles
+   ======================================== */
+
+/* Screen reader only content */
+.tresta-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus styles for all interactive elements */
+[data-tresta-widget] button:focus-visible,
+[data-tresta-widget] a:focus-visible,
+[data-tresta-widget] [tabindex]:focus-visible,
+[data-tresta-widget] input:focus-visible,
+[data-tresta-widget] select:focus-visible,
+[data-tresta-widget] textarea:focus-visible {
+  outline: 3px solid var(--tresta-primary-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Ensure focus is always visible */
+[data-tresta-widget] *:focus {
+  outline: none;
+}
+
+[data-tresta-widget] *:focus-visible {
+  outline: 3px solid var(--tresta-primary-color);
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+[data-tresta-widget] .tresta-skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--tresta-primary-color);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 4px;
+}
+
+[data-tresta-widget] .tresta-skip-link:focus {
+  top: 0;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  [data-tresta-widget] *,
+  [data-tresta-widget] *::before,
+  [data-tresta-widget] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  [data-tresta-widget] {
+    --tresta-border-color: currentColor;
+  }
+  
+  [data-tresta-widget] button,
+  [data-tresta-widget] a {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ARIA live regions */
+[data-tresta-widget] [aria-live] {
+  position: relative;
+}
+
+/* Loading state */
+[data-tresta-widget] [aria-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}

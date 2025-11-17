@@ -44,6 +44,8 @@ export class Carousel {
     carousel.setAttribute('role', 'region');
     carousel.setAttribute('aria-label', 'Customer testimonials');
     carousel.setAttribute('aria-roledescription', 'carousel');
+    carousel.setAttribute('aria-live', 'polite');
+    carousel.setAttribute('aria-atomic', 'false');
 
     // Create carousel structure
     const track = document.createElement('div');
@@ -56,6 +58,12 @@ export class Carousel {
     });
 
     carousel.appendChild(track);
+    
+    // Add keyboard navigation instructions for screen readers
+    const instructions = document.createElement('div');
+    instructions.className = 'tresta-sr-only';
+    instructions.textContent = 'Use arrow keys to navigate between testimonials, or tab to navigation buttons';
+    carousel.appendChild(instructions);
 
     // Add navigation buttons if enabled
     if (this.layoutConfig.showNavigation !== false) {
@@ -87,9 +95,10 @@ export class Carousel {
   private renderSlide(testimonial: Testimonial, index: number): HTMLElement {
     const slide = document.createElement('div');
     slide.className = 'tresta-carousel-slide';
-    slide.setAttribute('role', 'group');
+    slide.id = `testimonial-slide-${index}`;
+    slide.setAttribute('role', 'tabpanel');
     slide.setAttribute('aria-roledescription', 'slide');
-    slide.setAttribute('aria-label', `${index + 1} of ${this.testimonials.length}`);
+    slide.setAttribute('aria-label', `Testimonial ${index + 1} of ${this.testimonials.length}`);
 
     // Create testimonial card
     const card = new TestimonialCard({
@@ -114,8 +123,9 @@ export class Carousel {
     const prevButton = document.createElement('button');
     prevButton.className = 'tresta-carousel-button tresta-carousel-prev';
     prevButton.setAttribute('aria-label', 'Previous testimonial');
+    prevButton.setAttribute('type', 'button');
     prevButton.innerHTML = `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     `;
@@ -125,8 +135,9 @@ export class Carousel {
     const nextButton = document.createElement('button');
     nextButton.className = 'tresta-carousel-button tresta-carousel-next';
     nextButton.setAttribute('aria-label', 'Next testimonial');
+    nextButton.setAttribute('type', 'button');
     nextButton.innerHTML = `
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     `;
@@ -150,10 +161,12 @@ export class Carousel {
     this.testimonials.forEach((_, index) => {
       const dot = document.createElement('button');
       dot.className = 'tresta-carousel-dot';
+      dot.setAttribute('type', 'button');
       dot.setAttribute('role', 'tab');
       dot.setAttribute('aria-label', `Go to testimonial ${index + 1}`);
       dot.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
       dot.setAttribute('tabindex', index === 0 ? '0' : '-1');
+      dot.setAttribute('aria-controls', `testimonial-slide-${index}`);
       
       if (index === 0) {
         dot.classList.add('active');
@@ -371,14 +384,28 @@ export class Carousel {
    * Pauses auto-rotation
    */
   pause(): void {
-    this.isPaused = true;
+    if (!this.isPaused) {
+      this.isPaused = true;
+      
+      // Update ARIA live region to announce pause
+      if (this.container) {
+        this.container.setAttribute('aria-live', 'off');
+      }
+    }
   }
 
   /**
    * Resumes auto-rotation
    */
   resume(): void {
-    this.isPaused = false;
+    if (this.isPaused) {
+      this.isPaused = false;
+      
+      // Update ARIA live region to announce resume
+      if (this.container) {
+        this.container.setAttribute('aria-live', 'polite');
+      }
+    }
   }
 
   /**
