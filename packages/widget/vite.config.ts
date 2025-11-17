@@ -16,20 +16,8 @@ export default defineConfig(({ mode }) => ({
       output: {
         // Use named exports to avoid default export warning
         exports: 'named',
-        // Ensure single bundle output
-        inlineDynamicImports: false,
-        manualChunks: (id) => {
-          // Keep layouts as separate chunks for code splitting
-          if (id.includes('/layouts/')) {
-            const layoutName = id.split('/layouts/')[1].split('.')[0];
-            return `layout-${layoutName}`;
-          }
-          // DOMPurify as separate chunk for lazy loading
-          if (id.includes('dompurify')) {
-            return 'dompurify';
-          }
-          return 'index';
-        },
+        // Inline all imports for IIFE format (single bundle)
+        inlineDynamicImports: true,
       },
     },
     sourcemap: true,

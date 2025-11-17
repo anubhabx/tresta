@@ -54,7 +54,7 @@ export class Widget implements WidgetInstance {
 
       // Initialize style manager and get content root
       this.styleManager = new StyleManager({
-        debug: this.config.debug,
+        debug: this.config.debug ?? false,
       });
       this.contentRoot = this.styleManager.initializeStyles(this.root);
 

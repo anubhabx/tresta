@@ -2,8 +2,6 @@
  * API-specific type definitions
  */
 
-import type { WidgetData } from '../types';
-
 export interface APIClientConfig {
   baseURL: string;
   timeout: number;

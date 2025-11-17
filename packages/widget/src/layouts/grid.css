@@ -1,0 +1,100 @@
+/**
+ * Grid Layout Styles
+ * 
+ * Responsive CSS Grid layout with equal-height cards.
+ * Breakpoints: 1 column (mobile), 2 columns (tablet), 3-4 columns (desktop).
+ */
+
+.tresta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+/* Custom column count if specified */
+.tresta-grid[style*="--grid-columns"] {
+  grid-template-columns: repeat(var(--grid-columns, auto-fit), minmax(280px, 1fr));
+}
+
+.tresta-grid-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Ensure cards stretch to fill grid items */
+.tresta-grid-item .tresta-testimonial-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive Breakpoints */
+
+/* Mobile: 1 column */
+@media (max-width: 480px) {
+  .tresta-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 481px) and (max-width: 768px) {
+  .tresta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .tresta-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Large Desktop: 4 columns */
+@media (min-width: 1201px) {
+  .tresta-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Override for custom column count */
+@media (min-width: 481px) {
+  .tresta-grid[style*="--grid-columns: 1"] {
+    grid-template-columns: 1fr;
+  }
+  
+  .tresta-grid[style*="--grid-columns: 2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tresta-grid[style*="--grid-columns: 3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .tresta-grid[style*="--grid-columns: 4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .tresta-grid {
+    transition: none;
+  }
+}
+
+/* High Resolution Displays (4K+) */
+@media (min-width: 2560px) {
+  .tresta-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+}

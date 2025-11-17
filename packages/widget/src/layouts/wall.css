@@ -1,0 +1,198 @@
+/**
+ * Wall Layout Styles
+ * 
+ * Dense grid layout with varied card sizes.
+ * Featured items span multiple columns/rows for visual interest.
+ */
+
+.tresta-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-auto-rows: minmax(200px, auto);
+  grid-auto-flow: dense;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+/* Custom column count if specified */
+.tresta-wall[style*="--wall-columns"] {
+  grid-template-columns: repeat(var(--wall-columns), minmax(240px, 1fr));
+}
+
+.tresta-wall-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+/* Featured items span 2 columns and 2 rows */
+.tresta-wall-item-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+  min-height: 400px;
+}
+
+/* Ensure cards fill the wall item */
+.tresta-wall-item .tresta-testimonial-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Featured cards have larger text for emphasis */
+.tresta-wall-item-featured .tresta-testimonial-content {
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.tresta-wall-item-featured .tresta-author-name {
+  font-size: 1.125rem;
+}
+
+.tresta-wall-item-featured .tresta-rating {
+  transform: scale(1.2);
+  transform-origin: left center;
+}
+
+/* Responsive Breakpoints */
+
+/* Mobile: 1 column, no featured items */
+@media (max-width: 480px) {
+  .tresta-wall {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .tresta-wall-item-featured {
+    grid-column: span 1;
+    grid-row: span 1;
+    min-height: 200px;
+  }
+  
+  .tresta-wall-item-featured .tresta-testimonial-content {
+    font-size: 1rem;
+  }
+  
+  .tresta-wall-item-featured .tresta-author-name {
+    font-size: 1rem;
+  }
+  
+  .tresta-wall-item-featured .tresta-rating {
+    transform: scale(1);
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 481px) and (max-width: 768px) {
+  .tresta-wall {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* Featured items only span 2 columns (full width) on tablet */
+  .tresta-wall-item-featured {
+    grid-column: span 2;
+    grid-row: span 1;
+    min-height: 250px;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .tresta-wall {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* Large Desktop: 4 columns */
+@media (min-width: 1201px) {
+  .tresta-wall {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Override for custom column count */
+@media (min-width: 481px) {
+  .tresta-wall[style*="--wall-columns: 1"] {
+    grid-template-columns: 1fr;
+  }
+  
+  .tresta-wall[style*="--wall-columns: 1"] .tresta-wall-item-featured {
+    grid-column: span 1;
+  }
+  
+  .tresta-wall[style*="--wall-columns: 2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tresta-wall[style*="--wall-columns: 3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .tresta-wall[style*="--wall-columns: 4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Fallback for older browsers without CSS Grid */
+@supports not (display: grid) {
+  .tresta-wall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .tresta-wall-item {
+    flex: 1 1 240px;
+    max-width: calc(25% - 1rem);
+  }
+  
+  .tresta-wall-item-featured {
+    flex: 1 1 480px;
+    max-width: calc(50% - 1rem);
+  }
+  
+  @media (max-width: 1200px) {
+    .tresta-wall-item {
+      max-width: calc(33.333% - 1rem);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .tresta-wall-item {
+      max-width: calc(50% - 1rem);
+    }
+    
+    .tresta-wall-item-featured {
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .tresta-wall-item {
+      max-width: 100%;
+    }
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .tresta-wall {
+    transition: none;
+  }
+  
+  .tresta-wall-item-featured .tresta-rating {
+    transform: none;
+  }
+}
+
+/* High Resolution Displays (4K+) */
+@media (min-width: 2560px) {
+  .tresta-wall {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+}

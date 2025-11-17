@@ -74,6 +74,10 @@ export class RateLimiter {
 
     // Calculate when the oldest request will expire
     const oldestTimestamp = record.timestamps[0];
+    if (!oldestTimestamp) {
+      return 0;
+    }
+    
     const retryAfter = oldestTimestamp + this.config.windowMs - now;
 
     return Math.max(0, retryAfter);

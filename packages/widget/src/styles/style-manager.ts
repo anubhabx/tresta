@@ -4,9 +4,10 @@
 
 import baseStyles from './base.css?inline';
 import testimonialCardStyles from '../components/testimonial-card.css?inline';
+import carouselStyles from '../layouts/carousel.css?inline';
 
 // Combine all styles
-const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}`.trim();
+const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}\n\n${carouselStyles}`.trim();
 
 export interface StyleManagerConfig {
   useShadowDOM?: boolean;

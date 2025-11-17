@@ -1,0 +1,39 @@
+/**
+ * List Layout Styles
+ * 
+ * Simple vertical list layout with minimal styling.
+ * Optimized for older browsers and graceful degradation.
+ */
+
+.tresta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.tresta-list-item {
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tresta-list {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tresta-list {
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .tresta-list {
+    transition: none;
+  }
+}
