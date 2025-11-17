@@ -12,7 +12,8 @@ describe('ContentSanitizer', () => {
     it('should escape HTML entities in plain text', () => {
       const input = 'Hello <script>alert("xss")</script> World';
       const result = sanitizer.sanitizePlainText(input);
-      expect(result).toBe('Hello &lt;script&gt;alert("xss")&lt;/script&gt; World');
+      // Quotes should be escaped for security
+      expect(result).toBe('Hello &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; World');
     });
 
     it('should escape special characters', () => {

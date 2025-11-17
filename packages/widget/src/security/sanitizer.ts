@@ -27,19 +27,37 @@ let domPurifyInstance: typeof import('dompurify').default | null = null;
 
 /**
  * Detects if a string contains HTML markup
+ * Checks for common HTML tags to avoid false positives
  */
 function containsHTML(text: string): boolean {
-  // Check for common HTML patterns
-  return /<[a-z][\s\S]*>/i.test(text);
+  // List of common HTML tags to check for (including dangerous ones)
+  const commonTags = [
+    'a', 'b', 'i', 'p', 'div', 'span', 'strong', 'em', 'ul', 'li', 'ol', 'br', 'hr', 'img', 
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'tr', 'td', 'th', 'script', 'style', 'link', 
+    'meta', 'iframe', 'video', 'audio', 'svg', 'base', 'input', 'details', 'summary', 'marquee',
+    'form', 'button', 'select', 'textarea', 'object', 'embed', 'applet', 'body', 'html', 'head'
+  ];
+  
+  // Check if text contains any of these tags
+  for (const tag of commonTags) {
+    if (text.includes(`<${tag}>`) || text.includes(`<${tag} `) || text.includes(`</${tag}>`) || text.includes(`<${tag}/>`)) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 /**
  * Escapes HTML entities for plain text content
  */
 function escapeHTML(text: string): string {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 /**

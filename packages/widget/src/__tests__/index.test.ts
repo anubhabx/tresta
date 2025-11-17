@@ -21,8 +21,8 @@ describe('TrestaWidget Global API', () => {
   });
 
   describe('mount', () => {
-    it('should mount widget using element reference', () => {
-      const instance = TrestaWidget.mount(container, {
+    it('should mount widget using element reference', async () => {
+      const instance = await TrestaWidget.mount(container, {
         widgetId: 'test-123',
         debug: false,
         version: '1.0.0',
@@ -35,8 +35,8 @@ describe('TrestaWidget Global API', () => {
       expect(root).not.toBeNull();
     });
 
-    it('should mount widget using CSS selector', () => {
-      const instance = TrestaWidget.mount('#test-container', {
+    it('should mount widget using CSS selector', async () => {
+      const instance = await TrestaWidget.mount('#test-container', {
         widgetId: 'test-456',
         debug: false,
         version: '1.0.0',
@@ -49,18 +49,16 @@ describe('TrestaWidget Global API', () => {
       expect(root?.getAttribute('data-tresta-widget')).toBe('test-456');
     });
 
-    it('should throw error if container not found', () => {
-      expect(() => {
-        TrestaWidget.mount('#non-existent', {
-          widgetId: 'test-789',
-          debug: false,
-          version: '1.0.0',
-        });
-      }).toThrow('[TrestaWidget] Container not found: #non-existent');
+    it('should throw error if container not found', async () => {
+      await expect(TrestaWidget.mount('#non-existent', {
+        widgetId: 'test-789',
+        debug: false,
+        version: '1.0.0',
+      })).rejects.toThrow('[TrestaWidget] Container not found: #non-existent');
     });
 
-    it('should return widget instance with methods', () => {
-      const instance = TrestaWidget.mount(container, {
+    it('should return widget instance with methods', async () => {
+      const instance = await TrestaWidget.mount(container, {
         widgetId: 'test-123',
         debug: false,
         version: '1.0.0',
@@ -74,8 +72,8 @@ describe('TrestaWidget Global API', () => {
   });
 
   describe('unmount', () => {
-    it('should unmount widget using element reference', () => {
-      TrestaWidget.mount(container, {
+    it('should unmount widget using element reference', async () => {
+      await TrestaWidget.mount(container, {
         widgetId: 'test-123',
         debug: false,
         version: '1.0.0',
@@ -88,8 +86,8 @@ describe('TrestaWidget Global API', () => {
       expect(container.querySelector('[data-tresta-widget]')).toBeNull();
     });
 
-    it('should unmount widget using CSS selector', () => {
-      TrestaWidget.mount('#test-container', {
+    it('should unmount widget using CSS selector', async () => {
+      await TrestaWidget.mount('#test-container', {
         widgetId: 'test-456',
         debug: false,
         version: '1.0.0',
@@ -134,19 +132,19 @@ describe('TrestaWidget Global API', () => {
   });
 
   describe('Multiple instances', () => {
-    it('should support mounting multiple widgets', () => {
+    it('should support mounting multiple widgets', async () => {
       const container1 = document.createElement('div');
       const container2 = document.createElement('div');
       document.body.appendChild(container1);
       document.body.appendChild(container2);
 
-      const instance1 = TrestaWidget.mount(container1, {
+      const instance1 = await TrestaWidget.mount(container1, {
         widgetId: 'widget-1',
         debug: false,
         version: '1.0.0',
       });
 
-      const instance2 = TrestaWidget.mount(container2, {
+      const instance2 = await TrestaWidget.mount(container2, {
         widgetId: 'widget-2',
         debug: false,
         version: '1.0.0',
@@ -168,19 +166,19 @@ describe('TrestaWidget Global API', () => {
       document.body.removeChild(container2);
     });
 
-    it('should maintain independent state for each instance', () => {
+    it('should maintain independent state for each instance', async () => {
       const container1 = document.createElement('div');
       const container2 = document.createElement('div');
       document.body.appendChild(container1);
       document.body.appendChild(container2);
 
-      const instance1 = TrestaWidget.mount(container1, {
+      const instance1 = await TrestaWidget.mount(container1, {
         widgetId: 'widget-1',
         debug: false,
         version: '1.0.0',
       });
 
-      const instance2 = TrestaWidget.mount(container2, {
+      const instance2 = await TrestaWidget.mount(container2, {
         widgetId: 'widget-2',
         debug: false,
         version: '1.0.0',
@@ -202,7 +200,7 @@ describe('TrestaWidget Global API', () => {
 
   describe('Programmatic API', () => {
     it('should allow calling methods on returned instance', async () => {
-      const instance = TrestaWidget.mount(container, {
+      const instance = await TrestaWidget.mount(container, {
         widgetId: 'test-123',
         debug: false,
         version: '1.0.0',
@@ -219,8 +217,8 @@ describe('TrestaWidget Global API', () => {
       expect(instance.getState().mounted).toBe(false);
     });
 
-    it('should allow remounting after unmount', () => {
-      const instance = TrestaWidget.mount(container, {
+    it('should allow remounting after unmount', async () => {
+      const instance = await TrestaWidget.mount(container, {
         widgetId: 'test-123',
         debug: false,
         version: '1.0.0',
@@ -230,7 +228,7 @@ describe('TrestaWidget Global API', () => {
       expect(instance.getState().mounted).toBe(false);
 
       // Remount
-      instance.mount(container);
+      await instance.mount(container);
       expect(instance.getState().mounted).toBe(true);
     });
   });

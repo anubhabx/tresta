@@ -41,7 +41,9 @@ function sleep(ms: number): Promise<void> {
  */
 function isRetryableError(error: unknown): boolean {
   if (error instanceof WidgetError) {
-    // Retryable error codes
+    // Only retry if the error is marked as recoverable
+    // Retryable error codes: API_TIMEOUT, NETWORK_ERROR, API_ERROR
+    // Note: RATE_LIMITED is NOT retried - it should fail immediately
     const retryableCodes = [
       WidgetErrorCode.API_TIMEOUT,
       WidgetErrorCode.NETWORK_ERROR,

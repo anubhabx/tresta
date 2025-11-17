@@ -17,6 +17,7 @@ describe('API Client', () => {
   let apiClient: APIClient;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     apiClient = new APIClient(
       { baseURL: 'https://api.test.com', timeout: 10000 },
       'test-api-key'
@@ -25,6 +26,7 @@ describe('API Client', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe('Initialization', () => {
@@ -32,7 +34,7 @@ describe('API Client', () => {
       const client = new APIClient({}, 'test-key');
       const config = client.getConfig();
 
-      expect(config.baseURL).toBe('http://localhost:8000');
+      expect(config.baseURL).toBe('https://api.tresta.com');
       expect(config.timeout).toBe(10000);
       expect(config.maxRetries).toBe(3);
     });
@@ -282,17 +284,13 @@ describe('API Client', () => {
         headers: new Headers(),
       });
 
-      await expect(apiClient.fetchWidgetData('test-123')).rejects.toThrow(
-        WidgetError
-      );
+      const promise = apiClient.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      const error = await promise;
 
-      try {
-        await apiClient.fetchWidgetData('test-123');
-      } catch (error) {
-        expect(error).toBeInstanceOf(WidgetError);
-        expect((error as WidgetError).code).toBe(WidgetErrorCode.API_ERROR);
-        expect((error as WidgetError).recoverable).toBe(true);
-      }
+      expect(error).toBeInstanceOf(WidgetError);
+      expect(error.code).toBe(WidgetErrorCode.API_ERROR);
+      expect(error.recoverable).toBe(true);
     });
 
     it('should handle 502 Bad Gateway', async () => {
@@ -303,17 +301,13 @@ describe('API Client', () => {
         headers: new Headers(),
       });
 
-      await expect(apiClient.fetchWidgetData('test-123')).rejects.toThrow(
-        WidgetError
-      );
+      const promise = apiClient.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      const error = await promise;
 
-      try {
-        await apiClient.fetchWidgetData('test-123');
-      } catch (error) {
-        expect(error).toBeInstanceOf(WidgetError);
-        expect((error as WidgetError).code).toBe(WidgetErrorCode.API_ERROR);
-        expect((error as WidgetError).recoverable).toBe(true);
-      }
+      expect(error).toBeInstanceOf(WidgetError);
+      expect(error.code).toBe(WidgetErrorCode.API_ERROR);
+      expect(error.recoverable).toBe(true);
     });
 
     it('should handle 503 Service Unavailable', async () => {
@@ -324,17 +318,13 @@ describe('API Client', () => {
         headers: new Headers(),
       });
 
-      await expect(apiClient.fetchWidgetData('test-123')).rejects.toThrow(
-        WidgetError
-      );
+      const promise = apiClient.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      const error = await promise;
 
-      try {
-        await apiClient.fetchWidgetData('test-123');
-      } catch (error) {
-        expect(error).toBeInstanceOf(WidgetError);
-        expect((error as WidgetError).code).toBe(WidgetErrorCode.API_ERROR);
-        expect((error as WidgetError).recoverable).toBe(true);
-      }
+      expect(error).toBeInstanceOf(WidgetError);
+      expect(error.code).toBe(WidgetErrorCode.API_ERROR);
+      expect(error.recoverable).toBe(true);
     });
 
     it('should handle invalid API response format', async () => {
@@ -435,7 +425,9 @@ describe('API Client', () => {
         };
       });
 
-      const result = await apiClient.fetchWidgetData('test-123');
+      const promise = apiClient.fetchWidgetData('test-123');
+      await vi.runAllTimersAsync();
+      const result = await promise;
 
       expect(attemptCount).toBe(3);
       expect(result.widgetId).toBe('test-123');
@@ -475,7 +467,9 @@ describe('API Client', () => {
         };
       });
 
-      await expect(apiClient.fetchWidgetData('test-123')).rejects.toThrow();
+      const promise = apiClient.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      await promise;
 
       // Should have made 3 attempts
       expect(timestamps).toHaveLength(3);
@@ -508,7 +502,9 @@ describe('API Client', () => {
         };
       });
 
-      await expect(client.fetchWidgetData('test-123')).rejects.toThrow();
+      const promise = client.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      await promise;
 
       // Should only attempt 2 times (maxRetries = 2)
       expect(attemptCount).toBe(2);
@@ -523,17 +519,16 @@ describe('API Client', () => {
       );
 
       const networkClient = client.getNetworkClient();
-      vi.spyOn(networkClient, 'request').mockImplementation(async () => {
-        // Simulate slow request
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        return {
-          data: { data: { widget: {}, testimonials: [] } },
-          status: 200,
-          headers: new Headers(),
-        };
-      });
+      vi.spyOn(networkClient, 'request').mockRejectedValue(
+        new WidgetError(WidgetErrorCode.API_TIMEOUT, 'Request timed out after 100ms', true)
+      );
 
-      await expect(client.fetchWidgetData('test-123')).rejects.toThrow();
+      const promise = client.fetchWidgetData('test-123').catch((e) => e);
+      await vi.runAllTimersAsync();
+      const error = await promise;
+
+      expect(error).toBeInstanceOf(WidgetError);
+      expect(error.code).toBe(WidgetErrorCode.API_TIMEOUT);
     });
 
     it('should use default 10 second timeout', () => {

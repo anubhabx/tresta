@@ -47,6 +47,15 @@ export class Carousel {
     carousel.setAttribute('aria-live', 'polite');
     carousel.setAttribute('aria-atomic', 'false');
 
+    // Handle empty state
+    if (this.testimonials.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'tresta-empty-state';
+      emptyState.textContent = 'No testimonials to display yet.';
+      carousel.appendChild(emptyState);
+      return carousel;
+    }
+
     // Create carousel structure
     const track = document.createElement('div');
     track.className = 'tresta-carousel-track';

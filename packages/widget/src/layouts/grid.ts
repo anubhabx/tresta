@@ -38,6 +38,15 @@ export class Grid {
     grid.setAttribute('role', 'list');
     grid.setAttribute('aria-label', 'Customer testimonials');
 
+    // Handle empty state
+    if (this.testimonials.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'tresta-empty-state';
+      emptyState.textContent = 'No testimonials to display yet.';
+      grid.appendChild(emptyState);
+      return grid;
+    }
+
     // Apply column configuration if specified
     if (this.layoutConfig.columns) {
       grid.style.setProperty('--grid-columns', this.layoutConfig.columns.toString());

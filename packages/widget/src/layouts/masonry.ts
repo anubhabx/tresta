@@ -40,6 +40,15 @@ export class Masonry {
     masonry.setAttribute('role', 'list');
     masonry.setAttribute('aria-label', 'Customer testimonials');
 
+    // Handle empty state
+    if (this.testimonials.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'tresta-empty-state';
+      emptyState.textContent = 'No testimonials to display yet.';
+      masonry.appendChild(emptyState);
+      return masonry;
+    }
+
     // Apply column configuration if specified
     if (this.layoutConfig.columns) {
       masonry.style.setProperty('--masonry-columns', this.layoutConfig.columns.toString());

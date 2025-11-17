@@ -11,7 +11,7 @@ import type { APIClientConfig } from './types';
 import { Logger } from '../utils/logger';
 
 const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
-  baseURL: 'http://localhost:8000',
+  baseURL: 'https://api.tresta.com',
   timeout: 10000, // 10 seconds
   maxRetries: 3,
 };
@@ -127,7 +127,8 @@ export class APIClient {
       this.logger.debug('Raw API response:', apiResponse);
     }
     
-    const { data } = apiResponse;
+    // Handle both direct data and wrapped response formats
+    const data = apiResponse.data || apiResponse;
 
     if (!data || !data.widget) {
       const errorDetails = { hasData: !!data, hasWidget: !!(data?.widget) };

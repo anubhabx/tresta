@@ -36,6 +36,15 @@ export class List {
     list.setAttribute('role', 'list');
     list.setAttribute('aria-label', 'Customer testimonials');
 
+    // Handle empty state
+    if (this.testimonials.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'tresta-empty-state';
+      emptyState.textContent = 'No testimonials to display yet.';
+      list.appendChild(emptyState);
+      return list;
+    }
+
     // Render testimonial items
     this.testimonials.forEach((testimonial) => {
       const item = this.renderItem(testimonial);

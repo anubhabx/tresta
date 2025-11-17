@@ -218,9 +218,13 @@ describe('APIClient', () => {
         headers,
       });
 
+      // 429 errors should not retry - they should fail immediately
       await expect(apiClient.fetchWidgetData('test-widget-123')).rejects.toThrow(
         WidgetError
       );
+
+      // Should only be called once (no retries for rate limit)
+      expect(mockRequest).toHaveBeenCalledTimes(1);
 
       try {
         await apiClient.fetchWidgetData('test-widget-123');
@@ -239,9 +243,13 @@ describe('APIClient', () => {
         headers: new Headers(),
       });
 
+      // 429 errors should not retry - they should fail immediately
       await expect(apiClient.fetchWidgetData('test-widget-123')).rejects.toThrow(
         WidgetError
       );
+
+      // Should only be called once (no retries for rate limit)
+      expect(mockRequest).toHaveBeenCalledTimes(1);
 
       try {
         await apiClient.fetchWidgetData('test-widget-123');
@@ -306,8 +314,48 @@ describe('APIClient', () => {
       // Configure for 2 requests per window for testing
       rateLimiter.updateConfig({ maxRequests: 2, windowMs: 60000 });
 
+      // Mock API response format matching the actual API
+      const apiResponse = {
+        success: true,
+        message: 'Widget data fetched successfully',
+        data: {
+          widget: {
+            id: 'test-widget-123',
+            layout: 'grid',
+            theme: {
+              primaryColor: '#007bff',
+              secondaryColor: '#6c757d',
+            },
+            settings: {
+              maxTestimonials: 10,
+              showRating: true,
+              showDate: true,
+              showAvatar: true,
+              showAuthorRole: true,
+              showAuthorCompany: true,
+              theme: 'light',
+              cardStyle: 'default',
+            },
+          },
+          testimonials: [
+            {
+              id: '1',
+              content: 'Great product!',
+              rating: 5,
+              createdAt: '2025-01-01T00:00:00Z',
+              isOAuthVerified: true,
+              oauthProvider: 'google',
+              authorName: 'John Doe',
+              authorAvatar: 'https://example.com/avatar.jpg',
+              authorRole: 'CEO',
+              authorCompany: 'Acme Inc',
+            },
+          ],
+        },
+      };
+
       mockRequest.mockResolvedValue({
-        data: mockWidgetData,
+        data: apiResponse,
         status: 200,
         headers: new Headers(),
       });
@@ -330,6 +378,46 @@ describe('APIClient', () => {
     });
 
     it('should retry on recoverable errors', async () => {
+      // Mock API response format matching the actual API
+      const apiResponse = {
+        success: true,
+        message: 'Widget data fetched successfully',
+        data: {
+          widget: {
+            id: 'test-widget-123',
+            layout: 'grid',
+            theme: {
+              primaryColor: '#007bff',
+              secondaryColor: '#6c757d',
+            },
+            settings: {
+              maxTestimonials: 10,
+              showRating: true,
+              showDate: true,
+              showAvatar: true,
+              showAuthorRole: true,
+              showAuthorCompany: true,
+              theme: 'light',
+              cardStyle: 'default',
+            },
+          },
+          testimonials: [
+            {
+              id: '1',
+              content: 'Great product!',
+              rating: 5,
+              createdAt: '2025-01-01T00:00:00Z',
+              isOAuthVerified: true,
+              oauthProvider: 'google',
+              authorName: 'John Doe',
+              authorAvatar: 'https://example.com/avatar.jpg',
+              authorRole: 'CEO',
+              authorCompany: 'Acme Inc',
+            },
+          ],
+        },
+      };
+
       // First 2 calls fail with 500, 3rd succeeds
       mockRequest
         .mockResolvedValueOnce({
@@ -343,7 +431,7 @@ describe('APIClient', () => {
           headers: new Headers(),
         })
         .mockResolvedValueOnce({
-          data: mockWidgetData,
+          data: apiResponse,
           status: 200,
           headers: new Headers(),
         });
@@ -352,7 +440,8 @@ describe('APIClient', () => {
       await vi.runAllTimersAsync();
       const result = await promise;
 
-      expect(result).toEqual(mockWidgetData);
+      expect(result.widgetId).toBe('test-widget-123');
+      expect(result.testimonials).toHaveLength(1);
       expect(mockRequest).toHaveBeenCalledTimes(3);
     });
 
@@ -415,7 +504,7 @@ describe('APIClient', () => {
 
   describe('configuration', () => {
     it('should use default configuration', () => {
-      const client = new APIClient();
+      const client = new APIClient({}, 'test-key');
       const config = client.getConfig();
 
       expect(config.baseURL).toBe('https://api.tresta.com');
@@ -428,7 +517,7 @@ describe('APIClient', () => {
         baseURL: 'https://custom.api.com',
         timeout: 5000,
         maxRetries: 5,
-      });
+      }, 'test-key');
       const config = client.getConfig();
 
       expect(config.baseURL).toBe('https://custom.api.com');

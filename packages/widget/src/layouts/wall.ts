@@ -38,6 +38,15 @@ export class Wall {
     wall.setAttribute('role', 'list');
     wall.setAttribute('aria-label', 'Customer testimonials');
 
+    // Handle empty state
+    if (this.testimonials.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'tresta-empty-state';
+      emptyState.textContent = 'No testimonials to display yet.';
+      wall.appendChild(emptyState);
+      return wall;
+    }
+
     // Apply column configuration if specified
     if (this.layoutConfig.columns) {
       wall.style.setProperty('--wall-columns', this.layoutConfig.columns.toString());
