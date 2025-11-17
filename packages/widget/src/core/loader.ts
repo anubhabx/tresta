@@ -3,24 +3,21 @@
  */
 
 import { Widget } from './widget';
+import { parseWidgetConfig, validateConfig } from './config';
 import type { WidgetConfig } from '../types';
 
 /**
  * Parse configuration from data attributes on script tag or container
  */
 function parseConfig(element: HTMLScriptElement | HTMLElement): WidgetConfig {
-  const widgetId = element.getAttribute('data-widget-id');
+  const config = parseWidgetConfig(element);
   
-  if (!widgetId) {
-    throw new Error('[TrestaWidget] data-widget-id attribute is required');
+  // Validate the configuration
+  if (!validateConfig(config)) {
+    throw new Error('[TrestaWidget] Invalid widget configuration');
   }
-
-  return {
-    widgetId,
-    debug: element.getAttribute('data-debug') === 'true',
-    telemetry: element.getAttribute('data-telemetry') !== 'false',
-    version: element.getAttribute('data-version') || '1.0.0',
-  };
+  
+  return config;
 }
 
 /**

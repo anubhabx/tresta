@@ -9,6 +9,7 @@ import { APIClient } from '../api/client';
 import { StorageManager } from '../storage/cache-manager';
 import { createErrorState, createEmptyState } from '../components/error-state';
 import { TelemetryTracker } from '../telemetry';
+import { LayoutEngine } from '../layouts';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -34,8 +35,9 @@ export class Widget implements WidgetInstance {
       data: null,
     };
 
-    // Initialize API client and storage manager
-    this.apiClient = new APIClient();
+    // Initialize API client with API key and custom base URL if provided
+    const apiClientConfig = config.apiUrl ? { baseURL: config.apiUrl } : {};
+    this.apiClient = new APIClient(apiClientConfig, config.apiKey);
     this.storageManager = new StorageManager();
 
     // Initialize telemetry tracker
@@ -48,7 +50,14 @@ export class Widget implements WidgetInstance {
     );
 
     if (this.config.debug) {
-      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Initialized with config:`, config);
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Initialized with config:`, {
+        widgetId: config.widgetId,
+        apiKey: config.apiKey ? `${config.apiKey.substring(0, 15)}...` : 'NOT PROVIDED',
+        apiUrl: config.apiUrl || 'default (https://api.tresta.com)',
+        debug: config.debug,
+        telemetry: config.telemetry,
+        version: config.version,
+      });
       console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Telemetry enabled:`, this.telemetryTracker.isEnabled());
     }
   }
@@ -119,11 +128,22 @@ export class Widget implements WidgetInstance {
    */
   private async fetchAndRender(): Promise<void> {
     try {
+      if (this.config.debug) {
+        console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Starting fetchAndRender`);
+      }
+
       this.state.loading = true;
       
       // Try to fetch from API
       const data = await this.fetchWithFallback();
       
+      if (this.config.debug) {
+        console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Data fetched successfully:`, {
+          widgetId: data.widgetId,
+          testimonialCount: data.testimonials?.length || 0,
+        });
+      }
+
       this.state.data = data;
       this.state.error = null;
       this.state.loading = false;
@@ -187,7 +207,18 @@ export class Widget implements WidgetInstance {
    * Render widget content
    */
   private renderContent(data: WidgetData): void {
-    if (!this.contentRoot) return;
+    if (this.config.debug) {
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] renderContent called`, {
+        hasContentRoot: !!this.contentRoot,
+        testimonialCount: data.testimonials?.length || 0,
+        widgetData: data,
+      });
+    }
+
+    if (!this.contentRoot) {
+      console.error('[TrestaWidget] No content root available for rendering');
+      return;
+    }
 
     // Clear existing content
     this.contentRoot.innerHTML = '';
@@ -195,28 +226,30 @@ export class Widget implements WidgetInstance {
     // Check if there are any testimonials
     if (!data.testimonials || data.testimonials.length === 0) {
       if (this.config.debug) {
-        console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] empty`);
+        console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] No testimonials to display`);
       }
       this.renderEmptyState();
       return;
     }
 
-    // Create content wrapper with proper attributes
-    const wrapper = document.createElement('div');
-    wrapper.setAttribute('data-tresta-widget', this.config.widgetId);
-    wrapper.className = 'tresta-widget-content';
-    
-    // Placeholder content for now - will be replaced by layout engine in future tasks
-    wrapper.innerHTML = `
-      <div class="widget-container">
-        <p style="margin: 0; color: var(--tresta-secondary-color);">Tresta Widget (widgetId: ${this.config.widgetId})</p>
-        <p style="margin: 8px 0 0; font-size: 14px; color: var(--tresta-secondary-color);">
-          Loaded ${data.testimonials.length} testimonial(s)
-        </p>
-      </div>
-    `;
+    if (this.config.debug) {
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Rendering ${data.testimonials.length} testimonials with layout: ${data.config.layout.type}`);
+    }
 
-    this.contentRoot.appendChild(wrapper);
+    // Use LayoutEngine to render the testimonials
+    const layout = LayoutEngine.create({
+      testimonials: data.testimonials,
+      layoutConfig: data.config.layout,
+      displayOptions: data.config.display,
+      theme: data.config.theme,
+    });
+
+    const layoutElement = layout.render();
+    this.contentRoot.appendChild(layoutElement);
+
+    if (this.config.debug) {
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Widget rendered successfully with ${data.config.layout.type} layout`);
+    }
   }
 
   /**

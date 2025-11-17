@@ -10,7 +10,7 @@ import { RateLimiter } from './rate-limiter';
 import type { APIClientConfig } from './types';
 
 const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
-  baseURL: 'https://api.tresta.com',
+  baseURL: 'http://localhost:8000',
   timeout: 10000, // 10 seconds
   maxRetries: 3,
 };
@@ -22,20 +22,31 @@ export class APIClient {
   private config: APIClientConfig;
   private networkClient: NetworkClient;
   private rateLimiter: RateLimiter;
+  private apiKey: string | undefined;
 
-  constructor(config: Partial<APIClientConfig> = {}) {
+  constructor(config: Partial<APIClientConfig> = {}, apiKey?: string) {
     this.config = { ...DEFAULT_API_CLIENT_CONFIG, ...config };
     this.networkClient = new NetworkClient();
     this.rateLimiter = new RateLimiter({
       maxRequests: 100,
       windowMs: 60000, // 100 requests per minute
     });
+    this.apiKey = apiKey;
   }
 
   /**
    * Fetch widget data from the API
    */
   async fetchWidgetData(widgetId: string): Promise<WidgetData> {
+    // Check if API key is provided
+    if (!this.apiKey) {
+      throw new WidgetError(
+        WidgetErrorCode.UNAUTHORIZED,
+        'API key is required. Please provide an API key.',
+        false
+      );
+    }
+
     // Check rate limit
     if (!this.rateLimiter.isAllowed(widgetId)) {
       const retryAfter = this.rateLimiter.getRetryAfter(widgetId);
@@ -52,16 +63,28 @@ export class APIClient {
     // Fetch with retry logic
     return retry(
       async () => {
-        const url = `${this.config.baseURL}/api/widget/${widgetId}/data`;
+        const url = `${this.config.baseURL}/api/widgets/${widgetId}/public`;
+
+        console.log(`[TrestaWidget] Fetching widget data from: ${url}`);
+        console.log(`[TrestaWidget] Using API key: ${this.apiKey?.substring(0, 15)}...`);
 
         try {
-          const response = await this.networkClient.request<WidgetData>(url, {
+          const response = await this.networkClient.request<any>(url, {
             method: 'GET',
             timeout: this.config.timeout,
+            headers: {
+              'Authorization': `Bearer ${this.apiKey}`,
+              'Content-Type': 'application/json',
+            },
           });
 
-          // Handle HTTP status codes
-          return this.handleResponse(response, widgetId);
+          console.log(`[TrestaWidget] Received response:`, response.status);
+
+          // Handle HTTP status codes and transform response
+          const rawData = this.handleResponse(response, widgetId);
+
+          // Transform the API response to match WidgetData interface
+          return this.transformApiResponse(rawData);
         } catch (error) {
           // Re-throw WidgetErrors as-is
           if (error instanceof WidgetError) {
@@ -79,6 +102,80 @@ export class APIClient {
       },
       { maxRetries: this.config.maxRetries }
     );
+  }
+
+  /**
+   * Transform API response to WidgetData format
+   */
+  private transformApiResponse(apiResponse: any): WidgetData {
+    console.log('[TrestaWidget] Raw API response:', apiResponse);
+    
+    const { data } = apiResponse;
+
+    if (!data || !data.widget) {
+      console.error('[TrestaWidget] Invalid API response structure:', { hasData: !!data, hasWidget: !!(data?.widget) });
+      throw new WidgetError(
+        WidgetErrorCode.PARSE_ERROR,
+        'Invalid API response format',
+        false
+      );
+    }
+
+    console.log('[TrestaWidget] Transforming widget data:', {
+      widgetId: data.widget.id,
+      testimonialCount: data.testimonials?.length || 0,
+    });
+
+    // Transform to WidgetData format
+    return {
+      widgetId: data.widget.id,
+      config: {
+        layout: {
+          type: data.widget.layout || 'grid',
+          maxTestimonials: data.widget.settings?.maxTestimonials,
+          autoRotate: data.widget.settings?.autoRotate,
+          rotateInterval: data.widget.settings?.rotateInterval,
+          showNavigation: true,
+          columns: data.widget.settings?.columns,
+        },
+        theme: {
+          mode: data.widget.settings?.theme || 'light',
+          primaryColor: data.widget.theme?.primaryColor || '#0066FF',
+          secondaryColor: data.widget.theme?.secondaryColor || '#00CC99',
+          fontFamily: data.widget.settings?.fontFamily,
+          cardStyle: data.widget.settings?.cardStyle || 'default',
+        },
+        display: {
+          showRating: data.widget.settings?.showRating ?? true,
+          showDate: data.widget.settings?.showDate ?? true,
+          showAvatar: data.widget.settings?.showAvatar ?? true,
+          showAuthorRole: data.widget.settings?.showAuthorRole ?? true,
+          showAuthorCompany: data.widget.settings?.showAuthorCompany ?? true,
+          maxTestimonials: data.widget.settings?.maxTestimonials,
+        },
+      },
+      testimonials: (data.testimonials || []).map((t: any) => ({
+        id: t.id,
+        content: t.content,
+        rating: t.rating,
+        createdAt: t.createdAt,
+        isPublished: true,
+        isApproved: true,
+        isOAuthVerified: t.isOAuthVerified || false,
+        oauthProvider: t.oauthProvider,
+        author: {
+          name: t.authorName,
+          email: undefined, // Never expose email
+          avatar: t.authorAvatar,
+          role: t.authorRole,
+          company: t.authorCompany,
+        },
+        media: t.videoUrl ? {
+          type: 'video' as const,
+          url: t.videoUrl,
+        } : undefined,
+      })),
+    };
   }
 
   /**

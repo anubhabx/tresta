@@ -80,26 +80,70 @@ describe('APIClient', () => {
       baseURL: 'https://api.tresta.com',
       timeout: 10000,
       maxRetries: 3,
-    });
+    }, 'test-api-key-123');
     mockRequest = apiClient.getNetworkClient().request as ReturnType<typeof vi.fn>;
   });
 
   describe('fetchWidgetData', () => {
     it('should successfully fetch widget data', async () => {
+      // Mock the new API response format
+      const apiResponse = {
+        success: true,
+        message: 'Widget data fetched successfully',
+        data: {
+          widget: {
+            id: 'test-widget-123',
+            layout: 'grid',
+            theme: {
+              primaryColor: '#007bff',
+              secondaryColor: '#6c757d',
+            },
+            settings: {
+              maxTestimonials: 10,
+              showRating: true,
+              showDate: true,
+              showAvatar: true,
+              showAuthorRole: true,
+              showAuthorCompany: true,
+              theme: 'light',
+              cardStyle: 'default',
+            },
+          },
+          testimonials: [
+            {
+              id: '1',
+              content: 'Great product!',
+              rating: 5,
+              createdAt: '2025-01-01T00:00:00Z',
+              isOAuthVerified: true,
+              oauthProvider: 'google',
+              authorName: 'John Doe',
+              authorAvatar: 'https://example.com/avatar.jpg',
+              authorRole: 'CEO',
+              authorCompany: 'Acme Inc',
+            },
+          ],
+        },
+      };
+
       mockRequest.mockResolvedValue({
-        data: mockWidgetData,
+        data: apiResponse,
         status: 200,
         headers: new Headers(),
       });
 
       const result = await apiClient.fetchWidgetData('test-widget-123');
 
-      expect(result).toEqual(mockWidgetData);
+      expect(result.widgetId).toBe('test-widget-123');
+      expect(result.testimonials).toHaveLength(1);
       expect(mockRequest).toHaveBeenCalledWith(
-        'https://api.tresta.com/api/widget/test-widget-123/data',
+        'https://api.tresta.com/api/widgets/test-widget-123/public',
         expect.objectContaining({
           method: 'GET',
           timeout: 10000,
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer test-api-key-123',
+          }),
         })
       );
     });

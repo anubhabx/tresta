@@ -4,6 +4,7 @@
 
 export interface WidgetConfig {
   widgetId: string;
+  apiKey: string;
   container?: string | HTMLElement;
   debug?: boolean;
   telemetry?: boolean;
@@ -11,6 +12,7 @@ export interface WidgetConfig {
   theme?: ThemeConfig;
   errorMessage?: string;
   emptyMessage?: string;
+  apiUrl?: string;
 }
 
 export interface WidgetInstance {

@@ -5,11 +5,31 @@
 import baseStyles from './base.css?inline';
 import testimonialCardStyles from '../components/testimonial-card.css?inline';
 import errorStateStyles from '../components/error-state.css?inline';
+import listStyles from '../layouts/list.css?inline';
+import gridStyles from '../layouts/grid.css?inline';
+import masonryStyles from '../layouts/masonry.css?inline';
+import wallStyles from '../layouts/wall.css?inline';
 import carouselStyles from '../layouts/carousel.css?inline';
 import { ThemeManager, type ThemeManagerConfig } from './theme-manager';
 
 // Combine all styles
-const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}\n\n${errorStateStyles}\n\n${carouselStyles}`.trim();
+const BASE_STYLES = `
+${baseStyles}
+
+${testimonialCardStyles}
+
+${errorStateStyles}
+
+${listStyles}
+
+${gridStyles}
+
+${masonryStyles}
+
+${wallStyles}
+
+${carouselStyles}
+`.trim();
 
 export interface StyleManagerConfig {
   useShadowDOM?: boolean;
