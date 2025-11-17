@@ -1,37 +1,26 @@
 {
   "name": "@workspace/widget",
+  "private": true,
   "version": "1.0.0",
-  "description": "Tresta embeddable testimonial widget - standalone CDN library",
   "type": "module",
-  "main": "./dist/tresta-widget.js",
-  "module": "./dist/tresta-widget.esm.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --mode production",
-    "build:dev": "tsc && vite build --mode development",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "demo": "vite preview --port 8080 ./demo.html",
-    "type-check": "tsc --noEmit"
-  },
-  "keywords": [
-    "testimonials",
-    "widget",
-    "embed",
-    "reviews",
-    "social-proof"
-  ],
-  "author": "Tresta",
-  "license": "MIT",
-  "dependencies": {
-    "@workspace/types": "workspace:*"
+    "check-budgets": "node scripts/check-bundle-budgets.js",
+    "analyze": "vite build --mode analyze",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "devDependencies": {
-    "terser": "^5.44.0",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.11"
+    "@types/node": "^24.10.0",
+    "@vitest/ui": "^4.0.10",
+    "jsdom": "^27.2.0",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.2",
+    "vite-plugin-compression": "^0.5.1",
+    "vitest": "^4.0.10"
   }
 }

@@ -69,3 +69,5 @@ packages/widget/dist
 packages/widget/.env
 
 .kiro
+
+packages/design

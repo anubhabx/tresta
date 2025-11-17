@@ -1,0 +1,60 @@
+/**
+ * Base styles for Tresta Widget
+ * These styles are scoped to the widget and won't affect the host page
+ */
+
+:root {
+  /* Theme variables */
+  --tresta-primary-color: #3b82f6;
+  --tresta-secondary-color: #64748b;
+  --tresta-text-color: #1e293b;
+  --tresta-bg-color: #ffffff;
+  --tresta-border-color: #e2e8f0;
+  --tresta-border-radius: 8px;
+  --tresta-spacing: 16px;
+  --tresta-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+[data-tresta-widget] {
+  font-family: var(--tresta-font-family);
+  color: var(--tresta-text-color);
+  box-sizing: border-box;
+}
+
+[data-tresta-widget] *,
+[data-tresta-widget] *::before,
+[data-tresta-widget] *::after {
+  box-sizing: border-box;
+}
+
+/* Reset styles to prevent host page interference */
+[data-tresta-widget] {
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+[data-tresta-widget] p,
+[data-tresta-widget] h1,
+[data-tresta-widget] h2,
+[data-tresta-widget] h3,
+[data-tresta-widget] h4,
+[data-tresta-widget] h5,
+[data-tresta-widget] h6 {
+  margin: 0;
+  padding: 0;
+}
+
+[data-tresta-widget] button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+[data-tresta-widget] img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
