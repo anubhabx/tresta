@@ -735,6 +735,396 @@ describe('Widget', () => {
     });
   });
 
+  describe('maxTestimonials Limiting', () => {
+    it('should limit testimonials based on layoutConfig.maxTestimonials', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: true,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list', maxTestimonials: 3 },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Testimonial 1',
+            rating: 5,
+            createdAt: '2025-01-01T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 1' },
+          },
+          {
+            id: '2',
+            content: 'Testimonial 2',
+            rating: 5,
+            createdAt: '2025-01-02T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 2' },
+          },
+          {
+            id: '3',
+            content: 'Testimonial 3',
+            rating: 5,
+            createdAt: '2025-01-03T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 3' },
+          },
+          {
+            id: '4',
+            content: 'Testimonial 4',
+            rating: 5,
+            createdAt: '2025-01-04T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 4' },
+          },
+          {
+            id: '5',
+            content: 'Testimonial 5',
+            rating: 5,
+            createdAt: '2025-01-05T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 5' },
+          },
+        ],
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      const consoleSpy = vi.spyOn(console, 'log');
+
+      await widget.mount(container);
+
+      // Check that debug log shows limiting
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Rendering 3 testimonials (limited from 5)')
+      );
+
+      // Check that only 3 testimonials are rendered
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      expect(items?.length).toBe(3);
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should limit testimonials based on displayOptions.maxTestimonials', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { 
+            showRating: true, 
+            showDate: true, 
+            showAvatar: true, 
+            showAuthorRole: true, 
+            showAuthorCompany: true,
+            maxTestimonials: 2,
+          },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Testimonial 1',
+            rating: 5,
+            createdAt: '2025-01-01T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 1' },
+          },
+          {
+            id: '2',
+            content: 'Testimonial 2',
+            rating: 5,
+            createdAt: '2025-01-02T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 2' },
+          },
+          {
+            id: '3',
+            content: 'Testimonial 3',
+            rating: 5,
+            createdAt: '2025-01-03T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 3' },
+          },
+        ],
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      await widget.mount(container);
+
+      // Check that only 2 testimonials are rendered
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      expect(items?.length).toBe(2);
+    });
+
+    it('should prioritize layoutConfig.maxTestimonials over displayOptions.maxTestimonials', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list', maxTestimonials: 1 },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { 
+            showRating: true, 
+            showDate: true, 
+            showAvatar: true, 
+            showAuthorRole: true, 
+            showAuthorCompany: true,
+            maxTestimonials: 5,
+          },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Testimonial 1',
+            rating: 5,
+            createdAt: '2025-01-01T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 1' },
+          },
+          {
+            id: '2',
+            content: 'Testimonial 2',
+            rating: 5,
+            createdAt: '2025-01-02T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 2' },
+          },
+          {
+            id: '3',
+            content: 'Testimonial 3',
+            rating: 5,
+            createdAt: '2025-01-03T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 3' },
+          },
+        ],
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      await widget.mount(container);
+
+      // Should use layoutConfig.maxTestimonials (1) instead of displayOptions.maxTestimonials (5)
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      expect(items?.length).toBe(1);
+    });
+
+    it('should prioritize most recent testimonials when limiting', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list', maxTestimonials: 2 },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Oldest',
+            rating: 5,
+            createdAt: '2025-01-01T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 1' },
+          },
+          {
+            id: '2',
+            content: 'Middle',
+            rating: 5,
+            createdAt: '2025-01-02T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 2' },
+          },
+          {
+            id: '3',
+            content: 'Most Recent',
+            rating: 5,
+            createdAt: '2025-01-03T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 3' },
+          },
+        ],
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      
+      // Should render the 2 most recent testimonials
+      expect(items?.length).toBe(2);
+      
+      // Check that the most recent testimonials are rendered
+      const firstCard = items?.[0]?.querySelector('.tresta-testimonial-card');
+      const secondCard = items?.[1]?.querySelector('.tresta-testimonial-card');
+      
+      expect(firstCard?.textContent).toContain('Most Recent');
+      expect(secondCard?.textContent).toContain('Middle');
+    });
+
+    it('should handle fewer testimonials than limit gracefully', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list', maxTestimonials: 10 },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials: [
+          {
+            id: '1',
+            content: 'Testimonial 1',
+            rating: 5,
+            createdAt: '2025-01-01T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 1' },
+          },
+          {
+            id: '2',
+            content: 'Testimonial 2',
+            rating: 5,
+            createdAt: '2025-01-02T00:00:00Z',
+            isPublished: true,
+            isApproved: true,
+            isOAuthVerified: false,
+            author: { name: 'User 2' },
+          },
+        ],
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      await widget.mount(container);
+
+      // Should render all 2 testimonials (not throw error)
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      expect(items?.length).toBe(2);
+    });
+
+    it('should default to 100 testimonials when maxTestimonials is not specified', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      
+      // Create 150 testimonials
+      const testimonials = Array.from({ length: 150 }, (_, i) => ({
+        id: `${i + 1}`,
+        content: `Testimonial ${i + 1}`,
+        rating: 5,
+        createdAt: `2025-01-01T${String(i % 24).padStart(2, '0')}:${String(i % 60).padStart(2, '0')}:00Z`,
+        isPublished: true,
+        isApproved: true,
+        isOAuthVerified: false,
+        author: { name: `User ${i + 1}` },
+      }));
+
+      const apiData = {
+        widgetId: 'test-123',
+        config: {
+          layout: { type: 'list' },
+          theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
+          display: { showRating: true, showDate: true, showAvatar: true, showAuthorRole: true, showAuthorCompany: true },
+        },
+        testimonials,
+      };
+
+      const apiClient = (widget as any).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
+
+      await widget.mount(container);
+
+      // Should render only 100 testimonials (default limit)
+      const contentRoot = widget.getContentRoot();
+      const items = contentRoot?.querySelectorAll('.tresta-list-item');
+      expect(items?.length).toBe(100);
+    });
+  });
+
   describe('Cache Fallback', () => {
     it('should use cached data when API fails', async () => {
       const config: WidgetConfig = {

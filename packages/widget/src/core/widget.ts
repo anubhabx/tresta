@@ -10,6 +10,7 @@ import { StorageManager } from '../storage/cache-manager';
 import { createErrorState, createEmptyState } from '../components/error-state';
 import { TelemetryTracker } from '../telemetry';
 import { LayoutEngine } from '../layouts';
+import { limitTestimonials } from '../utils/testimonial-limiter';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -262,8 +263,13 @@ export class Widget implements WidgetInstance {
       return;
     }
 
+    // Apply maxTestimonials limit before rendering
+    // Check both layoutConfig and displayOptions for maxTestimonials
+    const maxTestimonials = data.config.layout.maxTestimonials ?? data.config.display.maxTestimonials;
+    const limitedTestimonials = limitTestimonials(data.testimonials, maxTestimonials);
+
     if (this.config.debug) {
-      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Rendering ${data.testimonials.length} testimonials with layout: ${data.config.layout.type}`);
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Rendering ${limitedTestimonials.length} testimonials (limited from ${data.testimonials.length}) with layout: ${data.config.layout.type}`);
     }
 
     // Clean up previous layout if exists
@@ -272,9 +278,9 @@ export class Widget implements WidgetInstance {
       this.currentLayout = null;
     }
 
-    // Use LayoutEngine to render the testimonials
+    // Use LayoutEngine to render the limited testimonials
     const layout = LayoutEngine.create({
-      testimonials: data.testimonials,
+      testimonials: limitedTestimonials,
       layoutConfig: data.config.layout,
       displayOptions: data.config.display,
       theme: data.config.theme,
