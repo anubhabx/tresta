@@ -8,6 +8,7 @@ import { StyleManager } from '../styles/style-manager';
 import { APIClient } from '../api/client';
 import { StorageManager } from '../storage/cache-manager';
 import { createErrorState, createEmptyState } from '../components/error-state';
+import { TelemetryTracker } from '../telemetry';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -22,6 +23,7 @@ export class Widget implements WidgetInstance {
   private eventListeners: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
   private apiClient: APIClient;
   private storageManager: StorageManager;
+  private telemetryTracker: TelemetryTracker;
 
   constructor(config: WidgetConfig) {
     this.config = config;
@@ -36,13 +38,26 @@ export class Widget implements WidgetInstance {
     this.apiClient = new APIClient();
     this.storageManager = new StorageManager();
 
+    // Initialize telemetry tracker
+    this.telemetryTracker = new TelemetryTracker(
+      config.widgetId,
+      config.version || '1.0.0',
+      {
+        enabled: config.telemetry !== false,
+      }
+    );
+
     if (this.config.debug) {
       console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Initialized with config:`, config);
+      console.log(`[TrestaWidget v${this.config.version || '1.0.0'}] Telemetry enabled:`, this.telemetryTracker.isEnabled());
     }
   }
 
   async mount(container: HTMLElement): Promise<void> {
     try {
+      // Start telemetry load tracking
+      this.telemetryTracker.startLoadTracking();
+
       // Check if widget is already mounted in this container
       if (widgetInstances.has(container)) {
         const existingWidget = widgetInstances.get(container);
@@ -84,6 +99,13 @@ export class Widget implements WidgetInstance {
       this.state.loading = false;
       this.state.error = error as Error;
       
+      // Track error in telemetry
+      if (error instanceof WidgetError) {
+        this.telemetryTracker.trackError(error.code);
+      } else {
+        this.telemetryTracker.trackError('MOUNT_ERROR');
+      }
+      
       // Log error with widget ID and version
       this.logError('Mount failed', error);
       
@@ -109,9 +131,19 @@ export class Widget implements WidgetInstance {
       // Render the widget content
       this.renderContent(data);
       
+      // Track successful load with layout type
+      this.telemetryTracker.trackLoad(data.config?.layout?.type);
+      
     } catch (error) {
       this.state.loading = false;
       this.state.error = error as Error;
+      
+      // Track error in telemetry
+      if (error instanceof WidgetError) {
+        this.telemetryTracker.trackError(error.code);
+      } else {
+        this.telemetryTracker.trackError('FETCH_ERROR');
+      }
       
       // Log error with widget ID and version
       this.logError('Failed to fetch widget data', error);
@@ -355,5 +387,12 @@ export class Widget implements WidgetInstance {
    */
   getContentRoot(): HTMLElement | null {
     return this.contentRoot;
+  }
+
+  /**
+   * Get the telemetry tracker (for testing and debugging)
+   */
+  getTelemetryTracker(): TelemetryTracker {
+    return this.telemetryTracker;
   }
 }
