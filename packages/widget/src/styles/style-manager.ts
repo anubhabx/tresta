@@ -2,108 +2,11 @@
  * Style Manager - Handles Shadow DOM and CSS isolation
  */
 
-// Base styles as a constant (will be replaced by Vite in production with actual CSS file)
-const BASE_STYLES = `
-:root {
-  --tresta-primary-color: #3b82f6;
-  --tresta-secondary-color: #64748b;
-  --tresta-text-color: #1e293b;
-  --tresta-bg-color: #ffffff;
-  --tresta-border-color: #e2e8f0;
-  --tresta-border-radius: 8px;
-  --tresta-spacing: 16px;
-  --tresta-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --tresta-theme-bg: #ffffff;
-  --tresta-theme-text: #1e293b;
-  --tresta-theme-border: #e2e8f0;
-}
+import baseStyles from './base.css?inline';
+import testimonialCardStyles from '../components/testimonial-card.css?inline';
 
-:root[data-theme="dark"] {
-  --tresta-theme-bg: #1e293b;
-  --tresta-theme-text: #f1f5f9;
-  --tresta-theme-border: #334155;
-}
-
-[data-tresta-widget] {
-  font-family: var(--tresta-font-family);
-  color: var(--tresta-text-color);
-  background-color: var(--tresta-bg-color);
-  box-sizing: border-box;
-  line-height: 1.5;
-  font-size: 16px;
-  all: revert;
-  display: block;
-}
-
-[data-tresta-widget] *,
-[data-tresta-widget] *::before,
-[data-tresta-widget] *::after {
-  box-sizing: border-box;
-}
-
-[data-tresta-widget] p,
-[data-tresta-widget] h1,
-[data-tresta-widget] h2,
-[data-tresta-widget] h3,
-[data-tresta-widget] h4,
-[data-tresta-widget] h5,
-[data-tresta-widget] h6 {
-  margin: 0;
-  padding: 0;
-  font-weight: normal;
-}
-
-[data-tresta-widget] button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  color: inherit;
-}
-
-[data-tresta-widget] img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border: none;
-}
-
-[data-tresta-widget] a {
-  color: var(--tresta-primary-color);
-  text-decoration: none;
-}
-
-[data-tresta-widget] a:hover {
-  text-decoration: underline;
-}
-
-[data-tresta-widget] .widget-container {
-  padding: var(--tresta-spacing);
-  border: 2px solid var(--tresta-border-color);
-  border-radius: var(--tresta-border-radius);
-  background-color: var(--tresta-bg-color);
-}
-
-[data-tresta-widget] .widget-loading {
-  text-align: center;
-  color: var(--tresta-secondary-color);
-  padding: var(--tresta-spacing);
-}
-
-[data-tresta-widget] .widget-error {
-  text-align: center;
-  color: #dc2626;
-  padding: var(--tresta-spacing);
-}
-
-[data-tresta-widget] .widget-empty {
-  text-align: center;
-  color: var(--tresta-secondary-color);
-  padding: var(--tresta-spacing);
-}
-`.trim();
+// Combine all styles
+const BASE_STYLES = `${baseStyles}\n\n${testimonialCardStyles}`.trim();
 
 export interface StyleManagerConfig {
   useShadowDOM?: boolean;

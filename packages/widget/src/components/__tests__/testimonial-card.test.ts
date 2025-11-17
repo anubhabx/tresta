@@ -145,10 +145,16 @@ describe('TestimonialCard', () => {
     });
 
     it('should not render avatar when avatar URL is missing', () => {
-      mockTestimonial.author.avatar = undefined;
+      const testimonialWithoutAvatar = {
+        ...mockTestimonial,
+        author: {
+          ...mockTestimonial.author,
+          avatar: undefined
+        }
+      };
 
       const card = new TestimonialCard({
-        testimonial: mockTestimonial,
+        testimonial: testimonialWithoutAvatar,
         displayOptions: mockDisplayOptions,
         theme: mockTheme
       });
