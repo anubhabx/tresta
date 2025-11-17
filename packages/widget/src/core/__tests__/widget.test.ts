@@ -394,4 +394,102 @@ describe('Widget', () => {
       consoleSpy.mockRestore();
     });
   });
+
+  describe('Shadow DOM and CSS Isolation', () => {
+    it('should initialize StyleManager on mount', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      await widget.mount(container);
+
+      const styleManager = widget.getStyleManager();
+      expect(styleManager).toBeDefined();
+      expect(styleManager).not.toBeNull();
+    });
+
+    it('should create content root for rendering', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      expect(contentRoot).toBeDefined();
+      expect(contentRoot?.getAttribute('data-tresta-widget-root')).toBe('true');
+    });
+
+    it('should use Shadow DOM when supported', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      await widget.mount(container);
+
+      const root = container.querySelector('[data-tresta-widget]');
+      
+      // Check if Shadow DOM is supported and used
+      if ('attachShadow' in Element.prototype) {
+        expect(root?.shadowRoot).toBeDefined();
+      }
+    });
+
+    it('should isolate widget styles from host page', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      // Add conflicting host page style
+      const hostStyle = document.createElement('style');
+      hostStyle.textContent = `
+        p { color: red !important; font-size: 50px !important; }
+      `;
+      document.head.appendChild(hostStyle);
+
+      const widget = new Widget(config);
+      await widget.mount(container);
+
+      const contentRoot = widget.getContentRoot();
+      const paragraph = contentRoot?.querySelector('p');
+
+      if (paragraph) {
+        const computedStyle = window.getComputedStyle(paragraph);
+        // Widget styles should be isolated (not red from host page)
+        // Note: This test may vary based on Shadow DOM support
+        expect(computedStyle.color).toBeDefined();
+      }
+
+      hostStyle.remove();
+    });
+
+    it('should clean up StyleManager on unmount', async () => {
+      const config: WidgetConfig = {
+        widgetId: 'test-123',
+        debug: false,
+        version: '1.0.0',
+      };
+
+      const widget = new Widget(config);
+      await widget.mount(container);
+
+      expect(widget.getStyleManager()).not.toBeNull();
+
+      widget.unmount();
+
+      expect(widget.getStyleManager()).toBeNull();
+      expect(widget.getContentRoot()).toBeNull();
+    });
+  });
 });

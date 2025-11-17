@@ -1,10 +1,11 @@
 /**
  * Base styles for Tresta Widget
  * These styles are scoped to the widget and won't affect the host page
+ * Works in both Shadow DOM and namespaced CSS modes
  */
 
 :root {
-  /* Theme variables */
+  /* Theme variables - CSS custom properties for theming */
   --tresta-primary-color: #3b82f6;
   --tresta-secondary-color: #64748b;
   --tresta-text-color: #1e293b;
@@ -13,12 +14,32 @@
   --tresta-border-radius: 8px;
   --tresta-spacing: 16px;
   --tresta-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Light theme (default) */
+  --tresta-theme-bg: #ffffff;
+  --tresta-theme-text: #1e293b;
+  --tresta-theme-border: #e2e8f0;
 }
 
+/* Dark theme support */
+:root[data-theme="dark"] {
+  --tresta-theme-bg: #1e293b;
+  --tresta-theme-text: #f1f5f9;
+  --tresta-theme-border: #334155;
+}
+
+/* Base widget styles */
 [data-tresta-widget] {
   font-family: var(--tresta-font-family);
   color: var(--tresta-text-color);
+  background-color: var(--tresta-bg-color);
   box-sizing: border-box;
+  line-height: 1.5;
+  font-size: 16px;
+  
+  /* Ensure isolation from host page */
+  all: revert;
+  display: block;
 }
 
 [data-tresta-widget] *,
@@ -28,11 +49,6 @@
 }
 
 /* Reset styles to prevent host page interference */
-[data-tresta-widget] {
-  line-height: 1.5;
-  font-size: 16px;
-}
-
 [data-tresta-widget] p,
 [data-tresta-widget] h1,
 [data-tresta-widget] h2,
@@ -42,6 +58,7 @@
 [data-tresta-widget] h6 {
   margin: 0;
   padding: 0;
+  font-weight: normal;
 }
 
 [data-tresta-widget] button {
@@ -51,10 +68,47 @@
   background: none;
   padding: 0;
   margin: 0;
+  color: inherit;
 }
 
 [data-tresta-widget] img {
   max-width: 100%;
   height: auto;
   display: block;
+  border: none;
+}
+
+[data-tresta-widget] a {
+  color: var(--tresta-primary-color);
+  text-decoration: none;
+}
+
+[data-tresta-widget] a:hover {
+  text-decoration: underline;
+}
+
+/* Widget container styles */
+[data-tresta-widget] .widget-container {
+  padding: var(--tresta-spacing);
+  border: 2px solid var(--tresta-border-color);
+  border-radius: var(--tresta-border-radius);
+  background-color: var(--tresta-bg-color);
+}
+
+[data-tresta-widget] .widget-loading {
+  text-align: center;
+  color: var(--tresta-secondary-color);
+  padding: var(--tresta-spacing);
+}
+
+[data-tresta-widget] .widget-error {
+  text-align: center;
+  color: #dc2626;
+  padding: var(--tresta-spacing);
+}
+
+[data-tresta-widget] .widget-empty {
+  text-align: center;
+  color: var(--tresta-secondary-color);
+  padding: var(--tresta-spacing);
 }

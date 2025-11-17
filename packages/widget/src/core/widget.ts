@@ -3,6 +3,7 @@
  */
 
 import type { WidgetConfig, WidgetInstance, WidgetState } from '../types';
+import { StyleManager } from '../styles/style-manager';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -12,6 +13,8 @@ export class Widget implements WidgetInstance {
   private state: WidgetState;
   private container: HTMLElement | null = null;
   private root: HTMLElement | null = null;
+  private styleManager: StyleManager | null = null;
+  private contentRoot: HTMLElement | null = null;
   private eventListeners: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
 
   constructor(config: WidgetConfig) {
@@ -48,14 +51,15 @@ export class Widget implements WidgetInstance {
       this.root.setAttribute('data-tresta-widget', this.config.widgetId);
       this.root.setAttribute('data-version', this.config.version || '1.0.0');
       this.root.setAttribute('data-instance-id', this.generateInstanceId());
-      
-      // Placeholder content for now
-      this.root.innerHTML = `
-        <div style="padding: 20px; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center;">
-          <p style="margin: 0; color: #64748b;">Tresta Widget (widgetId: ${this.config.widgetId})</p>
-          <p style="margin: 8px 0 0; font-size: 14px; color: #94a3b8;">Loading testimonials...</p>
-        </div>
-      `;
+
+      // Initialize style manager and get content root
+      this.styleManager = new StyleManager({
+        debug: this.config.debug,
+      });
+      this.contentRoot = this.styleManager.initializeStyles(this.root);
+
+      // Render content into the isolated root
+      this.renderContent();
 
       container.appendChild(this.root);
 
@@ -75,10 +79,37 @@ export class Widget implements WidgetInstance {
     }
   }
 
+  /**
+   * Render widget content
+   */
+  private renderContent(): void {
+    if (!this.contentRoot) return;
+
+    // Create content wrapper with proper attributes
+    const wrapper = document.createElement('div');
+    wrapper.setAttribute('data-tresta-widget', this.config.widgetId);
+    
+    // Placeholder content for now
+    wrapper.innerHTML = `
+      <div class="widget-container">
+        <p style="margin: 0; color: var(--tresta-secondary-color);">Tresta Widget (widgetId: ${this.config.widgetId})</p>
+        <p style="margin: 8px 0 0; font-size: 14px; color: var(--tresta-secondary-color);">Loading testimonials...</p>
+      </div>
+    `;
+
+    this.contentRoot.appendChild(wrapper);
+  }
+
   unmount(): void {
     try {
       // Remove all event listeners
       this.cleanupEventListeners();
+
+      // Clean up style manager
+      if (this.styleManager) {
+        this.styleManager.cleanup();
+        this.styleManager = null;
+      }
 
       // Remove widget root from DOM
       if (this.root && this.root.parentNode) {
@@ -93,6 +124,7 @@ export class Widget implements WidgetInstance {
 
       this.state.mounted = false;
       this.container = null;
+      this.contentRoot = null;
       
       if (this.config.debug) {
         console.log(`[TrestaWidget] Unmounted successfully`);
@@ -135,5 +167,19 @@ export class Widget implements WidgetInstance {
    */
   static getInstance(container: HTMLElement): Widget | undefined {
     return widgetInstances.get(container);
+  }
+
+  /**
+   * Get the style manager (for testing)
+   */
+  getStyleManager(): StyleManager | null {
+    return this.styleManager;
+  }
+
+  /**
+   * Get the content root element (for testing)
+   */
+  getContentRoot(): HTMLElement | null {
+    return this.contentRoot;
   }
 }
