@@ -29,12 +29,14 @@ Implemented 5 endpoints:
 - `getPerformanceAlerts`: Get active/resolved alerts
 - `resolvePerformanceAlert`: Mark alert as resolved
 
-#### Routes: `apps/api/src/routes/widget-analytics.route.ts`
-- POST `/api/widget-analytics/track` - Public telemetry
-- GET `/api/widget-analytics/:widgetId` - Analytics data
-- GET `/api/widget-analytics/:widgetId/realtime` - Real-time monitoring
-- GET `/api/widget-analytics/:widgetId/alerts` - Performance alerts
-- PATCH `/api/widget-analytics/alerts/:alertId/resolve` - Resolve alert
+#### Routes
+- `apps/api/src/routes/widget-analytics.route.ts`
+	- POST `/api/widget-analytics/track` - Public telemetry
+- `apps/api/src/routes/admin/widgets.route.ts`
+	- GET `/admin/widgets/:widgetId/analytics` - Analytics data (admin UI)
+	- GET `/admin/widgets/:widgetId/realtime` - Real-time monitoring (admin UI)
+	- GET `/admin/widgets/:widgetId/alerts` - Performance alerts (admin UI)
+	- PATCH `/admin/widgets/alerts/:alertId/resolve` - Resolve alert (admin UI)
 
 #### Service: `apps/api/src/services/widget-analytics.service.ts`
 Background services:

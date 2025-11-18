@@ -106,17 +106,17 @@ export function EmbedCodeDialog({
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const widgetScriptUrl = `${apiUrl}/widget/tresta-widget.js`;
-  const iframeUrl = `${apiUrl}/api/public/embed/${widgetId}`;
-  const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
-
   const apiKeyPlaceholder = "YOUR_API_KEY_HERE";
   const displayApiKey = apiKey || apiKeyPlaceholder;
+  const iframeUrl = `${apiUrl}/api/public/embed/${widgetId}?apiKey=${displayApiKey}`;
+  const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 
   const embedCodes = {
     script: `<!-- Tresta Widget -->
 <script 
   src="${widgetScriptUrl}" 
-  data-tresta-widget="${widgetId}" 
+    data-widget-id="${widgetId}"
+    data-tresta-widget="${widgetId}" 
   data-api-url="${apiUrl}"
   data-api-key="${displayApiKey}">
 </script>`,
@@ -138,6 +138,7 @@ function TestimonialWidget() {
     // Load widget script
     const script = document.createElement('script');
     script.src = '${widgetScriptUrl}';
+    script.setAttribute('data-widget-id', '${widgetId}');
     script.setAttribute('data-tresta-widget', '${widgetId}');
     script.setAttribute('data-api-key', '${displayApiKey}');
     document.body.appendChild(script);

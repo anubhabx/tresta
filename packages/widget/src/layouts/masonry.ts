@@ -17,6 +17,7 @@ export interface MasonryConfig {
 }
 
 export class Masonry {
+  private static readonly GRID_ROW_UNIT = 10;
   private testimonials: Testimonial[];
   private layoutConfig: LayoutConfig;
   private displayOptions: DisplayOptions;
@@ -58,6 +59,7 @@ export class Masonry {
     this.testimonials.forEach((testimonial) => {
       const item = this.renderItem(testimonial);
       masonry.appendChild(item);
+      this.queueSpanCalculation(item);
     });
 
     this.container = masonry;
@@ -102,12 +104,7 @@ export class Masonry {
     this.resizeObserver = new ResizeObserver((entries) => {
       entries.forEach((entry) => {
         const item = entry.target as HTMLElement;
-        const height = entry.contentRect.height;
-        
-        // Calculate grid row span based on item height
-        // Each row is approximately 10px, so we calculate how many rows this item needs
-        const rowSpan = Math.ceil(height / 10);
-        item.style.gridRowEnd = `span ${rowSpan}`;
+        this.applyRowSpan(item, entry.contentRect.height);
       });
     });
 
@@ -116,6 +113,36 @@ export class Masonry {
     items.forEach((item) => {
       this.resizeObserver!.observe(item);
     });
+  }
+
+  /**
+   * Sets grid row span based on measured height
+   */
+  private applyRowSpan(item: HTMLElement, measuredHeight?: number): void {
+    const height = measuredHeight ?? item.getBoundingClientRect().height;
+
+    if (!height || Number.isNaN(height)) {
+      return;
+    }
+
+    const rowSpan = Math.max(
+      1,
+      Math.ceil(height / Masonry.GRID_ROW_UNIT)
+    );
+
+    item.style.gridRowEnd = `span ${rowSpan}`;
+  }
+
+  /**
+   * Ensures span calculation runs even when ResizeObserver is unavailable
+   */
+  private queueSpanCalculation(item: HTMLElement): void {
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => this.applyRowSpan(item));
+      return;
+    }
+
+    setTimeout(() => this.applyRowSpan(item), 0);
   }
 
   /**

@@ -5,8 +5,15 @@
 import type { WidgetConfig, ThemeConfig } from '../types';
 import { ThemeManager } from '../styles/theme-manager';
 
+function getWidgetId(element: HTMLElement): string | null {
+  return (
+    element.getAttribute('data-widget-id') ||
+    element.getAttribute('data-tresta-widget')
+  );
+}
+
 export function parseWidgetConfig(element: HTMLElement): Partial<WidgetConfig> {
-  const widgetId = element.getAttribute('data-widget-id');
+  const widgetId = getWidgetId(element);
   const apiKey = element.getAttribute('data-api-key');
   const version = element.getAttribute('data-version');
   const apiUrl = element.getAttribute('data-api-url');

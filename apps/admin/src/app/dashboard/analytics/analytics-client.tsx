@@ -62,7 +62,7 @@ export function AnalyticsClient() {
 
     try {
       const response = await apiClient.get(
-        `/api/widget-analytics/${selectedWidgetId}?days=${selectedDays}`
+        `/admin/widgets/${selectedWidgetId}/analytics?days=${selectedDays}`
       );
       setAnalyticsData(response.data.data);
     } catch (err: any) {

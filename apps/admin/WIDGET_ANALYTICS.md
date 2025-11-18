@@ -76,7 +76,7 @@ Records widget load events. No authentication required.
 
 ### Get Widget Analytics (Protected)
 ```
-GET /api/widget-analytics/:widgetId?days=30
+GET /admin/widgets/:widgetId/analytics?days=30
 ```
 Retrieves analytics data for a specific widget.
 
@@ -119,13 +119,13 @@ Retrieves analytics data for a specific widget.
 
 ### Get Real-Time Analytics (Protected)
 ```
-GET /api/widget-analytics/:widgetId/realtime
+GET /admin/widgets/:widgetId/realtime
 ```
 Retrieves real-time analytics for the last 5 minutes.
 
 ### Get Performance Alerts (Protected)
 ```
-GET /api/widget-analytics/:widgetId/alerts?resolved=false
+GET /admin/widgets/:widgetId/alerts?resolved=false
 ```
 Retrieves performance alerts for a widget.
 
@@ -134,7 +134,7 @@ Retrieves performance alerts for a widget.
 
 ### Resolve Performance Alert (Protected)
 ```
-PATCH /api/widget-analytics/alerts/:alertId/resolve
+PATCH /admin/widgets/alerts/:alertId/resolve
 ```
 Marks a performance alert as resolved.
 

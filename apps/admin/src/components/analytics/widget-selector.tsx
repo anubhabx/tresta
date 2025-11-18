@@ -38,7 +38,7 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
           projectsData.map(async (project: any) => {
             try {
               const widgetsResponse = await apiClient.get(
-                `/api/widgets/${project.slug}`
+                `/api/widgets/project/${project.slug}`
               );
               return {
                 ...project,

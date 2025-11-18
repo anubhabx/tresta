@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'TrestaWidget',
       formats: ['iife'],
-      fileName: () => 'tresta-widget.iife.js',
+      fileName: () => 'tresta-widget.js',
     },
     rollupOptions: {
       output: {

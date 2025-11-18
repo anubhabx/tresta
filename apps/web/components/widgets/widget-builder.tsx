@@ -22,7 +22,7 @@ export function WidgetBuilder({
   projectSlug,
   projectId,
   widgetId,
-  mode,
+  mode
 }: WidgetBuilderProps) {
   const router = useRouter();
 
@@ -43,7 +43,7 @@ export function WidgetBuilder({
     showNavigation: true,
     columns: 3,
     cardStyle: "default",
-    animation: "fade",
+    animation: "fade"
   };
 
   const [previewConfig, setPreviewConfig] =
@@ -82,7 +82,7 @@ export function WidgetBuilder({
         showNavigation: widget.config.showNavigation ?? true,
         columns: widget.config.columns || 3,
         cardStyle: (widget.config.cardStyle as any) || "default",
-        animation: (widget.config.animation as any) || "fade",
+        animation: (widget.config.animation as any) || "fade"
       });
     }
   }, [mode, widget]);
@@ -111,8 +111,8 @@ export function WidgetBuilder({
             showNavigation: data.showNavigation,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation,
-          },
+            animation: data.animation
+          }
         });
         toast.success("Widget created successfully!");
       } else {
@@ -133,8 +133,8 @@ export function WidgetBuilder({
             showNavigation: data.showNavigation,
             columns: data.columns,
             cardStyle: data.cardStyle,
-            animation: data.animation,
-          },
+            animation: data.animation
+          }
         });
         toast.success("Widget updated successfully!");
       }
@@ -178,7 +178,7 @@ export function WidgetBuilder({
       </div>
 
       {/* Split Layout: Form (Left) | Preview (Right) */}
-      <div className="grid space-x-6 space-y-6 grid-cols-1 lg:grid-cols-3">
+      <div className="relative grid space-x-6 lg:gap-6 space-y-6 grid-cols-1 lg:grid-cols-3">
         {/* Left Column: Form */}
         <div className="space-y-6 w-full">
           <div className="rounded-lg border bg-card">
@@ -201,7 +201,7 @@ export function WidgetBuilder({
         </div>
 
         {/* Right Column: Live Preview - Sticky */}
-        <div className="lg:sticky lg:top-6 lg:h-fit col-span-2">
+        <div className="lg:sticky lg:top-6 lg:h-fit lg:col-span-2">
           <div className="rounded-lg border bg-card p-6">
             <WidgetPreview config={previewConfig} widgetId={widgetId} />
           </div>

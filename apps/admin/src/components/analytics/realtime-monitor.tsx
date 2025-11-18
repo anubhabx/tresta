@@ -34,7 +34,7 @@ export function RealtimeMonitor({ widgetId }: RealtimeMonitorProps) {
   const fetchRealtimeData = async () => {
     try {
       const response = await apiClient.get(
-        `/api/widget-analytics/${widgetId}/realtime`
+        `/admin/widgets/${widgetId}/realtime`
       );
       setData(response.data.data);
       setError(null);

@@ -29,7 +29,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
   const fetchAlerts = async () => {
     try {
       const response = await apiClient.get(
-        `/api/widget-analytics/${widgetId}/alerts?resolved=${showResolved}`
+        `/admin/widgets/${widgetId}/alerts?resolved=${showResolved}`
       );
       setAlerts(response.data.data.alerts);
       setError(null);
@@ -42,7 +42,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
 
   const resolveAlert = async (alertId: string) => {
     try {
-      await apiClient.patch(`/api/widget-analytics/alerts/${alertId}/resolve`);
+      await apiClient.patch(`/admin/widgets/alerts/${alertId}/resolve`);
       fetchAlerts();
     } catch (err: any) {
       console.error('Failed to resolve alert:', err);

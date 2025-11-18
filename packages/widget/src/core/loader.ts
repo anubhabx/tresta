@@ -78,8 +78,9 @@ function initializeWidget(script: HTMLScriptElement): void {
  */
 export function autoInitialize(): void {
   try {
-    // Find all script tags with data-widget-id attribute
-    const scripts = document.querySelectorAll('script[data-widget-id]');
+    const scripts = document.querySelectorAll(
+      'script[data-widget-id], script[data-tresta-widget]'
+    );
     
     if (scripts.length === 0) {
       // No widgets to initialize
