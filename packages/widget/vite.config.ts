@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'TrestaWidget',
+      name: 'TrestaWidgetLib',
       formats: ['iife'],
       fileName: () => 'tresta-widget.js',
     },

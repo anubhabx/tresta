@@ -12,7 +12,11 @@ import {
   handlePrismaError
 } from "../lib/errors.ts";
 import { ResponseHandler } from "../lib/response.ts";
-import type { WidgetConfig } from "@workspace/types";
+import {
+  DEFAULT_WIDGET_CONFIG,
+  MVP_WIDGET_CONFIG_FIELDS,
+  type WidgetConfig
+} from "@workspace/types";
 import { validateWidgetConfig } from "../validators/widget.validator.ts";
 import type { WidgetData } from "@/types/api-responses.ts";
 import { validateApiKey } from "../services/api-key.service.ts";
@@ -82,12 +86,14 @@ const createWidget = async (
     }
 
     // Create the widget with validated config
+    const normalizedConfig = normalizeWidgetConfig(validatedConfig);
+
     let widget;
     try {
       widget = await prisma.widget.create({
         data: {
           projectId,
-          config: validatedConfig as any
+          config: normalizedConfig as any
         }
       });
     } catch (error) {
@@ -171,10 +177,15 @@ const updateWidget = async (
     // Update the widget
     let updatedWidget;
     try {
+      const nextConfig = normalizeWidgetConfig({
+        ...(existingWidget.config as WidgetConfig),
+        ...(validatedConfig ?? {})
+      });
+
       updatedWidget = await prisma.widget.update({
         where: { id: widgetId },
         data: {
-          config: (validatedConfig ?? existingWidget.config) as any
+          config: nextConfig as any
         }
       });
     } catch (error) {
@@ -346,45 +357,20 @@ const fetchPublicWidgetData = async (
     });
 
     // Parse widget config (it's stored as JSON)
-    const widgetConfig = widget.config as any;
-
-    console.log(widgetConfig);
-
-    // Use shared default settings
-    const defaultSettings: WidgetConfig = {
-      showRating: true,
-      showDate: true,
-      showAvatar: true,
-      showAuthorRole: true,
-      showAuthorCompany: true,
-      maxTestimonials: 10,
-      autoRotate: false,
-      rotateInterval: 5000,
-      columns: 3,
-      gap: 24,
-      cardStyle: "default",
-      animation: "fade",
-      layout: "grid",
-      theme: "light",
-      primaryColor: "#0066FF",
-      secondaryColor: "#00CC99"
-    };
+    const runtimeConfig = mergeWithWidgetDefaults(widget.config as WidgetConfig);
 
     // Prepare response data - flatten config for widget consumption
     const widgetData = {
       widget: {
         id: widget.id,
-        name: widgetConfig.name || widget.Project.name,
-        type: widgetConfig.type || "testimonial",
-        layout: widgetConfig.layout || "grid",
+        name: widget.Project.name,
+        type: "testimonial",
+        layout: runtimeConfig.layout || "grid",
         theme: {
-          primaryColor:
-            widgetConfig.primaryColor || defaultSettings.primaryColor,
-          secondaryColor:
-            widgetConfig.secondaryColor || defaultSettings.secondaryColor
+          primaryColor: runtimeConfig.primaryColor,
+          secondaryColor: runtimeConfig.secondaryColor
         },
-        // widgetConfig already contains all the settings directly (not nested)
-        settings: { ...defaultSettings, ...widgetConfig }
+        settings: runtimeConfig
       },
       project: {
         name: widget.Project.name,
@@ -519,3 +505,56 @@ export {
   fetchPublicWidgetData,
   renderWidgetPage
 };
+
+const MAX_MVP_TESTIMONIALS = 20;
+const MIN_ROTATE_INTERVAL = 2000;
+const MAX_ROTATE_INTERVAL = 10000;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function mergeWithWidgetDefaults(config?: WidgetConfig | null): WidgetConfig {
+  const merged = {
+    ...DEFAULT_WIDGET_CONFIG,
+    ...(config ?? {})
+  } as WidgetConfig;
+
+  merged.maxTestimonials = clamp(
+    merged.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
+    1,
+    MAX_MVP_TESTIMONIALS
+  );
+
+  merged.rotateInterval = clamp(
+    merged.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
+    MIN_ROTATE_INTERVAL,
+    MAX_ROTATE_INTERVAL
+  );
+
+  if (merged.layout !== "carousel") {
+    merged.autoRotate = false;
+  }
+
+  if (!merged.theme) {
+    merged.theme = DEFAULT_WIDGET_CONFIG.theme;
+  }
+
+  if (!merged.primaryColor) {
+    merged.primaryColor = DEFAULT_WIDGET_CONFIG.primaryColor;
+  }
+
+  if (!merged.secondaryColor) {
+    merged.secondaryColor = DEFAULT_WIDGET_CONFIG.secondaryColor;
+  }
+
+  return merged;
+}
+
+function normalizeWidgetConfig(config?: Partial<WidgetConfig>): WidgetConfig {
+  const merged = mergeWithWidgetDefaults(config as WidgetConfig);
+  return MVP_WIDGET_CONFIG_FIELDS.reduce((acc, key) => {
+    (acc as Record<string, unknown>)[key as string] = merged[key];
+    return acc;
+  }, {} as WidgetConfig);
+}

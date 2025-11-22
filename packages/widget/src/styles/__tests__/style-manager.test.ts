@@ -83,6 +83,19 @@ describe('StyleManager', () => {
 
       consoleSpy.mockRestore();
     });
+
+    it('should apply nonce to Shadow DOM style element when provided', () => {
+      const styleManager = new StyleManager({
+        useShadowDOM: true,
+        nonceApplier: (element) => element.setAttribute('nonce', 'test-nonce'),
+      });
+
+      styleManager.initializeStyles(container);
+
+      const shadowRoot = container.shadowRoot;
+      const styleElement = shadowRoot?.querySelector('style');
+      expect(styleElement?.getAttribute('nonce')).toBe('test-nonce');
+    });
   });
 
   describe('Namespaced CSS Fallback', () => {
@@ -136,6 +149,18 @@ describe('StyleManager', () => {
       );
 
       consoleSpy.mockRestore();
+    });
+
+    it('should apply nonce to global style element when provided', () => {
+      const styleManager = new StyleManager({
+        useShadowDOM: false,
+        nonceApplier: (element) => element.setAttribute('nonce', 'global-nonce'),
+      });
+
+      styleManager.initializeStyles(container);
+
+      const styleElement = document.getElementById('tresta-widget-styles');
+      expect(styleElement?.getAttribute('nonce')).toBe('global-nonce');
     });
   });
 

@@ -1,3 +1,5 @@
+import type { WidgetConfig } from "@workspace/types";
+
 /**
  * API Response Type Definitions
  * Provides TypeScript types for API responses to improve type safety
@@ -292,51 +294,6 @@ export enum WidgetTheme {
   LIGHT = "LIGHT",
   DARK = "DARK",
   AUTO = "AUTO",
-}
-
-export interface WidgetConfig {
-  // Display settings
-  type: WidgetType;
-  theme: WidgetTheme;
-  maxTestimonials?: number; // Maximum number of testimonials to display
-
-  // Layout settings
-  columns?: number; // For grid/masonry layouts (1-4)
-  itemsPerSlide?: number; // For carousel (1-3)
-  gap?: number; // Gap between items in pixels
-
-  // Styling settings
-  backgroundColor?: string;
-  textColor?: string;
-  primaryColor?: string; // For buttons, links, accents
-  borderRadius?: number; // Border radius in pixels
-  cardShadow?: boolean;
-
-  // Content display settings
-  showRating?: boolean;
-  showDate?: boolean;
-  showAuthorPhoto?: boolean;
-  showAuthorName?: boolean;
-  showAuthorEmail?: boolean;
-  excerptLength?: number; // Max characters before "Read more" (0 = full)
-
-  // Behavior settings
-  autoplay?: boolean; // For carousel
-  autoplayInterval?: number; // In milliseconds (carousel)
-  pauseOnHover?: boolean; // For carousel
-  loop?: boolean; // For carousel
-  showNavigation?: boolean; // Show prev/next buttons
-  showPagination?: boolean; // Show dots/pagination
-
-  // Filter settings
-  minRating?: number; // Only show testimonials with rating >= this (1-5)
-  tags?: string[]; // Filter by tags
-  sortBy?: "newest" | "oldest" | "highest_rating" | "random";
-
-  // Advanced settings
-  customCSS?: string; // Custom CSS to inject
-  animation?: "none" | "fade" | "slide" | "scale";
-  animationDuration?: number; // In milliseconds
 }
 
 /**

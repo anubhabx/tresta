@@ -15,6 +15,7 @@ export interface WidgetConfig {
   apiUrl?: string;
   lang?: string; // Language code for localization (e.g., 'en', 'es', 'fr')
   useShadowDOM?: boolean; // Whether to use Shadow DOM for style isolation (default: true)
+  nonce?: string; // CSP nonce propagated from host environments
 }
 
 export interface WidgetInstance {

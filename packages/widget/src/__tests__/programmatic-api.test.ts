@@ -7,6 +7,69 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TrestaWidget } from '../index.js';
 import type { WidgetConfig } from '../types/index.js';
 
+const defaultApiPayload = {
+  data: {
+    widget: {
+      id: 'default-widget',
+      layout: 'grid',
+      settings: {
+        maxTestimonials: 5,
+        showRating: true,
+        showDate: true,
+        showAvatar: true,
+        showAuthorRole: true,
+        showAuthorCompany: true,
+        cardStyle: 'default',
+      },
+      theme: {
+        primaryColor: '#0066FF',
+        secondaryColor: '#00CC99',
+      },
+    },
+    testimonials: [
+      {
+        id: 'testimonial-1',
+        content: 'Great product! Highly recommend.',
+        rating: 5,
+        createdAt: '2024-01-01',
+        authorName: 'Test Author',
+        authorRole: 'Product Manager',
+        authorCompany: 'Acme Co.',
+      },
+    ],
+  },
+};
+
+const createMockHeaders = () =>
+  typeof Headers !== 'undefined'
+    ? new Headers({ 'content-type': 'application/json' })
+    : ({
+        get: (key: string) =>
+          key.toLowerCase() === 'content-type' ? 'application/json' : null,
+      } as Headers);
+
+const clonePayload = <T>(payload: T): T => {
+  const structuredCloneFn = (globalThis as unknown as {
+    structuredClone?: <V>(value: V) => V;
+  }).structuredClone;
+
+  if (typeof structuredCloneFn === 'function') {
+    return structuredCloneFn(payload);
+  }
+
+  return JSON.parse(JSON.stringify(payload));
+};
+
+const createFetchSuccessResponse = () => ({
+  ok: true,
+  status: 200,
+  headers: createMockHeaders(),
+  json: vi.fn().mockResolvedValue(clonePayload(defaultApiPayload)),
+  text: vi.fn().mockResolvedValue(JSON.stringify(defaultApiPayload)),
+});
+
+const originalFetch = globalThis.fetch;
+
 describe('Programmatic API', () => {
   let container1: HTMLElement;
   let container2: HTMLElement;
@@ -20,15 +83,28 @@ describe('Programmatic API', () => {
     container2 = document.createElement('div');
     container2.id = 'test-container-2';
     document.body.appendChild(container2);
+
+    globalThis.fetch = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(createFetchSuccessResponse())) as typeof fetch;
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
+
     // Clean up after each test
     if (container1.parentNode) {
       container1.parentNode.removeChild(container1);
     }
     if (container2.parentNode) {
       container2.parentNode.removeChild(container2);
+    }
+
+    if (originalFetch) {
+      globalThis.fetch = originalFetch;
+    } else {
+      // @ts-expect-error - allow removing fetch when not originally defined
+      delete globalThis.fetch;
     }
   });
 

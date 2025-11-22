@@ -17,6 +17,7 @@ export function parseWidgetConfig(element: HTMLElement): Partial<WidgetConfig> {
   const apiKey = element.getAttribute('data-api-key');
   const version = element.getAttribute('data-version');
   const apiUrl = element.getAttribute('data-api-url');
+  const nonce = element.getAttribute('nonce');
   
   const config: Partial<WidgetConfig> = {
     debug: element.getAttribute('data-debug') === 'true',
@@ -39,6 +40,10 @@ export function parseWidgetConfig(element: HTMLElement): Partial<WidgetConfig> {
 
   if (apiUrl) {
     config.apiUrl = apiUrl;
+  }
+
+  if (nonce) {
+    config.nonce = nonce;
   }
 
   // Parse theme configuration from data attributes

@@ -1,11 +1,93 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { WidgetFormData } from "./widget-form";
 import { Loader2 } from "lucide-react";
+import { DEFAULT_WIDGET_CONFIG, type WidgetConfig } from "@workspace/types";
 
 const WIDGET_SCRIPT_PATH = "/widget/tresta-widget.js";
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const PREVIEW_MAX_TESTIMONIALS = 6;
+const ROTATE_INTERVAL_MIN = 2000;
+const ROTATE_INTERVAL_MAX = 10000;
+const PREVIEW_FETCHED_AT = "2024-01-01T00:00:00.000Z";
+const INLINE_SOURCE_URL = "tresta-preview-inline.js";
+const INLINE_SOURCE_MAP_DATA_URL =
+  "data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidHJlc3RhLXByZXZpZXctaW5saW5lLmpzIiwic291cmNlcyI6WyJ0cmVzdGEtcHJldmlldy1pbmxpbmUuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9";
+
+type PreviewTestimonial = {
+  id: string;
+  authorName: string;
+  authorRole: string;
+  authorCompany: string;
+  content: string;
+  rating: number;
+  createdAt: string;
+  authorAvatar?: string;
+};
+
+const DEFAULT_PREVIEW_TESTIMONIALS: ReadonlyArray<PreviewTestimonial> = [
+  {
+    id: "1",
+    authorName: "Sarah Johnson",
+    authorRole: "CEO",
+    authorCompany: "Tech Innovations Inc",
+    content:
+      "This is an amazing product! It has completely transformed how we collect and display customer testimonials.",
+    rating: 5,
+    createdAt: "2024-01-10T12:00:00.000Z",
+  },
+  {
+    id: "2",
+    authorName: "Michael Chen",
+    authorRole: "Marketing Director",
+    authorCompany: "Digital Solutions",
+    content:
+      "Highly recommended! The widget looks professional and integrates seamlessly with our website.",
+    rating: 5,
+    createdAt: "2024-01-08T15:30:00.000Z",
+  },
+  {
+    id: "3",
+    authorName: "Emily Rodriguez",
+    authorRole: "Product Manager",
+    authorCompany: "StartupXYZ",
+    content:
+      "Easy to use and powerful. Our team loves how simple it is to customize the widget to match our brand.",
+    rating: 5,
+    createdAt: "2024-01-05T09:45:00.000Z",
+  },
+  {
+    id: "4",
+    authorName: "David Thompson",
+    authorRole: "Founder",
+    authorCompany: "Growth Labs",
+    content:
+      "The best testimonial solution we've tried. Layout and customization options are exactly what we needed.",
+    rating: 4,
+    createdAt: "2023-12-30T18:20:00.000Z",
+  },
+  {
+    id: "5",
+    authorName: "Lisa Anderson",
+    authorRole: "Head of Sales",
+    authorCompany: "Enterprise Corp",
+    content:
+      "Our clients trust us more now that they can see authentic testimonials beautifully displayed on our site.",
+    rating: 5,
+    createdAt: "2023-12-20T11:10:00.000Z",
+  },
+  {
+    id: "6",
+    authorName: "James Wilson",
+    authorRole: "CTO",
+    authorCompany: "Cloud Systems",
+    content:
+      "Excellent! The widget is lightweight, fast, and doesn't impact our page load times.",
+    rating: 5,
+    createdAt: "2023-12-12T08:55:00.000Z",
+  },
+];
 
 interface WidgetPreviewProps {
   config: WidgetFormData;
@@ -13,355 +95,135 @@ interface WidgetPreviewProps {
   testimonials?: any[];
 }
 
-type WidgetGlobal = {
-  mount: (container: HTMLElement | string, options: Record<string, unknown>) => Promise<unknown>;
+type NormalizedPreviewConfig = {
+  layout: "grid" | "carousel";
+  theme: "light" | "dark" | "auto";
+  primaryColor: string;
+  showRating: boolean;
+  showAvatar: boolean;
+  maxTestimonials: number;
+  autoRotate: boolean;
+  rotateInterval: number;
+};
+
+type PreviewDocumentPayload = {
+  widgetId: string;
+  apiUrl: string;
+  scriptSources: string[];
+  config: NormalizedPreviewConfig;
+  mockResponse: ReturnType<typeof buildMockApiResponse>;
+  nonce?: string;
+  displayDefaults: {
+    secondaryColor: string;
+    showDate: boolean;
+    showAuthorRole: boolean;
+    showAuthorCompany: boolean;
+  };
+};
+
+type PreviewMessage = {
+  type?: "tresta-preview-ready" | "tresta-preview-error";
+  error?: string;
 };
 
 export function WidgetPreview({
   config,
   widgetId,
-  testimonials = [],
+  testimonials,
 }: WidgetPreviewProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [iframeKey, setIframeKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const scriptLoadedRef = useRef(false);
-  const [scriptReady, setScriptReady] = useState(false);
-  const scriptElementRef = useRef<HTMLScriptElement | null>(null);
-  const widgetInstanceRef = useRef<{ instance: any; container: HTMLElement } | null>(null);
-  const restoreFetchRef = useRef<(() => void) | null>(null);
-  const inlineLoadAttemptedRef = useRef(false);
+  const resolvedTestimonials = testimonials ?? DEFAULT_PREVIEW_TESTIMONIALS;
+  const documentNonce = typeof window !== "undefined" ? getDocumentNonce() : undefined;
 
-  const loadWidgetInline = useCallback(async () => {
-    if (inlineLoadAttemptedRef.current) {
-      return hasWidgetGlobal();
-    }
-
-    inlineLoadAttemptedRef.current = true;
-
-    try {
-      await import("@workspace/widget");
-
-      if (hasWidgetGlobal()) {
-        console.info("[WidgetPreview] Loaded widget library via inline fallback");
-        scriptLoadedRef.current = true;
-        setScriptReady(true);
-        return true;
-      }
-
-      throw new Error("TrestaWidget global missing after inline import");
-    } catch (inlineError) {
-      console.error("[WidgetPreview] Inline widget load failed", inlineError);
-      setError("Failed to load widget library");
-      setIsLoading(false);
-      return false;
-    }
+  useEffect(() => {
+    setIsMounted(true);
   }, []);
 
-  // Load the widget script only once
+  const previewPayload = useMemo<PreviewDocumentPayload | null>(() => {
+    if (!isMounted) {
+      return null;
+    }
+
+    const apiUrl = resolveApiBaseUrl();
+    if (!apiUrl) {
+      return null;
+    }
+
+    const scriptSources = getWidgetScriptSources(apiUrl);
+    if (!scriptSources.length) {
+      return null;
+    }
+
+    const normalizedConfig = normalizePreviewConfig(config);
+    const previewWidgetId = widgetId || "preview-widget";
+    const mockResponse = buildMockApiResponse({
+      widgetId: previewWidgetId,
+      config: normalizedConfig,
+      testimonials: resolvedTestimonials,
+    });
+
+    return {
+      widgetId: previewWidgetId,
+      apiUrl,
+      scriptSources,
+      config: normalizedConfig,
+      mockResponse,
+      nonce: documentNonce,
+      displayDefaults: {
+        secondaryColor: DEFAULT_WIDGET_CONFIG.secondaryColor,
+        showDate: DEFAULT_WIDGET_CONFIG.showDate,
+        showAuthorRole: DEFAULT_WIDGET_CONFIG.showAuthorRole,
+        showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
+      },
+    };
+  }, [config, widgetId, resolvedTestimonials, isMounted]);
+
+  const iframeDocument = useMemo(() => {
+    if (!previewPayload) {
+      return null;
+    }
+    return buildPreviewDocument(previewPayload);
+  }, [previewPayload]);
+
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    if (hasWidgetGlobal()) {
-      scriptLoadedRef.current = true;
-      setScriptReady(true);
-      return;
-    }
-
-    if (scriptLoadedRef.current) {
+    if (!iframeDocument) {
+      setError("Unable to prepare preview environment");
+      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     setError(null);
-
-    const sources = getWidgetScriptSources();
-    if (!sources.length) {
-      setError("Unable to resolve widget script URL");
-      setIsLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    const attemptLoad = (index: number) => {
-      if (cancelled || scriptLoadedRef.current) {
-        return;
-      }
-
-      if (index >= sources.length) {
-        console.error("[WidgetPreview] Unable to load widget script from any source");
-        void loadWidgetInline();
-        return;
-      }
-
-      const src = sources[index];
-      if (!src) {
-        attemptLoad(index + 1);
-        return;
-      }
-      console.log(`[WidgetPreview] Loading widget script from ${src}`);
-
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = src;
-      script.crossOrigin = "anonymous";
-      scriptElementRef.current = script;
-
-      script.onload = () => {
-        if (cancelled) {
-          return;
-        }
-
-        if (hasWidgetGlobal()) {
-          console.log("[WidgetPreview] Widget script loaded successfully");
-          scriptLoadedRef.current = true;
-          setScriptReady(true);
-        } else {
-          console.warn(
-            "[WidgetPreview] Script loaded but TrestaWidget global missing, trying next source",
-          );
-          script.remove();
-          attemptLoad(index + 1);
-        }
-      };
-
-      script.onerror = (error) => {
-        if (cancelled) {
-          return;
-        }
-        console.error(`[WidgetPreview] Failed to load widget script from ${src}`, error);
-        script.remove();
-        attemptLoad(index + 1);
-      };
-
-      document.body.appendChild(script);
-    };
-
-    attemptLoad(0);
-
-    return () => {
-      cancelled = true;
-      if (!scriptLoadedRef.current && scriptElementRef.current?.parentNode) {
-        scriptElementRef.current.parentNode.removeChild(scriptElementRef.current);
-      }
-    };
-  }, [loadWidgetInline]); // Only run once on mount
+    setIframeKey((key) => key + 1);
+  }, [iframeDocument]);
 
   useEffect(() => {
-    return () => {
-      if (restoreFetchRef.current) {
-        restoreFetchRef.current();
-        restoreFetchRef.current = null;
+    const handleMessage = (event: MessageEvent) => {
+      // Security check: ensure message comes from same origin
+      if (event.origin !== window.location.origin) {
+        return;
       }
 
-      if (widgetInstanceRef.current?.instance) {
-        try {
-          widgetInstanceRef.current.instance.unmount?.();
-        } catch (err) {
-          console.warn("[WidgetPreview] Failed to unmount widget instance", err);
-        }
+      if (!event?.data || typeof event.data !== "object") {
+        return;
       }
-      widgetInstanceRef.current = null;
+
+      const message = event.data as PreviewMessage;
+      if (message.type === "tresta-preview-ready") {
+        setIsLoading(false);
+        setError(null);
+      } else if (message.type === "tresta-preview-error") {
+        setIsLoading(false);
+        setError(message.error || "Failed to render widget preview");
+      }
     };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
-
-  // Render/update widget when config changes
-  useEffect(() => {
-    if (!scriptReady || !containerRef.current || typeof window === "undefined") {
-      return;
-    }
-
-    const mockTestimonials = testimonials.length
-      ? testimonials
-      : [
-          {
-            id: "1",
-            authorName: "Sarah Johnson",
-            authorRole: "CEO",
-            authorCompany: "Tech Innovations Inc",
-            content:
-              "This is an amazing product! It has completely transformed how we collect and display customer testimonials. The ease of use and beautiful design make it a no-brainer.",
-            rating: 5,
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-            authorAvatar: undefined,
-          },
-          {
-            id: "2",
-            authorName: "Michael Chen",
-            authorRole: "Marketing Director",
-            authorCompany: "Digital Solutions",
-            content:
-              "Highly recommended! The widget looks professional and integrates seamlessly with our website. Our conversion rates have improved significantly.",
-            rating: 5,
-            createdAt: new Date(Date.now() - 259200000).toISOString(),
-            authorAvatar: undefined,
-          },
-          {
-            id: "3",
-            authorName: "Emily Rodriguez",
-            authorRole: "Product Manager",
-            authorCompany: "StartupXYZ",
-            content:
-              "Easy to use and very powerful. Our team loves how simple it is to customize the widget to match our brand. Great support too!",
-            rating: 5,
-            createdAt: new Date(Date.now() - 604800000).toISOString(),
-            authorAvatar: undefined,
-          },
-          {
-            id: "4",
-            authorName: "David Thompson",
-            authorRole: "Founder",
-            authorCompany: "Growth Labs",
-            content:
-              "The best testimonial solution we've tried. The variety of layouts and customization options are exactly what we needed.",
-            rating: 4,
-            createdAt: new Date(Date.now() - 1209600000).toISOString(),
-            authorAvatar: undefined,
-          },
-          {
-            id: "5",
-            authorName: "Lisa Anderson",
-            authorRole: "Head of Sales",
-            authorCompany: "Enterprise Corp",
-            content:
-              "Our clients trust us more now that they can see authentic testimonials beautifully displayed on our site. Worth every penny!",
-            rating: 5,
-            createdAt: new Date(Date.now() - 1814400000).toISOString(),
-            authorAvatar: undefined,
-          },
-          {
-            id: "6",
-            authorName: "James Wilson",
-            authorRole: "CTO",
-            authorCompany: "Cloud Systems",
-            content:
-              "Excellent! The widget is lightweight, fast, and doesn't impact our page load times. Exactly what we were looking for.",
-            rating: 5,
-            createdAt: new Date(Date.now() - 2592000000).toISOString(),
-            authorAvatar: undefined,
-          },
-        ];
-
-    const previewWidgetId = widgetId || "preview-widget";
-    const apiBaseUrl = resolveApiBaseUrl();
-
-    if (!apiBaseUrl) {
-      setError("Unable to determine API base URL for preview");
-      setIsLoading(false);
-      return;
-    }
-
-    const targetUrl = `${apiBaseUrl}/api/widgets/${previewWidgetId}/public`;
-
-    const mockResponse = buildMockApiResponse({
-      widgetId: previewWidgetId,
-      config,
-      testimonials: mockTestimonials,
-    });
-
-    const mountPreview = async () => {
-      if (!containerRef.current) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      if (restoreFetchRef.current) {
-        restoreFetchRef.current();
-        restoreFetchRef.current = null;
-      }
-
-      if (widgetInstanceRef.current) {
-        try {
-          widgetInstanceRef.current.instance.unmount?.();
-        } catch (err) {
-          console.warn("[WidgetPreview] Failed to unmount previous instance", err);
-        }
-        widgetInstanceRef.current.container.remove();
-        widgetInstanceRef.current = null;
-      }
-
-      const originalFetch = window.fetch.bind(window);
-      window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        const requestUrl =
-          typeof input === "string"
-            ? input
-            : input instanceof URL
-              ? input.toString()
-              : input.url ?? "";
-
-        if (requestUrl === targetUrl) {
-          return new Response(JSON.stringify(mockResponse), {
-            status: 200,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-        }
-
-        return originalFetch(input, init);
-      };
-
-      restoreFetchRef.current = () => {
-        window.fetch = originalFetch;
-      };
-
-      const previewWrapper = document.createElement("div");
-      previewWrapper.className = "tresta-widget-preview";
-      containerRef.current.innerHTML = "";
-      containerRef.current.appendChild(previewWrapper);
-
-      try {
-        const trestaWidget = await waitForWidgetGlobal();
-
-        const instance = await trestaWidget.mount(previewWrapper, {
-          widgetId: previewWidgetId,
-          apiKey: "preview-api-key",
-          apiUrl: apiBaseUrl,
-          debug: true,
-          telemetry: false,
-          version: "preview",
-          theme: {
-            mode: config.theme ?? "light",
-            primaryColor: config.primaryColor || "#0066FF",
-            secondaryColor: config.secondaryColor || "#00CC99",
-          },
-          layout: {
-            type: config.layout,
-            columns: config.columns || 3,
-            autoRotate: config.autoRotate ?? false,
-            rotateInterval: config.rotateInterval || 5000,
-            showNavigation: false,
-          },
-          display: {
-            showRating: config.showRating ?? true,
-            showDate: config.showDate ?? true,
-            showAvatar: config.showAvatar ?? false,
-            showAuthorRole: config.showAuthorRole ?? true,
-            showAuthorCompany: config.showAuthorCompany ?? true,
-            maxTestimonials: Math.min(config.maxTestimonials || 10, 6),
-          },
-        });
-
-        widgetInstanceRef.current = {
-          instance,
-          container: previewWrapper,
-        };
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error("[WidgetPreview] Error initializing widget:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to render widget",
-        );
-        setIsLoading(false);
-      }
-    };
-
-    mountPreview();
-  }, [config, widgetId, testimonials, scriptReady]);
 
   return (
     <div className="w-full">
@@ -370,39 +232,42 @@ export function WidgetPreview({
         {isLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading preview...
+            Rendering preview...
           </div>
         )}
       </div>
 
-      <div
-        className="rounded-xl border overflow-hidden shadow-sm"
-        style={{
-          backgroundColor: config.theme === "dark" ? "#0a0a0a" : "#fafafa",
-        }}
-      >
-        {error ? (
+      <div className="rounded-xl border overflow-hidden shadow-sm bg-card">
+        {error || !iframeDocument ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-destructive mb-2">Preview Error</p>
-            <p className="text-xs text-muted-foreground">{error}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Make sure the widget is built:{" "}
-              <code className="bg-muted px-1.5 py-0.5 rounded">
-                cd packages/widget && pnpm build
-              </code>
+            <p className="text-xs text-muted-foreground">
+              {error || "Widget preview unavailable"}
             </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Ensure the widget assets are built:
+              <code className="bg-muted px-1.5 py-0.5 rounded ml-1">cd packages/widget &amp;&amp; pnpm build</code>
+            </p>
+            <button
+              onClick={() => setIframeKey((k) => k + 1)}
+              className="mt-4 text-xs text-primary hover:underline"
+            >
+              Retry Preview
+            </button>
           </div>
         ) : (
-          <div
-            ref={containerRef}
-            className="min-h-[500px] max-h-[700px] w-full overflow-auto p-8"
+          <iframe
+            key={iframeKey}
+            srcDoc={iframeDocument}
+            sandbox="allow-scripts allow-same-origin"
+            className="min-h-[520px] w-full border-0"
+            title="Widget preview"
           />
         )}
       </div>
 
       <p className="mt-2 text-xs text-muted-foreground">
-        Preview updates in real-time as you change settings. Mock testimonials
-        are shown for demonstration.
+        Preview updates instantly with mock testimonials to match your settings.
       </p>
     </div>
   );
@@ -410,8 +275,8 @@ export function WidgetPreview({
 
 interface MockResponseConfig {
   widgetId: string;
-  config: WidgetFormData;
-  testimonials: any[];
+  config: NormalizedPreviewConfig;
+  testimonials: ReadonlyArray<any>;
 }
 
 function buildMockApiResponse({
@@ -419,25 +284,22 @@ function buildMockApiResponse({
   config,
   testimonials,
 }: MockResponseConfig) {
-  const primaryColor = config.primaryColor || "#0066FF";
-  const secondaryColor = config.secondaryColor || "#00CC99";
-  const settings = {
-    layout: config.layout,
-    theme: config.theme ?? "light",
-    showRating: config.showRating ?? true,
-    showDate: config.showDate ?? true,
-    showAvatar: config.showAvatar ?? false,
-    showAuthorRole: config.showAuthorRole ?? true,
-    showAuthorCompany: config.showAuthorCompany ?? true,
-    maxTestimonials: Math.min(config.maxTestimonials || 10, 6),
-    columns: config.columns || 3,
-    autoRotate: config.autoRotate ?? false,
-    rotateInterval: config.rotateInterval || 5000,
-    showNavigation: false,
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    cardStyle: config.cardStyle || "default",
-  } as const;
+  const defaultedSettings = {
+    ...DEFAULT_WIDGET_CONFIG,
+    ...config,
+    showDate: DEFAULT_WIDGET_CONFIG.showDate,
+    showAuthorRole: DEFAULT_WIDGET_CONFIG.showAuthorRole,
+    showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
+    columns: config.layout === "grid" ? 3 : 1,
+    showNavigation: config.layout === "carousel",
+  } satisfies WidgetConfig;
+
+  defaultedSettings.maxTestimonials = config.maxTestimonials;
+  defaultedSettings.autoRotate = config.autoRotate;
+  defaultedSettings.rotateInterval = config.rotateInterval;
+
+  const primaryColor = defaultedSettings.primaryColor;
+  const secondaryColor = DEFAULT_WIDGET_CONFIG.secondaryColor;
 
   return {
     success: true,
@@ -451,7 +313,7 @@ function buildMockApiResponse({
           primaryColor,
           secondaryColor,
         },
-        settings,
+        settings: defaultedSettings,
       },
       project: {
         name: "Preview Project",
@@ -476,9 +338,31 @@ function buildMockApiResponse({
       })),
     },
     meta: {
-      fetchedAt: new Date().toISOString(),
+      fetchedAt: PREVIEW_FETCHED_AT,
       total: testimonials.length,
     },
+  };
+}
+
+function normalizePreviewConfig(config: WidgetFormData): NormalizedPreviewConfig {
+  const layout = config.layout === "carousel" ? "carousel" : "grid";
+  const rotateInterval = Math.min(
+    Math.max(config.rotateInterval, ROTATE_INTERVAL_MIN),
+    ROTATE_INTERVAL_MAX,
+  );
+
+  return {
+    layout,
+    theme: config.theme ?? DEFAULT_WIDGET_CONFIG.theme,
+    primaryColor: config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
+    showRating: config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,
+    showAvatar: config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
+    maxTestimonials: Math.min(
+      config.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
+      PREVIEW_MAX_TESTIMONIALS,
+    ),
+    autoRotate: layout === "carousel" ? config.autoRotate ?? false : false,
+    rotateInterval,
   };
 }
 
@@ -493,63 +377,223 @@ function resolveApiBaseUrl() {
   return "";
 }
 
-function getWidgetScriptSources(): string[] {
+function getWidgetScriptSources(apiUrl: string): string[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   const sources = new Set<string>();
-  const apiBase = resolveApiBaseUrl();
+  const normalizedApi = apiUrl.replace(/\/$/, "");
   const origin = window.location.origin;
 
-  if (apiBase) {
-    sources.add(`${apiBase}${WIDGET_SCRIPT_PATH}`);
+  if (origin) {
+    sources.add(`${origin}${WIDGET_SCRIPT_PATH}`);
   }
 
-  if (!apiBase || apiBase !== origin) {
-    sources.add(`${origin}${WIDGET_SCRIPT_PATH}`);
+  if (normalizedApi && normalizedApi !== origin) {
+    sources.add(`${normalizedApi}${WIDGET_SCRIPT_PATH}`);
   }
 
   return Array.from(sources);
 }
 
-async function waitForWidgetGlobal(timeout = 5000, interval = 50): Promise<WidgetGlobal> {
-  const start = typeof performance !== "undefined" ? performance.now() : Date.now();
+function buildPreviewDocument(payload: PreviewDocumentPayload): string {
+  const dataJson = serializeForInlineScript(payload);
+  const nonceAttr = payload.nonce ? ` nonce="${payload.nonce}"` : "";
 
-  while (true) {
-    const widget = getWidgetGlobal();
-    if (widget) {
-      return widget;
-    }
+  return `<!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Tresta Widget Preview</title>
+      <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          margin: 0;
+          padding: 24px;
+          min-height: 100vh;
+          background-color: lab(7.24807% 0 0);
+        }
+        body::-webkit-scrollbar {
+          width: 12px;
+        }
+        body::-webkit-scrollbar-track {
+          background-color: lab(7.24807% 0 0);
+        }
+        body::-webkit-scrollbar-thumb {
+          background-color: lab(7.24807% 0 0);
+          border-radius: 6px;
+        }
+        #preview-status {
+          font-size: 14px;
+          color: #94a3b8;
+          margin-bottom: 16px;
+          text-align: center;
+        }
+        #tresta-widget-preview-root {
+          width: 100%;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="preview-status">Loading widget preview…</div>
+      <div id="tresta-widget-preview-root" aria-live="polite"></div>
+      <script type="application/json" id="tresta-preview-data">${dataJson}</script>
+      <script${nonceAttr}>
+        (() => {
+          if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+            try {
+              window.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject = () => {};
+            } catch (err) {
+              console.warn('[TrestaWidget] Failed to patch React DevTools hook', err);
+            }
+          }
 
-    const elapsed = (typeof performance !== "undefined" ? performance.now() : Date.now()) - start;
-    if (elapsed >= timeout) {
-      throw new Error("Widget library not loaded");
-    }
+          const log = (msg, data) => {
+            // console.log('[Preview Iframe] ' + msg, data || '');
+          };
 
-    await sleep(interval);
-  }
+          const dataElement = document.getElementById('tresta-preview-data');
+          if (!dataElement) {
+            window.parent?.postMessage({ type: 'tresta-preview-error', error: 'Missing preview data' }, '*');
+            return;
+          }
+
+          const previewData = JSON.parse(dataElement.textContent || '{}');
+          const statusEl = document.getElementById('preview-status');
+
+          const notify = (type, payload) => {
+            window.parent?.postMessage({ type, ...payload }, '*');
+          };
+
+          const originalFetch = window.fetch.bind(window);
+          const targetUrl = previewData.apiUrl + '/api/widgets/' + previewData.widgetId + '/public';
+
+          window.fetch = (input, init) => {
+            const url = typeof input === 'string'
+              ? input
+              : input instanceof Request
+                ? input.url
+                : typeof input === 'object' && input?.url
+                  ? input.url
+                  : '';
+
+            if (url === targetUrl) {
+              return Promise.resolve(new Response(JSON.stringify(previewData.mockResponse), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              }));
+            }
+
+            return originalFetch(input, init);
+          };
+
+          const mountWidget = () => {
+            const root = document.getElementById('tresta-widget-preview-root');
+            if (!root || !window.TrestaWidget) {
+              notify('tresta-preview-error', { error: 'Widget mount target missing' });
+              return;
+            }
+
+            root.innerHTML = '';
+            window.TrestaWidget.mount(root, {
+              widgetId: previewData.widgetId,
+              apiKey: 'preview-api-key',
+              apiUrl: previewData.apiUrl,
+              debug: true,
+              telemetry: false,
+              theme: {
+                mode: previewData.config.theme,
+                primaryColor: previewData.config.primaryColor,
+                secondaryColor: previewData.displayDefaults.secondaryColor,
+              },
+              layout: {
+                type: previewData.config.layout,
+                columns: previewData.config.layout === 'grid' ? 3 : 1,
+                autoRotate: previewData.config.autoRotate,
+                rotateInterval: previewData.config.rotateInterval,
+                showNavigation: previewData.config.layout === 'carousel',
+              },
+              display: {
+                showRating: previewData.config.showRating,
+                showDate: previewData.displayDefaults.showDate,
+                showAvatar: previewData.config.showAvatar,
+                showAuthorRole: previewData.displayDefaults.showAuthorRole,
+                showAuthorCompany: previewData.displayDefaults.showAuthorCompany,
+                maxTestimonials: previewData.config.maxTestimonials,
+              },
+            }).then(() => {
+              statusEl?.remove();
+              notify('tresta-preview-ready', {});
+            }).catch((error) => {
+              notify('tresta-preview-error', { error: error?.message || 'Failed to render widget' });
+            });
+          };
+
+          const waitForWidget = (attempts) => {
+            if (window.TrestaWidget?.mount) {
+              mountWidget();
+              return;
+            }
+            if (attempts <= 0) {
+              notify('tresta-preview-error', { error: 'Widget library failed to initialize' });
+              return;
+            }
+            setTimeout(() => waitForWidget(attempts - 1), 50);
+          };
+
+          const scriptSources = previewData.scriptSources || [];
+
+          const loadScriptFromSource = (index) => {
+            if (window.TrestaWidget?.mount) {
+              waitForWidget(10);
+              return;
+            }
+
+            if (index >= scriptSources.length) {
+              notify('tresta-preview-error', { error: 'Unable to load widget library' });
+              return;
+            }
+
+            const src = scriptSources[index];
+
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = src;
+            script.crossOrigin = 'anonymous';
+            if (previewData.nonce) {
+              script.setAttribute('nonce', previewData.nonce);
+            }
+
+            script.onload = () => {
+              waitForWidget(200);
+            };
+            script.onerror = (e) => {
+              loadScriptFromSource(index + 1);
+            };
+            document.body.appendChild(script);
+          };
+
+          loadScriptFromSource(0);
+        })();
+        //# sourceURL=${INLINE_SOURCE_URL}
+        //# sourceMappingURL=${INLINE_SOURCE_MAP_DATA_URL}
+      </script>
+    </body>
+  </html>`;
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+function serializeForInlineScript(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003C").replace(/>/g, "\\u003E");
 }
 
-function hasWidgetGlobal() {
-  return Boolean(getWidgetGlobal());
-}
-
-function getWidgetGlobal(): WidgetGlobal | undefined {
-  if (typeof window === "undefined") {
+function getDocumentNonce(): string | undefined {
+  if (typeof document === "undefined") {
     return undefined;
   }
 
-  const widget = (window as Window & { TrestaWidget?: WidgetGlobal }).TrestaWidget;
-  if (widget && typeof widget.mount === "function") {
-    return widget;
-  }
-
-  return undefined;
+  const scriptWithNonce = document.querySelector<HTMLScriptElement>("script[nonce]");
+  return scriptWithNonce?.getAttribute("nonce") ?? undefined;
 }

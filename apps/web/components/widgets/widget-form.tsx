@@ -9,6 +9,7 @@ import { Form } from "@workspace/ui/components/form";
 import { Separator } from "@workspace/ui/components/separator";
 import { Loader2 } from "lucide-react";
 import type { Widget, WidgetConfig } from "@/lib/queries/widgets";
+import { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
 import {
   WidgetBasicSection,
   WidgetAppearanceSection,
@@ -16,23 +17,24 @@ import {
   WidgetLayoutSection,
 } from "./widget-form-sections";
 
+const MIN_MAX_TESTIMONIALS = 20;
+const MIN_ROTATE_INTERVAL = 2000;
+const MAX_ROTATE_INTERVAL = 10000;
+
 const widgetFormSchema = z.object({
-  layout: z.enum(["carousel", "grid", "masonry", "wall"]),
+  layout: z.enum(["grid", "carousel"]),
   theme: z.enum(["light", "dark", "auto"]),
-  primaryColor: z.string().optional(),
-  secondaryColor: z.string().optional(),
+  primaryColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/),
   showRating: z.boolean(),
-  showDate: z.boolean(),
   showAvatar: z.boolean(),
-  showAuthorRole: z.boolean(),
-  showAuthorCompany: z.boolean(),
-  maxTestimonials: z.number().min(1).max(100),
+  maxTestimonials: z.number().min(1).max(MIN_MAX_TESTIMONIALS),
   autoRotate: z.boolean(),
-  rotateInterval: z.number().min(1000).max(30000),
-  showNavigation: z.boolean(),
-  columns: z.number().min(1).max(6),
-  cardStyle: z.enum(["default", "minimal", "bordered"]),
-  animation: z.enum(["fade", "slide", "none"]),
+  rotateInterval: z
+    .number()
+    .min(MIN_ROTATE_INTERVAL)
+    .max(MAX_ROTATE_INTERVAL),
 });
 
 export type WidgetFormData = z.infer<typeof widgetFormSchema>;
@@ -54,43 +56,7 @@ export function WidgetForm({
 }: WidgetFormProps) {
   const form = useForm<WidgetFormData>({
     resolver: zodResolver(widgetFormSchema),
-    defaultValues: initialData
-      ? {
-          layout: (initialData.config?.layout as any) || "carousel",
-          theme: (initialData.config?.theme as any) || "light",
-          primaryColor: initialData.config?.primaryColor || "#0066FF",
-          secondaryColor: initialData.config?.secondaryColor || "#00CC99",
-          showRating: initialData.config?.showRating ?? true,
-          showDate: initialData.config?.showDate ?? true,
-          showAvatar: initialData.config?.showAvatar ?? false,
-          showAuthorRole: initialData.config?.showAuthorRole ?? true,
-          showAuthorCompany: initialData.config?.showAuthorCompany ?? true,
-          maxTestimonials: initialData.config?.maxTestimonials || 10,
-          autoRotate: initialData.config?.autoRotate ?? false,
-          rotateInterval: initialData.config?.rotateInterval || 5000,
-          showNavigation: initialData.config?.showNavigation ?? true,
-          columns: initialData.config?.columns || 3,
-          cardStyle: (initialData.config?.cardStyle as any) || "default",
-          animation: (initialData.config?.animation as any) || "fade",
-        }
-      : {
-          layout: "carousel",
-          theme: "light",
-          primaryColor: "#0066FF",
-          secondaryColor: "#00CC99",
-          showRating: true,
-          showDate: true,
-          showAvatar: false,
-          showAuthorRole: true,
-          showAuthorCompany: true,
-          maxTestimonials: 10,
-          autoRotate: false,
-          rotateInterval: 5000,
-          showNavigation: true,
-          columns: 3,
-          cardStyle: "default",
-          animation: "fade",
-        },
+    defaultValues: getInitialValues(initialData?.config),
   });
 
   const watchLayout = form.watch("layout");
@@ -103,15 +69,28 @@ export function WidgetForm({
     onConfigChangeRef.current = onConfigChange;
   }, [onConfigChange]);
 
-  // Subscribe to form changes and notify parent
+  // Subscribe to form changes and notify parent with debounce
   useEffect(() => {
+    const timeoutId = { current: undefined as ReturnType<typeof setTimeout> | undefined };
+
     const subscription = form.watch((value) => {
-      if (onConfigChangeRef.current) {
-        onConfigChangeRef.current(value as WidgetFormData);
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
       }
+
+      timeoutId.current = setTimeout(() => {
+        if (onConfigChangeRef.current) {
+          onConfigChangeRef.current(value as WidgetFormData);
+        }
+      }, 500);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
+    };
   }, [form]);
 
   return (
@@ -147,4 +126,41 @@ export function WidgetForm({
       </form>
     </Form>
   );
+}
+
+function getInitialValues(config?: WidgetConfig) {
+  const normalized = {
+    layout: config?.layout === "carousel" ? "carousel" : "grid",
+    theme: config?.theme || DEFAULT_WIDGET_CONFIG.theme,
+    primaryColor: config?.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
+    showRating:
+      typeof config?.showRating === "boolean"
+        ? config.showRating
+        : DEFAULT_WIDGET_CONFIG.showRating,
+    showAvatar:
+      typeof config?.showAvatar === "boolean"
+        ? config.showAvatar
+        : DEFAULT_WIDGET_CONFIG.showAvatar,
+    maxTestimonials:
+      config?.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
+    autoRotate: config?.layout === "carousel" && config?.autoRotate ? true : false,
+    rotateInterval:
+      config?.rotateInterval || DEFAULT_WIDGET_CONFIG.rotateInterval,
+  } as WidgetFormData;
+
+  normalized.maxTestimonials = Math.min(
+    Math.max(normalized.maxTestimonials, 1),
+    MIN_MAX_TESTIMONIALS
+  );
+
+  normalized.rotateInterval = Math.min(
+    Math.max(normalized.rotateInterval, MIN_ROTATE_INTERVAL),
+    MAX_ROTATE_INTERVAL
+  );
+
+  if (normalized.layout !== "carousel") {
+    normalized.autoRotate = false;
+  }
+
+  return normalized;
 }

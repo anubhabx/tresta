@@ -35,6 +35,7 @@ export interface StyleManagerConfig {
   useShadowDOM?: boolean;
   debug?: boolean;
   theme?: ThemeManagerConfig['theme'];
+  nonceApplier?: ((element: HTMLElement) => void) | undefined;
 }
 
 export class StyleManager {
@@ -42,10 +43,12 @@ export class StyleManager {
   private useShadowDOM: boolean;
   private debug: boolean;
   private themeManager: ThemeManager;
+  private nonceApplier?: ((element: HTMLElement) => void) | undefined;
 
   constructor(config: StyleManagerConfig = {}) {
     this.useShadowDOM = config.useShadowDOM ?? this.detectShadowDOMSupport();
     this.debug = config.debug ?? false;
+    this.nonceApplier = config.nonceApplier;
     
     const themeConfig: ThemeManagerConfig = { debug: this.debug };
     if (config.theme) {
@@ -86,6 +89,7 @@ export class StyleManager {
 
     // Create style element
     const styleElement = document.createElement('style');
+    this.applyNonce(styleElement);
     styleElement.textContent = this.getShadowDOMStyles();
     this.shadowRoot.appendChild(styleElement);
 
@@ -116,6 +120,7 @@ export class StyleManager {
     if (!document.getElementById('tresta-widget-styles')) {
       const styleElement = document.createElement('style');
       styleElement.id = 'tresta-widget-styles';
+      this.applyNonce(styleElement);
       styleElement.textContent = this.getNamespacedStyles();
       document.head.appendChild(styleElement);
     }
@@ -190,5 +195,14 @@ export class StyleManager {
    */
   getShadowRoot(): ShadowRoot | null {
     return this.shadowRoot;
+  }
+
+  /**
+   * Apply CSP nonce when provided
+   */
+  private applyNonce(element: HTMLElement): void {
+    if (this.nonceApplier) {
+      this.nonceApplier(element);
+    }
   }
 }

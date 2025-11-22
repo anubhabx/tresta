@@ -13,6 +13,7 @@ import { LayoutEngine } from '../layouts';
 import { limitTestimonials } from '../utils/testimonial-limiter';
 import { Logger } from '../utils/logger';
 import { CSPValidator } from '../security/csp-validator';
+import type { CSPConfig } from '../security/csp-validator';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -64,9 +65,15 @@ export class Widget implements WidgetInstance {
     );
 
     // Initialize CSP validator
-    this.cspValidator = new CSPValidator({
+    const cspConfig: Partial<CSPConfig> = {
       reportViolations: config.debug || false,
-    });
+    };
+
+    if (config.nonce) {
+      cspConfig.nonce = config.nonce;
+    }
+
+    this.cspValidator = new CSPValidator(cspConfig);
 
     this.logger.debug('Initialized with config:', {
       widgetId: config.widgetId,
@@ -117,6 +124,7 @@ export class Widget implements WidgetInstance {
         debug: this.config.debug ?? false,
         theme: this.config.theme,
         ...(this.config.useShadowDOM !== undefined && { useShadowDOM: this.config.useShadowDOM }),
+        nonceApplier: (element) => this.cspValidator.applyNonce(element),
       });
       this.contentRoot = this.styleManager.initializeStyles(this.root);
       

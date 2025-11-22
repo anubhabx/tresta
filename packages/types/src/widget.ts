@@ -9,9 +9,18 @@
 export type WidgetLayout = "carousel" | "grid" | "masonry" | "wall" | "list";
 
 /**
+ * Subset of layouts we expose in the MVP embed builder.
+ */
+export const MVP_WIDGET_LAYOUTS = ["grid", "carousel"] as const;
+
+export type MvpWidgetLayout = (typeof MVP_WIDGET_LAYOUTS)[number];
+
+/**
  * Widget theme types
  */
 export type WidgetTheme = "light" | "dark" | "auto";
+
+export const MVP_WIDGET_THEMES = ["light", "dark", "auto"] as const;
 
 /**
  * Card style types
@@ -80,6 +89,22 @@ export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
   rotateInterval: 5000,
   showNavigation: true,
 };
+
+/**
+ * Fields surfaced in the MVP-level customization UI.
+ */
+export const MVP_WIDGET_CONFIG_FIELDS = [
+  "layout",
+  "theme",
+  "primaryColor",
+  "showRating",
+  "showAvatar",
+  "maxTestimonials",
+  "autoRotate",
+  "rotateInterval",
+] as const satisfies ReadonlyArray<keyof WidgetConfig>;
+
+export type MvpWidgetConfigField = (typeof MVP_WIDGET_CONFIG_FIELDS)[number];
 
 /**
  * Widget entity (database model)

@@ -16,6 +16,12 @@ const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
   maxRetries: 3,
 };
 
+const DEFAULT_THEME_MODE = 'light';
+const DEFAULT_PRIMARY_COLOR = '#0066FF';
+const DEFAULT_SECONDARY_COLOR = '#00CC99';
+const DEFAULT_MAX_TESTIMONIALS = 10;
+const DEFAULT_ROTATE_INTERVAL = 5000;
+
 /**
  * API Client for fetching widget data
  */
@@ -151,32 +157,40 @@ export class APIClient {
       });
     }
 
+    const settings = data.widget.settings ?? {};
+    const layoutType = data.widget.layout || 'grid';
+    const maxTestimonials = settings.maxTestimonials ?? DEFAULT_MAX_TESTIMONIALS;
+    const autoRotate = layoutType === 'carousel' ? settings.autoRotate ?? false : false;
+    const rotateInterval = settings.rotateInterval ?? DEFAULT_ROTATE_INTERVAL;
+    const showNavigation = layoutType === 'carousel' ? settings.showNavigation ?? true : false;
+    const columns = settings.columns ?? (layoutType === 'grid' ? 3 : 1);
+
     // Transform to WidgetData format
     return {
       widgetId: data.widget.id,
       config: {
         layout: {
-          type: data.widget.layout || 'grid',
-          maxTestimonials: data.widget.settings?.maxTestimonials,
-          autoRotate: data.widget.settings?.autoRotate,
-          rotateInterval: data.widget.settings?.rotateInterval,
-          showNavigation: true,
-          columns: data.widget.settings?.columns,
+          type: layoutType,
+          maxTestimonials,
+          autoRotate,
+          rotateInterval,
+          showNavigation,
+          columns,
         },
         theme: {
-          mode: data.widget.settings?.theme || 'light',
-          primaryColor: data.widget.theme?.primaryColor || '#0066FF',
-          secondaryColor: data.widget.theme?.secondaryColor || '#00CC99',
-          fontFamily: data.widget.settings?.fontFamily,
-          cardStyle: data.widget.settings?.cardStyle || 'default',
+          mode: settings.theme || DEFAULT_THEME_MODE,
+          primaryColor: data.widget.theme?.primaryColor || DEFAULT_PRIMARY_COLOR,
+          secondaryColor: data.widget.theme?.secondaryColor || DEFAULT_SECONDARY_COLOR,
+          fontFamily: settings.fontFamily,
+          cardStyle: settings.cardStyle || 'default',
         },
         display: {
-          showRating: data.widget.settings?.showRating ?? true,
-          showDate: data.widget.settings?.showDate ?? true,
-          showAvatar: data.widget.settings?.showAvatar ?? true,
-          showAuthorRole: data.widget.settings?.showAuthorRole ?? true,
-          showAuthorCompany: data.widget.settings?.showAuthorCompany ?? true,
-          maxTestimonials: data.widget.settings?.maxTestimonials,
+          showRating: settings.showRating ?? true,
+          showDate: settings.showDate ?? true,
+          showAvatar: settings.showAvatar ?? true,
+          showAuthorRole: settings.showAuthorRole ?? true,
+          showAuthorCompany: settings.showAuthorCompany ?? true,
+          maxTestimonials,
         },
       },
       testimonials: (data.testimonials || []).map((t: any) => ({

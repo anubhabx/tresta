@@ -51,10 +51,8 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="carousel">Carousel</SelectItem>
                   <SelectItem value="grid">Grid</SelectItem>
-                  <SelectItem value="masonry">Masonry</SelectItem>
-                  <SelectItem value="wall">Wall</SelectItem>
+                  <SelectItem value="carousel">Carousel</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -114,61 +112,6 @@ export function WidgetAppearanceSection({
           placeholder="#0066FF"
           description="Main brand color for the widget"
         />
-
-        <CustomFormField
-          type="text"
-          control={control}
-          name="secondaryColor"
-          label="Secondary Color"
-          placeholder="#00CC99"
-          description="Secondary accent color"
-        />
-
-        <FormField
-          control={control}
-          name="cardStyle"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Card Style</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select card style" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="minimal">Minimal</SelectItem>
-                  <SelectItem value="bordered">Bordered</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="animation"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Animation</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select animation" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="fade">Fade</SelectItem>
-                  <SelectItem value="slide">Slide</SelectItem>
-                  <SelectItem value="none">None</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </CardContent>
     </Card>
   );
@@ -183,7 +126,7 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
     <Card>
       <CardHeader>
         <CardTitle>Display Options</CardTitle>
-        <CardDescription>Choose what information to show</CardDescription>
+        <CardDescription>Choose the key testimonial details</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
@@ -195,27 +138,6 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
                 <FormLabel className="text-base">Show Rating</FormLabel>
                 <FormDescription>
                   Display star ratings on testimonials
-                </FormDescription>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="showDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Show Date</FormLabel>
-                <FormDescription>
-                  Display submission date on testimonials
                 </FormDescription>
               </div>
               <FormControl>
@@ -249,45 +171,6 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
           )}
         />
 
-        <FormField
-          control={control}
-          name="showAuthorRole"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Show Author Role</FormLabel>
-                <FormDescription>
-                  Display author's job title or role
-                </FormDescription>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="showAuthorCompany"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Show Author Company</FormLabel>
-                <FormDescription>Display author's company name</FormDescription>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
       </CardContent>
     </Card>
   );
@@ -321,51 +204,23 @@ export function WidgetLayoutSection({
                 <div className="space-y-2">
                   <Slider
                     min={1}
-                    max={100}
+                    max={20}
                     step={1}
                     value={[field.value]}
                     onValueChange={(value) => field.onChange(value[0])}
                   />
                   <div className="text-sm text-muted-foreground text-right">
-                    {field.value} testimonials
+                    {field.value} testimonial{field.value === 1 ? "" : "s"}
                   </div>
                 </div>
               </FormControl>
               <FormDescription>
-                Maximum number of testimonials to display
+                Limit how many testimonials the embed renders
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {(layout === "grid" || layout === "masonry") && (
-          <FormField
-            control={control}
-            name="columns"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Columns</FormLabel>
-                <FormControl>
-                  <div className="space-y-2">
-                    <Slider
-                      min={1}
-                      max={6}
-                      step={1}
-                      value={[field.value]}
-                      onValueChange={(value) => field.onChange(value[0])}
-                    />
-                    <div className="text-sm text-muted-foreground text-right">
-                      {field.value} columns
-                    </div>
-                  </div>
-                </FormControl>
-                <FormDescription>Number of columns in the grid</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
         {layout === "carousel" && (
           <>
@@ -400,9 +255,9 @@ export function WidgetLayoutSection({
                     <FormControl>
                       <div className="space-y-2">
                         <Slider
-                          min={1000}
-                          max={30000}
-                          step={1000}
+                          min={2000}
+                          max={10000}
+                          step={500}
                           value={[field.value]}
                           onValueChange={(value) => field.onChange(value[0])}
                         />
@@ -419,27 +274,6 @@ export function WidgetLayoutSection({
                 )}
               />
             )}
-
-            <FormField
-              control={control}
-              name="showNavigation"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Show Navigation</FormLabel>
-                    <FormDescription>
-                      Display navigation arrows for manual control
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
           </>
         )}
       </CardContent>

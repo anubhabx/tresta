@@ -10,6 +10,7 @@ import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useCallback, useEffect } from "react";
+import { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
 
 interface WidgetBuilderProps {
   projectSlug: string;
@@ -28,22 +29,14 @@ export function WidgetBuilder({
 
   // Default config for preview
   const defaultConfig: WidgetFormData = {
-    layout: "carousel",
-    theme: "light",
-    primaryColor: "#0066FF",
-    secondaryColor: "#00CC99",
-    showRating: true,
-    showDate: true,
-    showAvatar: false,
-    showAuthorRole: true,
-    showAuthorCompany: true,
-    maxTestimonials: 10,
+    layout: "grid",
+    theme: DEFAULT_WIDGET_CONFIG.theme,
+    primaryColor: DEFAULT_WIDGET_CONFIG.primaryColor,
+    showRating: DEFAULT_WIDGET_CONFIG.showRating,
+    showAvatar: DEFAULT_WIDGET_CONFIG.showAvatar,
+    maxTestimonials: 6,
     autoRotate: false,
-    rotateInterval: 5000,
-    showNavigation: true,
-    columns: 3,
-    cardStyle: "default",
-    animation: "fade"
+    rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
   };
 
   const [previewConfig, setPreviewConfig] =
@@ -67,22 +60,19 @@ export function WidgetBuilder({
   useEffect(() => {
     if (mode === "edit" && widget?.config) {
       setPreviewConfig({
-        layout: (widget.config.layout as any) || "carousel",
-        theme: (widget.config.theme as any) || "light",
-        primaryColor: widget.config.primaryColor || "#0066FF",
-        secondaryColor: widget.config.secondaryColor || "#00CC99",
-        showRating: widget.config.showRating ?? true,
-        showDate: widget.config.showDate ?? true,
-        showAvatar: widget.config.showAvatar ?? false,
-        showAuthorRole: widget.config.showAuthorRole ?? true,
-        showAuthorCompany: widget.config.showAuthorCompany ?? true,
-        maxTestimonials: widget.config.maxTestimonials || 10,
-        autoRotate: widget.config.autoRotate ?? false,
-        rotateInterval: widget.config.rotateInterval || 5000,
-        showNavigation: widget.config.showNavigation ?? true,
-        columns: widget.config.columns || 3,
-        cardStyle: (widget.config.cardStyle as any) || "default",
-        animation: (widget.config.animation as any) || "fade"
+        layout: widget.config.layout === "carousel" ? "carousel" : "grid",
+        theme: (widget.config.theme as any) || DEFAULT_WIDGET_CONFIG.theme,
+        primaryColor:
+          widget.config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
+        showRating: widget.config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,
+        showAvatar: widget.config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
+        maxTestimonials:
+          widget.config.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
+        autoRotate: widget.config.layout === "carousel" && widget.config.autoRotate
+          ? true
+          : false,
+        rotateInterval:
+          widget.config.rotateInterval || DEFAULT_WIDGET_CONFIG.rotateInterval
       });
     }
   }, [mode, widget]);
@@ -92,49 +82,26 @@ export function WidgetBuilder({
 
   const handleSubmit = async (data: WidgetFormData) => {
     try {
+      const mutationPayload = {
+        layout: data.layout,
+        theme: data.theme,
+        primaryColor: data.primaryColor,
+        showRating: data.showRating,
+        showAvatar: data.showAvatar,
+        maxTestimonials: data.maxTestimonials,
+        autoRotate: data.layout === "carousel" ? data.autoRotate : false,
+        rotateInterval: data.rotateInterval
+      };
+
       if (mode === "create") {
         await createWidget.mutateAsync({
           projectId,
-          config: {
-            layout: data.layout,
-            theme: data.theme,
-            primaryColor: data.primaryColor,
-            secondaryColor: data.secondaryColor,
-            showRating: data.showRating,
-            showDate: data.showDate,
-            showAvatar: data.showAvatar,
-            showAuthorRole: data.showAuthorRole,
-            showAuthorCompany: data.showAuthorCompany,
-            maxTestimonials: data.maxTestimonials,
-            autoRotate: data.autoRotate,
-            rotateInterval: data.rotateInterval,
-            showNavigation: data.showNavigation,
-            columns: data.columns,
-            cardStyle: data.cardStyle,
-            animation: data.animation
-          }
+          config: mutationPayload
         });
         toast.success("Widget created successfully!");
       } else {
         await updateWidget.mutateAsync({
-          config: {
-            layout: data.layout,
-            theme: data.theme,
-            primaryColor: data.primaryColor,
-            secondaryColor: data.secondaryColor,
-            showRating: data.showRating,
-            showDate: data.showDate,
-            showAvatar: data.showAvatar,
-            showAuthorRole: data.showAuthorRole,
-            showAuthorCompany: data.showAuthorCompany,
-            maxTestimonials: data.maxTestimonials,
-            autoRotate: data.autoRotate,
-            rotateInterval: data.rotateInterval,
-            showNavigation: data.showNavigation,
-            columns: data.columns,
-            cardStyle: data.cardStyle,
-            animation: data.animation
-          }
+          config: mutationPayload
         });
         toast.success("Widget updated successfully!");
       }
