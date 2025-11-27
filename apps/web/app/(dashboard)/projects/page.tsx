@@ -69,7 +69,7 @@ const ProjectsPage = () => {
               href={`/projects/${project.slug}`}
               className="group"
             >
-              <Card className="h-full border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-border/50 hover:border-border transition-all duration-200">
+              <Card className="h-full shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-border/50 hover:border-border transition-all duration-200">
                 <CardHeader className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start gap-3 flex-1 min-w-0">

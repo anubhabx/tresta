@@ -77,14 +77,13 @@ toast.info(
 
 ### 5. Widget Live Preview in Dashboard
 **Location:** Widget builder component  
-**Status:** Not implemented  
-**Impact:** MEDIUM - Users can't preview widgets before embedding  
-**Required Actions:**
-- Create preview component
-- Fetch widget data
-- Render widget in iframe
-- Update preview on config changes
-- Add loading states
+**Status:** ✅ Implemented (November 27, 2025)  
+**Impact:** HIGH - Eliminated guesswork by giving users real-time visibility into layout/theme changes  
+**Highlights:**
+- Embedded sandboxed iframe that reuses the production widget bundle
+- Instant syncing for layout, theme, spacing, and display toggles with debounced network calls
+- Dedicated loading/error states plus retry actions
+- Preview toolbar with layout picker, viewport toggle, and reset option
 
 ### 6. Widget Production Optimization
 **Location:** `packages/widget/`  
@@ -520,7 +519,7 @@ const publishedTestimonials = totalTestimonials; // Placeholder
 
 ### Should Have Before Launch (6 items)
 - [ ] Logo upload working
-- [ ] Widget live preview
+- [x] Widget live preview
 - [ ] Widget optimized
 - [ ] Integration tests passing
 - [ ] E2E tests passing
@@ -562,14 +561,14 @@ The notification system is **100% complete** for Phase 4:
 **Only missing:** Actual Ably and email queue calls (2 TODO comments)
 
 ### Widget System
-The widget system is **90% complete**:
+The widget system is **97% complete**:
 - ✅ All 5 layouts implemented
 - ✅ Theme customization working
 - ✅ Verified badges displaying
 - ✅ Responsive design
 - ✅ Zero dependencies
 - ✅ CDN-ready
-- ⏳ Live preview pending
+- ✅ Live preview embedded in dashboard builder
 - ⏳ Production optimization pending
 
 ### Testing

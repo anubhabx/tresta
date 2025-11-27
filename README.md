@@ -5,10 +5,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.x-green)](https://www.prisma.io/)
-[![MVP Progress](https://img.shields.io/badge/MVP-95%25-brightgreen)](PROJECT_STATUS.md)
+[![MVP Progress](https://img.shields.io/badge/MVP-97%25-brightgreen)](PROJECT_STATUS.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> **📊 Project Status:** 95% complete - [View detailed status report](PROJECT_STATUS.md)
+> **📊 Project Status:** 97% complete - [View detailed status report](PROJECT_STATUS.md)
 
 ---
 
@@ -40,6 +40,9 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 
 **Recent Updates (November 2025):**
 
+- ✅ Live widget preview embedded in the dashboard builder with instant config sync
+- ✅ WCAG 2.1 AA accessibility sweep for the widget (keyboard nav, ARIA, live regions)
+- ✅ CSP compliance toolkit with runtime validator + CI audit script
 - ✅ Auto-moderation system with sentiment analysis
 - ✅ Google OAuth verification with trust badges
 - ✅ Custom account settings with GDPR compliance
@@ -82,6 +85,9 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - ⚡ **Auto-initialization**: Detects and initializes from script tags
 - 🎯 **Performance**: Optimized bundle (42.39 KB IIFE, 58.61 KB ESM)
 - ✅ **Verified Badges**: Display OAuth verification status in all layouts
+- ♿ **Accessibility**: WCAG 2.1 AA compliant (keyboard nav, focus states, screen readers)
+- 🛡️ **CSP Compliance**: Runtime validator + CI audit script for strict security policies
+- 🧪 **Dashboard Live Preview**: Real-time preview panel with layout switching + loading states
 
 ### Authentication & Security
 
@@ -369,7 +375,7 @@ Comprehensive documentation is available in the repository:
 
 ### Project Documentation
 
-- **[Project Status](PROJECT_STATUS.md)** - Detailed completion status and accomplishments (95% complete)
+- **[Project Status](PROJECT_STATUS.md)** - Detailed completion status and accomplishments (97% complete)
 - **[Features](FEATURES.md)** - Complete feature implementation status and details
 - **[Roadmap](ROADMAP.md)** - Development timeline and future plans
 - **[Changelog](CHANGELOG.md)** - Version history and recent changes
