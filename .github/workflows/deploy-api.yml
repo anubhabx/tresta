@@ -1,0 +1,61 @@
+name: Deploy API to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.4.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build API
+        run: pnpm turbo build --filter=api
+
+      - name: Prepare deployment artifact
+        run: |
+          pnpm deploy --filter=api --prod ./deployment
+          cp -r apps/api/dist ./deployment/dist
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AD613C00D62043FA8D24AE5E5A4735E5 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FC46D85C1FDB44B29773441A498A0320 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7C641638234E4E1DB274D48845FBB589 }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_APP_NAME || 'tresta-api-prod' }}
+          package: ./deployment
