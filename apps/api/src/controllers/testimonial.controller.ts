@@ -18,6 +18,7 @@ import { verifyGoogleIdToken } from "../lib/google-oauth.ts";
 import {
   moderateTestimonial,
   checkDuplicateContent,
+  analyzeReviewerBehavior,
 } from "../services/moderation.service.ts";
 
 const createTestimonial = async (
@@ -192,12 +193,18 @@ const createTestimonial = async (
       moderationSettings: project.moderationSettings as any,
     };
 
+    const reviewerBehavior = await analyzeReviewerBehavior(project.id, {
+      ipAddress: req.ip,
+      email: authorEmail,
+    });
+
     const moderationResult = await moderateTestimonial(
       content,
       authorEmail,
       rating,
       isOAuthVerified,
       moderationConfig,
+      reviewerBehavior,
     );
 
     // Prepare testimonial data

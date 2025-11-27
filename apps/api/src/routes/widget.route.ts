@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { attachUser } from "../middleware/auth.middleware.ts";
 import { validateApiKeyMiddleware, requirePermission } from "../middleware/api-key.middleware.ts";
+import { publicRateLimitMiddleware } from "../middleware/rate-limiter.ts";
+import { auditLog } from "../middleware/audit-log.middleware.ts";
 import {
   createWidget,
   updateWidget,
@@ -15,6 +17,7 @@ const router: Router = Router();
 // GET /api/widgets/:widgetId/public - Fetch widget data for embedding
 router.get(
   "/:widgetId/public", 
+  publicRateLimitMiddleware,
   validateApiKeyMiddleware, 
   requirePermission('widgets'), 
   fetchPublicWidgetData
@@ -22,15 +25,15 @@ router.get(
 
 // Protected routes - require authentication (use global restrictive CORS)
 // POST /api/widgets - Create a new widget
-router.post("/", attachUser, createWidget);
+router.post("/", attachUser, auditLog, createWidget);
 
 // GET /api/widgets/project/:slug - List all widgets for a project
 router.get("/project/:slug", attachUser, listWidgets);
 
 // PUT /api/widgets/:widgetId - Update widget configuration
-router.put("/:widgetId", attachUser, updateWidget);
+router.put("/:widgetId", attachUser, auditLog, updateWidget);
 
 // DELETE /api/widgets/:widgetId - Delete a widget
-router.delete("/:widgetId", attachUser, deleteWidget);
+router.delete("/:widgetId", attachUser, auditLog, deleteWidget);
 
 export { router as widgetRouter };

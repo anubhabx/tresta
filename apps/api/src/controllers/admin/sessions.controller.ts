@@ -88,9 +88,6 @@ export const revokeSession = async (
     // Revoke the session via Clerk API
     await clerkClient.sessions.revokeSession(sessionId);
 
-    // TODO: Log revocation in audit log
-    // This would require the audit log service to be implemented
-    // For now, we'll just log to console
     console.log(`Session ${sessionId} revoked by admin ${adminId}`);
 
     return ResponseHandler.success(res, {

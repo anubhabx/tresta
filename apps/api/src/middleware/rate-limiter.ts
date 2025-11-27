@@ -48,6 +48,22 @@ const adminHeavyRateLimiter = new RateLimiterRedis({
   duration: 300, // 5 minutes
 });
 
+// Public IP-based limiter: 300 requests per 5 minutes per IP
+const publicIpRateLimiter = new RateLimiterRedis({
+  storeClient: getRedisClient(),
+  keyPrefix: 'tresta:ratelimit:public:ip',
+  points: 300,
+  duration: 300,
+});
+
+function getClientIp(req: Request): string {
+  const forwarded = (req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['x-forwarded-for']) as string | undefined;
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
 /**
  * Express middleware for API rate limiting
  * 
@@ -101,6 +117,58 @@ export async function rateLimitMiddleware(
     } else {
       // Redis error - don't block the request
       console.error('Rate limiter error:', error);
+      next();
+    }
+  }
+}
+
+/**
+ * Public rate limiting middleware (IP-based)
+ *
+ * Limits unauthenticated/public endpoints by IP address to prevent abuse
+ * while keeping limits high enough for legitimate embed traffic.
+ */
+export async function publicRateLimitMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const clientIp = getClientIp(req);
+
+  if (!clientIp) {
+    return next();
+  }
+
+  try {
+    const rateLimitRes = await publicIpRateLimiter.consume(clientIp);
+
+    res.setHeader('X-RateLimit-Limit', '300');
+    res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+    res.setHeader(
+      'X-RateLimit-Reset',
+      new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+    );
+    res.setHeader('X-RateLimit-Key', clientIp);
+
+    next();
+  } catch (error: any) {
+    if (error.remainingPoints !== undefined) {
+      res.setHeader('X-RateLimit-Limit', '300');
+      res.setHeader('X-RateLimit-Remaining', '0');
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + error.msBeforeNext).toISOString()
+      );
+      res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+      res.setHeader('X-RateLimit-Key', clientIp);
+
+      res.status(429).json({
+        success: false,
+        error: 'Too many requests from this IP',
+        retryAfter: Math.ceil(error.msBeforeNext / 1000),
+      });
+    } else {
+      console.error('Public rate limiter error:', error);
       next();
     }
   }

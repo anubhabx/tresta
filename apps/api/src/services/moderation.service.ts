@@ -1,3 +1,5 @@
+import { prisma } from "@workspace/database/prisma";
+
 /**
  * Auto-Moderation Service
  *
@@ -26,6 +28,19 @@ interface ModerationConfig {
     averageRating?: number; // Project average rating for deviation detection
     existingContents?: string[]; // Existing testimonial contents for duplicate detection
   };
+}
+
+type ReviewerRiskLevel = "low" | "medium" | "high";
+
+export interface ReviewerBehaviorSignals {
+  ipAddress?: string | null;
+  email?: string | null;
+  timeframeHours: number;
+  ipRecentCount: number;
+  ipProjectRecentCount: number;
+  emailRecentCount: number;
+  suspiciousReasons: string[];
+  riskLevel: ReviewerRiskLevel;
 }
 
 // Enhanced profanity lists by severity (expanded from open-source datasets)
@@ -736,6 +751,7 @@ export async function moderateTestimonial(
   rating: number | undefined,
   isOAuthVerified: boolean,
   config: ModerationConfig,
+  behaviorSignals?: ReviewerBehaviorSignals | null,
 ): Promise<ModerationResult> {
   const issues: string[] = []; // Bad flags - problems that need attention
   const notes: string[] = []; // Info flags - positive signals
@@ -847,6 +863,16 @@ export async function moderateTestimonial(
     }
   }
 
+  if (behaviorSignals && behaviorSignals.suspiciousReasons.length > 0) {
+    issues.push(...behaviorSignals.suspiciousReasons);
+
+    if (behaviorSignals.riskLevel === "high") {
+      status = "REJECTED";
+    } else if (status === "PENDING") {
+      status = "FLAGGED";
+    }
+  }
+
   // Calculate quality score
   const qualityScore = calculateQualityScore(content, rating, isOAuthVerified);
 
@@ -877,43 +903,106 @@ export async function moderateTestimonial(
 }
 
 /**
- * TODO: Reviewer behavioral pattern detection (post-MVP)
+ * Review behavioral analysis (non-intrusive)
  *
- * Future enhancement: Detect spam patterns across multiple reviews
- *
- * Heuristics to implement:
- * - Multiple reviews from same email/IP in short timeframe
- * - Similar content patterns from same reviewer
- * - Velocity-based detection (burst of reviews)
- * - Cross-project spam detection
- *
- * Example implementation:
- *
- * async function checkReviewerBehavior(
- *   email: string,
- *   ipAddress: string,
- *   projectId: string
- * ): Promise<{ isSuspicious: boolean; patterns: string[] }> {
- *   // Query testimonials table for reviewer history
- *   const recentReviews = await prisma.testimonial.findMany({
- *     where: {
- *       OR: [
- *         { authorEmail: email },
- *         { ipAddress: ipAddress }
- *       ],
- *       createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
- *     }
- *   });
- *
- *   const patterns = [];
- *   if (recentReviews.length > 5) patterns.push('High review velocity');
- *   if (recentReviews.filter(r => r.projectId !== projectId).length > 3) {
- *     patterns.push('Cross-project spam pattern');
- *   }
- *
- *   return { isSuspicious: patterns.length > 0, patterns };
- * }
+ * Looks for suspicious velocity patterns using IP and email without blocking
+ * legitimate testimonials. Returns descriptive reasons so callers can flag
+ * rather than auto-reject unless the activity is extremely abusive.
  */
+export async function analyzeReviewerBehavior(
+  projectId: string,
+  options: {
+    ipAddress?: string | null;
+    email?: string | null;
+    timeframeHours?: number;
+  } = {}
+): Promise<ReviewerBehaviorSignals | null> {
+  const { ipAddress, email, timeframeHours = 24 } = options;
+
+  if (!ipAddress && !email) {
+    return null;
+  }
+
+  const since = new Date(Date.now() - timeframeHours * 60 * 60 * 1000);
+
+  const [ipRecentCount, ipProjectRecentCount, emailRecentCount] = await Promise.all([
+    ipAddress
+      ? prisma.testimonial.count({
+          where: {
+            ipAddress,
+            createdAt: { gte: since },
+          },
+        })
+      : Promise.resolve(0),
+    ipAddress
+      ? prisma.testimonial.count({
+          where: {
+            ipAddress,
+            projectId,
+            createdAt: { gte: since },
+          },
+        })
+      : Promise.resolve(0),
+    email
+      ? prisma.testimonial.count({
+          where: {
+            authorEmail: email,
+            createdAt: { gte: since },
+          },
+        })
+      : Promise.resolve(0),
+  ]);
+
+  const suspiciousReasons: string[] = [];
+  let riskLevel: ReviewerRiskLevel = "low";
+
+  const escalate = (level: ReviewerRiskLevel): void => {
+    if (level === "high" || riskLevel === "high") {
+      riskLevel = "high";
+      return;
+    }
+    if (level === "medium" && riskLevel === "low") {
+      riskLevel = "medium";
+    }
+  };
+
+  if (ipRecentCount >= 10) {
+    suspiciousReasons.push(
+      `High submission volume from same IP (${ipRecentCount} in last ${timeframeHours}h)`
+    );
+    escalate("high");
+  } else if (ipRecentCount >= 5) {
+    suspiciousReasons.push(
+      `Unusual submission volume from same IP (${ipRecentCount} in last ${timeframeHours}h)`
+    );
+    escalate("medium");
+  }
+
+  if (ipProjectRecentCount >= 3) {
+    suspiciousReasons.push(
+      `Multiple testimonials for this project from same IP (${ipProjectRecentCount} in last ${timeframeHours}h)`
+    );
+    escalate("medium");
+  }
+
+  if (emailRecentCount >= 4) {
+    suspiciousReasons.push(
+      `Repeated submissions from same email (${emailRecentCount} in last ${timeframeHours}h)`
+    );
+    escalate(emailRecentCount >= 6 ? "high" : "medium");
+  }
+
+  return {
+    ipAddress,
+    email,
+    timeframeHours,
+    ipRecentCount,
+    ipProjectRecentCount,
+    emailRecentCount,
+    suspiciousReasons,
+    riskLevel,
+  };
+}
 
 /**
  * Check for duplicate content

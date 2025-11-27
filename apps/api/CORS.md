@@ -139,7 +139,7 @@ router.post("/", restrictiveCors, attachUser, createWidget);
 1. **No credentials:** Public endpoints don't accept authentication tokens
 2. **Read-only:** Only GET requests allowed
 3. **Business logic validation:** Controllers validate project visibility and testimonial status
-4. **Rate limiting:** (TODO) Add rate limiting for abuse prevention
+4. **Rate limiting:** IP-based limiter (`publicRateLimitMiddleware`) protects public widget endpoints without requiring auth
 5. **Caching:** Server-side caching reduces load from repeated requests
 
 ### What CORS Does NOT Protect
