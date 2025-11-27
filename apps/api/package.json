@@ -25,6 +25,7 @@
     "ably": "^2.14.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.63.0",
+    "concurrently": "^9.2.1",
     "cors": "^2.8.5",
     "cron": "^4.3.4",
     "dompurify": "^3.3.0",
