@@ -44,7 +44,7 @@ export default function NotFoundPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild size="lg" className="flex-1">
-              <a href="mailto:support@tresta.com">
+              <a href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}`}>
                 <LifeBuoy className="mr-2 h-4 w-4" />
                 Contact support
               </a>

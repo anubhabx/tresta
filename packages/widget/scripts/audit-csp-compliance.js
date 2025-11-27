@@ -20,8 +20,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ALLOWED_DOMAINS = [
-  'cdn.tresta.com',
-  'api.tresta.com',
+  'cdn.tresta.app',
+  'api.tresta.app',
 ];
 
 const violations = [];

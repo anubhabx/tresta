@@ -325,7 +325,7 @@ All notable changes to the Tresta project will be documented in this file.
 
 - Created `renderBranding()` function in renderer
 - Always displays at bottom of widget with top border separator
-- Small gray text (12px) with branded link to tresta.io
+- Small gray text (12px) with branded link to tresta.app
 - Link styled with primary theme color and hover effect
 - Fixed demo files to properly render branding footer
 
@@ -382,7 +382,7 @@ Simple embed (auto-initialize):
 
 ```html
 <script
-  src="https://cdn.tresta.io/widget.js"
+  src="https://cdn.tresta.app/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
 ></script>
 ```
@@ -391,7 +391,7 @@ With customization:
 
 ```html
 <script
-  src="https://cdn.tresta.io/widget.js"
+  src="https://cdn.tresta.app/widget.js"
   data-tresta-widget="YOUR_WIDGET_ID"
   data-primary-color="#10b981"
   data-autoplay="true"

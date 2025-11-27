@@ -24,8 +24,8 @@ export function SiteFooter() {
           <Link href="/settings/notifications" className="hover:text-foreground transition-colors">
             Notifications
           </Link>
-          <Link href="mailto:support@tresta.com" className="hover:text-foreground transition-colors">
-            support@tresta.com
+          <Link href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}`} className="hover:text-foreground transition-colors">
+            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}
           </Link>
         </div>
 

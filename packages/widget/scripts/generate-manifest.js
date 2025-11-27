@@ -125,9 +125,9 @@ function generateManifest() {
       buildTime: new Date().toISOString(),
       assets: assets,
       cdn: {
-        baseUrl: `https://cdn.tresta.com/widget/v${version}`,
-        versionedUrl: `https://cdn.tresta.com/widget/v${version}/tresta-widget.iife.js`,
-        majorVersionUrl: `https://cdn.tresta.com/widget/v${version.split('.')[0]}/tresta-widget.iife.js`,
+        baseUrl: `https://cdn.tresta.app/widget/v${version}`,
+        versionedUrl: `https://cdn.tresta.app/widget/v${version}/tresta-widget.iife.js`,
+        majorVersionUrl: `https://cdn.tresta.app/widget/v${version.split('.')[0]}/tresta-widget.iife.js`,
       },
       embedCode: {
         standard: generateStandardEmbed(version),
@@ -160,7 +160,7 @@ function generateManifest() {
 function generateStandardEmbed(version) {
   return `<!-- Tresta Testimonial Widget -->
 <div id="tresta-widget-{WIDGET_ID}" data-widget-id="{WIDGET_ID}"></div>
-<script async src="https://cdn.tresta.com/widget/v${version}/tresta-widget.iife.js" 
+<script async src="https://cdn.tresta.app/widget/v${version}/tresta-widget.iife.js" 
         data-widget-id="{WIDGET_ID}"></script>`;
 }
 
@@ -171,7 +171,7 @@ function generateCSPEmbed(version, integrity) {
   return `<!-- Tresta Testimonial Widget (CSP-friendly with SRI) -->
 <div id="tresta-widget-{WIDGET_ID}" data-widget-id="{WIDGET_ID}"></div>
 <script async 
-        src="https://cdn.tresta.com/widget/v${version}/tresta-widget.iife.js" 
+        src="https://cdn.tresta.app/widget/v${version}/tresta-widget.iife.js" 
         integrity="${integrity || 'sha384-HASH_WILL_BE_GENERATED'}"
         crossorigin="anonymous"
         data-widget-id="{WIDGET_ID}"></script>`;

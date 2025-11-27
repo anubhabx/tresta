@@ -59,7 +59,7 @@ tracker.trackInteraction('carousel');
 const tracker = new TelemetryTracker('widget-123', '1.0.0', {
   enabled: true,           // Enable/disable telemetry
   samplingRate: 0.01,      // 1% sampling rate
-  endpoint: 'https://api.tresta.com/telemetry',
+  endpoint: 'https://api.tresta.app/telemetry',
 });
 ```
 

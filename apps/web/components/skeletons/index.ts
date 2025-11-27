@@ -2,7 +2,7 @@
 export {
   DashboardStatsSkeleton,
   RecentProjectsListSkeleton,
-  QuickActionsCardSkeleton,
+
   GettingStartedCardSkeleton,
   DashboardHeaderSkeleton,
   DashboardPageSkeleton,

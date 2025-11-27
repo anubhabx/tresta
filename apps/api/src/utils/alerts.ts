@@ -16,31 +16,31 @@ import { REDIS_KEYS } from '../lib/redis-keys.ts';
  */
 export async function checkAndAlertQuota(currentCount: number): Promise<void> {
   const redis = getRedisClient();
-  
+
   // Define thresholds
   const thresholds = [
     { count: 160, percentage: 80, level: 'warning', emoji: '⚠️' },
     { count: 180, percentage: 90, level: 'critical', emoji: '🚨' },
     { count: 200, percentage: 100, level: 'exhausted', emoji: '🔴' },
   ];
-  
+
   for (const threshold of thresholds) {
     if (currentCount === threshold.count) {
       // Check if we already sent this alert today
       const alertKey = `${REDIS_KEYS.EMAIL_QUOTA_LOCKED}:alert:${threshold.count}`;
       const alreadySent = await redis.get(alertKey);
-      
+
       if (alreadySent) {
         continue; // Already sent this alert today
       }
-      
+
       // Send alert
       const message = threshold.count === 200
         ? `${threshold.emoji} Email quota exhausted (200/200) - non-critical emails deferred to tomorrow's digest`
         : `${threshold.emoji} Email quota at ${threshold.percentage}% (${currentCount}/200)${threshold.count === 180 ? ' - approaching limit' : ''}`;
-      
+
       await sendSlackAlert(message, threshold.level);
-      
+
       // Mark alert as sent (expires at midnight UTC)
       const now = new Date();
       const tomorrow = Date.UTC(
@@ -51,7 +51,7 @@ export async function checkAndAlertQuota(currentCount: number): Promise<void> {
       );
       const ttl = Math.floor((tomorrow - Date.now()) / 1000);
       await redis.setex(alertKey, ttl, '1');
-      
+
       console.log(`📢 Alert sent: ${message}`);
     }
   }
@@ -65,12 +65,12 @@ export async function checkAndAlertQuota(currentCount: number): Promise<void> {
  */
 async function sendSlackAlert(message: string, level: string): Promise<void> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-  
+
   if (!webhookUrl) {
     console.warn('⚠️ SLACK_WEBHOOK_URL not configured, skipping alert:', message);
     return;
   }
-  
+
   try {
     // Determine color based on level
     const colors: Record<string, string> = {
@@ -78,7 +78,7 @@ async function sendSlackAlert(message: string, level: string): Promise<void> {
       critical: '#FF4500', // Red-Orange
       exhausted: '#DC143C', // Crimson
     };
-    
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -107,16 +107,16 @@ async function sendSlackAlert(message: string, level: string): Promise<void> {
               },
             ],
             footer: 'Tresta Monitoring',
-            footer_icon: 'https://tresta.app/favicon.ico',
+            footer_icon: `${process.env.APP_URL || 'https://tresta.app'}/favicon.ico`,
           },
         ],
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Slack API error: ${response.status}`);
     }
-    
+
     console.log('✅ Slack alert sent successfully');
   } catch (error) {
     console.error('❌ Failed to send Slack alert:', error);
@@ -143,7 +143,7 @@ export async function sendAlert(
     warning: 'warning',
     error: 'exhausted',
   };
-  
+
   await sendSlackAlert(message, levelMap[level]);
 }
 
@@ -159,13 +159,13 @@ export async function sendDailySummary(stats: {
   failedJobs: number;
 }): Promise<void> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-  
+
   if (!webhookUrl) {
     return;
   }
-  
+
   const message = `📊 Daily Summary - ${new Date().toISOString().split('T')[0]}`;
-  
+
   try {
     await fetch(webhookUrl, {
       method: 'POST',

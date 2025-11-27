@@ -1,11 +1,12 @@
 import trestaLogo from '../assets/tresta-logo.svg?raw';
+import { WIDGET_BRANDING_URL } from '../config/env';
 
 export function createBrandingBadge(): HTMLElement {
   const badgeWrapper = document.createElement('div');
   badgeWrapper.className = 'tresta-branding-badge';
 
   const link = document.createElement('a');
-  link.href = 'https://tresta.com';
+  link.href = WIDGET_BRANDING_URL;
   link.target = '_blank';
   link.rel = 'noreferrer noopener';
   link.className = 'tresta-branding-link';

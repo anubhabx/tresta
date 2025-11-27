@@ -5,6 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
+const normalizeUrl = (url?: string) => {
+  if (!url) return undefined;
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
+
+const WIDGET_CDN_BASE_URL =
+  normalizeUrl(process.env.NEXT_PUBLIC_WIDGET_CDN_BASE_URL) ?? 'https://cdn.tresta.app';
+
+const WIDGET_API_BASE_URL =
+  normalizeUrl(process.env.NEXT_PUBLIC_WIDGET_API_BASE_URL) ?? 'https://api.tresta.app';
+
 interface EmbedCodeGeneratorProps {
   widgetId: string;
   version?: string;
@@ -33,24 +44,30 @@ export function EmbedCodeGenerator({
 
   const generateStandardEmbed = () => {
     const versionUrl = getVersionUrl();
+    const scriptSrc = `${WIDGET_CDN_BASE_URL}/widget/${versionUrl}/tresta-widget.iife.js`;
     return `<!-- Tresta Testimonial Widget -->
 <div id="tresta-widget-${widgetId}" data-widget-id="${widgetId}"></div>
-<script async src="https://cdn.tresta.com/widget/${versionUrl}/tresta-widget.iife.js" 
+<script async src="${scriptSrc}" 
         data-widget-id="${widgetId}"></script>`;
   };
 
   const generateCSPEmbed = () => {
     const versionUrl = getVersionUrl();
+    const scriptSrc = `${WIDGET_CDN_BASE_URL}/widget/${versionUrl}/tresta-widget.iife.js`;
     return `<!-- Tresta Testimonial Widget (CSP-friendly with SRI) -->
 <div id="tresta-widget-${widgetId}" data-widget-id="${widgetId}"></div>
 <script async 
-        src="https://cdn.tresta.com/widget/${versionUrl}/tresta-widget.iife.js" 
+        src="${scriptSrc}" 
         integrity="${integrity}"
         crossorigin="anonymous"
         data-widget-id="${widgetId}"></script>`;
   };
 
   const embedCode = embedType === 'standard' ? generateStandardEmbed() : generateCSPEmbed();
+  const cspDirectiveText = `script-src 'self' ${WIDGET_CDN_BASE_URL};
+connect-src ${WIDGET_API_BASE_URL};
+img-src ${WIDGET_CDN_BASE_URL} ${WIDGET_API_BASE_URL} data:;
+style-src 'self' ${WIDGET_CDN_BASE_URL};`;
 
   const copyToClipboard = async () => {
     try {
@@ -180,10 +197,7 @@ export function EmbedCodeGenerator({
             Required CSP Directives
           </h4>
           <pre className="bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 p-3 rounded text-xs overflow-x-auto">
-{`script-src 'self' https://cdn.tresta.com;
-connect-src https://api.tresta.com;
-img-src https://cdn.tresta.com https://api.tresta.com data:;
-style-src 'self' https://cdn.tresta.com;`}
+{cspDirectiveText}
           </pre>
         </div>
       )}

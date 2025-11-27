@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { APIClient } from '../api/client';
 import { WidgetError, WidgetErrorCode } from '../types';
+import { WIDGET_API_BASE_URL } from '../config/env';
 
 describe('API Client', () => {
   let apiClient: APIClient;
@@ -34,7 +35,7 @@ describe('API Client', () => {
       const client = new APIClient({}, 'test-key');
       const config = client.getConfig();
 
-      expect(config.baseURL).toBe('https://api.tresta.com');
+      expect(config.baseURL).toBe(WIDGET_API_BASE_URL);
       expect(config.timeout).toBe(10000);
       expect(config.maxRetries).toBe(3);
     });

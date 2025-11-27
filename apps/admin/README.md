@@ -32,6 +32,10 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3001
+
+# Widget Embed Configuration
+NEXT_PUBLIC_WIDGET_CDN_BASE_URL=https://cdn.tresta.app
+NEXT_PUBLIC_WIDGET_API_BASE_URL=https://api.tresta.app
 ```
 
 ### 3. Set Up Admin User

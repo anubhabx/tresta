@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TelemetryTracker } from '../tracker';
+import { WIDGET_TELEMETRY_ENDPOINT } from '../../config/env';
 
 describe('TelemetryTracker', () => {
   let tracker: TelemetryTracker;
@@ -75,7 +76,7 @@ describe('TelemetryTracker', () => {
     expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
     
     const call = sendBeaconSpy.mock.calls[0];
-    expect(call[0]).toBe('https://api.tresta.com/telemetry');
+    expect(call[0]).toBe(WIDGET_TELEMETRY_ENDPOINT);
     
     const blob = call[1];
     expect(blob).toBeInstanceOf(Blob);
@@ -139,7 +140,7 @@ describe('TelemetryTracker', () => {
     tracker.trackLoad('grid');
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy.mock.calls[0][0]).toBe('https://api.tresta.com/telemetry');
+    expect(fetchSpy.mock.calls[0][0]).toBe(WIDGET_TELEMETRY_ENDPOINT);
     expect(fetchSpy.mock.calls[0][1]).toMatchObject({
       method: 'POST',
       keepalive: true,

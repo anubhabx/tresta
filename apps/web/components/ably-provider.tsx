@@ -65,7 +65,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
           callback(null, tokenRequest.data);
         } catch (error) {
           console.error("Ably auth error:", error);
-          callback(error as Error, null);
+          callback(error as any, null);
         }
       },
     });
@@ -91,14 +91,14 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
 
     // Subscribe to user's notification channel
     const channel = client.channels.get(`notifications:${userId}`);
-    
+
     channel.subscribe("notification", (message) => {
       console.log("New notification received:", message.data);
-      
+
       // Invalidate queries to fetch new notifications
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
-      
+
       // Show toast notification
       if (message.data?.title) {
         toast.info(message.data.title, {
@@ -135,7 +135,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
 
     // Track user activity
     const activityEvents = ["mousemove", "keypress", "click", "scroll", "touchstart"];
-    
+
     activityEvents.forEach((event) => {
       window.addEventListener(event, resetInactivityTimer);
     });
@@ -168,7 +168,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
     };
 
     const activityEvents = ["mousemove", "keypress", "click"];
-    
+
     activityEvents.forEach((event) => {
       window.addEventListener(event, handleActivity, { once: true });
     });

@@ -271,7 +271,7 @@ export default function TestimonialSubmissionPage({
                 asChild
                 className="border-dashed"
               >
-                <a href="mailto:support@tresta.com?subject=Testimonial%20Update">
+                <a href="mailto:support@tresta.app?subject=Testimonial%20Update">
                   Need to update yours?
                 </a>
               </Button>

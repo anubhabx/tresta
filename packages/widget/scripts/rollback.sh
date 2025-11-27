@@ -23,7 +23,7 @@ REASON=$2
 URGENT=$3
 
 # Configuration
-CDN_BUCKET="${CDN_BUCKET:-cdn.tresta.com}"
+CDN_BUCKET="${CDN_BUCKET:-cdn.tresta.app}"
 CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID:-E1234567890ABC}"
 SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
@@ -246,9 +246,9 @@ echo -e "${GREEN}║              Rollback Completed Successfully               
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
-echo "  1. Monitor error rates: https://monitoring.tresta.com/widget-dashboard"
-echo "  2. Check customer reports: https://support.tresta.com"
-echo "  3. Schedule post-mortem: https://calendar.tresta.com"
+echo "  1. Monitor error rates: https://monitoring.tresta.app/widget-dashboard"
+echo "  2. Check customer reports: https://support.tresta.app"
+echo "  3. Schedule post-mortem: https://calendar.tresta.app"
 echo "  4. Update incident ticket with rollback details"
 echo ""
 echo -e "${YELLOW}Rollback Details:${NC}"

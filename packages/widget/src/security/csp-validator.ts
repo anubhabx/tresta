@@ -8,6 +8,13 @@
  * - Validates no inline scripts or eval() usage
  */
 
+import {
+  WIDGET_ALLOWED_DOMAINS,
+  WIDGET_API_BASE_URL,
+  WIDGET_CDN_BASE_URL,
+  buildWidgetScriptUrl,
+} from '../config/env';
+
 export interface CSPConfig {
   allowedDomains: string[];
   nonce?: string;
@@ -15,10 +22,7 @@ export interface CSPConfig {
 }
 
 // Default allowed domains per requirements
-const DEFAULT_ALLOWED_DOMAINS = [
-  'cdn.tresta.com',
-  'api.tresta.com',
-];
+const DEFAULT_ALLOWED_DOMAINS = [...WIDGET_ALLOWED_DOMAINS];
 
 /**
  * CSP Validator class
@@ -285,10 +289,10 @@ export interface CSPValidationResult {
  */
 export function getRequiredCSPDirectives(): string[] {
   return [
-    "script-src 'self' https://cdn.tresta.com",
-    "connect-src https://api.tresta.com",
-    "img-src https://cdn.tresta.com https://api.tresta.com data:",
-    "style-src 'self' https://cdn.tresta.com",
+    `script-src 'self' ${WIDGET_CDN_BASE_URL}`,
+    `connect-src ${WIDGET_API_BASE_URL}`,
+    `img-src ${WIDGET_CDN_BASE_URL} ${WIDGET_API_BASE_URL} data:`,
+    `style-src 'self' ${WIDGET_CDN_BASE_URL}`,
   ];
 }
 
@@ -303,11 +307,12 @@ export function generateCSPFriendlyEmbedCode(
 ): string {
   const nonceAttr = nonce ? ` nonce="${nonce}"` : '';
   const integrityAttr = integrity ? ` integrity="${integrity}" crossorigin="anonymous"` : '';
+  const scriptSrc = buildWidgetScriptUrl(version);
 
   return `<!-- Tresta Testimonial Widget (CSP-friendly) -->
 <div id="tresta-widget-${widgetId}" data-widget-id="${widgetId}"></div>
 <script async 
-        src="https://cdn.tresta.com/widget/v${version}/tresta-widget.iife.js"${integrityAttr}${nonceAttr}
+        src="${scriptSrc}"${integrityAttr}${nonceAttr}
         data-widget-id="${widgetId}"></script>`;
 }
 

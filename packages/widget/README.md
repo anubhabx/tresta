@@ -67,7 +67,7 @@ The build produces:
 
 ```html
 <div id="tresta-widget-123" data-widget-id="123"></div>
-<script async src="https://cdn.tresta.com/widget/v1.0.0/tresta-widget.iife.js" 
+<script async src="https://cdn.tresta.app/widget/v1.0.0/tresta-widget.iife.js" 
         data-widget-id="123"></script>
 ```
 

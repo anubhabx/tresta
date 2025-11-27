@@ -10,6 +10,7 @@
 
 import type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types';
 import { TelemetrySampler } from './sampler';
+import { WIDGET_TELEMETRY_ENDPOINT } from '../config/env';
 
 export class TelemetryTracker {
   private config: TelemetryConfig;
@@ -35,7 +36,7 @@ export class TelemetryTracker {
     this.config = {
       enabled: !telemetryDisabled && !dntEnabled,
       samplingRate: config.samplingRate ?? 0.01, // Default 1%
-      endpoint: config.endpoint ?? 'https://api.tresta.com/telemetry',
+      endpoint: config.endpoint ?? WIDGET_TELEMETRY_ENDPOINT,
     };
 
     this.sampler = new TelemetrySampler(this.config.samplingRate);

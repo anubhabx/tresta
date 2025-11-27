@@ -43,7 +43,7 @@ export default function ForbiddenPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild size="lg" className="flex-1">
-              <a href="mailto:support@tresta.com">Contact support</a>
+              <a href="mailto:support@tresta.app">Contact support</a>
             </Button>
           </div>
         </CardContent>

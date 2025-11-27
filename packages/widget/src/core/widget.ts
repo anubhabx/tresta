@@ -15,6 +15,7 @@ import { limitTestimonials } from '../utils/testimonial-limiter';
 import { Logger } from '../utils/logger';
 import { CSPValidator } from '../security/csp-validator';
 import type { CSPConfig } from '../security/csp-validator';
+import { WIDGET_API_BASE_URL } from '../config/env';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -79,7 +80,7 @@ export class Widget implements WidgetInstance {
     this.logger.debug('Initialized with config:', {
       widgetId: config.widgetId,
       apiKey: config.apiKey ? `${config.apiKey.substring(0, 15)}...` : 'NOT PROVIDED',
-      apiUrl: config.apiUrl || 'default (https://api.tresta.com)',
+      apiUrl: config.apiUrl || `default (${WIDGET_API_BASE_URL})`,
       debug: config.debug,
       telemetry: config.telemetry,
       version: config.version,

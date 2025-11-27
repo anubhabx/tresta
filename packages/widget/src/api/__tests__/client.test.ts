@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { APIClient } from '../client';
 import { WidgetError, WidgetErrorCode } from '../../types';
 import type { WidgetData } from '../../types';
+import { WIDGET_API_BASE_URL } from '../../config/env';
 
 // Mock the network client
 vi.mock('../network', () => {
@@ -77,7 +78,7 @@ describe('APIClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     apiClient = new APIClient({
-      baseURL: 'https://api.tresta.com',
+      baseURL: WIDGET_API_BASE_URL,
       timeout: 10000,
       maxRetries: 3,
     }, 'test-api-key-123');
@@ -137,7 +138,7 @@ describe('APIClient', () => {
       expect(result.widgetId).toBe('test-widget-123');
       expect(result.testimonials).toHaveLength(1);
       expect(mockRequest).toHaveBeenCalledWith(
-        'https://api.tresta.com/api/widgets/test-widget-123/public',
+        `${WIDGET_API_BASE_URL}/api/widgets/test-widget-123/public`,
         expect.objectContaining({
           method: 'GET',
           timeout: 10000,
@@ -507,7 +508,7 @@ describe('APIClient', () => {
       const client = new APIClient({}, 'test-key');
       const config = client.getConfig();
 
-      expect(config.baseURL).toBe('https://api.tresta.com');
+      expect(config.baseURL).toBe(WIDGET_API_BASE_URL);
       expect(config.timeout).toBe(10000);
       expect(config.maxRetries).toBe(3);
     });

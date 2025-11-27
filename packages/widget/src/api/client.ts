@@ -9,9 +9,10 @@ import { retry } from './retry';
 import { RateLimiter } from './rate-limiter';
 import type { APIClientConfig } from './types';
 import { Logger } from '../utils/logger';
+import { WIDGET_API_BASE_URL } from '../config/env';
 
 const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
-  baseURL: 'https://api.tresta.com',
+  baseURL: WIDGET_API_BASE_URL,
   timeout: 10000, // 10 seconds
   maxRetries: 3,
 };
