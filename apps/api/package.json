@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "pnpm dlx tsx --watch src/index.ts",
     "dev:workers": "pnpm dlx tsx --watch src/workers/index.ts",
-    "build": "tsc",
+    "build": "pnpm --filter @workspace/database build && tsc",
     "start": "node dist/index.js",
     "start:workers": "node dist/workers/index.js",
     "migrate:testimonials": "ts-node src/scripts/migrate-existing-testimonials.ts"
@@ -52,6 +52,6 @@
     "@types/node": "^20.19.9",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.7.3"
   }
 }
