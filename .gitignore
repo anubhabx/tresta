@@ -68,6 +68,4 @@ packages/widget/dist
 **/index.html
 packages/widget/.env
 
-.kiro
-
-packages/design
+pnpm-lock.yaml
