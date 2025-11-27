@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@workspace/database/*": ["../../packages/database/src/*"],
+      "@workspace/database/*": ["../../packages/database/dist/*"],
       "@workspace/types": ["../../packages/types/src/index.ts"],
       "@workspace/types/*": ["../../packages/types/src/*"]
     },

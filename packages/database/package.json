@@ -2,13 +2,18 @@
   "name": "@workspace/database",
   "type": "module",
   "exports": {
-    "./prisma": "./src/prisma.ts"
+    "./prisma": "./dist/prisma.js"
   },
+  "types": "./dist/prisma.d.ts",
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "prisma": "^6.16.1"
   },
   "scripts": {
+    "build": "tsc && node scripts/copy-generated.js",
     "generate": "prisma generate --no-engine"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1"
   }
 }
