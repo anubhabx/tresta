@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateToken } from '../../controllers/ably.controller.ts';
+import { generateToken } from '../../controllers/ably.controller.js';
 
 const router: Router = Router();
 

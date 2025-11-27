@@ -9,8 +9,8 @@ import {
   listApiKeysHandler, 
   getApiKeyHandler,
   revokeApiKeyHandler 
-} from '../controllers/api-key.controller.ts';
-import { attachUser } from '../middleware/auth.middleware.ts';
+} from '../controllers/api-key.controller.js';
+import { attachUser } from '../middleware/auth.middleware.js';
 
 const router: RouterType = Router();
 

@@ -1,5 +1,5 @@
-import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS } from '../lib/redis-keys.ts';
+import { getRedisClient } from '../lib/redis.js';
+import { REDIS_KEYS } from '../lib/redis-keys.js';
 
 /**
  * Check email quota and send alerts at key thresholds

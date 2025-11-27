@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { adminReadRateLimitMiddleware, adminWriteRateLimitMiddleware } from '../../middleware/rate-limiter.ts';
-import { auditLog } from '../../middleware/audit-log.middleware.ts';
-import { getFeatureFlags, updateFeatureFlagController, createFeatureFlagController } from '../../controllers/admin/feature-flags.controller.ts';
+import { adminReadRateLimitMiddleware, adminWriteRateLimitMiddleware } from '../../middleware/rate-limiter.js';
+import { auditLog } from '../../middleware/audit-log.middleware.js';
+import { getFeatureFlags, updateFeatureFlagController, createFeatureFlagController } from '../../controllers/admin/feature-flags.controller.js';
 
 const router: Router = Router();
 

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.ts';
-import { getRedisClient } from '../../lib/redis.ts';
-import { BadRequestError } from '../../lib/errors.ts';
+import { ResponseHandler } from '../../lib/response.js';
+import { getRedisClient } from '../../lib/redis.js';
+import { BadRequestError } from '../../lib/errors.js';
 
 const ALERT_KEYS = {
   EMAIL_QUOTA_THRESHOLD: 'alerts:email_quota_threshold',

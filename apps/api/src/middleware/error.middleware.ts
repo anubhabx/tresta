@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { ApiError } from "../lib/errors.ts";
-import { ResponseHandler } from "../lib/response.ts";
+import { ApiError } from '../lib/errors.js';
+import { ResponseHandler } from '../lib/response.js';
 
 /**
  * Global error handling middleware

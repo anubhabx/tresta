@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { rateLimitMiddleware } from '../middleware/rate-limiter.ts';
+import { rateLimitMiddleware } from '../middleware/rate-limiter.js';
 import {
   listNotifications,
   getUnreadCount,
@@ -7,7 +7,7 @@ import {
   markAllAsRead,
   getPreferences,
   updatePreferences,
-} from '../controllers/notification.controller.ts';
+} from '../controllers/notification.controller.js';
 
 const router: Router = Router();
 

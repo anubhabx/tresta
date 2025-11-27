@@ -1,5 +1,5 @@
 import { CronJob } from 'cron';
-import { checkWidgetPerformance, cleanupOldAnalytics } from '../services/widget-analytics.service.ts';
+import { checkWidgetPerformance, cleanupOldAnalytics } from '../services/widget-analytics.service.js';
 
 // Performance check job (every 15 minutes)
 export const performanceCheckJob = new CronJob(

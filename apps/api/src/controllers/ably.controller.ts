@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import Ably from 'ably';
-import { BadRequestError, InternalServerError } from '../lib/errors.ts';
-import { ResponseHandler } from '../lib/response.ts';
+import { BadRequestError, InternalServerError } from '../lib/errors.js';
+import { ResponseHandler } from '../lib/response.js';
 
 const ablyApiKey = process.env.ABLY_API_KEY;
 

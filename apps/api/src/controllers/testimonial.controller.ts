@@ -8,18 +8,18 @@ import {
   ForbiddenError,
   ValidationError,
   handlePrismaError,
-} from "../lib/errors.ts";
+} from '../lib/errors.js';
 import {
   ResponseHandler,
   extractPaginationParams,
   calculateSkip,
-} from "../lib/response.ts";
-import { verifyGoogleIdToken } from "../lib/google-oauth.ts";
+} from '../lib/response.js';
+import { verifyGoogleIdToken } from '../lib/google-oauth.js';
 import {
   moderateTestimonial,
   checkDuplicateContent,
   analyzeReviewerBehavior,
-} from "../services/moderation.service.ts";
+} from '../services/moderation.service.js';
 
 const createTestimonial = async (
   req: Request,

@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import { requireAdmin } from '../../middleware/admin.middleware.ts';
-import dlqRouter from './dlq.route.ts';
-import healthRouter from './health.route.ts';
-import metricsRouter from './metrics.route.ts';
-import usersRouter from './users.route.ts';
-import projectsRouter from './projects.route.ts';
-import testimonialsRouter from './testimonials.route.ts';
-import settingsRouter from './settings.route.ts';
-import auditLogsRouter from './audit-logs.route.ts';
-import sessionsRouter from './sessions.route.ts';
-import alertsRouter from './alerts.route.ts';
-import errorsRouter from './errors.route.ts';
-import systemRouter from './system.route.ts';
-import featureFlagsRouter from './feature-flags.route.ts';
-import widgetAnalyticsRouter from './widgets.route.ts';
+import { requireAdmin } from '../../middleware/admin.middleware.js';
+import dlqRouter from './dlq.route.js';
+import healthRouter from './health.route.js';
+import metricsRouter from './metrics.route.js';
+import usersRouter from './users.route.js';
+import projectsRouter from './projects.route.js';
+import testimonialsRouter from './testimonials.route.js';
+import settingsRouter from './settings.route.js';
+import auditLogsRouter from './audit-logs.route.js';
+import sessionsRouter from './sessions.route.js';
+import alertsRouter from './alerts.route.js';
+import errorsRouter from './errors.route.js';
+import systemRouter from './system.route.js';
+import featureFlagsRouter from './feature-flags.route.js';
+import widgetAnalyticsRouter from './widgets.route.js';
 
 const router: Router = Router();
 

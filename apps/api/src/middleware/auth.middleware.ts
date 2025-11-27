@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { UnauthorizedError } from "../lib/errors.ts";
+import { UnauthorizedError } from '../lib/errors.js';
 import { clerkClient, getAuth } from "@clerk/express";
 
 export const attachUser = async (

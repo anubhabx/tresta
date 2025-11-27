@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getAuth, clerkClient } from '@clerk/express';
-import { UnauthorizedError, ForbiddenError } from '../lib/errors.ts';
+import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
 
 /**
  * Admin authentication middleware

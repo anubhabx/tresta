@@ -1,8 +1,8 @@
 import { Worker } from 'bullmq';
 import { Resend } from 'resend';
 import { prisma } from '@workspace/database/prisma';
-import { NotificationService } from '../services/notification.service.ts';
-import { getRedisClient } from '../lib/redis.ts';
+import { NotificationService } from '../services/notification.service.js';
+import { getRedisClient } from '../lib/redis.js';
 
 const redisUrl = process.env.REDIS_URL;
 const resendApiKey = process.env.RESEND_API_KEY;
@@ -35,7 +35,7 @@ export const emailWorker = new Worker(
 
     // Atomic check-and-increment quota (Lua script)
     const { success, count } = await NotificationService.tryIncrementEmailUsage(priority);
-    
+
     if (!success) {
       console.log(`Email quota exhausted (${count}/200), deferring email ${notificationId}`);
       // Don't retry quota failures - will be picked up by next day's digest
@@ -68,8 +68,8 @@ export const emailWorker = new Worker(
 
     try {
       // Import email templates
-      const { renderEmailTemplate, renderPlainTextTemplate } = await import('../templates/notification-email.ts');
-      
+      const { renderEmailTemplate, renderPlainTextTemplate } = await import('../templates/notification-email.js');
+
       // Send email with templates
       await resend.emails.send({
         from: process.env.EMAIL_FROM || 'Tresta <notifications@tresta.app>',
@@ -84,9 +84,9 @@ export const emailWorker = new Worker(
       });
 
       // Check for quota alerts
-      const { checkAndAlertQuota } = await import('../utils/alerts.ts');
+      const { checkAndAlertQuota } = await import('../utils/alerts.js');
       await checkAndAlertQuota(count);
-      
+
       console.log(`Email sent successfully: ${notificationId} (${count}/200 today)`);
     } catch (error: any) {
       // Distinguish between transient and permanent failures
@@ -126,29 +126,29 @@ emailWorker.on('completed', (job) => {
 
 emailWorker.on('failed', async (job, err) => {
   console.error(`Email ${job?.id} failed:`, err);
-  
+
   // Don't persist quota failures to DLQ (expected behavior)
   if (err.message.includes('QUOTA_EXCEEDED')) {
     return;
   }
-  
+
   if (!job) return;
 
   // Determine error type and extract metadata
   const errorType = err.message.includes('TRANSIENT_ERROR') ? 'transient' : 'permanent';
   const statusCode = (err as any).statusCode || null;
-  const providerResponse = (err as any).response 
+  const providerResponse = (err as any).response
     ? JSON.stringify((err as any).response).substring(0, 1000)
     : null;
-  
+
   // Build retry history
-  const retryHistory = job.attemptsMade 
+  const retryHistory = job.attemptsMade
     ? Array.from({ length: job.attemptsMade }, (_, i) => ({
-        attempt: i + 1,
-        timestamp: new Date().toISOString(),
-      }))
+      attempt: i + 1,
+      timestamp: new Date().toISOString(),
+    }))
     : [];
-  
+
   // Persist to DLQ with detailed metadata
   await prisma.deadLetterJob.create({
     data: {

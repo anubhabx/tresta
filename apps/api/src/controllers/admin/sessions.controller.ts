@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.ts';
+import { ResponseHandler } from '../../lib/response.js';
 import { clerkClient } from '@clerk/express';
-import { InternalServerError } from '../../lib/errors.ts';
+import { InternalServerError } from '../../lib/errors.js';
 
 /**
  * GET /admin/sessions

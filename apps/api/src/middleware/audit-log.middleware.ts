@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getAuth } from '@clerk/express';
 import { v4 as uuidv4 } from 'uuid';
-import { getRedisClient } from '../lib/redis.ts';
+import { getRedisClient } from '../lib/redis.js';
 
 /**
  * Audit log middleware with guaranteed delivery
@@ -25,7 +25,7 @@ export function auditLog(
   next: NextFunction
 ): void {
   const { userId } = getAuth(req);
-  
+
   if (!userId) {
     // Skip audit logging for unauthenticated requests
     return next();
@@ -35,6 +35,12 @@ export function auditLog(
   const requestId = (req.headers['x-request-id'] as string) || uuidv4();
   req.headers['x-request-id'] = requestId;
   res.setHeader('X-Request-ID', requestId);
+
+  const ipAddress = req.ip ?? req.socket.remoteAddress ?? null;
+  const userAgentHeader = req.headers['user-agent'];
+  const userAgent = Array.isArray(userAgentHeader)
+    ? userAgentHeader[0] ?? null
+    : userAgentHeader ?? null;
 
   // Capture request details
   const auditEntry = {
@@ -48,8 +54,8 @@ export function auditLog(
     requestBody: sanitizeRequestBody(req.body),
     requestId,
     timestamp: new Date().toISOString(),
-    ipAddress: req.ip || req.socket.remoteAddress,
-    userAgent: req.headers['user-agent'],
+    ipAddress,
+    userAgent,
   };
 
   // Capture response after it's sent
@@ -92,7 +98,7 @@ function extractTargetType(path: string): string | null {
     if (resource === 'testimonials') return 'testimonial';
     if (resource === 'settings') return 'settings';
     if (resource === 'sessions') return 'session';
-    return resource;
+    if (resource) return resource;
   }
   return null;
 }
@@ -113,7 +119,7 @@ function sanitizeRequestBody(body: any): any {
   }
 
   const sanitized = { ...body };
-  
+
   // Remove sensitive fields
   const sensitiveFields = ['password', 'token', 'apiKey', 'secret'];
   for (const field of sensitiveFields) {
@@ -130,7 +136,7 @@ function sanitizeRequestBody(body: any): any {
  */
 async function writeAuditLog(entry: any): Promise<void> {
   const { prisma } = await import('@workspace/database/prisma');
-  
+
   await prisma.auditLog.create({
     data: {
       adminId: entry.adminId,
@@ -154,13 +160,13 @@ async function writeAuditLog(entry: any): Promise<void> {
  */
 async function addToRetryQueue(entry: any): Promise<void> {
   const redis = getRedisClient();
-  
+
   const retryEntry = {
     ...entry,
     retryCount: 0,
     addedToQueueAt: new Date().toISOString(),
   };
-  
+
   await redis.lpush('audit_logs:retry_queue', JSON.stringify(retryEntry));
 }
 
@@ -170,32 +176,32 @@ async function addToRetryQueue(entry: any): Promise<void> {
  */
 export async function retryFailedAuditLogs(): Promise<void> {
   const redis = getRedisClient();
-  
+
   try {
     // Get all entries from retry queue
     const entries = await redis.lrange('audit_logs:retry_queue', 0, -1);
-    
+
     for (const entryStr of entries) {
       try {
         const entry = JSON.parse(entryStr);
-        
+
         // Attempt to write to database
         await writeAuditLog(entry);
-        
+
         // Remove from retry queue on success
         await redis.lrem('audit_logs:retry_queue', 1, entryStr);
-        
+
         console.log(`Successfully retried audit log: ${entry.id}`);
       } catch (error) {
         console.error('Failed to retry audit log:', error);
-        
+
         // Increment retry count
         const entry = JSON.parse(entryStr);
         entry.retryCount = (entry.retryCount || 0) + 1;
-        
+
         // Remove old entry and add updated one
         await redis.lrem('audit_logs:retry_queue', 1, entryStr);
-        
+
         // Only retry up to 5 times
         if (entry.retryCount < 5) {
           await redis.lpush('audit_logs:retry_queue', JSON.stringify(entry));

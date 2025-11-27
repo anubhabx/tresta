@@ -1,7 +1,7 @@
 import { prisma } from '@workspace/database/prisma';
 import type { Request, Response, NextFunction } from 'express';
-import { BadRequestError, NotFoundError } from '../lib/errors.ts';
-import { ResponseHandler } from '../lib/response.ts';
+import { BadRequestError, NotFoundError } from '../lib/errors.js';
+import { ResponseHandler } from '../lib/response.js';
 
 /**
  * GET /api/notifications

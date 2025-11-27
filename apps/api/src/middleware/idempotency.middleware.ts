@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
-import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS } from '../lib/redis-keys.ts';
+import { getRedisClient } from '../lib/redis.js';
+import { REDIS_KEYS } from '../lib/redis-keys.js';
 
 /**
  * Idempotency middleware for webhook endpoints (Clerk retries)

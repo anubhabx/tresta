@@ -146,7 +146,7 @@ export function renderDigestTemplate(
     if (!acc[notif.type]) {
       acc[notif.type] = [];
     }
-    acc[notif.type].push(notif);
+    acc[notif.type]?.push(notif);
     return acc;
   }, {} as Record<string, Notification[]>);
 

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { prisma } from '@workspace/database/prisma';
-import { ResponseHandler } from '../../lib/response.ts';
-import { NotFoundError, handlePrismaError } from '../../lib/errors.ts';
+import { ResponseHandler } from '../../lib/response.js';
+import { NotFoundError, handlePrismaError } from '../../lib/errors.js';
 
 /**
  * GET /admin/projects

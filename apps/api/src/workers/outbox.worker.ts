@@ -1,6 +1,6 @@
 import { Worker, Queue } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
-import { NotificationService } from '../services/notification.service.ts';
+import { NotificationService } from '../services/notification.service.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

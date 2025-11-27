@@ -3,7 +3,7 @@ import {
   createTestNotification,
   createMultipleTestNotifications,
   clearTestNotifications,
-} from '../controllers/test.controller.ts';
+} from '../controllers/test.controller.js';
 
 const router: Router = Router();
 

@@ -5,26 +5,26 @@ import * as dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { webhookRouter } from "./routes/webhook.route.ts";
-import { publicRouter } from "./routes/public.route.ts";
+import { webhookRouter } from './routes/webhook.route.js';
+import { publicRouter } from './routes/public.route.js';
 import { clerkMiddleware } from "@clerk/express";
-import { attachUser } from "./middleware/auth.middleware.ts";
+import { attachUser } from './middleware/auth.middleware.js';
 import {
   errorHandler,
   notFoundHandler,
-} from "./middleware/error.middleware.ts";
-import { dynamicCors } from "./middleware/cors.middleware.ts";
+} from './middleware/error.middleware.js';
+import { dynamicCors } from './middleware/cors.middleware.js';
 
-import { projectRouter } from "./routes/project.route.ts";
-import { mediaRouter } from "./routes/media.route.ts";
-import { widgetRouter } from "./routes/widget.route.ts";
-import apiKeyRouter from "./routes/api-key.route.ts";
-import adminRouter from "./routes/admin/index.ts";
-import notificationsRouter from "./routes/notifications.route.ts";
-import ablyRouter from "./routes/ably/token.route.ts";
-import testRouter from "./routes/test.route.ts";
-import widgetAnalyticsRouter from "./routes/widget-analytics.route.ts";
-import { blobStorageService } from "./services/blob-storage.service.ts";
+import { projectRouter } from './routes/project.route.js';
+import { mediaRouter } from './routes/media.route.js';
+import { widgetRouter } from './routes/widget.route.js';
+import apiKeyRouter from './routes/api-key.route.js';
+import adminRouter from './routes/admin/index.js';
+import notificationsRouter from './routes/notifications.route.js';
+import ablyRouter from './routes/ably/token.route.js';
+import testRouter from './routes/test.route.js';
+import widgetAnalyticsRouter from './routes/widget-analytics.route.js';
+import { blobStorageService } from './services/blob-storage.service.js';
 
 dotenv.config();
 
@@ -113,20 +113,20 @@ const server = app.listen(PORT, () => {
 // Graceful shutdown handlers
 async function gracefulShutdown(signal: string) {
   console.log(`\n${signal} received, starting graceful shutdown...`);
-  
+
   // Stop accepting new connections
   server.close(async () => {
     console.log('HTTP server closed');
-    
+
     try {
       // Import disconnect functions (dynamic import to avoid circular dependencies)
       const { disconnectPrisma } = await import('@workspace/database/prisma');
-      const { disconnectRedis } = await import('./lib/redis.ts');
-      
+      const { disconnectRedis } = await import('./lib/redis.js');
+
       // Disconnect from databases
       await disconnectPrisma();
       await disconnectRedis();
-      
+
       console.log('Graceful shutdown completed');
       process.exit(0);
     } catch (error) {
@@ -134,7 +134,7 @@ async function gracefulShutdown(signal: string) {
       process.exit(1);
     }
   });
-  
+
   // Force shutdown after 30 seconds
   setTimeout(() => {
     console.error('Forced shutdown after timeout');

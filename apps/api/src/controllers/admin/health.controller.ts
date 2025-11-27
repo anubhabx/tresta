@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Queue } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
-import { getRedisClient } from '../../lib/redis.ts';
+import { getRedisClient } from '../../lib/redis.js';
 
 /**
  * GET /healthz

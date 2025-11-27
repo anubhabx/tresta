@@ -5,9 +5,9 @@ import {
   getRealtimeAnalytics,
   getPerformanceAlerts,
   resolvePerformanceAlert,
-} from "../controllers/widget-analytics.controller.ts";
-import { attachUser } from "../middleware/auth.middleware.ts";
-import { createRateLimiter } from "../middleware/rate-limiter.ts";
+} from '../controllers/widget-analytics.controller.js';
+import { attachUser } from '../middleware/auth.middleware.js';
+import { createRateLimiter } from '../middleware/rate-limiter.js';
 
 const router: Router = Router();
 

@@ -28,7 +28,7 @@ export function SessionsClient() {
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<SessionRow | null>(null);
 
-  const handleRevokeClick = (session: Session) => {
+  const handleRevokeClick = (session: SessionRow) => {
     setSelectedSession(session);
     setRevokeDialogOpen(true);
   };

@@ -1,16 +1,16 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
-import { ResponseHandler } from "../lib/response.ts";
+import { ResponseHandler } from '../lib/response.js';
 import { 
   BadRequestError, 
   ValidationError, 
   ForbiddenError,
   handlePrismaError 
-} from "../lib/errors.ts";
+} from '../lib/errors.js';
 import {
   blobStorageService,
   StorageDirectory,
-} from "../services/blob-storage.service.ts";
+} from '../services/blob-storage.service.js';
 
 // Validation schema for upload URL request
 const generateUploadUrlSchema = z.object({

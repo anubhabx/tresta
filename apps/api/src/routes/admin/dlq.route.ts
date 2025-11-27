@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listDLQJobs, requeueJob, getDLQStats } from '../../controllers/admin/dlq.controller.ts';
+import { listDLQJobs, requeueJob, getDLQStats } from '../../controllers/admin/dlq.controller.js';
 
 const router: Router = Router();
 

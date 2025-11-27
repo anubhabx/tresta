@@ -1,10 +1,10 @@
 import { CronJob } from 'cron';
 import { prisma } from '@workspace/database/prisma';
 import { Resend } from 'resend';
-import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS } from '../lib/redis-keys.ts';
-import { NotificationService } from '../services/notification.service.ts';
-import { renderDigestTemplate, renderPlainTextDigest } from '../templates/notification-email.ts';
+import { getRedisClient } from '../lib/redis.js';
+import { REDIS_KEYS } from '../lib/redis-keys.js';
+import { NotificationService } from '../services/notification.service.js';
+import { renderDigestTemplate, renderPlainTextDigest } from '../templates/notification-email.js';
 import { NotificationType } from '@workspace/database/prisma';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -22,13 +22,13 @@ export const dailyDigestJob = new CronJob(
   '0 9 * * *', // Every day at 9 AM UTC
   async () => {
     console.log('🔔 Starting daily digest job...');
-    
+
     const redis = getRedisClient();
 
     // Distributed lock to prevent concurrent digest runs (clock skew, redeploy)
     const lockKey = REDIS_KEYS.LOCK_DIGEST;
     const lockAcquired = await redis.set(lockKey, '1', 'EX', 3600, 'NX'); // 1 hour lock
-    
+
     if (!lockAcquired) {
       console.log('⚠️ Digest job already running, skipping');
       return;
@@ -71,11 +71,11 @@ export const dailyDigestJob = new CronJob(
             userId: user.id,
             createdAt: { gte: yesterday },
             // Exclude critical types (already sent immediately)
-            type: { 
+            type: {
               notIn: [
-                NotificationType.TESTIMONIAL_FLAGGED, 
+                NotificationType.TESTIMONIAL_FLAGGED,
                 NotificationType.SECURITY_ALERT
-              ] 
+              ]
             },
           },
           orderBy: { createdAt: 'desc' },
@@ -89,11 +89,11 @@ export const dailyDigestJob = new CronJob(
 
         // Atomic check-and-increment quota
         const { success, count } = await NotificationService.tryIncrementEmailUsage('normal');
-        
+
         if (!success) {
           console.log(`⚠️ Email quota exhausted (${count}/200), stopping digest job`);
           skippedCount++;
-          
+
           // Lock quota for rest of day and record next retry time
           await NotificationService.setQuotaLock();
           break;
@@ -127,9 +127,9 @@ export const dailyDigestJob = new CronJob(
 
           sentCount++;
           console.log(`✅ Digest sent to ${user.email}: ${notifications.length} notifications (${count}/200)`);
-          
+
           // Check for quota alerts
-          const { checkAndAlertQuota } = await import('../utils/alerts.ts');
+          const { checkAndAlertQuota } = await import('../utils/alerts.js');
           await checkAndAlertQuota(count);
         } catch (error) {
           console.error(`❌ Failed to send digest to ${user.email}:`, error);

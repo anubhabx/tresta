@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.ts';
-import { BadRequestError, UnauthorizedError } from '../../lib/errors.ts';
+import { ResponseHandler } from '../../lib/response.js';
+import { BadRequestError, UnauthorizedError } from '../../lib/errors.js';
 import {
   getAllFeatureFlags,
   updateFeatureFlag,
   createFeatureFlag,
-} from '../../services/feature-flags.service.ts';
+} from '../../services/feature-flags.service.js';
 
 /**
  * GET /admin/feature-flags

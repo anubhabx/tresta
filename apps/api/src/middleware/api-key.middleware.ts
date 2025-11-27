@@ -4,8 +4,8 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { validateApiKey, incrementUsage } from '../services/api-key.service.ts';
-import { UnauthorizedError, ForbiddenError } from '../lib/errors.ts';
+import { validateApiKey, incrementUsage } from '../services/api-key.service.js';
+import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
 import type { ApiKey } from '@workspace/database/prisma';
 
 /**

@@ -1,6 +1,6 @@
 import { Worker } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
-import { NotificationService } from '../services/notification.service.ts';
+import { NotificationService } from '../services/notification.service.js';
 
 const redisUrl = process.env.REDIS_URL;
 

@@ -7,9 +7,9 @@ import {
   getModerationQueue,
   bulkModerationAction,
   updateModerationStatus,
-} from "../controllers/testimonial.controller.ts";
+} from '../controllers/testimonial.controller.js';
 import { Router } from "express";
-import { attachUser } from "../middleware/auth.middleware.ts";
+import { attachUser } from '../middleware/auth.middleware.js';
 
 const router: Router = Router({ mergeParams: true });
 

@@ -1,5 +1,5 @@
 import { prisma } from "@workspace/database/prisma";
-import { moderateTestimonial } from "../services/moderation.service.ts";
+import { moderateTestimonial } from '../services/moderation.service.js';
 
 /**
  * Migration script to auto-moderate all existing testimonials

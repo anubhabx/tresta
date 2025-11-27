@@ -10,16 +10,16 @@ import {
   InternalServerError,
   ValidationError,
   handlePrismaError
-} from "../lib/errors.ts";
-import { ResponseHandler } from "../lib/response.ts";
+} from '../lib/errors.js';
+import { ResponseHandler } from '../lib/response.js';
 import {
   DEFAULT_WIDGET_CONFIG,
   MVP_WIDGET_CONFIG_FIELDS,
   type WidgetConfig
 } from "@workspace/types";
-import { validateWidgetConfig } from "../validators/widget.validator.ts";
-import type { WidgetData } from "@/types/api-responses.ts";
-import { validateApiKey } from "../services/api-key.service.ts";
+import { validateWidgetConfig } from '../validators/widget.validator.js';
+import type { WidgetData } from '../../types/api-responses.js';
+import { validateApiKey } from '../services/api-key.service.js';
 
 const escapeHtmlAttribute = (value: string): string =>
   value

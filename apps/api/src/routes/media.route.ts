@@ -4,7 +4,7 @@ import {
   generateReadUrl,
   deleteBlob,
   getBlobMetadata,
-} from "../controllers/media.controller.ts";
+} from '../controllers/media.controller.js';
 
 const router: Router = Router();
 

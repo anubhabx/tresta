@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getSessions, revokeSession } from '../../controllers/admin/sessions.controller.ts';
-import { auditLog } from '../../middleware/audit-log.middleware.ts';
-import { adminReadRateLimitMiddleware, adminWriteRateLimitMiddleware } from '../../middleware/rate-limiter.ts';
+import { getSessions, revokeSession } from '../../controllers/admin/sessions.controller.js';
+import { auditLog } from '../../middleware/audit-log.middleware.js';
+import { adminReadRateLimitMiddleware, adminWriteRateLimitMiddleware } from '../../middleware/rate-limiter.js';
 
 const router: Router = Router();
 

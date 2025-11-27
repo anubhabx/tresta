@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { adminReadRateLimitMiddleware, adminHeavyRateLimitMiddleware } from '../../middleware/rate-limiter.ts';
-import { listUsers, getUserById, exportUserData } from '../../controllers/admin/users.controller.ts';
+import { adminReadRateLimitMiddleware, adminHeavyRateLimitMiddleware } from '../../middleware/rate-limiter.js';
+import { listUsers, getUserById, exportUserData } from '../../controllers/admin/users.controller.js';
 
 const router: Router = Router();
 

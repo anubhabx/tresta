@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
-import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS, getCurrentDateUTC } from '../lib/redis-keys.ts';
-import { NotificationService } from '../services/notification.service.ts';
+import { getRedisClient } from '../lib/redis.js';
+import { REDIS_KEYS, getCurrentDateUTC } from '../lib/redis-keys.js';
+import { NotificationService } from '../services/notification.service.js';
 
 /**
  * Nightly reconciliation job - snapshots Redis quota to Postgres

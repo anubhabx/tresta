@@ -8,12 +8,12 @@ import {
   ForbiddenError,
   ValidationError,
   handlePrismaError,
-} from "../lib/errors.ts";
+} from '../lib/errors.js';
 import {
   ResponseHandler,
   extractPaginationParams,
   calculateSkip,
-} from "../lib/response.ts";
+} from '../lib/response.js';
 import {
   isValidHexColor,
   isValidUrl,
@@ -22,7 +22,7 @@ import {
   isValidVisibility,
   validateSocialLinks,
   validateTags,
-} from "../lib/validators.ts";
+} from '../lib/validators.js';
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,

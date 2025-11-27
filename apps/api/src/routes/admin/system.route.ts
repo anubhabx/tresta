@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getSystemInfo } from '../../controllers/admin/system.controller.ts';
+import { getSystemInfo } from '../../controllers/admin/system.controller.js';
 
 const router: Router = Router();
 

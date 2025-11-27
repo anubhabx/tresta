@@ -5,7 +5,7 @@ import { prisma } from "@workspace/database/prisma";
 import {
   blobStorageService,
   StorageDirectory,
-} from "../services/blob-storage.service.ts";
+} from '../services/blob-storage.service.js';
 
 export const syncUserToDB = async (
   req: Request,

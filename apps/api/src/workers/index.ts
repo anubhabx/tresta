@@ -14,13 +14,13 @@ import * as dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { prisma, disconnectPrisma } from '@workspace/database/prisma';
-import { disconnectRedis } from '../lib/redis.ts';
-import { outboxWorker } from './outbox.worker.ts';
-import { notificationWorker } from './notification.worker.ts';
-import { emailWorker } from './email.worker.ts';
-import { startDailyDigestJob } from '../jobs/daily-digest.job.ts';
-import { startReconciliationJob } from '../jobs/reconciliation.job.ts';
-import { scheduleWidgetAnalyticsJobs } from '../jobs/widget-analytics.job.ts';
+import { disconnectRedis } from '../lib/redis.js';
+import { outboxWorker } from './outbox.worker.js';
+import { notificationWorker } from './notification.worker.js';
+import { emailWorker } from './email.worker.js';
+import { startDailyDigestJob } from '../jobs/daily-digest.job.js';
+import { startReconciliationJob } from '../jobs/reconciliation.job.js';
+import { scheduleWidgetAnalyticsJobs } from '../jobs/widget-analytics.job.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,9 +41,9 @@ async function gracefulShutdown(signal: string) {
 
   try {
     // Stop cron jobs
-    const { dailyDigestJob } = await import('../jobs/daily-digest.job.ts');
-    const { reconciliationJob } = await import('../jobs/reconciliation.job.ts');
-    const { performanceCheckJob, analyticsCleanupJob } = await import('../jobs/widget-analytics.job.ts');
+    const { dailyDigestJob } = await import('../jobs/daily-digest.job.js');
+    const { reconciliationJob } = await import('../jobs/reconciliation.job.js');
+    const { performanceCheckJob, analyticsCleanupJob } = await import('../jobs/widget-analytics.job.js');
     dailyDigestJob.stop();
     reconciliationJob.stop();
     performanceCheckJob.stop();

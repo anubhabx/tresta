@@ -16,9 +16,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 import { prisma } from '@workspace/database/prisma';
-import { getRedisClient, disconnectRedis } from '../lib/redis.ts';
-import { REDIS_KEYS, getCurrentDateUTC } from '../lib/redis-keys.ts';
-import { NotificationService } from '../services/notification.service.ts';
+import { getRedisClient, disconnectRedis } from '../lib/redis.js';
+import { REDIS_KEYS, getCurrentDateUTC } from '../lib/redis-keys.js';
+import { NotificationService } from '../services/notification.service.js';
 import { NotificationType } from '@workspace/database/prisma';
 
 async function testDigestLogic() {
@@ -91,26 +91,31 @@ async function testDigestLogic() {
     if (users.length > 0) {
       console.log('5. Testing notification query...');
       const testUser = users[0];
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      const notifications = await prisma.notification.findMany({
-        where: {
-          userId: testUser.id,
-          createdAt: { gte: yesterday },
-          type: { 
-            notIn: [
-              NotificationType.TESTIMONIAL_FLAGGED, 
-              NotificationType.SECURITY_ALERT
-            ] 
+
+      if (!testUser) {
+        console.log('   ⚠️ Unable to load a sample user; skipping notification query test');
+      } else {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const notifications = await prisma.notification.findMany({
+          where: {
+            userId: testUser.id,
+            createdAt: { gte: yesterday },
+            type: {
+              notIn: [
+                NotificationType.TESTIMONIAL_FLAGGED,
+                NotificationType.SECURITY_ALERT,
+              ],
+            },
           },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 50,
-      });
-      
-      console.log(`   Found ${notifications.length} notifications for user ${testUser.email}`);
-      console.log('   ✅ Notification query works correctly\n');
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+        });
+
+        console.log(`   Found ${notifications.length} notifications for user ${testUser.email}`);
+        console.log('   ✅ Notification query works correctly\n');
+      }
     }
     
     // Test 5: Quota increment

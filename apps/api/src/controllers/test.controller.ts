@@ -6,10 +6,10 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { NotificationService } from '../services/notification.service.ts';
+import { NotificationService } from '../services/notification.service.js';
 import { NotificationType } from '@workspace/database/prisma';
-import { ResponseHandler } from '../lib/response.ts';
-import { BadRequestError } from '../lib/errors.ts';
+import { ResponseHandler } from '../lib/response.js';
+import { BadRequestError } from '../lib/errors.js';
 
 /**
  * Create a test notification for the authenticated user

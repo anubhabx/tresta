@@ -6,7 +6,7 @@ import {
   ContainerClient,
 } from "@azure/storage-blob";
 import { v4 as uuidv4 } from "uuid";
-import { InternalServerError } from "../lib/errors.ts";
+import { InternalServerError } from '../lib/errors.js';
 
 // Environment variables
 const getStorageConfig = () => {

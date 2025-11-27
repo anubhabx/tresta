@@ -8,7 +8,13 @@
       "@workspace/types": ["../../packages/types/src/index.ts"],
       "@workspace/types/*": ["../../packages/types/src/*"]
     },
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*",
+    "types/**/*.d.ts",
+    "types/**/*.ts"
+  ]
 }

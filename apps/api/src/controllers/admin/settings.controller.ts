@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.ts';
-import { getRedisClient } from '../../lib/redis.ts';
-import { BadRequestError, ConflictError } from '../../lib/errors.ts';
+import { ResponseHandler } from '../../lib/response.js';
+import { getRedisClient } from '../../lib/redis.js';
+import { BadRequestError, ConflictError } from '../../lib/errors.js';
 import crypto from 'crypto';
 
 const SETTINGS_CHANGE_CHANNEL = 'settings:changes';

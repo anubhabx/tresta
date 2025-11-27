@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { auditLog } from '../../middleware/audit-log.middleware.ts';
-import { getSettings, updateSettings } from '../../controllers/admin/settings.controller.ts';
+import { auditLog } from '../../middleware/audit-log.middleware.js';
+import { getSettings, updateSettings } from '../../controllers/admin/settings.controller.js';
 
 const router: Router = Router();
 

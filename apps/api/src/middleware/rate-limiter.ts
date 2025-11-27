@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { getAuth } from '@clerk/express';
-import { getRedisClient } from '../lib/redis.ts';
+import { getRedisClient } from '../lib/redis.js';
 
 /**
  * Rate limiter instances
@@ -59,7 +59,8 @@ const publicIpRateLimiter = new RateLimiterRedis({
 function getClientIp(req: Request): string {
   const forwarded = (req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['x-forwarded-for']) as string | undefined;
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    const parts = (forwarded as string).split(',');
+    return parts[0] ? parts[0].trim() : 'unknown';
   }
   return req.ip || req.socket.remoteAddress || 'unknown';
 }

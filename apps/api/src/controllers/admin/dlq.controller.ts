@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Queue } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
-import { BadRequestError, NotFoundError, handlePrismaError } from '../../lib/errors.ts';
-import { ResponseHandler } from '../../lib/response.ts';
+import { BadRequestError, NotFoundError, handlePrismaError } from '../../lib/errors.js';
+import { ResponseHandler } from '../../lib/response.js';
 
 /**
  * Get Redis connection config for BullMQ

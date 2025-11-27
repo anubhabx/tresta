@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { attachUser } from "../middleware/auth.middleware.ts";
-import { validateApiKeyMiddleware, requirePermission } from "../middleware/api-key.middleware.ts";
-import { publicRateLimitMiddleware } from "../middleware/rate-limiter.ts";
-import { auditLog } from "../middleware/audit-log.middleware.ts";
+import { attachUser } from '../middleware/auth.middleware.js';
+import { validateApiKeyMiddleware, requirePermission } from '../middleware/api-key.middleware.js';
+import { publicRateLimitMiddleware } from '../middleware/rate-limiter.js';
+import { auditLog } from '../middleware/audit-log.middleware.js';
 import {
   createWidget,
   updateWidget,
   listWidgets,
   deleteWidget,
   fetchPublicWidgetData,
-} from "../controllers/widget.controller.ts";
+} from '../controllers/widget.controller.js';
 
 const router: Router = Router();
 

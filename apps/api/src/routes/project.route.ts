@@ -5,9 +5,9 @@ import {
   getPublicProjectBySlug,
   updateProject,
   deleteProject,
-} from "../controllers/project.controller.ts";
+} from '../controllers/project.controller.js';
 import { Router } from "express";
-import { testimonialRouter } from "./testimonial.route.ts";
+import { testimonialRouter } from './testimonial.route.js';
 
 const router: Router = Router();
 

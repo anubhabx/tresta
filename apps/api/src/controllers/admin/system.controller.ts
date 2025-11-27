@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.ts';
-import { getRedisClient } from '../../lib/redis.ts';
-import { getAllFeatureFlags } from '../../services/feature-flags.service.ts';
+import { ResponseHandler } from '../../lib/response.js';
+import { getRedisClient } from '../../lib/redis.js';
+import { getAllFeatureFlags } from '../../services/feature-flags.service.js';
 
 /**
  * GET /admin/system

@@ -10,15 +10,15 @@ import {
   revokeApiKey, 
   getApiKeyById,
   type ApiKeyEnvironment 
-} from '../services/api-key.service.ts';
-import { ResponseHandler } from '../lib/response.ts';
+} from '../services/api-key.service.js';
+import { ResponseHandler } from '../lib/response.js';
 import { 
   BadRequestError, 
   NotFoundError, 
   ForbiddenError, 
   ValidationError,
   handlePrismaError 
-} from '../lib/errors.ts';
+} from '../lib/errors.js';
 import { prisma } from '@workspace/database/prisma';
 
 /**

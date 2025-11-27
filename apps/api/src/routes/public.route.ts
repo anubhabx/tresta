@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getPublicProjectBySlug } from "../controllers/project.controller.ts";
-import { renderWidgetPage } from "../controllers/widget.controller.ts";
-import { publicRateLimitMiddleware } from "../middleware/rate-limiter.ts";
+import { getPublicProjectBySlug } from '../controllers/project.controller.js';
+import { renderWidgetPage } from '../controllers/widget.controller.js';
+import { publicRateLimitMiddleware } from '../middleware/rate-limiter.js';
 
 const router: Router = Router();
 

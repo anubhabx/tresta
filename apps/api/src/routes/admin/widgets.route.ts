@@ -4,7 +4,7 @@ import {
   getRealtimeAnalytics,
   getPerformanceAlerts,
   resolvePerformanceAlert,
-} from '../../controllers/widget-analytics.controller.ts';
+} from '../../controllers/widget-analytics.controller.js';
 
 const router: Router = Router();
 

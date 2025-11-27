@@ -3,9 +3,9 @@ import {
   adminReadRateLimitMiddleware,
   adminWriteRateLimitMiddleware,
   adminHeavyRateLimitMiddleware,
-} from '../../middleware/rate-limiter.ts';
-import { auditLog } from '../../middleware/audit-log.middleware.ts';
-import { listTestimonials, updateTestimonialStatus, bulkUpdateTestimonials } from '../../controllers/admin/testimonials.controller.ts';
+} from '../../middleware/rate-limiter.js';
+import { auditLog } from '../../middleware/audit-log.middleware.js';
+import { listTestimonials, updateTestimonialStatus, bulkUpdateTestimonials } from '../../controllers/admin/testimonials.controller.js';
 
 const router: Router = Router();
 

@@ -1,8 +1,8 @@
 import { NotificationType } from '@workspace/database/prisma';
 import { prisma } from '@workspace/database/prisma';
-import { getRedisClient } from '../lib/redis.ts';
-import { REDIS_KEYS, getTTLToMidnightUTC, getCurrentDateUTC } from '../lib/redis-keys.ts';
-import { sanitizeNotificationContent, sanitizeMetadata } from '../utils/sanitize.ts';
+import { getRedisClient } from '../lib/redis.js';
+import { REDIS_KEYS, getTTLToMidnightUTC, getCurrentDateUTC } from '../lib/redis-keys.js';
+import { sanitizeNotificationContent, sanitizeMetadata } from '../utils/sanitize.js';
 
 interface CreateNotificationParams {
   userId: string;

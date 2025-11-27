@@ -5,8 +5,8 @@ import {
   NotFoundError,
   ValidationError,
   handlePrismaError,
-} from "../lib/errors.ts";
-import { ResponseHandler } from "../lib/response.ts";
+} from '../lib/errors.js';
+import { ResponseHandler } from '../lib/response.js';
 
 /**
  * Track widget load event (telemetry endpoint)
