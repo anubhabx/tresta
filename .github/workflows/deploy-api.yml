@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare deployment artifact
         run: |
-          pnpm deploy --filter=api --prod ./deployment
+          pnpm deploy --filter=api --prod --legacy ./deployment
           cp -r apps/api/dist ./deployment/dist
 
       - name: Login to Azure
