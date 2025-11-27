@@ -14,7 +14,7 @@ export class ApiError extends Error {
     this.statusCode = statusCode;
     this.code = code || `ERROR_${statusCode}`;
     this.details = details;
-    
+
     // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -110,7 +110,7 @@ export class ServiceUnavailableError extends ApiError {
  * @param error The error thrown by Prisma.
  * @returns An instance of ApiError.
  */
-export function handlePrismaError(error: unknown): ApiError {
+export function handlePrismaError(error: any): ApiError {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
       case "P2002": // Unique constraint violation
@@ -119,49 +119,49 @@ export function handlePrismaError(error: unknown): ApiError {
           `A record with this ${fields || "value"} already exists.`,
           { prismaCode: error.code, fields }
         );
-      
+
       case "P2025": // Record to update not found
         return new NotFoundError(
           (error.meta?.cause as string) || "Record not found.",
           { prismaCode: error.code }
         );
-      
+
       case "P2003": // Foreign key constraint failed
         return new BadRequestError(
           "Cannot perform this operation due to related records.",
           { prismaCode: error.code, field: error.meta?.field_name }
         );
-      
+
       case "P2014": // Relation violation
         return new BadRequestError(
           "The change you are trying to make would violate a required relation.",
           { prismaCode: error.code }
         );
-      
+
       case "P2015": // Related record not found
         return new NotFoundError(
           "A related record could not be found.",
           { prismaCode: error.code }
         );
-      
+
       case "P2016": // Query interpretation error
         return new BadRequestError(
           "Query interpretation error. Please check your request.",
           { prismaCode: error.code }
         );
-      
+
       case "P2021": // Table does not exist
         return new InternalServerError(
           "Database configuration error.",
           { prismaCode: error.code }
         );
-      
+
       case "P2022": // Column does not exist
         return new InternalServerError(
           "Database schema error.",
           { prismaCode: error.code }
         );
-      
+
       default:
         // Fallback for other known Prisma errors
         return new BadRequestError(
