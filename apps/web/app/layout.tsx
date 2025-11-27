@@ -4,6 +4,7 @@ import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@workspace/ui/components/sonner";
+import { SiteFooter } from "@/components/site-footer";
 
 const fontSans = Figtree({
   subsets: ["latin"],
@@ -41,7 +42,10 @@ export default function RootLayout({
           className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} font-sans antialiased `}
         >
           <Providers>
-            {children}
+            <div className="flex min-h-svh flex-col">
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+            </div>
             <Toaster position="bottom-right" />
           </Providers>
         </body>

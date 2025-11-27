@@ -20,7 +20,6 @@ import {
   ChevronUp,
   Layers2Icon,
   LayoutDashboardIcon,
-  UserIcon,
   PlusIcon,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
@@ -34,10 +33,10 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
-import { FaGithub } from "react-icons/fa";
 import { projects } from "@/lib/queries";
 import { NotificationSidebarSection } from "@/components/notifications/notification-sidebar-section";
 import { ThemeToggle } from "@/components/theme-toggle";
+import Image from "next/image";
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
@@ -51,9 +50,18 @@ const UISidebar = () => {
 
   return (
     <Sidebar className="border-none group/collapsible" collapsible="icon">
-      <SidebarHeader className="px-4 py-3 text-lg font-semibold flex flex-row items-center justify-start">
-        <FaGithub className="group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6" />
-        <span className="group-data-[collapsible=icon]:hidden">Tresta</span>
+      <SidebarHeader className=" text-lg font-semibold flex flex-row items-center justify-start">
+        <Link href="/dashboard" className="flex items-center gap-2 text-foreground w-8! h-8!">
+          <Image
+            src="/branding/tresta.svg"
+            alt="Tresta logo"
+            width={32}
+            height={32}
+            className="h-8! w-8! group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6"
+            priority
+          />
+          <span className="group-data-[collapsible=icon]:hidden">Tresta</span>
+        </Link>
       </SidebarHeader>
 
       <Separator />

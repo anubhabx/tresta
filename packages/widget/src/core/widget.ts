@@ -8,6 +8,7 @@ import { StyleManager } from '../styles/style-manager';
 import { APIClient } from '../api/client';
 import { StorageManager } from '../storage/cache-manager';
 import { createErrorState, createEmptyState } from '../components/error-state';
+import { createBrandingBadge } from '../components/branding-badge';
 import { TelemetryTracker } from '../telemetry';
 import { LayoutEngine } from '../layouts';
 import { limitTestimonials } from '../utils/testimonial-limiter';
@@ -296,6 +297,7 @@ export class Widget implements WidgetInstance {
 
     const layoutElement = layout.render();
     this.contentRoot.appendChild(layoutElement);
+    this.appendBrandingBadge();
 
     // Track the current layout for cleanup
     this.currentLayout = layout;
@@ -342,6 +344,7 @@ export class Widget implements WidgetInstance {
     });
 
     this.contentRoot.appendChild(errorState);
+    this.appendBrandingBadge();
   }
 
   /**
@@ -357,6 +360,24 @@ export class Widget implements WidgetInstance {
     const emptyState = createEmptyState(this.config.emptyMessage);
 
     this.contentRoot.appendChild(emptyState);
+    this.appendBrandingBadge();
+  }
+
+  /**
+   * Append branding badge to the widget root
+   */
+  private appendBrandingBadge(): void {
+    if (!this.contentRoot) {
+      return;
+    }
+
+    const existingBadge = this.contentRoot.querySelector('.tresta-branding-badge');
+    if (existingBadge) {
+      existingBadge.remove();
+    }
+
+    const badge = createBrandingBadge();
+    this.contentRoot.appendChild(badge);
   }
 
   /**
