@@ -107,7 +107,7 @@ const createTestimonial = async (
     }
 
     // Verify Google OAuth token if provided
-    let googleProfile = null;
+    let googleProfile: any = null;
     let isOAuthVerified = false;
     let oauthSubject = null;
 
@@ -315,19 +315,19 @@ const createTestimonial = async (
     }
 
     return ResponseHandler.created(res, {
-      message: moderationResult.status === 'APPROVED' 
-        ? "Testimonial submitted and approved successfully" 
+      message: moderationResult.status === 'APPROVED'
+        ? "Testimonial submitted and approved successfully"
         : "Testimonial submitted successfully and is pending review",
       data: {
         ...newTestimonial,
         moderationInfo: {
           status: moderationResult.status,
           autoPublished: moderationResult.autoPublish,
-          message: moderationResult.status === 'APPROVED' 
+          message: moderationResult.status === 'APPROVED'
             ? 'Your testimonial has been automatically approved and published'
             : moderationResult.status === 'FLAGGED'
-            ? 'Your testimonial is under review'
-            : 'Your testimonial is pending approval'
+              ? 'Your testimonial is under review'
+              : 'Your testimonial is pending approval'
         }
       }
     });

@@ -75,7 +75,7 @@ export async function createMultipleTestNotifications(
         const { count = 10 } = req.body;
         const actualCount = Math.min(Math.max(1, count), 50);
 
-        const notifications = [];
+        const notifications: any[] = [];
 
         for (let i = 0; i < actualCount; i++) {
             const notification = await NotificationService.create({

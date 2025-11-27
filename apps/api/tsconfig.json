@@ -10,7 +10,8 @@
     },
     "allowImportingTsExtensions": false,
     "noEmit": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "noImplicitAny": false
   },
   "include": [
     "src/**/*",

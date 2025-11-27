@@ -13,7 +13,8 @@
     "widget:preview": "pnpm --filter @workspace/widget preview",
     "admin:dev": "pnpm --filter admin dev",
     "admin:build": "pnpm --filter admin build",
-    "admin:start": "pnpm --filter admin start"
+    "admin:start": "pnpm --filter admin start",
+    "postinstall": "turbo run generate"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
