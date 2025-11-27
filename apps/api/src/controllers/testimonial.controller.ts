@@ -166,6 +166,55 @@ const createTestimonial = async (
       });
     }
 
+    // Prevent duplicate testimonials from the same reviewer (account/IP/device)
+    const normalizedEmail = authorEmail?.trim().toLowerCase();
+    const reviewerIdentityFilters = [] as any[];
+
+    if (normalizedEmail) {
+      reviewerIdentityFilters.push({
+        authorEmail: {
+          equals: normalizedEmail,
+          mode: 'insensitive',
+        },
+      });
+    }
+
+    if (oauthSubject) {
+      reviewerIdentityFilters.push({ oauthSubject });
+    }
+
+    const clientIp = req.ip || req.socket.remoteAddress;
+    const userAgent = req.get('user-agent') || undefined;
+
+    if (clientIp) {
+      const ipFilter: Record<string, string> = { ipAddress: clientIp };
+      if (userAgent) {
+        ipFilter.userAgent = userAgent;
+      }
+      reviewerIdentityFilters.push(ipFilter);
+    }
+
+    if (reviewerIdentityFilters.length > 0) {
+      const existingReviewer = await prisma.testimonial.findFirst({
+        where: {
+          projectId: project.id,
+          OR: reviewerIdentityFilters,
+        },
+        select: { id: true, authorEmail: true, createdAt: true },
+      });
+
+      if (existingReviewer) {
+        throw new ConflictError(
+          'Each user can only submit one testimonial per project',
+          {
+            projectId: project.id,
+            existingTestimonialId: existingReviewer.id,
+            createdAt: existingReviewer.createdAt,
+          }
+        );
+      }
+    }
+
     // Check for duplicate content
     const existingTestimonials = await prisma.testimonial.findMany({
       where: { projectId: project.id },

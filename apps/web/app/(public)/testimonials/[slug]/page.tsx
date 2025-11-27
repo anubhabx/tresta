@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { use, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { CheckCircle2, MessageSquare, ShieldCheck } from "lucide-react";
+import { Ban, CheckCircle2, MessageSquare, ShieldCheck } from "lucide-react";
 import { useApi } from "@/hooks/use-api";
 import type { ApiResponse, CreateTestimonialPayload } from "@/types/api";
 import { AzureFileUpload } from "@/components/azure-file-upload";
@@ -77,6 +78,9 @@ export default function TestimonialSubmissionPage({
   const api = useApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [hasExistingSubmission, setHasExistingSubmission] = useState(false);
+  const [existingSubmissionCreatedAt, setExistingSubmissionCreatedAt] =
+    useState<string | undefined>(undefined);
   const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
   const [isGoogleVerified, setIsGoogleVerified] = useState(false);
 
@@ -195,14 +199,88 @@ export default function TestimonialSubmissionPage({
       toast.success("Thank you! Your testimonial has been submitted.");
     } catch (error: any) {
       console.error("Failed to submit testimonial:", error);
-      toast.error(
-        error?.response?.data?.message ||
-          "Failed to submit testimonial. Please try again.",
-      );
+      const status = error?.response?.status;
+      if (status === 409) {
+        const responseMessage =
+          error?.response?.data?.message ||
+          "It looks like you've already shared your experience.";
+        const details =
+          error?.response?.data?.error?.details ||
+          error?.response?.data?.data;
+
+        if (details?.createdAt) {
+          setExistingSubmissionCreatedAt(details.createdAt);
+        } else {
+          setExistingSubmissionCreatedAt(undefined);
+        }
+
+        setHasExistingSubmission(true);
+        toast.info(responseMessage);
+      } else {
+        toast.error(
+          error?.response?.data?.message ||
+            "Failed to submit testimonial. Please try again.",
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const formattedExistingDate = existingSubmissionCreatedAt
+    ? new Intl.DateTimeFormat(undefined, {
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(new Date(existingSubmissionCreatedAt))
+    : null;
+
+  if (hasExistingSubmission) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-lg w-full">
+          <CardContent className="pt-12 pb-12 text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-primary/10">
+                <Ban className="h-16 w-16 text-primary" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-3">
+                Testimonial Already Submitted
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Thanks again for your enthusiasm! Each customer can submit
+                one testimonial per project, and we already have yours on
+                file.
+              </p>
+            </div>
+            {formattedExistingDate && (
+              <p className="text-sm text-muted-foreground">
+                Submitted on {formattedExistingDate}
+              </p>
+            )}
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button asChild size="lg">
+                <Link href={`/testimonials/${slug}`}>
+                  View Other Testimonials
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                asChild
+                className="border-dashed"
+              >
+                <a href="mailto:support@tresta.com?subject=Testimonial%20Update">
+                  Need to update yours?
+                </a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
