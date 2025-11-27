@@ -1,66 +1,82 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAlerts, useUpdateAlertConfig } from '@/lib/hooks/use-alerts';
-import { DataTable } from '@/components/tables/data-table';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  useAlerts,
+  useUpdateAlertConfig,
+  type AlertConfig,
+  type AlertHistory,
+} from '@/lib/hooks/use-alerts';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Save, AlertCircle, Bell, CheckCircle, XCircle } from 'lucide-react';
 import { formatDate } from '@/lib/utils/format';
 import { toast } from 'sonner';
+import type { AxiosError } from 'axios';
 
 export function AlertsClient() {
   const { data, isLoading, error, refetch } = useAlerts();
   const updateConfig = useUpdateAlertConfig();
 
-  const [formData, setFormData] = useState({
+  type AlertFieldName = keyof AlertConfig;
+  type AlertFieldValue = AlertConfig[AlertFieldName];
+
+  const [formData, setFormData] = useState<AlertConfig>({
     emailQuotaThreshold: 80,
     dlqCountThreshold: 10,
     failedJobRateThreshold: 0.1,
     slackWebhookUrl: '',
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<AlertFieldName, string>>>({});
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    if (data?.config) {
+    if (!data?.config) {
+      return undefined;
+    }
+
+    const frame = requestAnimationFrame(() => {
       setFormData({
         emailQuotaThreshold: data.config.emailQuotaThreshold,
         dlqCountThreshold: data.config.dlqCountThreshold,
         failedJobRateThreshold: data.config.failedJobRateThreshold,
         slackWebhookUrl: data.config.slackWebhookUrl,
       });
-    }
+      setHasChanges(false);
+      setErrors({});
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [data]);
 
-  const validateField = (name: string, value: any): string | null => {
-    switch (name) {
-      case 'emailQuotaThreshold':
-        if (value < 0 || value > 100) {
-          return 'Email quota threshold must be between 0 and 100';
-        }
-        break;
-      case 'dlqCountThreshold':
-        if (value < 0) {
-          return 'DLQ count threshold must be a positive number';
-        }
-        break;
-      case 'failedJobRateThreshold':
-        if (value < 0 || value > 1) {
-          return 'Failed job rate threshold must be between 0 and 1';
-        }
-        break;
-      case 'slackWebhookUrl':
-        if (value && !value.startsWith('https://hooks.slack.com/')) {
-          return 'Invalid Slack webhook URL';
-        }
-        break;
+  const validateField = (name: AlertFieldName, value: AlertFieldValue): string | null => {
+    if (name === 'slackWebhookUrl') {
+      if (typeof value === 'string' && value && !value.startsWith('https://hooks.slack.com/')) {
+        return 'Invalid Slack webhook URL';
+      }
+      return null;
+    }
+
+    const numericValue = typeof value === 'number' ? value : Number(value);
+    if (Number.isNaN(numericValue)) {
+      return 'Value must be a number';
+    }
+
+    if (name === 'emailQuotaThreshold' && (numericValue < 0 || numericValue > 100)) {
+      return 'Email quota threshold must be between 0 and 100';
+    }
+    if (name === 'dlqCountThreshold' && numericValue < 0) {
+      return 'DLQ count threshold must be a positive number';
+    }
+    if (name === 'failedJobRateThreshold' && (numericValue < 0 || numericValue > 1)) {
+      return 'Failed job rate threshold must be between 0 and 1';
     }
     return null;
   };
 
-  const handleChange = (name: string, value: any) => {
+  const handleChange = (name: AlertFieldName, value: AlertFieldValue) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setHasChanges(true);
 
@@ -79,11 +95,11 @@ export function AlertsClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: Record<string, string> = {};
+    const newErrors: Partial<Record<AlertFieldName, string>> = {};
     Object.entries(formData).forEach(([key, value]) => {
-      const error = validateField(key, value);
+      const error = validateField(key as AlertFieldName, value as AlertFieldValue);
       if (error) {
-        newErrors[key] = error;
+        newErrors[key as AlertFieldName] = error;
       }
     });
 
@@ -97,8 +113,19 @@ export function AlertsClient() {
       await updateConfig.mutateAsync(formData);
       toast.success('Alert configuration updated successfully');
       setHasChanges(false);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error?.message || 'Failed to update alert configuration');
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        (error as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+      ) {
+        toast.error(
+          (error as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+        );
+        return;
+      }
+      toast.error('Failed to update alert configuration');
     }
   };
 
@@ -115,23 +142,24 @@ export function AlertsClient() {
     }
   };
 
-  const historyColumns = [
+  const historyColumns: DataTableColumn<AlertHistory>[] = useMemo(
+    () => [
     {
       key: 'alertType',
       header: 'Alert Type',
-      render: (alert: any) => <Badge variant="warning">{alert.alertType}</Badge>,
+      render: (alert) => <Badge variant="warning">{alert.alertType}</Badge>,
     },
     {
       key: 'message',
       header: 'Message',
-      render: (alert: any) => (
+      render: (alert) => (
         <span className="text-sm text-gray-900 dark:text-gray-100">{alert.message}</span>
       ),
     },
     {
       key: 'triggeredAt',
       header: 'Triggered At',
-      render: (alert: any) => (
+      render: (alert) => (
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {formatDate(alert.triggeredAt)}
         </span>
@@ -140,7 +168,7 @@ export function AlertsClient() {
     {
       key: 'resolved',
       header: 'Status',
-      render: (alert: any) =>
+      render: (alert) =>
         alert.resolved ? (
           <Badge variant="default">
             <CheckCircle className="h-3 w-3" />
@@ -153,7 +181,9 @@ export function AlertsClient() {
           </Badge>
         ),
     },
-  ];
+  ],
+    []
+  );
 
   if (isLoading) {
     return (

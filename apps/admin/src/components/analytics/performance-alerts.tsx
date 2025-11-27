@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { AlertTriangle, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react';
+import type { AxiosError } from 'axios';
 
 interface Alert {
   id: string;
@@ -26,32 +27,48 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
   const [error, setError] = useState<string | null>(null);
   const [showResolved, setShowResolved] = useState(false);
 
-  const fetchAlerts = async () => {
+  const fetchAlerts = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await apiClient.get(
         `/admin/widgets/${widgetId}/alerts?resolved=${showResolved}`
       );
       setAlerts(response.data.data.alerts);
       setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load alerts');
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+      ) {
+        setError(
+          (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message ||
+            'Failed to load alerts'
+        );
+      } else {
+        setError('Failed to load alerts');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showResolved, widgetId]);
 
-  const resolveAlert = async (alertId: string) => {
-    try {
-      await apiClient.patch(`/admin/widgets/alerts/${alertId}/resolve`);
-      fetchAlerts();
-    } catch (err: any) {
-      console.error('Failed to resolve alert:', err);
-    }
-  };
+  const resolveAlert = useCallback(
+    async (alertId: string) => {
+      try {
+        await apiClient.patch(`/admin/widgets/alerts/${alertId}/resolve`);
+        await fetchAlerts();
+      } catch (err) {
+        console.error('Failed to resolve alert:', err);
+      }
+    },
+    [fetchAlerts]
+  );
 
   useEffect(() => {
-    fetchAlerts();
-  }, [widgetId, showResolved]);
+    void fetchAlerts();
+  }, [fetchAlerts]);
 
   if (isLoading) {
     return (

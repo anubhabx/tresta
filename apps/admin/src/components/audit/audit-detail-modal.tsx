@@ -11,22 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils/format';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import type { AuditLog } from '@/lib/hooks/use-audit-logs';
 
 interface AuditDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  log: {
-    id: string;
-    requestId: string;
-    adminName: string;
-    adminEmail: string;
-    actionType: string;
-    targetType: string;
-    targetId: string;
-    beforeSnapshot: any;
-    afterSnapshot: any;
-    createdAt: string;
-  } | null;
+  log: AuditLog | null;
 }
 
 export function AuditDetailModal({ open, onOpenChange, log }: AuditDetailModalProps) {

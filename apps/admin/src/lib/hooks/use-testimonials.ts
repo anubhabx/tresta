@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface Testimonial {
+export interface Testimonial {
   id: string;
   content: string;
   authorName: string;
@@ -77,7 +77,7 @@ interface BulkUpdateTestimonialsParams {
   dryRun?: boolean;
 }
 
-interface BulkUpdatePreview {
+export interface BulkUpdatePreview {
   id: string;
   currentStatus: string;
   newStatus: string;
@@ -97,11 +97,13 @@ interface BulkUpdateResponse {
   };
 }
 
+export type BulkUpdateResult = BulkUpdateResponse['data'];
+
 export function useBulkUpdateTestimonials() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({ testimonialIds, status, dryRun = false }: BulkUpdateTestimonialsParams) => {
+  return useMutation<BulkUpdateResult, unknown, BulkUpdateTestimonialsParams>({
+    mutationFn: async ({ testimonialIds, status, dryRun = false }) => {
       const response = await apiClient.post<BulkUpdateResponse>(
         '/admin/testimonials/bulk-update',
         { testimonialIds, status, dryRun }

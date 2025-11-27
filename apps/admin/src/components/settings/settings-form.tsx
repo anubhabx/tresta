@@ -5,13 +5,18 @@ import { Button } from '@/components/ui/button';
 import { useSettings, useUpdateSettings } from '@/lib/hooks/use-settings';
 import { RefreshCw, Save, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDate } from '@/lib/utils/format';
+
+interface SettingsFormData {
+  emailQuotaLimit: number;
+  ablyConnectionLimit: number;
+  autoModerationEnabled: boolean;
+}
 
 export function SettingsForm() {
   const { data: settings, isLoading, error, refetch } = useSettings();
   const updateSettings = useUpdateSettings();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SettingsFormData>({
     emailQuotaLimit: 0,
     ablyConnectionLimit: 0,
     autoModerationEnabled: false,
@@ -21,24 +26,30 @@ export function SettingsForm() {
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    if (settings) {
+    if (!settings) return;
+
+    const frame = requestAnimationFrame(() => {
       setFormData({
         emailQuotaLimit: settings.emailQuotaLimit,
         ablyConnectionLimit: settings.ablyConnectionLimit,
         autoModerationEnabled: settings.autoModerationEnabled,
       });
-    }
+      setHasChanges(false);
+      setErrors({});
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [settings]);
 
-  const validateField = (name: string, value: any): string | null => {
+  const validateField = (name: keyof SettingsFormData, value: number | boolean): string | null => {
     switch (name) {
       case 'emailQuotaLimit':
-        if (value < 0 || value > 1000000) {
+        if (typeof value !== 'number' || value < 0 || value > 1000000) {
           return 'Email quota must be between 0 and 1,000,000';
         }
         break;
       case 'ablyConnectionLimit':
-        if (value < 0 || value > 10000) {
+        if (typeof value !== 'number' || value < 0 || value > 10000) {
           return 'Ably connection limit must be between 0 and 10,000';
         }
         break;
@@ -47,7 +58,7 @@ export function SettingsForm() {
     return null;
   };
 
-  const handleChange = (name: string, value: any) => {
+  const handleChange = <T extends keyof SettingsFormData>(name: T, value: SettingsFormData[T]) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setHasChanges(true);
 
@@ -69,7 +80,7 @@ export function SettingsForm() {
 
     // Validate all fields
     const newErrors: Record<string, string> = {};
-    Object.entries(formData).forEach(([key, value]) => {
+    (Object.entries(formData) as Array<[keyof SettingsFormData, SettingsFormData[keyof SettingsFormData]]>).forEach(([key, value]) => {
       const error = validateField(key, value);
       if (error) {
         newErrors[key] = error;
@@ -91,12 +102,19 @@ export function SettingsForm() {
       });
       toast.success('Settings updated successfully');
       setHasChanges(false);
-    } catch (error: any) {
-      if (error.response?.status === 409) {
-        toast.error('Settings were modified by another admin. Please refresh and try again.');
-      } else {
-        toast.error(error.response?.data?.error?.message || 'Failed to update settings');
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const apiError = err as {
+          response?: { status?: number; data?: { error?: { message?: string } } };
+        };
+        if (apiError.response?.status === 409) {
+          toast.error('Settings were modified by another admin. Please refresh and try again.');
+          return;
+        }
+        toast.error(apiError.response?.data?.error?.message || 'Failed to update settings');
+        return;
       }
+      toast.error('Failed to update settings');
     }
   };
 

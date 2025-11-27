@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useUsers } from '@/lib/hooks/use-users';
-import { DataTable } from '@/components/tables/data-table';
+import { useMemo, useState } from 'react';
+import { useUsers, type User } from '@/lib/hooks/use-users';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,68 +21,71 @@ export function UsersClient() {
   };
 
   const { data, isLoading, error, refetch } = useUsers(
-    Object.keys(params).length > 0 ? params : undefined
+    Object.keys(params).length > 0 ? params : undefined,
   );
 
-  const columns = [
-    {
-      key: 'name',
-      header: 'Name',
-      render: (user: any) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {user.name}
+  const columns: DataTableColumn<User>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: 'Name',
+        render: (user) => (
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {user.name}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-        </div>
-      ),
-    },
-    {
-      key: 'plan',
-      header: 'Plan',
-      render: (user: any) => (
-        <Badge variant={user.plan === 'PRO' ? 'default' : 'secondary'}>
-          {user.plan}
-        </Badge>
-      ),
-    },
-    {
-      key: 'projects',
-      header: 'Projects',
-      render: (user: any) => (
-        <span className="text-sm text-gray-900 dark:text-gray-100">
-          {formatNumber(user.projectCount)}
-        </span>
-      ),
-    },
-    {
-      key: 'testimonials',
-      header: 'Testimonials',
-      render: (user: any) => (
-        <span className="text-sm text-gray-900 dark:text-gray-100">
-          {formatNumber(user.testimonialCount)}
-        </span>
-      ),
-    },
-    {
-      key: 'lastLogin',
-      header: 'Last Login',
-      render: (user: any) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
-        </span>
-      ),
-    },
-    {
-      key: 'joinedAt',
-      header: 'Joined',
-      render: (user: any) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatDate(user.joinedAt)}
-        </span>
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        key: 'plan',
+        header: 'Plan',
+        render: (user) => (
+          <Badge variant={user.plan === 'PRO' ? 'default' : 'secondary'}>
+            {user.plan}
+          </Badge>
+        ),
+      },
+      {
+        key: 'projects',
+        header: 'Projects',
+        render: (user) => (
+          <span className="text-sm text-gray-900 dark:text-gray-100">
+            {formatNumber(user.projectCount)}
+          </span>
+        ),
+      },
+      {
+        key: 'testimonials',
+        header: 'Testimonials',
+        render: (user) => (
+          <span className="text-sm text-gray-900 dark:text-gray-100">
+            {formatNumber(user.testimonialCount)}
+          </span>
+        ),
+      },
+      {
+        key: 'lastLogin',
+        header: 'Last Login',
+        render: (user) => (
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
+          </span>
+        ),
+      },
+      {
+        key: 'joinedAt',
+        header: 'Joined',
+        render: (user) => (
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {formatDate(user.joinedAt)}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="space-y-6">

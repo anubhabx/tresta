@@ -3,15 +3,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
   plan: 'FREE' | 'PRO';
-  createdAt: string;
-  lastLogin: string | null;
-  projectsCount: number;
-  testimonialsCount: number;
+  projectCount: number;
+  testimonialCount: number;
+  joinedAt: string;
+  lastLogin?: string | null;
 }
 
 interface UsersResponse {
@@ -23,7 +23,7 @@ interface UsersResponse {
   };
 }
 
-interface UseUsersParams {
+export interface UseUsersParams {
   search?: string;
   plan?: string;
   cursor?: string;
@@ -40,7 +40,7 @@ export function useUsers(params?: UseUsersParams) {
   });
 }
 
-interface UserDetail {
+export interface UserDetail {
   id: string;
   email: string;
   firstName: string;

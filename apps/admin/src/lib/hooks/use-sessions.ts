@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface Session {
+export interface Session {
   sessionId: string;
   userId: string;
   userName: string;
@@ -14,7 +14,7 @@ interface Session {
   createdAt: string;
 }
 
-interface RecentSignIn {
+export interface RecentSignIn {
   userId: string;
   userName: string;
   userEmail: string;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldAlert } from 'lucide-react';
+import Link from 'next/link';
 
 export default function UnauthorizedPage() {
   return (
@@ -16,7 +17,7 @@ export default function UnauthorizedPage() {
         </h1>
 
         <p className="text-gray-600 dark:text-gray-400 mb-8">
-          You don't have permission to access the admin panel. This area is
+          You don&apos;t have permission to access the admin panel. This area is
           restricted to administrators only.
         </p>
 
@@ -28,12 +29,12 @@ export default function UnauthorizedPage() {
           </p>
         </div>
 
-        <a
+        <Link
           href="/"
           className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
         >
           Return to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

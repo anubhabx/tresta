@@ -7,7 +7,6 @@ import {
   RefreshCw,
   Server,
   Database,
-  Zap,
   Flag,
   Globe,
   CheckCircle,

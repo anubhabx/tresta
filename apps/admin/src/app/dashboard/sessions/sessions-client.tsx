@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useSessions, useRevokeSession } from '@/lib/hooks/use-sessions';
-import { DataTable } from '@/components/tables/data-table';
+import { useSessions, useRevokeSession, type Session, type RecentSignIn } from '@/lib/hooks/use-sessions';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -21,9 +21,9 @@ export function SessionsClient() {
   const { data, isLoading, error, refetch } = useSessions();
   const revokeSession = useRevokeSession();
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
-  const handleRevokeClick = (session: any) => {
+  const handleRevokeClick = (session: Session) => {
     setSelectedSession(session);
     setRevokeDialogOpen(true);
   };
@@ -41,11 +41,11 @@ export function SessionsClient() {
     }
   };
 
-  const activeSessionColumns = [
+  const activeSessionColumns: DataTableColumn<Session>[] = [
     {
       key: 'user',
       header: 'User',
-      render: (session: any) => (
+      render: (session) => (
         <div>
           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {session.userName}
@@ -57,7 +57,7 @@ export function SessionsClient() {
     {
       key: 'ipAddress',
       header: 'IP Address',
-      render: (session: any) => (
+      render: (session) => (
         <span className="text-sm font-mono text-gray-900 dark:text-gray-100">
           {session.ipAddress}
         </span>
@@ -66,7 +66,7 @@ export function SessionsClient() {
     {
       key: 'userAgent',
       header: 'Device',
-      render: (session: any) => (
+      render: (session) => (
         <div className="max-w-xs">
           <span className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
             {session.userAgent}
@@ -77,7 +77,7 @@ export function SessionsClient() {
     {
       key: 'lastActivity',
       header: 'Last Activity',
-      render: (session: any) => (
+      render: (session) => (
         <div>
           <div className="text-sm text-gray-900 dark:text-gray-100">
             {formatRelativeTime(session.lastActivity)}
@@ -91,7 +91,7 @@ export function SessionsClient() {
     {
       key: 'actions',
       header: 'Actions',
-      render: (session: any) => (
+      render: (session) => (
         <Button
           size="sm"
           variant="destructive"
@@ -105,11 +105,11 @@ export function SessionsClient() {
     },
   ];
 
-  const recentSignInColumns = [
+  const recentSignInColumns: DataTableColumn<RecentSignIn>[] = [
     {
       key: 'user',
       header: 'User',
-      render: (signIn: any) => (
+      render: (signIn) => (
         <div>
           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {signIn.userName}
@@ -121,7 +121,7 @@ export function SessionsClient() {
     {
       key: 'ipAddress',
       header: 'IP Address',
-      render: (signIn: any) => (
+      render: (signIn) => (
         <span className="text-sm font-mono text-gray-900 dark:text-gray-100">
           {signIn.ipAddress}
         </span>
@@ -130,7 +130,7 @@ export function SessionsClient() {
     {
       key: 'timestamp',
       header: 'Timestamp',
-      render: (signIn: any) => (
+      render: (signIn) => (
         <div>
           <div className="text-sm text-gray-900 dark:text-gray-100">
             {formatRelativeTime(signIn.timestamp)}

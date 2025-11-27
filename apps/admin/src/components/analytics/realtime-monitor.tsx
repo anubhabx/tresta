@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { Activity, AlertCircle, Clock, Loader2 } from 'lucide-react';
+import type { AxiosError } from 'axios';
 
 interface RealtimeData {
   widgetId: string;
@@ -31,28 +32,39 @@ export function RealtimeMonitor({ widgetId }: RealtimeMonitorProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRealtimeData = async () => {
+  const fetchRealtimeData = useCallback(async () => {
     try {
-      const response = await apiClient.get(
-        `/admin/widgets/${widgetId}/realtime`
-      );
+      const response = await apiClient.get(`/admin/widgets/${widgetId}/realtime`);
       setData(response.data.data);
       setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load real-time data');
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+      ) {
+        setError(
+          (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message ||
+            'Failed to load real-time data'
+        );
+      } else {
+        setError('Failed to load real-time data');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [widgetId]);
 
   useEffect(() => {
-    fetchRealtimeData();
+    void fetchRealtimeData();
 
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchRealtimeData, 30000);
+    const interval = setInterval(() => {
+      void fetchRealtimeData();
+    }, 30000);
 
     return () => clearInterval(interval);
-  }, [widgetId]);
+  }, [fetchRealtimeData]);
 
   if (isLoading) {
     return (

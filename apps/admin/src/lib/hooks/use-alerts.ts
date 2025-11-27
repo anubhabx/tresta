@@ -3,14 +3,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface AlertConfig {
+export interface AlertConfig {
   emailQuotaThreshold: number;
   dlqCountThreshold: number;
   failedJobRateThreshold: number;
   slackWebhookUrl: string;
 }
 
-interface AlertHistory {
+export interface AlertHistory {
   id: string;
   alertType: string;
   message: string;
@@ -20,10 +20,12 @@ interface AlertHistory {
 
 interface AlertsResponse {
   success: boolean;
-  data: {
-    config: AlertConfig;
-    history: AlertHistory[];
-  };
+  data: AlertsData;
+}
+
+export interface AlertsData {
+  config: AlertConfig;
+  history: AlertHistory[];
 }
 
 export function useAlerts() {

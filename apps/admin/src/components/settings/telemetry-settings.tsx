@@ -12,11 +12,12 @@ interface TelemetrySettingsProps {
 }
 
 export function TelemetrySettings({ 
-  projectId, 
+  projectId: _projectId, 
   currentSetting = 'sampled',
   samplingRate = 1,
   onUpdate 
 }: TelemetrySettingsProps) {
+  void _projectId; // reserved for future API call payloads
   const [telemetrySetting, setTelemetrySetting] = useState<'off' | 'sampled' | 'opt-in'>(currentSetting);
   const [rate, setRate] = useState(samplingRate);
   const [isSaving, setIsSaving] = useState(false);
@@ -32,7 +33,7 @@ export function TelemetrySettings({
       }
       
       toast.success('Telemetry settings updated successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to update telemetry settings');
     } finally {
       setIsSaving(false);

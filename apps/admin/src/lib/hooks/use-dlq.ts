@@ -4,11 +4,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 import { toast } from 'sonner';
 
-interface DLQJob {
+export interface DLQJob {
   id: string;
   jobId: string;
   queue: string;
-  data: any;
+  data: Record<string, unknown>;
   error: string;
   errorType: 'transient' | 'permanent';
   statusCode: number | null;
@@ -26,6 +26,11 @@ interface DLQResponse {
   };
 }
 
+interface RequeueJobResponse {
+  success: boolean;
+  message?: string;
+}
+
 export function useDLQ(params?: { queue?: string; errorType?: string; limit?: number }) {
   return useQuery({
     queryKey: ['dlq', params],
@@ -39,17 +44,22 @@ export function useDLQ(params?: { queue?: string; errorType?: string; limit?: nu
 export function useRequeueJob() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<RequeueJobResponse, unknown, string>({
     mutationFn: async (jobId: string) => {
-      const response = await apiClient.post(`/admin/dlq/${jobId}/requeue`);
+      const response = await apiClient.post<RequeueJobResponse>(`/admin/dlq/${jobId}/requeue`);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dlq'] });
       toast.success('Job requeued successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.error?.message || 'Failed to requeue job');
+    onError: (error: unknown) => {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const err = error as { response?: { data?: { error?: { message?: string } } } };
+        toast.error(err.response?.data?.error?.message || 'Failed to requeue job');
+        return;
+      }
+      toast.error('Failed to requeue job');
     },
   });
 }

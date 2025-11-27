@@ -15,7 +15,9 @@ export function DLQClient() {
     ...(errorType && { errorType }),
   };
 
-  const { data, isLoading, error, refetch } = useDLQ(Object.keys(params).length > 0 ? params : undefined);
+  const { data, isLoading, error, refetch } = useDLQ(
+    Object.keys(params).length > 0 ? params : undefined,
+  );
   const { mutate: requeueJob, isPending, variables } = useRequeueJob();
 
   const handleRequeue = (jobId: string) => {
@@ -140,7 +142,7 @@ export function DLQClient() {
         <DLQTable
           jobs={data.jobs}
           onRequeue={handleRequeue}
-          isRequeuing={isPending ? (variables as string) : undefined}
+          isRequeuing={isPending ? variables : undefined}
         />
       )}
     </div>

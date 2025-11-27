@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuditLogs } from '@/lib/hooks/use-audit-logs';
+import { useAuditLogs, type AuditLog } from '@/lib/hooks/use-audit-logs';
 import { useExport } from '@/lib/hooks/use-export';
-import { DataTable } from '@/components/tables/data-table';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { AuditDetailModal } from '@/components/audit/audit-detail-modal';
 import { Badge } from '@/components/ui/badge';
@@ -14,17 +14,15 @@ import { toast } from 'sonner';
 
 export function AuditLogsClient() {
   const [search, setSearch] = useState('');
-  const [adminId, setAdminId] = useState('');
   const [actionType, setActionType] = useState('');
   const [targetType, setTargetType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const params = {
     ...(search && { search }),
-    ...(adminId && { adminId }),
     ...(actionType && { actionType }),
     ...(targetType && { targetType }),
     ...(startDate && { startDate }),
@@ -37,7 +35,7 @@ export function AuditLogsClient() {
 
   const exportMutation = useExport();
 
-  const handleViewDetails = (log: any) => {
+  const handleViewDetails = (log: AuditLog) => {
     setSelectedLog(log);
     setDetailModalOpen(true);
   };
@@ -76,11 +74,11 @@ export function AuditLogsClient() {
     });
   };
 
-  const columns = [
+  const columns: DataTableColumn<AuditLog>[] = [
     {
       key: 'admin',
       header: 'Admin',
-      render: (log: any) => (
+      render: (log) => (
         <div>
           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {log.adminName}
@@ -92,12 +90,12 @@ export function AuditLogsClient() {
     {
       key: 'action',
       header: 'Action',
-      render: (log: any) => <Badge variant="outline">{log.actionType}</Badge>,
+      render: (log) => <Badge variant="outline">{log.actionType}</Badge>,
     },
     {
       key: 'target',
       header: 'Target',
-      render: (log: any) => (
+      render: (log) => (
         <div>
           <Badge variant="secondary">{log.targetType}</Badge>
           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-mono">
@@ -109,7 +107,7 @@ export function AuditLogsClient() {
     {
       key: 'requestId',
       header: 'Request ID',
-      render: (log: any) => (
+      render: (log) => (
         <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
           {log.requestId.substring(0, 8)}...
         </span>
@@ -118,7 +116,7 @@ export function AuditLogsClient() {
     {
       key: 'timestamp',
       header: 'Timestamp',
-      render: (log: any) => (
+      render: (log) => (
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {formatDate(log.createdAt)}
         </span>
@@ -127,7 +125,7 @@ export function AuditLogsClient() {
     {
       key: 'actions',
       header: 'Actions',
-      render: (log: any) => (
+      render: (log) => (
         <Button size="sm" variant="ghost" onClick={() => handleViewDetails(log)}>
           <Eye className="h-4 w-4" />
           View

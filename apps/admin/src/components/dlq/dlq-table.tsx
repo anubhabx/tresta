@@ -3,22 +3,10 @@
 import { formatDate, formatRelativeTime } from '@/lib/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { DLQJob } from '@/lib/hooks/use-dlq';
 import { RotateCw, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { DLQJobModal } from './dlq-job-modal';
-
-interface DLQJob {
-  id: string;
-  jobId: string;
-  queue: string;
-  data: any;
-  error: string;
-  errorType: 'transient' | 'permanent';
-  statusCode: number | null;
-  retried: boolean;
-  retriedAt: string | null;
-  failedAt: string;
-}
 
 interface DLQTableProps {
   jobs: DLQJob[];

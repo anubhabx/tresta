@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { Loader2 } from 'lucide-react';
+import type { AxiosError } from 'axios';
+import type { WidgetConfig } from '@workspace/types';
 
 interface Widget {
   id: string;
   projectId: string;
-  config: any;
+  config: WidgetConfig;
   createdAt: string;
 }
 
@@ -16,6 +18,12 @@ interface Project {
   name: string;
   slug: string;
   widgets: Widget[];
+}
+
+interface ApiProjectSummary {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 interface WidgetSelectorProps {
@@ -30,21 +38,21 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await apiClient.get('/api/projects');
+        const response = await apiClient.get<{ data: ApiProjectSummary[] }>('/api/projects');
         const projectsData = response.data.data;
 
         // Fetch widgets for each project
         const projectsWithWidgets = await Promise.all(
-          projectsData.map(async (project: any) => {
+          projectsData.map(async (project) => {
             try {
-              const widgetsResponse = await apiClient.get(
+              const widgetsResponse = await apiClient.get<{ data: Widget[] }>(
                 `/api/widgets/project/${project.slug}`
               );
               return {
                 ...project,
                 widgets: widgetsResponse.data.data || [],
               };
-            } catch (err) {
+            } catch {
               return {
                 ...project,
                 widgets: [],
@@ -53,15 +61,27 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
           })
         );
 
-        setProjects(projectsWithWidgets.filter(p => p.widgets.length > 0));
-      } catch (err: any) {
-        setError(err.response?.data?.error?.message || 'Failed to load projects');
+        setProjects(projectsWithWidgets.filter((p) => p.widgets.length > 0));
+      } catch (err: unknown) {
+        if (
+          err &&
+          typeof err === 'object' &&
+          'response' in err &&
+          (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+        ) {
+          setError(
+            (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message ||
+              'Failed to load projects'
+          );
+        } else {
+          setError('Failed to load projects');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProjects();
+    void fetchProjects();
   }, []);
 
   if (isLoading) {

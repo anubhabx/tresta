@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import type { WidgetConfig, WidgetLayout, WidgetTheme, CardStyle } from '@workspace/types';
 import { DEFAULT_WIDGET_CONFIG } from '@workspace/types';
 

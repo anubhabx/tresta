@@ -5,19 +5,7 @@ import { formatDate } from '@/lib/utils/format';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-
-interface DLQJob {
-  id: string;
-  jobId: string;
-  queue: string;
-  data: any;
-  error: string;
-  errorType: 'transient' | 'permanent';
-  statusCode: number | null;
-  retried: boolean;
-  retriedAt: string | null;
-  failedAt: string;
-}
+import type { DLQJob } from '@/lib/hooks/use-dlq';
 
 interface DLQJobModalProps {
   job: DLQJob;

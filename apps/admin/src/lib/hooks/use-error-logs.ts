@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface ErrorLog {
+export interface ErrorLog {
   id: string;
   requestId: string;
   message: string;
@@ -12,7 +12,7 @@ interface ErrorLog {
   type: string;
   userId: string | null;
   requestPath: string | null;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
   sentryId: string | null;
   createdAt: string;
 }
@@ -26,7 +26,7 @@ interface ErrorLogsResponse {
   };
 }
 
-interface UseErrorLogsParams {
+export interface UseErrorLogsParams {
   severity?: string;
   type?: string;
   startDate?: string;

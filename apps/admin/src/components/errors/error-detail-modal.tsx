@@ -11,23 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils/format';
 import { Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import type { ErrorLog } from '@/lib/hooks/use-error-logs';
 
 interface ErrorDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  error: {
-    id: string;
-    requestId: string;
-    message: string;
-    stacktrace: string;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-    type: string;
-    userId: string | null;
-    requestPath: string | null;
-    metadata: any;
-    sentryId: string | null;
-    createdAt: string;
-  } | null;
+  error: ErrorLog | null;
 }
 
 export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModalProps) {

@@ -3,21 +3,33 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface Project {
+export interface ProjectOwner {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface ProjectTestimonialCounts {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  flagged: number;
+}
+
+export interface Project {
   id: string;
   name: string;
   slug: string;
-  type: string;
+  projectType?: string;
+  type?: string;
   visibility: string;
-  owner: {
-    id: string;
-    name: string;
-    email: string;
-  };
+  owner: ProjectOwner;
   createdAt: string;
   testimonialsCount: number;
   pendingCount: number;
   approvedCount: number;
+  testimonialCounts?: ProjectTestimonialCounts;
 }
 
 interface ProjectsResponse {
@@ -49,7 +61,7 @@ export function useProjects(params?: UseProjectsParams) {
   });
 }
 
-interface ProjectDetail {
+export interface ProjectDetail {
   id: string;
   name: string;
   slug: string;
@@ -65,7 +77,7 @@ interface ProjectDetail {
   profanityFilterLevel: string;
   brandColorPrimary: string | null;
   brandColorSecondary: string | null;
-  socialLinks: any;
+  socialLinks: Record<string, string | null> | null;
   tags: string[];
   createdAt: string;
   updatedAt: string;

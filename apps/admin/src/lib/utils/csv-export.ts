@@ -1,7 +1,10 @@
+export type CsvRowValue = string | number | boolean | null | undefined;
+export type CsvRow = Record<string, CsvRowValue>;
+
 /**
  * Convert array of objects to CSV string
  */
-export function convertToCSV(data: any[], columns: string[]): string {
+export function convertToCSV(data: CsvRow[], columns: string[]): string {
   if (data.length === 0) return '';
 
   // Create header row
@@ -57,7 +60,7 @@ export function generateCSVFilename(prefix: string): string {
 /**
  * Export data to CSV and download
  */
-export function exportToCSV(data: any[], columns: string[], filenamePrefix: string): void {
+export function exportToCSV(data: CsvRow[], columns: string[], filenamePrefix: string): void {
   const csv = convertToCSV(data, columns);
   const filename = generateCSVFilename(filenamePrefix);
   downloadCSV(csv, filename);

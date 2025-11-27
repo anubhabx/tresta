@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useBulkUpdateTestimonials } from '@/lib/hooks/use-testimonials';
 import { RefreshCw } from 'lucide-react';
+import type { BulkUpdateResult, BulkUpdatePreview } from '@/lib/hooks/use-testimonials';
 
 interface BulkConfirmationDialogProps {
   open: boolean;
@@ -30,27 +31,45 @@ export function BulkConfirmationDialog({
   action,
   onSuccess,
 }: BulkConfirmationDialogProps) {
-  const [preview, setPreview] = useState<any>(null);
+  const [preview, setPreview] = useState<BulkUpdateResult | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(true);
   
   const bulkUpdate = useBulkUpdateTestimonials();
 
   useEffect(() => {
-    if (open && testimonialIds.length > 0) {
-      setLoadingPreview(true);
-      // Fetch dry-run preview
-      bulkUpdate.mutateAsync({
-        testimonialIds,
-        status: action,
-        dryRun: true,
-      }).then((data) => {
-        setPreview(data);
-        setLoadingPreview(false);
-      }).catch(() => {
-        setLoadingPreview(false);
-      });
+    if (!open || testimonialIds.length === 0) {
+      return undefined;
     }
-  }, [open, testimonialIds, action]);
+
+    let isActive = true;
+    const frame = requestAnimationFrame(() => setLoadingPreview(true));
+
+    const loadPreview = async () => {
+      try {
+        const data = await bulkUpdate.mutateAsync({
+          testimonialIds,
+          status: action,
+          dryRun: true,
+        });
+        if (!isActive) return;
+        setPreview(data ?? null);
+      } catch {
+        if (!isActive) return;
+        setPreview(null);
+      } finally {
+        if (isActive) {
+          setLoadingPreview(false);
+        }
+      }
+    };
+
+    loadPreview();
+
+    return () => {
+      isActive = false;
+      cancelAnimationFrame(frame);
+    };
+  }, [open, testimonialIds, action, bulkUpdate]);
 
   const handleConfirm = async () => {
     try {
@@ -61,7 +80,7 @@ export function BulkConfirmationDialog({
       });
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error handling is done in the parent component via toast
     }
   };
@@ -126,7 +145,7 @@ export function BulkConfirmationDialog({
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {preview.preview.map((item: any) => (
+                    {preview.preview?.map((item: BulkUpdatePreview) => (
                       <tr key={item.id}>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                           {item.authorName}

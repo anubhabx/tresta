@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { Loader2, RefreshCw, AlertTriangle, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { MetricsCard } from '@/components/dashboard/metrics-card';
@@ -10,6 +10,7 @@ import { GeographicDistribution } from '@/components/analytics/geographic-distri
 import { RealtimeMonitor } from '@/components/analytics/realtime-monitor';
 import { PerformanceAlerts } from '@/components/analytics/performance-alerts';
 import { WidgetSelector } from '@/components/analytics/widget-selector';
+import type { AxiosError } from 'axios';
 
 interface AnalyticsData {
   widget: {
@@ -54,7 +55,7 @@ export function AnalyticsClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     if (!selectedWidgetId) return;
 
     setIsLoading(true);
@@ -65,18 +66,30 @@ export function AnalyticsClient() {
         `/admin/widgets/${selectedWidgetId}/analytics?days=${selectedDays}`
       );
       setAnalyticsData(response.data.data);
-    } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to load analytics');
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message
+      ) {
+        setError(
+          (err as AxiosError<{ error?: { message?: string } }>).response?.data?.error?.message ||
+            'Failed to load analytics'
+        );
+      } else {
+        setError('Failed to load analytics');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedDays, selectedWidgetId]);
 
   useEffect(() => {
     if (selectedWidgetId) {
-      fetchAnalytics();
+      void fetchAnalytics();
     }
-  }, [selectedWidgetId, selectedDays]);
+  }, [fetchAnalytics, selectedWidgetId]);
 
   if (!selectedWidgetId) {
     return (

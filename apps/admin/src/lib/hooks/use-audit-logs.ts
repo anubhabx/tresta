@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 
-interface AuditLog {
+export interface AuditLog {
   id: string;
   requestId: string;
   adminId: string;
@@ -12,8 +12,8 @@ interface AuditLog {
   actionType: string;
   targetType: string;
   targetId: string;
-  beforeSnapshot: any;
-  afterSnapshot: any;
+  beforeSnapshot: Record<string, unknown> | null;
+  afterSnapshot: Record<string, unknown> | null;
   createdAt: string;
 }
 
@@ -26,7 +26,7 @@ interface AuditLogsResponse {
   };
 }
 
-interface UseAuditLogsParams {
+export interface UseAuditLogsParams {
   adminId?: string;
   actionType?: string;
   targetType?: string;

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useProjects } from '@/lib/hooks/use-projects';
-import { DataTable } from '@/components/tables/data-table';
+import { useMemo, useState } from 'react';
+import { useProjects, type Project } from '@/lib/hooks/use-projects';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,79 +23,76 @@ export function ProjectsClient() {
   };
 
   const { data, isLoading, error, refetch } = useProjects(
-    Object.keys(params).length > 0 ? params : undefined
+    Object.keys(params).length > 0 ? params : undefined,
   );
-
-  const columns = [
-    {
-      key: 'name',
-      header: 'Project',
-      render: (project: any) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {project.name}
+  
+  const columns: DataTableColumn<Project>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: 'Project',
+        render: (project) => (
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {project.name}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">/{project.slug}</div>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            /{project.slug}
+        ),
+      },
+      {
+        key: 'owner',
+        header: 'Owner',
+        render: (project) => (
+          <div>
+            <div className="text-sm text-gray-900 dark:text-gray-100">{project.owner.name}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">{project.owner.email}</div>
           </div>
-        </div>
-      ),
-    },
-    {
-      key: 'owner',
-      header: 'Owner',
-      render: (project: any) => (
-        <div>
-          <div className="text-sm text-gray-900 dark:text-gray-100">
-            {project.owner.name}
+        ),
+      },
+      {
+        key: 'type',
+        header: 'Type',
+        render: (project) => (
+          <Badge variant="outline">{project.projectType ?? project.type ?? 'Unknown'}</Badge>
+        ),
+      },
+      {
+        key: 'visibility',
+        header: 'Visibility',
+        render: (project) => (
+          <Badge variant={project.visibility === 'PUBLIC' ? 'default' : 'secondary'}>
+            {project.visibility}
+          </Badge>
+        ),
+      },
+      {
+        key: 'testimonials',
+        header: 'Testimonials',
+        render: (project) => (
+          <div className="text-sm">
+            <div className="text-gray-900 dark:text-gray-100">
+              Total: {formatNumber(project.testimonialCounts?.total ?? project.testimonialsCount)}
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              Pending: {formatNumber(project.testimonialCounts?.pending ?? project.pendingCount)} | Approved:{' '}
+              {formatNumber(project.testimonialCounts?.approved ?? project.approvedCount)}
+            </div>
           </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {project.owner.email}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'type',
-      header: 'Type',
-      render: (project: any) => (
-        <Badge variant="outline">{project.projectType}</Badge>
-      ),
-    },
-    {
-      key: 'visibility',
-      header: 'Visibility',
-      render: (project: any) => (
-        <Badge variant={project.visibility === 'PUBLIC' ? 'default' : 'secondary'}>
-          {project.visibility}
-        </Badge>
-      ),
-    },
-    {
-      key: 'testimonials',
-      header: 'Testimonials',
-      render: (project: any) => (
-        <div className="text-sm">
-          <div className="text-gray-900 dark:text-gray-100">
-            Total: {formatNumber(project.testimonialCounts.total)}
-          </div>
-          <div className="text-gray-500 dark:text-gray-400">
-            Pending: {formatNumber(project.testimonialCounts.pending)} | Approved:{' '}
-            {formatNumber(project.testimonialCounts.approved)}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: 'Created',
-      render: (project: any) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatDate(project.createdAt)}
-        </span>
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        key: 'createdAt',
+        header: 'Created',
+        render: (project) => (
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {formatDate(project.createdAt)}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="space-y-6">

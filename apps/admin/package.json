@@ -32,6 +32,7 @@
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
+    "eslint-module-utils": "^2.8.0",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"

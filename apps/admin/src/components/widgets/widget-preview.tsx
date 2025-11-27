@@ -13,12 +13,26 @@ export function WidgetPreview({ widgetId, config }: WidgetPreviewProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!iframeRef.current) return;
-
     const iframe = iframeRef.current;
+    if (!iframe) {
+      return () => undefined;
+    }
+
+    let isActive = true;
+    const startFrame = requestAnimationFrame(() => {
+      if (isActive) {
+        setIsLoading(true);
+      }
+    });
+
     const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
 
-    if (!iframeDoc) return;
+    if (!iframeDoc) {
+      cancelAnimationFrame(startFrame);
+      return () => {
+        isActive = false;
+      };
+    }
 
     // Build the preview HTML with the widget
     const previewHTML = `
@@ -201,7 +215,17 @@ export function WidgetPreview({ widgetId, config }: WidgetPreviewProps) {
     iframeDoc.write(previewHTML);
     iframeDoc.close();
 
-    setIsLoading(false);
+    const endFrame = requestAnimationFrame(() => {
+      if (isActive) {
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      isActive = false;
+      cancelAnimationFrame(startFrame);
+      cancelAnimationFrame(endFrame);
+    };
   }, [widgetId, config]);
 
   return (

@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { useErrorLogs } from '@/lib/hooks/use-error-logs';
-import { DataTable } from '@/components/tables/data-table';
+import { useCallback, useMemo, useState } from 'react';
+import { useErrorLogs, type ErrorLog } from '@/lib/hooks/use-error-logs';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { ErrorDetailModal } from '@/components/errors/error-detail-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Filter, Eye, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Filter, Eye } from 'lucide-react';
 import { formatDate, formatNumber } from '@/lib/utils/format';
+
+const severityVariants = {
+  LOW: 'secondary' as const,
+  MEDIUM: 'warning' as const,
+  HIGH: 'destructive' as const,
+  CRITICAL: 'destructive' as const,
+};
 
 export function ErrorsClient() {
   const [search, setSearch] = useState('');
@@ -16,7 +23,7 @@ export function ErrorsClient() {
   const [type, setType] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [selectedError, setSelectedError] = useState<any>(null);
+  const [selectedError, setSelectedError] = useState<ErrorLog | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const params = {
@@ -28,79 +35,75 @@ export function ErrorsClient() {
   };
 
   const { data, isLoading, error, refetch } = useErrorLogs(
-    Object.keys(params).length > 0 ? params : undefined
+    Object.keys(params).length > 0 ? params : undefined,
   );
 
-  const handleViewDetails = (errorLog: any) => {
+  const handleViewDetails = useCallback((errorLog: ErrorLog) => {
     setSelectedError(errorLog);
     setDetailModalOpen(true);
-  };
+  }, []);
 
-  const severityVariants = {
-    LOW: 'secondary' as const,
-    MEDIUM: 'warning' as const,
-    HIGH: 'destructive' as const,
-    CRITICAL: 'destructive' as const,
-  };
-
-  const columns = [
-    {
-      key: 'severity',
-      header: 'Severity',
-      render: (errorLog: any) => (
-        <Badge variant={severityVariants[errorLog.severity as keyof typeof severityVariants]}>
-          {errorLog.severity}
-        </Badge>
-      ),
-    },
-    {
-      key: 'type',
-      header: 'Type',
-      render: (errorLog: any) => <Badge variant="outline">{errorLog.type}</Badge>,
-    },
-    {
-      key: 'message',
-      header: 'Message',
-      render: (errorLog: any) => (
-        <div className="max-w-md">
-          <span className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
-            {errorLog.message}
-          </span>
-        </div>
-      ),
-    },
-    {
-      key: 'userId',
-      header: 'Affected User',
-      render: (errorLog: any) =>
-        errorLog.userId ? (
-          <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
-            {errorLog.userId.substring(0, 8)}...
-          </span>
-        ) : (
-          <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+  const columns: DataTableColumn<ErrorLog>[] = useMemo(
+    () => [
+      {
+        key: 'severity',
+        header: 'Severity',
+        render: (errorLog) => (
+          <Badge variant={severityVariants[errorLog.severity as keyof typeof severityVariants]}>
+            {errorLog.severity}
+          </Badge>
         ),
-    },
-    {
-      key: 'timestamp',
-      header: 'Timestamp',
-      render: (errorLog: any) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatDate(errorLog.createdAt)}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      render: (errorLog: any) => (
-        <Button size="sm" variant="ghost" onClick={() => handleViewDetails(errorLog)}>
-          <Eye className="h-4 w-4" />
-          View
-        </Button>
-      ),
-    },
-  ];
+      },
+      {
+        key: 'type',
+        header: 'Type',
+        render: (errorLog) => <Badge variant="outline">{errorLog.type}</Badge>,
+      },
+      {
+        key: 'message',
+        header: 'Message',
+        render: (errorLog) => (
+          <div className="max-w-md">
+            <span className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+              {errorLog.message}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: 'userId',
+        header: 'Affected User',
+        render: (errorLog) =>
+          errorLog.userId ? (
+            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+              {errorLog.userId.substring(0, 8)}...
+            </span>
+          ) : (
+            <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+          ),
+      },
+      {
+        key: 'timestamp',
+        header: 'Timestamp',
+        render: (errorLog) => (
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {formatDate(errorLog.createdAt)}
+          </span>
+        ),
+      },
+      {
+        key: 'actions',
+        header: 'Actions',
+        render: (errorLog) => (
+          <Button size="sm" variant="ghost" onClick={() => handleViewDetails(errorLog)}>
+            <Eye className="h-4 w-4" />
+            View
+          </Button>
+        ),
+      },
+    ],
+    [handleViewDetails],
+  );
 
   return (
     <div className="space-y-6">

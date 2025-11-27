@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useTestimonials } from '@/lib/hooks/use-testimonials';
+import { useMemo, useState } from 'react';
+import { useTestimonials, type Testimonial } from '@/lib/hooks/use-testimonials';
 import { useExport } from '@/lib/hooks/use-export';
-import { DataTable } from '@/components/tables/data-table';
+import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { TableSearch } from '@/components/tables/table-search';
 import { ModerationBadge } from '@/components/testimonials/moderation-badge';
 import { ModerationActions } from '@/components/testimonials/moderation-actions';
@@ -29,7 +29,7 @@ export function TestimonialsClient() {
   };
 
   const { data, isLoading, error, refetch } = useTestimonials(
-    Object.keys(params).length > 0 ? params : undefined
+    Object.keys(params).length > 0 ? params : undefined,
   );
 
   const exportMutation = useExport();
@@ -86,76 +86,79 @@ export function TestimonialsClient() {
     });
   };
 
-  const columns = [
-    {
-      key: 'content',
-      header: 'Content',
-      render: (testimonial: any) => (
-        <div className="max-w-md">
-          <div className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
-            {testimonial.content}
+  const columns: DataTableColumn<Testimonial>[] = useMemo(
+    () => [
+      {
+        key: 'content',
+        header: 'Content',
+        render: (testimonial) => (
+          <div className="max-w-md">
+            <div className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+              {testimonial.content}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              by {testimonial.authorName}
+            </div>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            by {testimonial.authorName}
+        ),
+      },
+      {
+        key: 'project',
+        header: 'Project',
+        render: (testimonial) => (
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {testimonial.project.name}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              /{testimonial.project.slug}
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      key: 'project',
-      header: 'Project',
-      render: (testimonial: any) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {testimonial.project.name}
+        ),
+      },
+      {
+        key: 'rating',
+        header: 'Rating',
+        render: (testimonial) => (
+          <div className="flex items-center gap-1">
+            <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {testimonial.rating}
+            </span>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            /{testimonial.project.slug}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'rating',
-      header: 'Rating',
-      render: (testimonial: any) => (
-        <div className="flex items-center gap-1">
-          <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {testimonial.rating}
+        ),
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (testimonial) => (
+          <ModerationBadge status={testimonial.moderationStatus} />
+        ),
+      },
+      {
+        key: 'createdAt',
+        header: 'Created',
+        render: (testimonial) => (
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {formatDate(testimonial.createdAt)}
           </span>
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (testimonial: any) => (
-        <ModerationBadge status={testimonial.moderationStatus} />
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: 'Created',
-      render: (testimonial: any) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {formatDate(testimonial.createdAt)}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      render: (testimonial: any) => (
-        <ModerationActions
-          testimonialId={testimonial.id}
-          currentStatus={testimonial.moderationStatus}
-          testimonialContent={testimonial.content}
-          authorName={testimonial.authorName}
-        />
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        key: 'actions',
+        header: 'Actions',
+        render: (testimonial) => (
+          <ModerationActions
+            testimonialId={testimonial.id}
+            currentStatus={testimonial.moderationStatus}
+            testimonialContent={testimonial.content}
+            authorName={testimonial.authorName}
+          />
+        ),
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="space-y-6">

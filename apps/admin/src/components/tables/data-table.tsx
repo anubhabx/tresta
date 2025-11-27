@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-interface Column<T> {
+export interface DataTableColumn<T> {
   key: string;
   header: string;
   render: (item: T) => ReactNode;
@@ -11,7 +11,7 @@ interface Column<T> {
 
 interface DataTableProps<T> {
   data: T[];
-  columns: Column<T>[];
+  columns: DataTableColumn<T>[];
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
   selectable?: boolean;

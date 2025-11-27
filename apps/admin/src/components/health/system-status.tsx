@@ -19,14 +19,19 @@ export function SystemStatus({ status, checks }: SystemStatusProps) {
   const someUnhealthy = !allHealthy && (checks.database || checks.redis || checks.bullmq);
   const allUnhealthy = !checks.database && !checks.redis && !checks.bullmq;
 
-  const getIcon = () => {
-    if (isLoading) return null;
-    if (allHealthy) return CheckCircle;
-    if (allUnhealthy) return XCircle;
-    return AlertTriangle;
-  };
+  const iconClassName = cn(
+    'h-16 w-16',
+    allHealthy && 'text-green-600 dark:text-green-400',
+    someUnhealthy && 'text-yellow-600 dark:text-yellow-400',
+    allUnhealthy && 'text-red-600 dark:text-red-400'
+  );
 
-  const Icon = getIcon();
+  const iconElement = (() => {
+    if (isLoading) return null;
+    if (allHealthy) return <CheckCircle className={iconClassName} />;
+    if (allUnhealthy) return <XCircle className={iconClassName} />;
+    return <AlertTriangle className={iconClassName} />;
+  })();
 
   return (
     <div
@@ -38,18 +43,7 @@ export function SystemStatus({ status, checks }: SystemStatusProps) {
         isLoading && 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
       )}
     >
-      {Icon && (
-        <div className="flex justify-center mb-4">
-          <Icon
-            className={cn(
-              'h-16 w-16',
-              allHealthy && 'text-green-600 dark:text-green-400',
-              someUnhealthy && 'text-yellow-600 dark:text-yellow-400',
-              allUnhealthy && 'text-red-600 dark:text-red-400'
-            )}
-          />
-        </div>
-      )}
+      {iconElement && <div className="flex justify-center mb-4">{iconElement}</div>}
 
       <h2
         className={cn(

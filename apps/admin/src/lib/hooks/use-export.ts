@@ -2,12 +2,12 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
-import { exportToCSV } from '../utils/csv-export';
+import { exportToCSV, type CsvRow } from '../utils/csv-export';
 import { toast } from 'sonner';
 
 interface ExportParams {
   entityType: string;
-  data: any[];
+  data: CsvRow[];
   columns: string[];
   filenamePrefix: string;
 }

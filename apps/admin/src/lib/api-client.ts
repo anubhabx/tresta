@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
     // Get Clerk token from window if available (client-side only)
     if (typeof window !== 'undefined') {
       try {
-        // @ts-ignore - Clerk is available on window
+        // @ts-expect-error Clerk is injected by Clerk SDK on window
         const token = await window.Clerk?.session?.getToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;

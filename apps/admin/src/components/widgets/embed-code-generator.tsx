@@ -75,7 +75,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
       setCopied(true);
       toast.success('Embed code copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy to clipboard');
     }
   };
