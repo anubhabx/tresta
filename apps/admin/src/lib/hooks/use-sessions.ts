@@ -22,6 +22,9 @@ export interface RecentSignIn {
   timestamp: string;
 }
 
+export type SessionRow = Session & { id: string };
+export type RecentSignInRow = RecentSignIn & { id: string };
+
 interface SessionsResponse {
   success: boolean;
   data: {
@@ -30,12 +33,28 @@ interface SessionsResponse {
   };
 }
 
+interface SessionsData {
+  activeSessions: SessionRow[];
+  recentSignIns: RecentSignInRow[];
+}
+
 export function useSessions() {
-  return useQuery({
+  return useQuery<SessionsData>({
     queryKey: ['sessions'],
     queryFn: async () => {
       const response = await apiClient.get<SessionsResponse>('/admin/sessions');
-      return response.data.data;
+      const payload = response.data.data;
+
+      return {
+        activeSessions: payload.activeSessions.map((session) => ({
+          ...session,
+          id: session.sessionId,
+        })),
+        recentSignIns: payload.recentSignIns.map((signIn) => ({
+          ...signIn,
+          id: `${signIn.userId}-${signIn.timestamp}`,
+        })),
+      };
     },
   });
 }

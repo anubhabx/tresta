@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useSessions, useRevokeSession, type Session, type RecentSignIn } from '@/lib/hooks/use-sessions';
+import {
+  useSessions,
+  useRevokeSession,
+  type SessionRow,
+  type RecentSignInRow,
+} from '@/lib/hooks/use-sessions';
 import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +26,7 @@ export function SessionsClient() {
   const { data, isLoading, error, refetch } = useSessions();
   const revokeSession = useRevokeSession();
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [selectedSession, setSelectedSession] = useState<SessionRow | null>(null);
 
   const handleRevokeClick = (session: Session) => {
     setSelectedSession(session);
@@ -41,7 +46,7 @@ export function SessionsClient() {
     }
   };
 
-  const activeSessionColumns: DataTableColumn<Session>[] = [
+  const activeSessionColumns: DataTableColumn<SessionRow>[] = [
     {
       key: 'user',
       header: 'User',
@@ -105,7 +110,7 @@ export function SessionsClient() {
     },
   ];
 
-  const recentSignInColumns: DataTableColumn<RecentSignIn>[] = [
+  const recentSignInColumns: DataTableColumn<RecentSignInRow>[] = [
     {
       key: 'user',
       header: 'User',
