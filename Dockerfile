@@ -30,4 +30,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Adjust this path to whatever your actual output is
-CMD ["pnpm", "--filter", "api", "start"]
+CMD ["pnpm", "--filter", "api", "run", "start:all"]
