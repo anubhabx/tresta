@@ -1,4 +1,4 @@
-const DEFAULT_CDN_BASE_URL = 'https://cdn.tresta.app';
+const DEFAULT_CDN_BASE_URL = 'https://api.tresta.app';
 const DEFAULT_API_BASE_URL = 'https://api.tresta.app';
 const DEFAULT_BRANDING_URL = 'https://tresta.app';
 
