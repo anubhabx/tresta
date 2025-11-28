@@ -16,7 +16,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "@azure/storage-blob": "^12.29.1",
     "@clerk/express": "^1.7.31",
