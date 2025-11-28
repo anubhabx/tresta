@@ -16,9 +16,10 @@ COPY apps ./apps
 COPY packages ./packages
 
 # Install deps for all workspaces
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
-# Build shared packages
+# Build shared packages (Order matters!)
+RUN pnpm --filter @workspace/types build
 RUN pnpm --filter @workspace/database build
 RUN pnpm --filter @workspace/widget build
 
@@ -29,4 +30,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Adjust this path to whatever your actual output is
-CMD ["node", "apps/api/dist/apps/api/src/index.js"]
+CMD ["pnpm", "--filter", "api", "start"]
