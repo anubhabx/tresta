@@ -43,7 +43,7 @@ app.use(express.raw({ type: "application/json" }));
 app.use(clerkMiddleware());
 
 app.get("/health", (req, res) => {
-  res.status(200).send(process.env.REDIS_URL);
+  res.status(200).send("OK");
 });
 
 // Serve widget script (public, CDN-ready with aggressive caching)
