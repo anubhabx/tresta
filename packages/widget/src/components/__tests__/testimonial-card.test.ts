@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TestimonialCard } from '../testimonial-card';
-import type { Testimonial, DisplayOptions, ThemeConfig } from '../../types';
+import { TestimonialCard } from '../testimonial-card.js';
+import type { Testimonial, DisplayOptions, ThemeConfig } from '../../types/index.js';
 
 describe('TestimonialCard', () => {
   let mockTestimonial: Testimonial;

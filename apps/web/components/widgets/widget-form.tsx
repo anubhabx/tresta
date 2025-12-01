@@ -18,11 +18,10 @@ import {
 } from "./widget-form-sections";
 
 const MIN_MAX_TESTIMONIALS = 20;
-const MIN_ROTATE_INTERVAL = 2000;
-const MAX_ROTATE_INTERVAL = 10000;
+
 
 const widgetFormSchema = z.object({
-  layout: z.enum(["grid", "carousel"]),
+  layout: z.enum(["grid", "list"]),
   theme: z.enum(["light", "dark", "auto"]),
   primaryColor: z
     .string()
@@ -30,11 +29,9 @@ const widgetFormSchema = z.object({
   showRating: z.boolean(),
   showAvatar: z.boolean(),
   maxTestimonials: z.number().min(1).max(MIN_MAX_TESTIMONIALS),
-  autoRotate: z.boolean(),
-  rotateInterval: z
-    .number()
-    .min(MIN_ROTATE_INTERVAL)
-    .max(MAX_ROTATE_INTERVAL),
+  // autoRotate and rotateInterval removed as they are carousel-specific
+  autoRotate: z.boolean().optional(),
+  rotateInterval: z.number().optional(),
 });
 
 export type WidgetFormData = z.infer<typeof widgetFormSchema>;
@@ -59,8 +56,7 @@ export function WidgetForm({
     defaultValues: getInitialValues(initialData?.config),
   });
 
-  const watchLayout = form.watch("layout");
-  const watchAutoRotate = form.watch("autoRotate");
+
 
   // Use ref to store the callback to avoid dependency issues
   const onConfigChangeRef = useRef(onConfigChange);
@@ -102,8 +98,6 @@ export function WidgetForm({
         <WidgetDisplaySection control={form.control} />
         <WidgetLayoutSection
           control={form.control}
-          layout={watchLayout}
-          autoRotate={watchAutoRotate}
         />
 
         <Separator />
@@ -130,7 +124,7 @@ export function WidgetForm({
 
 function getInitialValues(config?: WidgetConfig) {
   const normalized = {
-    layout: config?.layout === "carousel" ? "carousel" : "grid",
+    layout: config?.layout === "list" ? "list" : "grid",
     theme: config?.theme || DEFAULT_WIDGET_CONFIG.theme,
     primaryColor: config?.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
     showRating:
@@ -143,24 +137,14 @@ function getInitialValues(config?: WidgetConfig) {
         : DEFAULT_WIDGET_CONFIG.showAvatar,
     maxTestimonials:
       config?.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
-    autoRotate: config?.layout === "carousel" && config?.autoRotate ? true : false,
-    rotateInterval:
-      config?.rotateInterval || DEFAULT_WIDGET_CONFIG.rotateInterval,
+    autoRotate: false,
+    rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
   } as WidgetFormData;
 
   normalized.maxTestimonials = Math.min(
     Math.max(normalized.maxTestimonials, 1),
     MIN_MAX_TESTIMONIALS
   );
-
-  normalized.rotateInterval = Math.min(
-    Math.max(normalized.rotateInterval, MIN_ROTATE_INTERVAL),
-    MAX_ROTATE_INTERVAL
-  );
-
-  if (normalized.layout !== "carousel") {
-    normalized.autoRotate = false;
-  }
 
   return normalized;
 }

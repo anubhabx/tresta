@@ -2,7 +2,7 @@
  * Storage type definitions
  */
 
-import type { WidgetData } from '../types';
+import type { WidgetData } from '../types/index.js';
 
 export interface CacheEntry {
   widgetId: string;

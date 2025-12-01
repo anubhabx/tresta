@@ -3,9 +3,9 @@
  * @version 1.0.0
  */
 
-import { Widget } from './core/widget';
-import { autoInitialize } from './core/loader';
-import type { WidgetConfig, WidgetInstance } from './types';
+import { Widget } from './core/widget.js';
+import { autoInitialize } from './core/loader.js';
+import type { WidgetConfig, WidgetInstance } from './types/index.js';
 
 // Expose global API
 export const TrestaWidget = {
@@ -16,10 +16,10 @@ export const TrestaWidget = {
    * @returns Widget instance
    */
   async mount(element: string | HTMLElement, config: WidgetConfig): Promise<WidgetInstance> {
-    const container = typeof element === 'string' 
-      ? document.querySelector(element) 
+    const container = typeof element === 'string'
+      ? document.querySelector(element)
       : element;
-    
+
     if (!container) {
       throw new Error(`[TrestaWidget] Container not found: ${element}`);
     }
@@ -34,10 +34,10 @@ export const TrestaWidget = {
    * @param element - Container element or CSS selector
    */
   unmount(element: string | HTMLElement): void {
-    const container = typeof element === 'string' 
-      ? document.querySelector(element) 
+    const container = typeof element === 'string'
+      ? document.querySelector(element)
       : element;
-    
+
     if (!container) {
       console.warn(`[TrestaWidget] Container not found: ${element}`);
       return;
@@ -59,7 +59,7 @@ export const TrestaWidget = {
 if (typeof window !== 'undefined') {
   // Expose to global scope
   (window as any).TrestaWidget = TrestaWidget;
-  
+
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', autoInitialize);

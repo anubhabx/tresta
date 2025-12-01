@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { TelemetrySampler } from '../sampler';
+import { TelemetrySampler } from '../sampler.js';
 
 describe('TelemetrySampler', () => {
   it('should initialize with default 1% sampling rate', () => {
@@ -32,7 +32,7 @@ describe('TelemetrySampler', () => {
 
   it('should sample at 100% rate', () => {
     const sampler = new TelemetrySampler(1.0);
-    
+
     // Test multiple times to ensure consistency
     for (let i = 0; i < 10; i++) {
       expect(sampler.shouldSample()).toBe(true);
@@ -41,7 +41,7 @@ describe('TelemetrySampler', () => {
 
   it('should never sample at 0% rate', () => {
     const sampler = new TelemetrySampler(0);
-    
+
     // Test multiple times to ensure consistency
     for (let i = 0; i < 10; i++) {
       expect(sampler.shouldSample()).toBe(false);
@@ -50,16 +50,16 @@ describe('TelemetrySampler', () => {
 
   it('should sample probabilistically', () => {
     const sampler = new TelemetrySampler(0.5);
-    
+
     // Mock Math.random to test sampling logic
     const mockRandom = vi.spyOn(Math, 'random');
-    
+
     mockRandom.mockReturnValue(0.3);
     expect(sampler.shouldSample()).toBe(true);
-    
+
     mockRandom.mockReturnValue(0.7);
     expect(sampler.shouldSample()).toBe(false);
-    
+
     mockRandom.mockRestore();
   });
 });

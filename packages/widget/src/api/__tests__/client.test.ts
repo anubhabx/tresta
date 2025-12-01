@@ -3,10 +3,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { APIClient } from '../client';
-import { WidgetError, WidgetErrorCode } from '../../types';
-import type { WidgetData } from '../../types';
-import { WIDGET_API_BASE_URL } from '../../config/env';
+import { APIClient } from '../client.js';
+import { WidgetError, WidgetErrorCode } from '../../types/index.js';
+import type { WidgetData } from '../../types/index.js';
+import { WIDGET_API_BASE_URL } from '../../config/env.js';
 
 // Mock the network client
 vi.mock('../network', () => {

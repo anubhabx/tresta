@@ -161,7 +161,7 @@ export interface ModerationQueueResponse
 
 export enum WidgetType {
   GRID = "GRID",
-  CAROUSEL = "CAROUSEL",
+  LIST = "LIST",
   MASONRY = "MASONRY",
 }
 

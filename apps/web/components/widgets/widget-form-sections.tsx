@@ -52,7 +52,7 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="grid">Grid</SelectItem>
-                  <SelectItem value="carousel">Carousel</SelectItem>
+                  <SelectItem value="list">List</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -178,14 +178,10 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
 
 interface WidgetLayoutSectionProps {
   control: Control<WidgetFormData>;
-  layout: string;
-  autoRotate: boolean;
 }
 
 export function WidgetLayoutSection({
   control,
-  layout,
-  autoRotate,
 }: WidgetLayoutSectionProps) {
   return (
     <Card>
@@ -222,60 +218,7 @@ export function WidgetLayoutSection({
           )}
         />
 
-        {layout === "carousel" && (
-          <>
-            <FormField
-              control={control}
-              name="autoRotate"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Auto Rotate</FormLabel>
-                    <FormDescription>
-                      Automatically cycle through testimonials
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
 
-            {autoRotate && (
-              <FormField
-                control={control}
-                name="rotateInterval"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rotation Interval (ms)</FormLabel>
-                    <FormControl>
-                      <div className="space-y-2">
-                        <Slider
-                          min={2000}
-                          max={10000}
-                          step={500}
-                          value={[field.value]}
-                          onValueChange={(value) => field.onChange(value[0])}
-                        />
-                        <div className="text-sm text-muted-foreground text-right">
-                          {field.value / 1000}s between rotations
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Time between automatic rotations
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </>
-        )}
       </CardContent>
     </Card>
   );

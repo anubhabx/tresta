@@ -6,9 +6,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { Widget } from '../core/widget';
-import { defaultCSPValidator } from '../security/csp-validator';
-import type { WidgetConfig } from '../types';
+import { Widget } from '../core/widget.js';
+import { defaultCSPValidator } from '../security/csp-validator.js';
+import type { WidgetConfig } from '../types/index.js';
 
 describe('CSP Compliance', () => {
   let container: HTMLElement;
@@ -81,7 +81,7 @@ describe('CSP Compliance', () => {
       const contentRoot = widget.getContentRoot();
       if (contentRoot) {
         const result = defaultCSPValidator.validateResources(contentRoot);
-        
+
         // Filter out any violations that are not inline-event related
         const inlineEventViolations = result.violations.filter(v => v.type === 'inline-event');
         expect(inlineEventViolations).toHaveLength(0);
@@ -101,10 +101,10 @@ describe('CSP Compliance', () => {
       const contentRoot = widget.getContentRoot();
       if (contentRoot) {
         const result = defaultCSPValidator.validateResources(contentRoot);
-        
+
         // Filter for image violations only (since we're testing resource loading)
         const imageViolations = result.violations.filter(v => v.type === 'image');
-        
+
         // Should have no violations for images from non-allowed domains
         expect(imageViolations).toHaveLength(0);
       }
@@ -121,7 +121,7 @@ describe('CSP Compliance', () => {
       const contentRoot = widget.getContentRoot();
       if (contentRoot) {
         const images = contentRoot.querySelectorAll('img');
-        
+
         images.forEach(img => {
           const src = img.getAttribute('src');
           if (src) {
@@ -137,11 +137,11 @@ describe('CSP Compliance', () => {
     it('should support nonce attribute for CSP', () => {
       const nonce = 'test-nonce-12345';
       const validatorWithNonce = defaultCSPValidator;
-      
+
       // Create a style element
       const style = document.createElement('style');
       validatorWithNonce.applyNonce(style);
-      
+
       // In a real scenario with nonce configured, it would be applied
       // This test verifies the mechanism exists
       expect(typeof validatorWithNonce.applyNonce).toBe('function');
@@ -155,7 +155,7 @@ describe('CSP Compliance', () => {
       document.body.appendChild(script);
 
       const nonce = defaultCSPValidator.getNonce();
-      
+
       // Clean up
       document.body.removeChild(script);
 
@@ -207,7 +207,7 @@ describe('CSP Compliance', () => {
       `;
 
       const result = defaultCSPValidator.validateResources(testRoot);
-      
+
       expect(result.valid).toBe(false);
       expect(result.violations.length).toBeGreaterThan(0);
     });
@@ -221,7 +221,7 @@ describe('CSP Compliance', () => {
       testRoot.appendChild(script);
 
       const result = defaultCSPValidator.validateResources(testRoot);
-      
+
       expect(result.violations[0]).toHaveProperty('type');
       expect(result.violations[0]).toHaveProperty('message');
       expect(result.violations[0]).toHaveProperty('url');
@@ -237,7 +237,7 @@ describe('CSP Compliance', () => {
       };
 
       widget = new Widget(config);
-      
+
       // Widget should mount without errors even in strict CSP
       await expect(widget.mount(container)).resolves.not.toThrow();
     });
@@ -252,7 +252,7 @@ describe('CSP Compliance', () => {
 
       // Verify no inline styles with style attribute
       const elementsWithInlineStyle = container.querySelectorAll('[style]');
-      
+
       // Some inline styles might be acceptable (e.g., for dynamic positioning)
       // but we should minimize them
       // This is more of a guideline check
@@ -276,7 +276,7 @@ describe('CSP Compliance', () => {
         if (contentRoot) {
           // Validate resources within Shadow DOM
           const result = defaultCSPValidator.validateResources(contentRoot);
-          
+
           // Should have no CSP violations
           const criticalViolations = result.violations.filter(
             v => v.type === 'script' || v.type === 'iframe' || v.type === 'inline-event'

@@ -2,10 +2,10 @@
  * Cache manager with IndexedDB and localStorage fallback
  */
 
-import type { WidgetData } from '../types';
-import type { CacheEntry, StorageAdapter } from './types';
-import { IndexedDBAdapter } from './indexeddb';
-import { LocalStorageAdapter } from './localstorage';
+import type { WidgetData } from '../types/index.js';
+import type { CacheEntry, StorageAdapter } from './types.js';
+import { IndexedDBAdapter } from './indexeddb.js';
+import { LocalStorageAdapter } from './localstorage.js';
 
 const DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const LOCALSTORAGE_TTL = 60 * 60 * 1000; // 1 hour (reduced for localStorage)
@@ -28,7 +28,7 @@ export class StorageManager {
       if (await indexedDBAdapter.isAvailable()) {
         this.adapter = indexedDBAdapter;
         console.log('[TrestaWidget] Using IndexedDB for caching');
-        
+
         // Clear expired entries on initialization (don't await to avoid blocking)
         this.clearExpired().catch(() => {
           // Ignore cleanup errors
@@ -41,7 +41,7 @@ export class StorageManager {
       if (await localStorageAdapter.isAvailable()) {
         this.adapter = localStorageAdapter;
         console.log('[TrestaWidget] Using localStorage for caching (IndexedDB unavailable)');
-        
+
         // Clear expired entries on initialization (don't await to avoid blocking)
         this.clearExpired().catch(() => {
           // Ignore cleanup errors
@@ -96,7 +96,7 @@ export class StorageManager {
 
       const key = this.getCacheKey(widgetId);
       const entry = await adapter.get(key);
-      
+
       if (!entry) {
         return null;
       }

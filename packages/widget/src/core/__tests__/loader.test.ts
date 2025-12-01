@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { autoInitialize } from '../loader';
+import { autoInitialize } from '../loader.js';
 
 describe('Loader - autoInitialize', () => {
   beforeEach(() => {

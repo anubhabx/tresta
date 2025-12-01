@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Widget } from '../widget';
-import type { WidgetConfig } from '../../types';
+import { Widget } from '../widget.js';
+import type { WidgetConfig } from '../../types/index.js';
 
 describe('Widget', () => {
   let container: HTMLElement;
@@ -184,7 +184,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Should not throw
       expect(() => widget.unmount()).not.toThrow();
     });
@@ -342,7 +342,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       let state = widget.getState();
       expect(state.mounted).toBe(false);
       expect(state.loading).toBe(false);
@@ -460,7 +460,7 @@ describe('Widget', () => {
       await widget.mount(container);
 
       const root = container.querySelector('[data-tresta-widget]');
-      
+
       // Check if Shadow DOM is supported and used
       if ('attachShadow' in Element.prototype) {
         expect(root?.shadowRoot).toBeDefined();
@@ -525,7 +525,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
@@ -554,7 +554,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
@@ -576,7 +576,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to return empty testimonials
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
@@ -611,7 +611,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to return empty testimonials
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
@@ -641,11 +641,11 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock storage manager to return null (no cache)
       const storageManager = (widget as any).storageManager;
       vi.spyOn(storageManager, 'get').mockResolvedValue(null);
-      
+
       // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
@@ -671,7 +671,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
@@ -691,11 +691,11 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock storage manager to return null (no cache)
       const storageManager = (widget as any).storageManager;
       vi.spyOn(storageManager, 'get').mockResolvedValue(null);
-      
+
       // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
@@ -720,7 +720,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Mock API client to return empty testimonials
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue({
@@ -753,7 +753,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {
@@ -843,17 +843,17 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {
           layout: { type: 'list' },
           theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
-          display: { 
-            showRating: true, 
-            showDate: true, 
-            showAvatar: true, 
-            showAuthorRole: true, 
+          display: {
+            showRating: true,
+            showDate: true,
+            showAvatar: true,
+            showAuthorRole: true,
             showAuthorCompany: true,
             maxTestimonials: 2,
           },
@@ -911,17 +911,17 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {
           layout: { type: 'list', maxTestimonials: 1 },
           theme: { mode: 'light', primaryColor: '#000', secondaryColor: '#666', cardStyle: 'default' },
-          display: { 
-            showRating: true, 
-            showDate: true, 
-            showAvatar: true, 
-            showAuthorRole: true, 
+          display: {
+            showRating: true,
+            showDate: true,
+            showAvatar: true,
+            showAuthorRole: true,
             showAuthorCompany: true,
             maxTestimonials: 5,
           },
@@ -979,7 +979,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {
@@ -1028,14 +1028,14 @@ describe('Widget', () => {
 
       const contentRoot = widget.getContentRoot();
       const items = contentRoot?.querySelectorAll('.tresta-list-item');
-      
+
       // Should render the 2 most recent testimonials
       expect(items?.length).toBe(2);
-      
+
       // Check that the most recent testimonials are rendered
       const firstCard = items?.[0]?.querySelector('.tresta-testimonial-card');
       const secondCard = items?.[1]?.querySelector('.tresta-testimonial-card');
-      
+
       expect(firstCard?.textContent).toContain('Most Recent');
       expect(secondCard?.textContent).toContain('Middle');
     });
@@ -1048,7 +1048,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {
@@ -1099,7 +1099,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       // Create 150 testimonials
       const testimonials = Array.from({ length: 150 }, (_, i) => ({
         id: `${i + 1}`,
@@ -1143,7 +1143,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const cachedData = {
         widgetId: 'test-123',
         config: {
@@ -1197,7 +1197,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const cachedData = {
         widgetId: 'test-123',
         config: {
@@ -1246,7 +1246,7 @@ describe('Widget', () => {
       };
 
       const widget = new Widget(config);
-      
+
       const apiData = {
         widgetId: 'test-123',
         config: {

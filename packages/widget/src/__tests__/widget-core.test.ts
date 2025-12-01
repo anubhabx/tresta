@@ -10,8 +10,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Widget } from '../core/widget';
-import type { WidgetConfig } from '../types';
+import { Widget } from '../core/widget.js';
+import type { WidgetConfig } from '../types/index.js';
 
 describe('Widget Core', () => {
   let container: HTMLElement;

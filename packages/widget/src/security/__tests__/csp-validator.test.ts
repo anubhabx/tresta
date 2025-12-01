@@ -7,8 +7,8 @@ import {
   CSPValidator,
   getRequiredCSPDirectives,
   generateCSPFriendlyEmbedCode,
-} from '../csp-validator';
-import { WIDGET_API_BASE_URL, WIDGET_CDN_BASE_URL } from '../../config/env';
+} from '../csp-validator.js';
+import { WIDGET_API_BASE_URL, WIDGET_CDN_BASE_URL } from '../../config/env.js';
 
 const getHostname = (url: string): string => {
   try {

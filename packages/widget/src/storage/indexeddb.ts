@@ -2,7 +2,7 @@
  * IndexedDB storage adapter
  */
 
-import type { CacheEntry, StorageAdapter } from './types';
+import type { CacheEntry, StorageAdapter } from './types.js';
 
 const DB_NAME = 'tresta-widget-cache';
 const DB_VERSION = 1;
@@ -40,7 +40,7 @@ export class IndexedDBAdapter implements StorageAdapter {
 
       testDB.close();
       indexedDB.deleteDatabase('__test__');
-      
+
       this.available = true;
       return true;
     } catch (error) {
@@ -71,7 +71,7 @@ export class IndexedDBAdapter implements StorageAdapter {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'widgetId' });
@@ -90,7 +90,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   async get(key: string): Promise<CacheEntry | null> {
     try {
       const db = await this.getDB();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
@@ -99,7 +99,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const entry = request.result as CacheEntry | undefined;
-          
+
           // Check if entry is expired
           if (entry && entry.expiresAt < Date.now()) {
             // Delete expired entry asynchronously
@@ -124,7 +124,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   async set(_key: string, value: CacheEntry): Promise<void> {
     try {
       const db = await this.getDB();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
@@ -145,7 +145,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   async delete(key: string): Promise<void> {
     try {
       const db = await this.getDB();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
@@ -166,7 +166,7 @@ export class IndexedDBAdapter implements StorageAdapter {
   async clear(): Promise<void> {
     try {
       const db = await this.getDB();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
@@ -188,12 +188,12 @@ export class IndexedDBAdapter implements StorageAdapter {
     try {
       const db = await this.getDB();
       const now = Date.now();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         const index = store.index('expiresAt');
-        
+
         // Get all entries with expiresAt < now
         const range = IDBKeyRange.upperBound(now);
         const request = index.openCursor(range);

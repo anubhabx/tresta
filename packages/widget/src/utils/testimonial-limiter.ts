@@ -5,7 +5,7 @@
  * Implements Requirements: 12.1, 12.2, 12.3, 12.4, 12.5
  */
 
-import type { Testimonial } from '../types';
+import type { Testimonial } from '../types/index.js';
 
 /**
  * Limits testimonials to the specified maximum count, prioritizing most recent.
@@ -51,7 +51,7 @@ function sortByCreatedAtDesc(testimonials: Testimonial[]): Testimonial[] {
   return [...testimonials].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();
-    
+
     // Sort descending (most recent first)
     return dateB - dateA;
   });

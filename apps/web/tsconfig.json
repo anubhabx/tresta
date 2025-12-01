@@ -3,10 +3,18 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@workspace/ui/*": ["../../packages/ui/src/*"],
-      "@workspace/widget": ["../../packages/widget/src/index.ts"],
-      "@workspace/widget/*": ["../../packages/widget/src/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@workspace/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@workspace/widget": [
+        "../../packages/widget/src/index.tsx"
+      ],
+      "@workspace/widget/*": [
+        "../../packages/widget/src/*"
+      ]
     },
     "plugins": [
       {
@@ -21,5 +29,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

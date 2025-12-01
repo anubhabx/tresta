@@ -13,7 +13,7 @@ import {
   WIDGET_API_BASE_URL,
   WIDGET_CDN_BASE_URL,
   buildWidgetScriptUrl,
-} from '../config/env';
+} from '../config/env.js';
 
 export interface CSPConfig {
   allowedDomains: string[];
@@ -161,8 +161,8 @@ export class CSPValidator {
       if (meta) {
         const content = meta.getAttribute('content') || '';
         // Check for strict CSP directives
-        return content.includes("'strict-dynamic'") || 
-               (!content.includes("'unsafe-inline'") && !content.includes("'unsafe-eval'"));
+        return content.includes("'strict-dynamic'") ||
+          (!content.includes("'unsafe-inline'") && !content.includes("'unsafe-eval'"));
       }
     } catch {
       // If we can't check, assume no strict CSP
@@ -256,7 +256,7 @@ export class CSPValidator {
     const sourceFile = event.sourceFile;
 
     return (
-      this.config.allowedDomains.some(domain => 
+      this.config.allowedDomains.some(domain =>
         blockedURI.includes(domain) || sourceFile?.includes(domain)
       ) ||
       sourceFile?.includes('tresta-widget') ||

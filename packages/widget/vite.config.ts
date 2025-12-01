@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import compression from 'vite-plugin-compression';
-import { visualizer } from 'rollup-plugin-visualizer';
+// import compression from 'vite-plugin-compression';
+// import { visualizer } from 'rollup-plugin-visualizer';
+import preact from '@preact/preset-vite';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -35,27 +37,37 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: false,
   },
   plugins: [
+    preact(),
+    tailwindcss(),
     // Gzip compression
-    compression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      threshold: 1024,
-    }),
+    // compression({
+    //   algorithm: 'gzip',
+    //   ext: '.gz',
+    //   threshold: 1024,
+    // }),
     // Brotli compression
-    compression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
-      threshold: 1024,
-    }),
+    // compression({
+    //   algorithm: 'brotliCompress',
+    //   ext: '.br',
+    //   threshold: 1024,
+    // }),
     // Bundle analyzer (only in analyze mode)
-    mode === 'analyze' &&
-      visualizer({
-        filename: 'dist/stats.html',
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-      }),
+    // mode === 'analyze' &&
+    //   visualizer({
+    //     filename: 'dist/stats.html',
+    //     open: true,
+    //     gzipSize: true,
+    //     brotliSize: true,
+    //   }),
   ].filter(Boolean),
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+      react: 'preact/compat',
+      'react-dom/test-utils': 'preact/test-utils',
+      'react-dom': 'preact/compat',
+    },
+  },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
   },

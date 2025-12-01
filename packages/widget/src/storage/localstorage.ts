@@ -2,7 +2,7 @@
  * localStorage storage adapter (fallback)
  */
 
-import type { CacheEntry, StorageAdapter } from './types';
+import type { CacheEntry, StorageAdapter } from './types.js';
 
 const STORAGE_PREFIX = 'tresta-widget-';
 
@@ -37,13 +37,13 @@ export class LocalStorageAdapter implements StorageAdapter {
     try {
       const storageKey = STORAGE_PREFIX + key;
       const item = localStorage.getItem(storageKey);
-      
+
       if (!item) {
         return null;
       }
 
       const entry = JSON.parse(item) as CacheEntry;
-      
+
       // Check if entry is expired
       if (entry.expiresAt < Date.now()) {
         // Delete expired entry
@@ -68,11 +68,11 @@ export class LocalStorageAdapter implements StorageAdapter {
       localStorage.setItem(storageKey, serialized);
     } catch (error) {
       // Handle quota exceeded error
-      if (error instanceof DOMException && 
-          (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+      if (error instanceof DOMException &&
+        (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
         console.warn('[TrestaWidget] localStorage quota exceeded, clearing old entries');
         await this.clearExpired();
-        
+
         // Try again after cleanup
         try {
           const storageKey = STORAGE_PREFIX + key;
@@ -108,7 +108,7 @@ export class LocalStorageAdapter implements StorageAdapter {
   async clear(): Promise<void> {
     try {
       const keysToRemove: string[] = [];
-      
+
       // Find all keys with our prefix
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -132,7 +132,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     try {
       const now = Date.now();
       const keysToRemove: string[] = [];
-      
+
       // Find all expired entries
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);

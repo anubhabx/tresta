@@ -2,7 +2,7 @@
  * Retry logic with exponential backoff and jitter
  */
 
-import { WidgetError, WidgetErrorCode } from '../types';
+import { WidgetError, WidgetErrorCode } from '../types/index.js';
 
 export interface RetryConfig {
   maxRetries: number;
@@ -82,7 +82,7 @@ export async function retry<T>(
 
       // Calculate delay and wait
       const delay = calculateDelay(attempt, retryConfig);
-      
+
       if (error instanceof WidgetError) {
         console.warn(
           `[TrestaWidget] Request failed (attempt ${attempt + 1}/${retryConfig.maxRetries}): ${error.message}. Retrying in ${Math.round(delay)}ms...`

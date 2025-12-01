@@ -2,8 +2,8 @@
  * Network layer with fetch and timeout support
  */
 
-import { WidgetError, WidgetErrorCode } from '../types';
-import type { RequestOptions, APIResponse } from './types';
+import { WidgetError, WidgetErrorCode } from '../types/index.js';
+import type { RequestOptions, APIResponse } from './types.js';
 
 /**
  * Create a fetch request with timeout support
@@ -45,7 +45,7 @@ export async function fetchWithTimeout<T>(
     // Parse response
     let data: T;
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType && contentType.includes('application/json')) {
       data = await response.json();
     } else {

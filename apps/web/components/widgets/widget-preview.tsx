@@ -8,8 +8,7 @@ import { DEFAULT_WIDGET_CONFIG, type WidgetConfig } from "@workspace/types";
 const WIDGET_SCRIPT_PATH = "/widget/tresta-widget.js";
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const PREVIEW_MAX_TESTIMONIALS = 6;
-const ROTATE_INTERVAL_MIN = 2000;
-const ROTATE_INTERVAL_MAX = 10000;
+
 const PREVIEW_FETCHED_AT = "2024-01-01T00:00:00.000Z";
 const INLINE_SOURCE_URL = "tresta-preview-inline.js";
 const INLINE_SOURCE_MAP_DATA_URL =
@@ -96,14 +95,12 @@ interface WidgetPreviewProps {
 }
 
 type NormalizedPreviewConfig = {
-  layout: "grid" | "carousel";
+  layout: "grid" | "list";
   theme: "light" | "dark" | "auto";
   primaryColor: string;
   showRating: boolean;
   showAvatar: boolean;
   maxTestimonials: number;
-  autoRotate: boolean;
-  rotateInterval: number;
 };
 
 type PreviewDocumentPayload = {
@@ -291,12 +288,12 @@ function buildMockApiResponse({
     showAuthorRole: DEFAULT_WIDGET_CONFIG.showAuthorRole,
     showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
     columns: config.layout === "grid" ? 3 : 1,
-    showNavigation: config.layout === "carousel",
+    showNavigation: false,
   } satisfies WidgetConfig;
 
   defaultedSettings.maxTestimonials = config.maxTestimonials;
-  defaultedSettings.autoRotate = config.autoRotate;
-  defaultedSettings.rotateInterval = config.rotateInterval;
+  defaultedSettings.autoRotate = false;
+  defaultedSettings.rotateInterval = DEFAULT_WIDGET_CONFIG.rotateInterval;
 
   const primaryColor = defaultedSettings.primaryColor;
   const secondaryColor = DEFAULT_WIDGET_CONFIG.secondaryColor;
@@ -345,11 +342,7 @@ function buildMockApiResponse({
 }
 
 function normalizePreviewConfig(config: WidgetFormData): NormalizedPreviewConfig {
-  const layout = config.layout === "carousel" ? "carousel" : "grid";
-  const rotateInterval = Math.min(
-    Math.max(config.rotateInterval, ROTATE_INTERVAL_MIN),
-    ROTATE_INTERVAL_MAX,
-  );
+  const layout = config.layout === "list" ? "list" : "grid";
 
   return {
     layout,
@@ -361,8 +354,6 @@ function normalizePreviewConfig(config: WidgetFormData): NormalizedPreviewConfig
       config.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
       PREVIEW_MAX_TESTIMONIALS,
     ),
-    autoRotate: layout === "carousel" ? config.autoRotate ?? false : false,
-    rotateInterval,
   };
 }
 
@@ -512,9 +503,9 @@ function buildPreviewDocument(payload: PreviewDocumentPayload): string {
               layout: {
                 type: previewData.config.layout,
                 columns: previewData.config.layout === 'grid' ? 3 : 1,
-                autoRotate: previewData.config.autoRotate,
-                rotateInterval: previewData.config.rotateInterval,
-                showNavigation: previewData.config.layout === 'carousel',
+                autoRotate: false,
+                rotateInterval: 0,
+                showNavigation: false,
               },
               display: {
                 showRating: previewData.config.showRating,

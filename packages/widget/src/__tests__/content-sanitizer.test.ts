@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ContentSanitizer, sanitizeContent, sanitizePlainText, sanitizeURL } from '../security/sanitizer';
+import { ContentSanitizer, sanitizeContent, sanitizePlainText, sanitizeURL } from '../security/sanitizer.js';
 
 describe('Content Sanitizer', () => {
   let sanitizer: ContentSanitizer;

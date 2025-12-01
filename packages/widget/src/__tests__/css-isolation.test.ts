@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { Widget } from '../core/widget';
-import type { WidgetConfig } from '../types';
+import { Widget } from '../core/widget.js';
+import type { WidgetConfig } from '../types/index.js';
 
 describe('CSS Isolation Integration Tests', () => {
   let container: HTMLElement;
@@ -77,7 +77,7 @@ describe('CSS Isolation Integration Tests', () => {
       if (widget.getStyleManager()?.isShadowDOM()) {
         const root = container.querySelector('[data-tresta-widget]');
         expect(root?.shadowRoot).toBeDefined();
-        
+
         // Verify content is inside Shadow DOM
         expect(contentRoot?.parentNode).toBe(root?.shadowRoot);
       }
@@ -115,12 +115,12 @@ describe('CSS Isolation Integration Tests', () => {
       const widgetElement = contentRoot?.querySelector('[data-tresta-widget]');
 
       expect(widgetElement).toBeDefined();
-      
+
       // Verify Shadow DOM structure
       if (widget.getStyleManager()?.isShadowDOM()) {
         const root = container.querySelector('[data-tresta-widget]');
         expect(root?.shadowRoot).toBeDefined();
-        
+
         // Verify styles are injected into Shadow DOM
         const styleElement = root?.shadowRoot?.querySelector('style');
         expect(styleElement).toBeDefined();
@@ -144,10 +144,10 @@ describe('CSS Isolation Integration Tests', () => {
 
       // Check that host element is not affected by widget styles
       const hostComputedStyle = window.getComputedStyle(hostElement);
-      
+
       // Host element should not have widget font family
       expect(hostComputedStyle.fontFamily).not.toContain('Segoe UI');
-      
+
       // Host element should not have widget colors
       expect(hostComputedStyle.color).not.toBe('rgb(30, 41, 59)'); // not --tresta-text-color
     });
@@ -165,7 +165,7 @@ describe('CSS Isolation Integration Tests', () => {
       // Check that host element doesn't have widget custom properties
       const hostComputedStyle = window.getComputedStyle(hostElement);
       const primaryColor = hostComputedStyle.getPropertyValue('--tresta-primary-color');
-      
+
       // In Shadow DOM mode, custom properties should not leak
       if (widget.getStyleManager()?.isShadowDOM()) {
         expect(primaryColor).toBe('');
@@ -208,7 +208,7 @@ describe('CSS Isolation Integration Tests', () => {
       if (widget1.getStyleManager()?.isShadowDOM()) {
         const root1 = container1.querySelector('[data-tresta-widget]');
         const root2 = container2.querySelector('[data-tresta-widget]');
-        
+
         expect(root1?.shadowRoot).toBeDefined();
         expect(root2?.shadowRoot).toBeDefined();
         expect(root1?.shadowRoot).not.toBe(root2?.shadowRoot);
@@ -234,7 +234,7 @@ describe('CSS Isolation Integration Tests', () => {
       await widget.mount(container);
 
       const styleManager = widget.getStyleManager();
-      
+
       if (!styleManager?.isShadowDOM()) {
         // Should have namespaced class
         const root = container.querySelector('[data-tresta-widget]');

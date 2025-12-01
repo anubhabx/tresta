@@ -8,9 +8,9 @@
  * - Opt-out via data-telemetry="false"
  */
 
-import type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types';
-import { TelemetrySampler } from './sampler';
-import { WIDGET_TELEMETRY_ENDPOINT } from '../config/env';
+import type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types.js';
+import { TelemetrySampler } from './sampler.js';
+import { WIDGET_TELEMETRY_ENDPOINT } from '../config/env.js';
 
 export class TelemetryTracker {
   private config: TelemetryConfig;
@@ -49,7 +49,7 @@ export class TelemetryTracker {
     // Check navigator.doNotTrack
     if (typeof navigator !== 'undefined') {
       const dnt = (navigator as any).doNotTrack || (window as any).doNotTrack || (navigator as any).msDoNotTrack;
-      
+
       // DNT can be "1", "yes", or true
       if (dnt === '1' || dnt === 'yes' || dnt === true) {
         return true;
@@ -136,7 +136,7 @@ export class TelemetryTracker {
    */
   getTelemetryData(): TelemetryData {
     const loadTime = this.loadStartTime > 0 ? performance.now() - this.loadStartTime : 0;
-    
+
     const errorCounts: Record<string, number> = {};
     this.errorCounts.forEach((count, code) => {
       errorCounts[code] = count;

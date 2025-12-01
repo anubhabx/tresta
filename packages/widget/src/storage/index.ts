@@ -2,7 +2,7 @@
  * Storage module exports
  */
 
-export { StorageManager } from './cache-manager';
-export { IndexedDBAdapter } from './indexeddb';
-export { LocalStorageAdapter } from './localstorage';
-export type { CacheEntry, StorageAdapter } from './types';
+export { StorageManager } from './cache-manager.js';
+export { IndexedDBAdapter } from './indexeddb.js';
+export { LocalStorageAdapter } from './localstorage.js';
+export type { CacheEntry, StorageAdapter } from './types.js';

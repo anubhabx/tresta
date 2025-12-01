@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { IndexedDBAdapter } from '../indexeddb';
-import type { CacheEntry } from '../types';
-import type { WidgetData } from '../../types';
+import { IndexedDBAdapter } from '../indexeddb.js';
+import type { CacheEntry } from '../types.js';
+import type { WidgetData } from '../../types/index.js';
 
 // Mock widget data
 const mockWidgetData: WidgetData = {

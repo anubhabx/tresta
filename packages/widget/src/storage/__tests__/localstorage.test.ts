@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { LocalStorageAdapter } from '../localstorage';
-import type { CacheEntry } from '../types';
-import type { WidgetData } from '../../types';
+import { LocalStorageAdapter } from '../localstorage.js';
+import type { CacheEntry } from '../types.js';
+import type { WidgetData } from '../../types/index.js';
 
 // Mock widget data
 const mockWidgetData: WidgetData = {
@@ -138,10 +138,10 @@ describe('LocalStorageAdapter', () => {
 
     await adapter.set('tresta-widget-test-1', entry1);
     await adapter.set('tresta-widget-test-2', entry2);
-    
+
     // Add a non-widget item to localStorage
     localStorage.setItem('other-key', 'other-value');
-    
+
     await adapter.clear();
 
     const retrieved1 = await adapter.get('tresta-widget-test-1');
@@ -183,7 +183,7 @@ describe('LocalStorageAdapter', () => {
   it('should handle JSON parse errors gracefully', async () => {
     // Manually set invalid JSON
     localStorage.setItem('tresta-widget-invalid', 'invalid-json');
-    
+
     const result = await adapter.get('invalid');
     expect(result).toBeNull();
   });
@@ -199,7 +199,7 @@ describe('LocalStorageAdapter', () => {
     };
 
     await adapter.set(key, entry);
-    
+
     // Check that the key is stored with prefix
     const storageKey = 'tresta-widget-test-123';
     const storedValue = localStorage.getItem(storageKey);

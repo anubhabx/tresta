@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { StyleManager } from '../style-manager';
+import { StyleManager } from '../style-manager.js';
 
 describe('StyleManager', () => {
   let container: HTMLElement;
@@ -120,7 +120,7 @@ describe('StyleManager', () => {
       const styleManager2 = new StyleManager({ useShadowDOM: false });
 
       styleManager1.initializeStyles(container);
-      
+
       const container2 = document.createElement('div');
       document.body.appendChild(container2);
       styleManager2.initializeStyles(container2);
@@ -182,7 +182,7 @@ describe('StyleManager', () => {
       document.head.appendChild(hostStyle);
 
       const element = contentRoot.querySelector('.test-element') as HTMLElement;
-      
+
       // Note: jsdom's Shadow DOM implementation doesn't fully isolate styles
       // In a real browser, Shadow DOM would prevent host styles from affecting the widget
       // We verify the structure is correct even if jsdom doesn't fully isolate

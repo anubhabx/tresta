@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TelemetryTracker } from '../tracker';
-import { WIDGET_TELEMETRY_ENDPOINT } from '../../config/env';
+import { TelemetryTracker } from '../tracker.js';
+import { WIDGET_TELEMETRY_ENDPOINT } from '../../config/env.js';
 
 describe('TelemetryTracker', () => {
   let tracker: TelemetryTracker;
@@ -68,23 +68,23 @@ describe('TelemetryTracker', () => {
 
   it('should track load event with sampling', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     tracker.startLoadTracking();
     vi.spyOn(performance, 'now').mockReturnValue(2000);
     tracker.trackLoad('grid');
 
     expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
-    
+
     const call = sendBeaconSpy.mock.calls[0];
     expect(call[0]).toBe(WIDGET_TELEMETRY_ENDPOINT);
-    
+
     const blob = call[1];
     expect(blob).toBeInstanceOf(Blob);
   });
 
   it('should not track when sampling rate is 0', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 0 });
-    
+
     tracker.startLoadTracking();
     tracker.trackLoad('grid');
 
@@ -93,7 +93,7 @@ describe('TelemetryTracker', () => {
 
   it('should track errors', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     tracker.trackError('API_ERROR');
 
     expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
@@ -101,7 +101,7 @@ describe('TelemetryTracker', () => {
 
   it('should accumulate error counts', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 0 });
-    
+
     tracker.trackError('API_ERROR');
     tracker.trackError('API_ERROR');
     tracker.trackError('NETWORK_ERROR');
@@ -115,7 +115,7 @@ describe('TelemetryTracker', () => {
 
   it('should track interactions', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     tracker.trackInteraction('carousel');
 
     expect(sendBeaconSpy).toHaveBeenCalledTimes(1);
@@ -123,7 +123,7 @@ describe('TelemetryTracker', () => {
 
   it('should not track when telemetry is disabled', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { enabled: false });
-    
+
     tracker.startLoadTracking();
     tracker.trackLoad('grid');
     tracker.trackError('API_ERROR');
@@ -150,7 +150,7 @@ describe('TelemetryTracker', () => {
 
   it('should update sampling rate', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 0 });
-    
+
     tracker.setSamplingRate(1.0);
     tracker.trackLoad('grid');
 
@@ -159,12 +159,12 @@ describe('TelemetryTracker', () => {
 
   it('should disable and enable telemetry', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0');
-    
+
     expect(tracker.isEnabled()).toBe(true);
-    
+
     tracker.disable();
     expect(tracker.isEnabled()).toBe(false);
-    
+
     tracker.enable();
     expect(tracker.isEnabled()).toBe(true);
   });
@@ -174,20 +174,20 @@ describe('TelemetryTracker', () => {
 
     tracker = new TelemetryTracker('widget-123', '1.0.0', { enabled: false });
     tracker.enable();
-    
+
     expect(tracker.isEnabled()).toBe(false);
   });
 
   it('should get telemetry data summary', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     tracker.startLoadTracking();
     vi.spyOn(performance, 'now').mockReturnValue(2500);
     tracker.trackLoad('carousel');
     tracker.trackError('API_ERROR');
 
     const data = tracker.getTelemetryData();
-    
+
     expect(data).toMatchObject({
       widgetId: 'widget-123',
       version: '1.0.0',
@@ -205,7 +205,7 @@ describe('TelemetryTracker', () => {
     });
 
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     // Should not throw
     expect(() => {
       tracker.trackLoad('grid');
@@ -214,24 +214,24 @@ describe('TelemetryTracker', () => {
 
   it('should not collect PII', () => {
     tracker = new TelemetryTracker('widget-123', '1.0.0', { samplingRate: 1.0 });
-    
+
     tracker.startLoadTracking();
     tracker.trackLoad('grid');
 
     const call = sendBeaconSpy.mock.calls[0];
     const blob = call[1];
-    
+
     // Read blob content
     const reader = new FileReader();
     reader.onload = () => {
       const data = JSON.parse(reader.result as string);
-      
+
       // Verify no PII fields
       expect(data).not.toHaveProperty('email');
       expect(data).not.toHaveProperty('name');
       expect(data).not.toHaveProperty('ip');
       expect(data).not.toHaveProperty('userId');
-      
+
       // Verify only allowed fields
       expect(data).toHaveProperty('widgetId');
       expect(data).toHaveProperty('version');

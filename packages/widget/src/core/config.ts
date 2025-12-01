@@ -2,8 +2,8 @@
  * Configuration parser and validator
  */
 
-import type { WidgetConfig, ThemeConfig } from '../types';
-import { ThemeManager } from '../styles/theme-manager';
+import type { WidgetConfig, ThemeConfig } from '../types/index.js';
+import { ThemeManager } from '../styles/theme-manager.js';
 
 function getWidgetId(element: HTMLElement): string | null {
   return (
@@ -18,7 +18,7 @@ export function parseWidgetConfig(element: HTMLElement): Partial<WidgetConfig> {
   const version = element.getAttribute('data-version');
   const apiUrl = element.getAttribute('data-api-url');
   const nonce = element.getAttribute('nonce');
-  
+
   const config: Partial<WidgetConfig> = {
     debug: element.getAttribute('data-debug') === 'true',
     telemetry: element.getAttribute('data-telemetry') !== 'false',

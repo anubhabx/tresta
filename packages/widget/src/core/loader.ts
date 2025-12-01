@@ -2,21 +2,21 @@
  * Auto-initialization logic for widgets embedded via script tag
  */
 
-import { Widget } from './widget';
-import { parseWidgetConfig, validateConfig } from './config';
-import type { WidgetConfig } from '../types';
+import { Widget } from './widget.js';
+import { parseWidgetConfig, validateConfig } from './config.js';
+import type { WidgetConfig } from '../types/index.js';
 
 /**
  * Parse configuration from data attributes on script tag or container
  */
 function parseConfig(element: HTMLScriptElement | HTMLElement): WidgetConfig {
   const config = parseWidgetConfig(element);
-  
+
   // Validate the configuration
   if (!validateConfig(config)) {
     throw new Error('[TrestaWidget] Invalid widget configuration');
   }
-  
+
   return config;
 }
 
@@ -25,7 +25,7 @@ function parseConfig(element: HTMLScriptElement | HTMLElement): WidgetConfig {
  */
 function findContainer(script: HTMLScriptElement, widgetId: string): HTMLElement {
   const containerSelector = script.getAttribute('data-container');
-  
+
   if (containerSelector) {
     const container = document.querySelector(containerSelector);
     if (!container) {
@@ -44,7 +44,7 @@ function findContainer(script: HTMLScriptElement, widgetId: string): HTMLElement
   const container = document.createElement('div');
   container.id = `tresta-widget-${widgetId}`;
   script.parentNode?.insertBefore(container, script.nextSibling);
-  
+
   return container;
 }
 
@@ -55,7 +55,7 @@ function initializeWidget(script: HTMLScriptElement): void {
   try {
     const config = parseConfig(script);
     const container = findContainer(script, config.widgetId);
-    
+
     // Check if already initialized
     const existingInstance = Widget.getInstance(container);
     if (existingInstance) {
@@ -81,7 +81,7 @@ export function autoInitialize(): void {
     const scripts = document.querySelectorAll(
       'script[data-widget-id], script[data-tresta-widget]'
     );
-    
+
     if (scripts.length === 0) {
       // No widgets to initialize
       return;

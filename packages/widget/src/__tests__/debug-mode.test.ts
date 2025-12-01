@@ -4,8 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { JSDOM } from 'jsdom';
-import { Widget } from '../core/widget';
-import type { WidgetConfig } from '../types';
+import { Widget } from '../core/widget.js';
+import type { WidgetConfig } from '../types/index.js';
 
 describe('Debug Mode Integration', () => {
   let dom: JSDOM;
@@ -27,10 +27,10 @@ describe('Debug Mode Integration', () => {
     document.body.appendChild(container);
 
     // Spy on console methods
-    consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => { });
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {

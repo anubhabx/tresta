@@ -2,14 +2,14 @@
  * API Client with retry logic, rate limiting, and error handling
  */
 
-import { WidgetError, WidgetErrorCode } from '../types';
-import type { WidgetData } from '../types';
-import { NetworkClient } from './network';
-import { retry } from './retry';
-import { RateLimiter } from './rate-limiter';
-import type { APIClientConfig } from './types';
-import { Logger } from '../utils/logger';
-import { WIDGET_API_BASE_URL } from '../config/env';
+import { WidgetError, WidgetErrorCode } from '../types/index.js';
+import type { WidgetData } from '../types/index.js';
+import { NetworkClient } from './network.js';
+import { retry } from './retry.js';
+import { RateLimiter } from './rate-limiter.js';
+import type { APIClientConfig } from './types.js';
+import { Logger } from '../utils/logger.js';
+import { WIDGET_API_BASE_URL } from '../config/env.js';
 
 const DEFAULT_API_CLIENT_CONFIG: APIClientConfig = {
   baseURL: WIDGET_API_BASE_URL,
@@ -133,7 +133,7 @@ export class APIClient {
     if (this.logger) {
       this.logger.debug('Raw API response:', apiResponse);
     }
-    
+
     // Handle both direct data and wrapped response formats
     const data = apiResponse.data || apiResponse;
 

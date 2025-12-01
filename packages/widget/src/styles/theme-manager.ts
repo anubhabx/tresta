@@ -2,7 +2,7 @@
  * Theme Manager - Handles theme configuration and CSS custom properties
  */
 
-import type { ThemeConfig } from '../types';
+import type { ThemeConfig } from '../types/index.js';
 
 export interface ThemeManagerConfig {
   theme?: ThemeConfig;

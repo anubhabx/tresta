@@ -47,9 +47,9 @@ app.get("/health", (req, res) => {
 });
 
 // Serve widget script (public, CDN-ready with aggressive caching)
-// Resolve widget path relative to the project root (apps/api)
-// This works in both dev (tsx) and prod (node dist/...) because CWD is consistent
-const widgetPath = path.resolve(process.cwd(), "../../packages/widget/dist");
+// Resolve widget path relative to this file
+// src/index.ts -> src -> api -> apps -> root -> packages -> widget -> dist
+const widgetPath = path.resolve(__dirname, "../../../packages/widget/dist");
 console.log("Widget path:", widgetPath);
 app.use(
   "/widget",

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createErrorState, createEmptyState } from '../error-state';
+import { createErrorState, createEmptyState } from '../error-state.js';
 
 describe('Error State Components', () => {
   describe('createErrorState', () => {

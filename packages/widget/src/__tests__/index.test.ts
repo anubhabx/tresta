@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { TrestaWidget } from '../index';
+import { TrestaWidget } from '../index.js';
 
 describe('TrestaWidget Global API', () => {
   let container: HTMLElement;

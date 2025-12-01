@@ -2,20 +2,19 @@
  * Main Widget class - orchestrates all widget functionality
  */
 
-import type { WidgetConfig, WidgetInstance, WidgetState, WidgetData } from '../types';
-import { WidgetError } from '../types';
-import { StyleManager } from '../styles/style-manager';
-import { APIClient } from '../api/client';
-import { StorageManager } from '../storage/cache-manager';
-import { createErrorState, createEmptyState } from '../components/error-state';
-import { createBrandingBadge } from '../components/branding-badge';
-import { TelemetryTracker } from '../telemetry';
-import { LayoutEngine } from '../layouts';
-import { limitTestimonials } from '../utils/testimonial-limiter';
-import { Logger } from '../utils/logger';
-import { CSPValidator } from '../security/csp-validator';
-import type { CSPConfig } from '../security/csp-validator';
-import { WIDGET_API_BASE_URL } from '../config/env';
+import { render, h } from 'preact';
+import type { WidgetConfig, WidgetInstance, WidgetState, WidgetData } from '../types/index.js';
+import { WidgetError } from '../types/index.js';
+import { StyleManager } from '../styles/style-manager.js';
+import { APIClient } from '../api/client.js';
+import { StorageManager } from '../storage/cache-manager.js';
+import { TelemetryTracker } from '../telemetry/index.js';
+import { limitTestimonials } from '../utils/testimonial-limiter.js';
+import { Logger } from '../utils/logger.js';
+import { CSPValidator } from '../security/csp-validator.js';
+import type { CSPConfig } from '../security/csp-validator.js';
+import { WIDGET_API_BASE_URL } from '../config/env.js';
+import { WidgetRoot } from '../components/WidgetRoot';
 
 // Track all widget instances for proper cleanup and isolation
 const widgetInstances = new WeakMap<HTMLElement, Widget>();
@@ -29,7 +28,6 @@ export class Widget implements WidgetInstance {
   private contentRoot: HTMLElement | null = null;
   private liveRegion: HTMLElement | null = null;
   private eventListeners: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
-  private currentLayout: { destroy: () => void } | null = null;
   private apiClient: APIClient;
   private storageManager: StorageManager;
   private telemetryTracker: TelemetryTracker;
@@ -111,12 +109,12 @@ export class Widget implements WidgetInstance {
       this.root.setAttribute('data-tresta-widget', this.config.widgetId);
       this.root.setAttribute('data-version', this.config.version || '1.0.0');
       this.root.setAttribute('data-instance-id', this.generateInstanceId());
-      
+
       // Add lang attribute for localization support
       if (this.config.lang) {
         this.root.setAttribute('lang', this.config.lang);
       }
-      
+
       // Add role for semantic structure
       this.root.setAttribute('role', 'region');
       this.root.setAttribute('aria-label', 'Testimonials widget');
@@ -129,7 +127,7 @@ export class Widget implements WidgetInstance {
         nonceApplier: (element) => this.cspValidator.applyNonce(element),
       });
       this.contentRoot = this.styleManager.initializeStyles(this.root);
-      
+
       // Create ARIA live region for dynamic content announcements
       this.liveRegion = document.createElement('div');
       this.liveRegion.setAttribute('role', 'status');
@@ -174,7 +172,7 @@ export class Widget implements WidgetInstance {
       this.logger.debug('Starting fetchAndRender');
 
       this.state.loading = true;
-      
+
       // Announce loading state to screen readers
       this.announceToScreenReader('Loading testimonials');
 
@@ -195,7 +193,7 @@ export class Widget implements WidgetInstance {
 
       // Track successful load with layout type
       this.telemetryTracker.trackLoad(data.config?.layout?.type);
-      
+
       // Announce successful load to screen readers
       const count = data.testimonials?.length || 0;
       this.announceToScreenReader(`${count} testimonial${count !== 1 ? 's' : ''} loaded`);
@@ -216,7 +214,7 @@ export class Widget implements WidgetInstance {
 
       // Render error state
       this.renderErrorState(error);
-      
+
       // Announce error to screen readers
       this.announceToScreenReader('Failed to load testimonials', 'assertive');
     }
@@ -265,45 +263,32 @@ export class Widget implements WidgetInstance {
       return;
     }
 
-    // Clear existing content
-    this.contentRoot.innerHTML = '';
-
-    // Check if there are any testimonials
-    if (!data.testimonials || data.testimonials.length === 0) {
-      this.logger.logEmpty();
-      this.renderEmptyState();
-      return;
-    }
-
     // Apply maxTestimonials limit before rendering
     // Check both layoutConfig and displayOptions for maxTestimonials
     const maxTestimonials = data.config.layout.maxTestimonials ?? data.config.display.maxTestimonials;
     const limitedTestimonials = limitTestimonials(data.testimonials, maxTestimonials);
 
-    this.logger.debug(`Rendering ${limitedTestimonials.length} testimonials (limited from ${data.testimonials.length}) with layout: ${data.config.layout.type}`);
+    // Create a new data object with limited testimonials
+    const renderData = {
+      ...data,
+      testimonials: limitedTestimonials
+    };
 
-    // Clean up previous layout if exists
-    if (this.currentLayout) {
-      this.currentLayout.destroy();
-      this.currentLayout = null;
+    // Preact Render
+    // We create a container for the app if it doesn't exist, or reuse it
+    let appContainer = this.contentRoot.querySelector('.tresta-app-root');
+    if (!appContainer) {
+      appContainer = document.createElement('div');
+      appContainer.className = 'tresta-app-root';
+      this.contentRoot.appendChild(appContainer);
     }
 
-    // Use LayoutEngine to render the limited testimonials
-    const layout = LayoutEngine.create({
-      testimonials: limitedTestimonials,
-      layoutConfig: data.config.layout,
-      displayOptions: data.config.display,
-      theme: data.config.theme,
-    });
+    render(
+      h(WidgetRoot, { data: renderData }),
+      appContainer
+    );
 
-    const layoutElement = layout.render();
-    this.contentRoot.appendChild(layoutElement);
-    this.appendBrandingBadge();
-
-    // Track the current layout for cleanup
-    this.currentLayout = layout;
-
-    this.logger.debug(`Widget rendered successfully with ${data.config.layout.type} layout`);
+    this.logger.debug(`Widget rendered successfully with Preact`);
 
     // Validate CSP compliance in debug mode
     if (this.config.debug && this.contentRoot) {
@@ -322,9 +307,6 @@ export class Widget implements WidgetInstance {
   private renderErrorState(error: unknown): void {
     if (!this.contentRoot) return;
 
-    // Clear existing content
-    this.contentRoot.innerHTML = '';
-
     // Determine error message
     let message = this.config.errorMessage;
 
@@ -336,49 +318,8 @@ export class Widget implements WidgetInstance {
       }
     }
 
-    // Create and append error state
-    const errorState = createErrorState({
-      type: 'error',
-      message,
-      widgetId: this.config.widgetId,
-      version: this.config.version || "N/A",
-    });
-
-    this.contentRoot.appendChild(errorState);
-    this.appendBrandingBadge();
-  }
-
-  /**
-   * Render empty state
-   */
-  private renderEmptyState(): void {
-    if (!this.contentRoot) return;
-
-    // Clear existing content
-    this.contentRoot.innerHTML = '';
-
-    // Create and append empty state
-    const emptyState = createEmptyState(this.config.emptyMessage);
-
-    this.contentRoot.appendChild(emptyState);
-    this.appendBrandingBadge();
-  }
-
-  /**
-   * Append branding badge to the widget root
-   */
-  private appendBrandingBadge(): void {
-    if (!this.contentRoot) {
-      return;
-    }
-
-    const existingBadge = this.contentRoot.querySelector('.tresta-branding-badge');
-    if (existingBadge) {
-      existingBadge.remove();
-    }
-
-    const badge = createBrandingBadge();
-    this.contentRoot.appendChild(badge);
+    // TODO: Use Preact Error Component
+    this.contentRoot.innerHTML = `<div class="tresta-error">${message}</div>`;
   }
 
   /**
@@ -406,10 +347,12 @@ export class Widget implements WidgetInstance {
 
   unmount(): void {
     try {
-      // Clean up current layout (timers, event listeners, etc.)
-      if (this.currentLayout) {
-        this.currentLayout.destroy();
-        this.currentLayout = null;
+      // Unmount Preact
+      if (this.contentRoot) {
+        const appContainer = this.contentRoot.querySelector('.tresta-app-root');
+        if (appContainer) {
+          render(null, appContainer);
+        }
       }
 
       // Remove all event listeners

@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { limitTestimonials } from '../testimonial-limiter';
-import type { Testimonial } from '../../types';
+import { limitTestimonials } from '../testimonial-limiter.js';
+import type { Testimonial } from '../../types/index.js';
 
 describe('limitTestimonials', () => {
   // Helper to create mock testimonials with specific dates

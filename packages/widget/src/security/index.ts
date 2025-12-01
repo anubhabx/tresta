@@ -8,14 +8,14 @@ export {
   sanitizeContent,
   sanitizePlainText,
   sanitizeURL
-} from './sanitizer';
+} from './sanitizer.js';
 
-export { 
-  CSPValidator, 
-  defaultCSPValidator, 
-  getRequiredCSPDirectives, 
+export {
+  CSPValidator,
+  defaultCSPValidator,
+  getRequiredCSPDirectives,
   generateCSPFriendlyEmbedCode,
   type CSPConfig,
   type CSPViolation,
   type CSPValidationResult
-} from './csp-validator';
+} from './csp-validator.js';

@@ -9,8 +9,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { StorageManager } from '../storage/cache-manager';
-import type { WidgetData } from '../types';
+import { StorageManager } from '../storage/cache-manager.js';
+import type { WidgetData } from '../types/index.js';
 
 describe('Storage Manager', () => {
   let storageManager: StorageManager;
@@ -299,7 +299,7 @@ describe('Storage Manager', () => {
     it.skip('should handle get errors gracefully', async () => {
       // TODO: Fix test - console.error spy not catching localStorage parse errors
       const consoleSpy = vi.spyOn(console, 'error');
-      
+
       const manager = new StorageManager();
 
       // Force an error by corrupting localStorage
@@ -316,7 +316,7 @@ describe('Storage Manager', () => {
     it.skip('should handle set errors gracefully', async () => {
       // TODO: Fix test - console.error spy not catching storage errors properly
       const consoleSpy = vi.spyOn(console, 'error');
-      
+
       const manager = new StorageManager();
 
       // Mock localStorage.setItem to throw

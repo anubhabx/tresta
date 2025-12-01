@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ContentSanitizer, sanitizeContent, sanitizePlainText, sanitizeURL } from '../sanitizer';
+import { ContentSanitizer, sanitizeContent, sanitizePlainText, sanitizeURL } from '../sanitizer.js';
 
 describe('ContentSanitizer', () => {
   let sanitizer: ContentSanitizer;
@@ -297,11 +297,11 @@ describe('ContentSanitizer', () => {
     it('should load DOMPurify only when HTML is detected', async () => {
       const plainText = 'Plain text';
       const htmlText = '<p>HTML text</p>';
-      
+
       // First call with plain text
       const result1 = await sanitizer.sanitize(plainText);
       expect(result1).toBe(plainText);
-      
+
       // Second call with HTML
       const result2 = await sanitizer.sanitize(htmlText);
       expect(result2).toContain('<p>');
@@ -333,7 +333,7 @@ describe('ContentSanitizer', () => {
       const customSanitizer = new ContentSanitizer({
         allowedTags: ['p', 'strong']
       });
-      
+
       const input = '<p><strong>Bold</strong><em>Italic</em></p>';
       const result = await customSanitizer.sanitize(input);
       expect(result).toContain('<strong>');
@@ -347,7 +347,7 @@ describe('ContentSanitizer', () => {
           'a': ['href']
         }
       });
-      
+
       const input = '<a href="https://example.com" target="_blank">Link</a>';
       const result = await customSanitizer.sanitize(input);
       expect(result).toContain('href=');

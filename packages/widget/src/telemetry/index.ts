@@ -2,6 +2,6 @@
  * Telemetry module exports
  */
 
-export { TelemetryTracker } from './tracker';
-export { TelemetrySampler } from './sampler';
-export type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types';
+export { TelemetryTracker } from './tracker.js';
+export { TelemetrySampler } from './sampler.js';
+export type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types.js';

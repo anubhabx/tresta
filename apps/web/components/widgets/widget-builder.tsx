@@ -60,7 +60,7 @@ export function WidgetBuilder({
   useEffect(() => {
     if (mode === "edit" && widget?.config) {
       setPreviewConfig({
-        layout: widget.config.layout === "carousel" ? "carousel" : "grid",
+        layout: widget.config.layout === "list" ? "list" : "grid",
         theme: (widget.config.theme as any) || DEFAULT_WIDGET_CONFIG.theme,
         primaryColor:
           widget.config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
@@ -68,11 +68,8 @@ export function WidgetBuilder({
         showAvatar: widget.config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
         maxTestimonials:
           widget.config.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
-        autoRotate: widget.config.layout === "carousel" && widget.config.autoRotate
-          ? true
-          : false,
-        rotateInterval:
-          widget.config.rotateInterval || DEFAULT_WIDGET_CONFIG.rotateInterval
+        autoRotate: false,
+        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
       });
     }
   }, [mode, widget]);
@@ -89,8 +86,8 @@ export function WidgetBuilder({
         showRating: data.showRating,
         showAvatar: data.showAvatar,
         maxTestimonials: data.maxTestimonials,
-        autoRotate: data.layout === "carousel" ? data.autoRotate : false,
-        rotateInterval: data.rotateInterval
+        autoRotate: false,
+        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
       };
 
       if (mode === "create") {

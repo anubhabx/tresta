@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { ThemeManager } from '../theme-manager';
-import type { ThemeConfig } from '../../types';
+import { ThemeManager } from '../theme-manager.js';
+import type { ThemeConfig } from '../../types/index.js';
 
 describe('ThemeManager', () => {
   let container: HTMLElement;
@@ -219,7 +219,7 @@ describe('ThemeManager', () => {
   describe('Theme Update', () => {
     it('should update theme configuration', () => {
       const themeManager = new ThemeManager();
-      
+
       themeManager.updateTheme({ mode: 'dark', primaryColor: '#9333ea' });
       const theme = themeManager.getTheme();
 

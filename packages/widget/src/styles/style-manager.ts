@@ -2,34 +2,11 @@
  * Style Manager - Handles Shadow DOM and CSS isolation
  */
 
-import baseStyles from './base.css?inline';
-import testimonialCardStyles from '../components/testimonial-card.css?inline';
-import errorStateStyles from '../components/error-state.css?inline';
-import listStyles from '../layouts/list.css?inline';
-import gridStyles from '../layouts/grid.css?inline';
-import masonryStyles from '../layouts/masonry.css?inline';
-import wallStyles from '../layouts/wall.css?inline';
-import carouselStyles from '../layouts/carousel.css?inline';
-import { ThemeManager, type ThemeManagerConfig } from './theme-manager';
+import indexStyles from '../index.css?inline';
+import { ThemeManager, type ThemeManagerConfig } from './theme-manager.js';
 
 // Combine all styles
-const BASE_STYLES = `
-${baseStyles}
-
-${testimonialCardStyles}
-
-${errorStateStyles}
-
-${listStyles}
-
-${gridStyles}
-
-${masonryStyles}
-
-${wallStyles}
-
-${carouselStyles}
-`.trim();
+const BASE_STYLES = indexStyles;
 
 export interface StyleManagerConfig {
   useShadowDOM?: boolean;
@@ -49,7 +26,7 @@ export class StyleManager {
     this.useShadowDOM = config.useShadowDOM ?? this.detectShadowDOMSupport();
     this.debug = config.debug ?? false;
     this.nonceApplier = config.nonceApplier;
-    
+
     const themeConfig: ThemeManagerConfig = { debug: this.debug };
     if (config.theme) {
       themeConfig.theme = config.theme;
@@ -171,7 +148,7 @@ export class StyleManager {
    */
   cleanup(): void {
     this.shadowRoot = null;
-    
+
     // Note: We don't remove the global style element in namespaced mode
     // because other widget instances might be using it
   }
