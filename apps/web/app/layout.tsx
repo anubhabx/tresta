@@ -22,12 +22,35 @@ const fontSerif = Lora({
 });
 
 export const metadata = {
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
+  title: "Tresta - Collect & Showcase Social Proof",
+  description:
+    "The all-in-one platform to collect, manage, and showcase authentic customer testimonials. Turn customer love into growth with Tresta.",
+  openGraph: {
+    title: "Tresta - Collect & Showcase Social Proof",
+    description:
+      "The all-in-one platform to collect, manage, and showcase authentic customer testimonials.",
+    url: "https://tresta.app",
+    siteName: "Tresta",
+    locale: "en_US",
+    type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tresta - Collect & Showcase Social Proof",
+    description:
+      "The all-in-one platform to collect, manage, and showcase authentic customer testimonials.",
+    creator: "@tresta",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

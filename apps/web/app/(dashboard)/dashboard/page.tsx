@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { Button } from "@workspace/ui/components/button";
 import { projects } from "@/lib/queries";
 import { DashboardPageSkeleton } from "@/components/skeletons";
 import {

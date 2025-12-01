@@ -22,7 +22,7 @@ export default async function PrivacyPage() {
           Privacy & Data Collection
         </h1>
         <p className="text-muted-foreground">
-          We believe in transparency. Here's exactly what data we collect and
+          We believe in transparency. Here&apos;s exactly what data we collect and
           why.
         </p>
       </div>
