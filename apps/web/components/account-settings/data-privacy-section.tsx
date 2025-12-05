@@ -280,7 +280,7 @@ export function DataPrivacySection({
             </div>
           </div>
           <Button variant="outline" asChild>
-            <Link href="/privacy">View Details</Link>
+            <Link href="/privacy-policy">View Details</Link>
           </Button>
         </div>
       </CardContent>

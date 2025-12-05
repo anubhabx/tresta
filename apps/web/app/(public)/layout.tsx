@@ -1,3 +1,4 @@
+import { LandingNavbar } from "@/components/landing/landing-navbar";
 import { BackgroundBeams } from "@workspace/ui/components/background-beams";
 import type { Metadata } from "next";
 
@@ -12,8 +13,8 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative">
-      <BackgroundBeams className="-z-10" />
+    <div className="relative pt-24">
+      <LandingNavbar />
       {children}
     </div>
   );

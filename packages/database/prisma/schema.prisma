@@ -81,7 +81,14 @@ model Subscription {
   id        String             @id @default(cuid())
   userId    String             @unique
   status    SubscriptionStatus // e.g., "active", "canceled", etc.
-  plan      UserPlan           @default(FREE) // e.g., "free", "pro", etc.
+  
+  // Relation to Plan
+  planId    String?
+  plan      Plan?              @relation(fields: [planId], references: [id])
+  
+  // Legacy/Fallback (optional, can keep for backward compatibility or remove if fresh)
+  // userPlan  UserPlan           @default(FREE) 
+
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 
@@ -92,11 +99,38 @@ model Subscription {
   currentPeriodEnd       DateTime?
   cancelAtPeriodEnd      Boolean   @default(false)
 
+  // Snapshot of price at time of subscription (optional but good for records)
   amount   Int? // Amount in smallest currency units
   currency String? @default("INR") // Currency Code
   interval String? // "month", "year"
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id              String   @id @default(cuid())
+  name            String   // "Pro Monthly", "Free"
+  slug            String   @unique // "pro-monthly", "free"
+  tier            UserPlan @default(FREE) // Grouping: FREE, PRO
+  description     String?
+  amount          Int      // Amount in smallest currency unit (paise)
+  currency        String   @default("INR")
+  
+  // Razorpay Specifics
+  razorpayPlanId  String?  // ID from Razorpay Dashboard
+  interval        String?  // "monthly", "yearly"
+  intervalCount   Int      @default(1)
+  
+  // Limits (-1 for unlimited)
+  maxProjects     Int      @default(1) 
+  maxTestimonials Int      @default(50)
+  maxApiRequests  Int      @default(300)
+  
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  subscriptions   Subscription[]
 }
 
 model Testimonial {

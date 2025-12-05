@@ -20,13 +20,11 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-          <Link href="/settings/notifications" className="hover:text-foreground transition-colors">
-            Notifications
-          </Link>
-          <Link href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}`} className="hover:text-foreground transition-colors">
-            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}
-          </Link>
+          <Link href="/contact-us" className="hover:text-foreground transition-colors">Contact</Link>
+          <Link href="/shipping-policy" className="hover:text-foreground transition-colors">Shipping</Link>
+          <Link href="/terms-and-conditions" className="hover:text-foreground transition-colors">Terms</Link>
+          <Link href="/cancellations-and-refunds" className="hover:text-foreground transition-colors">Refunds</Link>
+          <Link href="/privacy-policy" className="hover:text-foreground transition-colors">Privacy</Link>
         </div>
 
         <p className="text-xs sm:text-sm">&copy; {year} Tresta. All rights reserved.</p>

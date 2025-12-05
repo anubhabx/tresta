@@ -145,7 +145,7 @@ Tresta is a comprehensive testimonial management platform that has successfully 
   - Redirects to sign-in after successful deletion
 
 - **Privacy Transparency Page**
-  - Dedicated `/privacy` route
+  - Dedicated `/privacy-policy` route
   - 30+ Lucide icons for visual clarity
   - Four sections: Data Categories, Data Usage, Storage & Security, Your Rights
   - Data-driven rendering (383 lines of comprehensive privacy info)

@@ -216,7 +216,7 @@ All notable changes to the Tresta project will be documented in this file.
   - Clear warning about permanent data loss
   - Redirects to sign-in after successful deletion
 - **Privacy Transparency Page**:
-  - Created dedicated `/privacy` route for data collection disclosure
+  - Created dedicated `/privacy-policy` route for data collection disclosure
   - Structured data with TypeScript interfaces (DataItem, DataCategory, etc.)
   - 30+ Lucide icons for visual clarity (User, Mail, MapPin, Activity, etc.)
   - Four main sections: Data Categories, Data Usage, Storage & Security, Your Rights
@@ -243,10 +243,10 @@ All notable changes to the Tresta project will be documented in this file.
 - `apps/web/components/account-settings/data-privacy-section.tsx` - NEW
 - `apps/web/components/account-settings/data-collection-info.tsx` - NEW: 383 lines with structured data
 - `apps/web/components/account-settings/index.ts` - NEW: Barrel export
-- `apps/web/app/(dashboard)/privacy/page.tsx` - NEW: Dedicated privacy page
+- `apps/web/app/(dashboard)/privacy-policy/page.tsx` - NEW: Dedicated privacy page
 - `apps/web/app/(dashboard)/projects/new/page.tsx` - Updated layout alignment
 - `apps/web/app/(dashboard)/projects/[slug]/edit/page.tsx` - Updated layout alignment
-- `apps/web/middleware.ts` - Added `/privacy` to protected routes
+- `apps/web/middleware.ts` - Added `/privacy-policy` to protected routes
 
 **Dependencies:**
 
