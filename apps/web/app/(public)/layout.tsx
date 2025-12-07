@@ -1,4 +1,5 @@
 import { BackgroundBeams } from "@workspace/ui/components/background-beams";
+import { Button } from "@workspace/ui/components/button";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,9 +13,11 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative">
+    <div className="relative h-svh">
       <BackgroundBeams className="-z-10" />
-      {children}
+      <div className="max-w-3xl mx-auto">
+        {children}
+      </div>
     </div>
   );
 }
