@@ -37,6 +37,7 @@ import { projects } from "@/lib/queries";
 import { NotificationSidebarSection } from "@/components/notifications/notification-sidebar-section";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
+import { useUpgradeModal } from "@/components/billing/upgrade-modal";
 
 const UISidebar = () => {
   const { user, isLoaded } = useUser();
@@ -160,6 +161,25 @@ const UISidebar = () => {
 
         <Separator />
 
+        {/* Upgrade Plan Button */}
+        <SidebarMenuButton onClick={() => useUpgradeModal.getState().open()} asChild>
+          <Button
+            className="justify-start w-full p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-medium has-[>svg]:px-0! group-data-[collapsible=icon]:px-1.5!"
+            variant="ghost"
+          >
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-amber-600 dark:text-amber-500">
+                  <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+                </svg>
+              </span>
+              Upgrade Plan
+            </div>
+          </Button>
+        </SidebarMenuButton>
+
+        <Separator />
+
         {/* User Section */}
         {!isLoaded && <SidebarMenuSkeleton className="h-8 w-full" />}
 
@@ -168,7 +188,7 @@ const UISidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  className="justify-start w-full truncate overflow-ellipsis has-[>svg:px-0] group-data-[collapsible=icon]:px-0"
+                  className="justify-start px-2! w-full truncate overflow-ellipsis has-[>svg:px-0] group-data-[collapsible=icon]:px-1"
                   variant="ghost"
                 >
                   <CustomAvatar

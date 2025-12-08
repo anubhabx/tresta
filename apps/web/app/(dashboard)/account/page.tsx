@@ -3,6 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import { AccountSettingsSkeleton } from "@/components/skeletons/account-skeleton";
 import { AccountSettingsForm } from "@/components/account-settings-form";
+import { NotificationSettings } from "@/components/notification-settings";
+import { Separator } from "@workspace/ui/components/separator";
 
 export default function AccountPage() {
   const { user, isLoaded } = useUser();
@@ -31,6 +33,19 @@ export default function AccountPage() {
       </div>
 
       <AccountSettingsForm user={user} />
+
+      <div className="my-8">
+        <Separator />
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold">Notification Settings</h2>
+        <p className="text-muted-foreground mt-2">
+          Manage how you receive notifications from Tresta
+        </p>
+      </div>
+
+      <NotificationSettings />
     </div>
   );
 }
