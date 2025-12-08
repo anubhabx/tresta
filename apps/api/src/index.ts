@@ -24,6 +24,8 @@ import notificationsRouter from './routes/notifications.route.js';
 import ablyRouter from './routes/ably/token.route.js';
 import testRouter from './routes/test.route.js';
 import widgetAnalyticsRouter from './routes/widget-analytics.route.js';
+import { planRouter } from './routes/plan.route.js';
+import { paymentsRouter } from './routes/payments.route.js';
 import { blobStorageService } from './services/blob-storage.service.js';
 
 dotenv.config();
@@ -81,6 +83,8 @@ app.use("/api/widgets", widgetRouter);
 app.use("/api/widget-analytics", widgetAnalyticsRouter);
 app.use("/api/notifications", attachUser, notificationsRouter);
 app.use("/api/ably", attachUser, ablyRouter);
+app.use("/api/plans", planRouter);
+app.use("/api/payments", paymentsRouter);
 
 // Test routes (remove in production)
 if (process.env.NODE_ENV !== "production") {

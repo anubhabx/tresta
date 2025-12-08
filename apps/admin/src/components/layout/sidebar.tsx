@@ -16,6 +16,7 @@ import {
   Bell,
   Bug,
   Info,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,7 @@ const navigation = [
   { name: 'DLQ', href: '/dashboard/dlq', icon: AlertTriangle },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Plans', href: '/dashboard/plans', icon: CreditCard },
   { name: 'Projects', href: '/dashboard/projects', icon: FolderKanban },
   { name: 'Testimonials', href: '/dashboard/testimonials', icon: MessageSquare },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },

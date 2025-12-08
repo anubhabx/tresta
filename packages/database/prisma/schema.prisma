@@ -77,26 +77,64 @@ model Project {
   @@index([projectType])
 }
 
+
+model Plan {
+  id             String   @id @default(cuid())
+  name           String   @db.VarChar(255) // e.g., "Pro Plan", "Starter"
+  description    String?  @db.Text
+  price          Int // Amount in smallest currency unit (e.g., paise)
+  currency       String   @default("INR") @db.VarChar(3)
+  interval       String // "month", "year"
+  isActive       Boolean  @default(true)
+  limits         Json // { "projects": 5, "teamMembers": 2 }
+  razorpayPlanId String?  @unique // ID from Razorpay
+  type           UserPlan @default(FREE) // Mapping to enum for code compatibility
+
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
 model Subscription {
   id        String             @id @default(cuid())
   userId    String             @unique
   status    SubscriptionStatus // e.g., "active", "canceled", etc.
-  plan      UserPlan           @default(FREE) // e.g., "free", "pro", etc.
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  
+  // Relations
+  planId String?
+  plan   Plan?   @relation(fields: [planId], references: [id])
+  
+  // Legacy/Code Enum fallback (optional, but good to keep synced)
+  userPlan UserPlan @default(FREE) @map("plan") 
 
-  externalSubscriptionId String?   @unique
-  externalCustomerId     String?
-  priceId                String?
-  currentPeriodStart     DateTime?
-  currentPeriodEnd       DateTime?
-  cancelAtPeriodEnd      Boolean   @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  externalSubscriptionId String? @unique // Razorpay Subscription ID
+  externalCustomerId     String? // Razorpay Customer ID (optional)
+  
+  // Razorpay Specifics
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+
+  // Snapshot of price at time of subscription
   amount   Int? // Amount in smallest currency units
-  currency String? @default("INR") // Currency Code
+  currency String? @default("INR")
   interval String? // "month", "year"
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
 }
 
 model Testimonial {

@@ -14,6 +14,7 @@ import errorsRouter from './errors.route.js';
 import systemRouter from './system.route.js';
 import featureFlagsRouter from './feature-flags.route.js';
 import widgetAnalyticsRouter from './widgets.route.js';
+import plansRouter from './plans.route.js';
 
 const router: Router = Router();
 
@@ -35,5 +36,6 @@ router.use('/admin', errorsRouter);
 router.use('/admin', systemRouter);
 router.use('/admin', featureFlagsRouter);
 router.use('/admin', widgetAnalyticsRouter);
+router.use('/admin', plansRouter);
 
 export default router;

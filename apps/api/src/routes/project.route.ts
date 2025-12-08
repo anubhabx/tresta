@@ -1,3 +1,4 @@
+
 import {
   createProject,
   listProjects,
@@ -6,12 +7,13 @@ import {
   updateProject,
   deleteProject,
 } from '../controllers/project.controller.js';
+import { checkUsageLimit } from '../middleware/usage-limits.js';
 import { Router } from "express";
 import { testimonialRouter } from './testimonial.route.js';
 
 const router: Router = Router();
 
-router.post("/", createProject);
+router.post("/", checkUsageLimit("projects"), createProject);
 router.get("/", listProjects);
 router.get("/:slug", getProjectBySlug);
 router.put("/:slug", updateProject);

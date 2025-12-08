@@ -9,6 +9,7 @@ import {
   PasswordSection,
   ConnectedAccountsSection,
   DataPrivacySection,
+  BillingSection,
 } from "./account-settings";
 
 interface AccountSettingsFormProps {
@@ -42,6 +43,9 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
 
       {/* Password Management */}
       <PasswordSection user={currentUser} hasPassword={hasPassword} />
+
+      {/* Billing */}
+      <BillingSection />
 
       {/* Connected Accounts */}
       {externalAccounts.length > 0 && (

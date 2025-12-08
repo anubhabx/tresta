@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { SiteFooter } from "@/components/site-footer";
+import { UpgradeModal } from "@/components/billing/upgrade-modal";
 
 const fontSans = Figtree({
   subsets: ["latin"],
@@ -70,6 +71,7 @@ export default function RootLayout({
               <SiteFooter />
             </div>
             <Toaster position="bottom-right" />
+            <UpgradeModal />
           </Providers>
         </body>
       </html>
