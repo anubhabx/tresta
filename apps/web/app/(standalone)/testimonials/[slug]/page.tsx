@@ -306,7 +306,7 @@ export default function TestimonialSubmissionPage({
   return (
     <GoogleOAuthProvider>
       <div className="min-h-screen flex items-center justify-center p-4 w-full">
-        <Card className="max-w-2xl w-full">
+        <Card className="max-w-6xl w-full">
           <CardHeader className="space-y-1 pb-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-primary/10">

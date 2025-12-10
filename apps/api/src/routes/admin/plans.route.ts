@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { listAllPlans, getPlanById } from '../../controllers/admin/plans.controller.js';
+import { listAllPlans, getPlanById, getPlanMetrics } from '../../controllers/admin/plans.controller.js';
 import { createPlan, updatePlan, deletePlan } from '../../controllers/plan.controller.js';
 
 const router: Router = Router();
@@ -10,6 +10,12 @@ const router: Router = Router();
  * List all plans (active and inactive)
  */
 router.get('/plans', listAllPlans);
+
+/**
+ * GET /admin/plans/metrics
+ * Get plan usage metrics and MRR
+ */
+router.get('/plans/metrics', getPlanMetrics);
 
 /**
  * GET /admin/plans/:id

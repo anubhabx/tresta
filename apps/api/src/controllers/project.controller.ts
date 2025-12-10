@@ -427,6 +427,21 @@ const updateProject = async (
       });
     }
 
+    // Check user plan implementation
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true } // Assuming 'plan' field stores 'FREE' or 'PRO' or we check subscription
+    });
+    // In our schema User.plan is an Enum "FREE" | "PRO"
+
+    // Check if trying to update brand colors
+    if (
+      (payload.brandColorPrimary !== undefined || payload.brandColorSecondary !== undefined) &&
+      user?.plan === 'FREE'
+    ) {
+      throw new ForbiddenError("Brand color customization is available only for Pro plans.");
+    }
+
     // Check if project exists and belongs to user
     let existingProject;
     try {

@@ -14,8 +14,11 @@ import {
   TagsSection,
 } from "@/components/forms/project";
 
+import { useSubscription } from "@/hooks/use-subscription";
+
 export default function NewProjectPage() {
   const { form, isSubmitting, handleLogoUpload, onSubmit } = useProjectForm();
+  const { isPro } = useSubscription();
 
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4">
@@ -57,6 +60,7 @@ export default function NewProjectPage() {
           <BrandingSection
             control={form.control}
             onLogoUpload={handleLogoUpload}
+            isPro={isPro}
           />
 
           <SocialLinksSection control={form.control} />

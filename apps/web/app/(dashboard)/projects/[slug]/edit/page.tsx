@@ -16,6 +16,8 @@ import {
   TagsSection,
 } from "@/components/forms/project";
 
+import { useSubscription } from "@/hooks/use-subscription";
+
 interface ProjectEditPageProps {
   params: Promise<{
     slug: string;
@@ -24,6 +26,7 @@ interface ProjectEditPageProps {
 
 const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
   const { slug } = use(params);
+  const { isPro } = useSubscription();
   const {
     form,
     control,
@@ -98,7 +101,7 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
 
           <URLsSection control={control} />
 
-          <BrandingSection control={control} onLogoUpload={handleLogoUpload} />
+          <BrandingSection control={control} onLogoUpload={handleLogoUpload} isPro={isPro} />
 
           <SocialLinksSection control={control} />
 

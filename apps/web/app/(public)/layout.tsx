@@ -1,4 +1,5 @@
 import { LandingNavbar } from "@/components/landing/landing-navbar";
+import { SiteFooter } from "@/components/site-footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function PublicLayout({
       <main className="flex-1">
         {children}
       </main>
+      <SiteFooter />
     </div>
   );
 }
