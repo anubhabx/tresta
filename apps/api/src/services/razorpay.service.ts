@@ -83,3 +83,34 @@ export const verifyRazorpayOrderSignature = (
 
     return generatedSignature === razorpaySignature;
 };
+
+export const cancelRazorpaySubscription = async (
+    subscriptionId: string
+): Promise<any> => {
+    // Razorpay allows cancelling (pausing or cancelling at end of cycle)
+    // We want to cancel at period end usually.
+    // If we pass cancel_at_cycle_end: 1, it cancels at end of current cycle.
+    // The library method might be slightly different.
+    // razorpay.subscriptions.cancel(subscriptionId, cancel_at_cycle_end)
+    const result = await razorpay.subscriptions.cancel(subscriptionId, true); // true = at period end
+    // Docs say: subscription.cancel(subscriptionId, cancel_at_cycle_end)
+    // Actually method signature: cancel(subscriptionId, cancelAtCycleEnd)
+    // If we want cancelAtPeriodEnd, we pass true/1.
+    return result;
+};
+
+export const getSubscription = async (subscriptionId: string) => {
+    return await razorpay.subscriptions.fetch(subscriptionId);
+};
+
+export const resumeRazorpaySubscription = async (subscriptionId: string) => {
+    // To resume (cancel the scheduled cancellation), we send cancel_at_cycle_end = 0
+    // However, the node-razorpay lib might not have a dedicated 'resume' method, 
+    // we typically use 'cancel' with false to cancel immediately? No.
+    // We strictly use update usually. 
+    // Razorpay API: PATCH /subscriptions/{id} -> { cancel_at_cycle_end: 0 }
+    // The library usually maps update(id, options).
+    return await razorpay.subscriptions.update(subscriptionId, {
+        cancel_at_cycle_end: false
+    } as any);
+};

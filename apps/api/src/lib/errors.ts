@@ -111,6 +111,10 @@ export class ServiceUnavailableError extends ApiError {
  * @returns An instance of ApiError.
  */
 export function handlePrismaError(error: any): ApiError {
+  if (error instanceof ApiError) {
+    return error;
+  }
+
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
       case "P2002": // Unique constraint violation
@@ -193,8 +197,9 @@ export function handlePrismaError(error: any): ApiError {
   }
 
   // Fallback for unknown errors
+  console.error("Unknown API Error:", error);
   return new InternalServerError(
-    "An unexpected database error occurred.",
-    { type: "unknown_database_error" }
+    "An unexpected error occurred.",
+    { type: "unknown_error", originalError: process.env.NODE_ENV === 'development' ? error.message : undefined }
   );
 }
