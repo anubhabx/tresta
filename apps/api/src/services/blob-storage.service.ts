@@ -307,7 +307,7 @@ class BlobStorageService {
           containerName,
           blobName,
           permissions: BlobSASPermissions.parse("cw"), // Create and Write
-          startsOn: new Date(),
+          startsOn: new Date(new Date().valueOf() - 5 * 60 * 1000), // Start 5 minutes ago to avoid clock skew
           expiresOn,
           contentType, // Set content type in SAS
         },
@@ -352,7 +352,7 @@ class BlobStorageService {
           containerName,
           blobName,
           permissions: BlobSASPermissions.parse("r"), // Read only
-          startsOn: new Date(),
+          startsOn: new Date(new Date().valueOf() - 5 * 60 * 1000), // Start 5 minutes ago to avoid clock skew
           expiresOn,
         },
         credentials,
