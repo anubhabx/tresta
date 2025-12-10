@@ -1,26 +1,24 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { usePlans, type Plan } from '@/lib/hooks/use-plans';
 import { DataTable, type DataTableColumn } from '@/components/tables/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Plus } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { formatDate } from '@/lib/utils/format';
-import { toast } from 'sonner';
 import { PlanDialog } from './plan-dialog';
 
 export function PlansClient() {
     const { plans, isLoading, error, refetch, deletePlan } = usePlans();
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const columns: DataTableColumn<Plan>[] = useMemo(
         () => [
             {
                 key: 'name',
                 header: 'Name',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <div>
                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {plan.name}
@@ -34,7 +32,7 @@ export function PlansClient() {
             {
                 key: 'price',
                 header: 'Price',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <span className="text-sm text-gray-900 dark:text-gray-100 font-mono">
                         {new Intl.NumberFormat('en-IN', { style: 'currency', currency: plan.currency }).format(plan.price / 100)} / {plan.interval}
                     </span>
@@ -43,7 +41,7 @@ export function PlansClient() {
             {
                 key: 'type',
                 header: 'Type',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <Badge variant={plan.type === 'PRO' ? 'default' : 'secondary'}>
                         {plan.type}
                     </Badge>
@@ -52,7 +50,7 @@ export function PlansClient() {
             {
                 key: 'isActive',
                 header: 'Status',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <Badge variant={plan.isActive ? 'outline' : 'destructive'}>
                         {plan.isActive ? 'Active' : 'Inactive'}
                     </Badge>
@@ -61,7 +59,7 @@ export function PlansClient() {
             {
                 key: 'razorpayPlanId',
                 header: 'Razorpay ID',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">
                         {plan.razorpayPlanId || 'N/A'}
                     </code>
@@ -70,7 +68,7 @@ export function PlansClient() {
             {
                 key: 'createdAt',
                 header: 'Created At',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                         {formatDate(plan.createdAt)}
                     </span>
@@ -79,7 +77,7 @@ export function PlansClient() {
             {
                 key: 'actions',
                 header: 'Actions',
-                render: (plan) => (
+                render: (plan: Plan) => (
                     <div className="flex gap-2">
                         {plan.isActive && (
                             <Button

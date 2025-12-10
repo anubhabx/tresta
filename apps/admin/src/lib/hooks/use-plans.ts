@@ -10,7 +10,7 @@ export interface Plan {
     price: number;
     currency: string;
     interval: string;
-    limits: Record<string, any>;
+    limits: Record<string, number>;
     isActive: boolean;
     razorpayPlanId: string | null;
     type: string;
@@ -24,7 +24,7 @@ interface CreatePlanData {
     price: number;
     currency?: string;
     interval: string;
-    limits: any;
+    limits: Record<string, number>;
     razorpayPlanId?: string;
     type?: string;
 }
@@ -34,7 +34,7 @@ interface UpdatePlanData {
     description?: string;
     price?: number;
     interval?: string;
-    limits?: any;
+    limits?: Record<string, number>;
     razorpayPlanId?: string;
     isActive?: boolean;
 }
@@ -59,7 +59,7 @@ export function usePlans() {
             queryClient.invalidateQueries({ queryKey: ['admin-plans'] });
             toast.success('Plan created successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast.error(error.message || 'Failed to create plan');
         },
     });
@@ -73,7 +73,7 @@ export function usePlans() {
             queryClient.invalidateQueries({ queryKey: ['admin-plans'] });
             toast.success('Plan updated successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast.error(error.message || 'Failed to update plan');
         },
     });
@@ -86,7 +86,7 @@ export function usePlans() {
             queryClient.invalidateQueries({ queryKey: ['admin-plans'] });
             toast.success('Plan deactivated successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast.error(error.message || 'Failed to deactivate plan');
         }
     });
