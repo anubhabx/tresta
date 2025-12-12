@@ -13,13 +13,20 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
-import { FolderIcon, MessageSquareIcon, CalendarIcon } from "lucide-react";
+import {
+  FolderIcon,
+  MessageSquareIcon,
+  CalendarIcon,
+  PlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { useSubscription } from "@/hooks/use-subscription";
 
 const ProjectsPage = () => {
   const { data: projectsData, isLoading: isLoadingProjects } =
     projects.queries.useList(1, 100);
+  const { usage, plan, isPro, isLoading: isLoadingSubscription } = useSubscription();
 
   if (isLoadingProjects) {
     return <ProjectsListPageSkeleton />;
@@ -35,6 +42,12 @@ const ProjectsPage = () => {
     );
   }
 
+  const isLimitReached =
+    !isPro &&
+    usage?.projects !== undefined &&
+    plan?.limits?.projects !== undefined &&
+    usage.projects >= plan.limits.projects;
+
   return (
     <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full min-w-0 h-full p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto overflow-x-hidden">
       {/* Header */}
@@ -47,11 +60,23 @@ const ProjectsPage = () => {
             Manage your testimonial collection projects
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <Badge variant="secondary" className="text-xs sm:text-sm">
             {projectsList.length}{" "}
             {projectsList.length === 1 ? "Project" : "Projects"}
           </Badge>
+          {isLimitReached ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/dashboard/settings">Upgrade</Link>
+            </Button>
+          ) : (
+            <Button asChild size="sm" disabled={isLoadingSubscription}>
+              <Link href="/projects/new">
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Create
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 

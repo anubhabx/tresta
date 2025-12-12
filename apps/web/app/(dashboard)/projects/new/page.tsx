@@ -18,7 +18,46 @@ import { useSubscription } from "@/hooks/use-subscription";
 
 export default function NewProjectPage() {
   const { form, isSubmitting, handleLogoUpload, onSubmit } = useProjectForm();
-  const { isPro } = useSubscription();
+  const { isPro, usage, plan, isLoading } = useSubscription();
+
+  const isLimitReached =
+    !isPro &&
+    usage?.projects !== undefined &&
+    plan?.limits?.projects !== undefined &&
+    usage.projects >= plan.limits.projects;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isLimitReached) {
+    return (
+      <div className="container mx-auto max-w-lg py-16 px-4 text-center">
+        <div className="flex justify-center mb-6">
+          <div className="p-4 rounded-full bg-primary/10">
+            <span className="text-4xl">🛑</span>
+          </div>
+        </div>
+        <h1 className="text-3xl font-bold mb-4">Project Limit Reached</h1>
+        <p className="text-muted-foreground mb-8 text-lg">
+          You have reached the maximum number of projects for your current plan.
+          Upgrade to Pro to create unlimited projects.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Button asChild variant="default" size="lg">
+            <Link href="/dashboard/settings">Upgrade to Pro</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/dashboard">Back to Dashboard</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4">
