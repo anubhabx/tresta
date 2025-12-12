@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { Ban, CheckCircle2, MessageSquare, ShieldCheck } from "lucide-react";
-import { useApi } from "@/hooks/use-api";
-import type { ApiResponse, CreateTestimonialPayload } from "@/types/api";
+import axios from "axios";
+import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
 import { AzureFileUpload } from "@/components/azure-file-upload";
 import { GoogleOAuthProvider } from "@/components/google-oauth-provider";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
@@ -151,6 +151,30 @@ export default function TestimonialSubmissionPage({
     }
   };
 
+  // Fetch project details
+  const [project, setProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const res = await publicApi.get<ApiResponse<Project>>(
+          `/api/public/projects/${slug}`,
+        );
+        setProject(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch project:", error);
+        toast.error("Failed to load project details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchProject();
+    }
+  }, [slug]);
+
   // Handle Google Sign-In error
   const handleGoogleError = () => {
     toast.error("Google Sign-In was unsuccessful. Please try again.");
@@ -227,7 +251,7 @@ export default function TestimonialSubmissionPage({
       } else {
         toast.error(
           error?.response?.data?.message ||
-            "Failed to submit testimonial. Please try again.",
+          "Failed to submit testimonial. Please try again.",
         );
       }
     } finally {
@@ -237,9 +261,9 @@ export default function TestimonialSubmissionPage({
 
   const formattedExistingDate = existingSubmissionCreatedAt
     ? new Intl.DateTimeFormat(undefined, {
-        dateStyle: "long",
-        timeStyle: "short",
-      }).format(new Date(existingSubmissionCreatedAt))
+      dateStyle: "long",
+      timeStyle: "short",
+    }).format(new Date(existingSubmissionCreatedAt))
     : null;
 
   if (hasExistingSubmission) {
@@ -316,19 +340,49 @@ export default function TestimonialSubmissionPage({
       <div className="min-h-screen flex items-center justify-center p-4 w-full">
         <Card className="max-w-6xl w-full">
           <CardHeader className="space-y-1 pb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <MessageSquare className="h-6 w-6 text-primary" />
+            {isLoading ? (
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-lg bg-muted animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-6 w-48 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-64 bg-muted animate-pulse rounded" />
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-2xl font-bold">
-                  Share Your Experience
-                </CardTitle>
-                <CardDescription className="text-base mt-1">
-                  Your feedback helps us improve and inspires others
-                </CardDescription>
+            ) : (
+              <div className="flex items-center gap-3 mb-2">
+                {project?.logoUrl ? (
+                  <img
+                    src={project.logoUrl}
+                    alt={`${project.name} Logo`}
+                    className="h-12 w-12 object-contain rounded-lg bg-white p-1 border"
+                  />
+                ) : (
+                  <div
+                    className="p-2 rounded-lg"
+                    style={{
+                      backgroundColor: project?.brandColorPrimary
+                        ? `${project.brandColorPrimary}15` // 10% opacity
+                        : "hsl(var(--primary) / 0.1)",
+                    }}
+                  >
+                    <MessageSquare
+                      className="h-6 w-6"
+                      style={{
+                        color: project?.brandColorPrimary || "hsl(var(--primary))",
+                      }}
+                    />
+                  </div>
+                )}
+                <div>
+                  <CardTitle className="text-2xl font-bold">
+                    Share Your Experience with {project?.name || "Us"}
+                  </CardTitle>
+                  <CardDescription className="text-base mt-1">
+                    Your feedback helps us improve and inspires others
+                  </CardDescription>
+                </div>
               </div>
-            </div>
+            )}
           </CardHeader>
 
           <Separator />
@@ -490,6 +544,11 @@ export default function TestimonialSubmissionPage({
                   size="lg"
                   className="w-full"
                   disabled={isSubmitting}
+                  style={
+                    project?.brandColorPrimary
+                      ? { backgroundColor: project.brandColorPrimary }
+                      : undefined
+                  }
                 >
                   {isSubmitting ? "Submitting..." : "Submit Testimonial"}
                 </Button>
