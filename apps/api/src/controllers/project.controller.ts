@@ -367,23 +367,22 @@ const getPublicProjectBySlug = async (
       project = await prisma.project.findFirst({
         where: {
           slug,
-          visibility: "PUBLIC",
+          // visibility: "PUBLIC", // We need to fetch private projects too for the collection form
           isActive: true,
         },
         select: {
           id: true,
           name: true,
-          shortDescription: true,
           slug: true,
           logoUrl: true,
           projectType: true,
-          websiteUrl: true,
-          collectionFormUrl: true,
           brandColorPrimary: true,
           brandColorSecondary: true,
-          tags: true,
-          createdAt: true,
-          updatedAt: true,
+          user: {
+            select: {
+              plan: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -391,15 +390,29 @@ const getPublicProjectBySlug = async (
     }
 
     if (!project) {
-      throw new NotFoundError("Project not found or not publicly accessible", {
+      throw new NotFoundError("Project not found", {
         slug,
-        suggestion: 'This project may be private or inactive. Please contact the project owner.'
+        suggestion: 'This project may be inactive. Please contact the project owner.'
       });
     }
 
+    // Check plan limits
+    const isPro = project.user.plan === "PRO";
+    const data: any = { ...project };
+
+    // Apply feature gates
+    // Logos are free, but colors are premium
+    if (!isPro) {
+      data.brandColorPrimary = null;
+      data.brandColorSecondary = null;
+    }
+
+    // Remove internal user data
+    delete (data as any).user;
+
     return ResponseHandler.success(res, {
       message: "Public project retrieved successfully",
-      data: serializeProject(project),
+      data,
     });
   } catch (error) {
     next(error);
