@@ -26,6 +26,14 @@ import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
 import { Badge } from "@workspace/ui/components/badge";
 
+// Public API client (no credentials/cookie, no auth header)
+const publicApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 const testimonialFormSchema = z.object({
   authorName: z
     .string()
@@ -75,7 +83,7 @@ export default function TestimonialSubmissionPage({
   params,
 }: TestimonialSubmissionPageProps) {
   const { slug } = use(params);
-  const api = useApi();
+  // const api = useApi(); // Removed to avoid CORS issues with credentials
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [hasExistingSubmission, setHasExistingSubmission] = useState(false);
@@ -187,8 +195,8 @@ export default function TestimonialSubmissionPage({
         (payload as any).googleIdToken = googleIdToken;
       }
 
-      await api.post<ApiResponse<unknown>>(
-        `/api/projects/${slug}/testimonials`,
+      await publicApi.post<ApiResponse<unknown>>(
+        `/api/public/projects/${slug}/testimonials`,
         payload,
       );
 
