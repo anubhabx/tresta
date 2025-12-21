@@ -1,5 +1,7 @@
 import { NotificationType } from '@workspace/database/prisma';
 import { prisma } from '@workspace/database/prisma';
+import { EmailService } from './email.service.js';
+import { AblyService } from './ably.service.js';
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS, getTTLToMidnightUTC, getCurrentDateUTC } from '../lib/redis-keys.js';
 import { sanitizeNotificationContent, sanitizeMetadata } from '../utils/sanitize.js';
@@ -363,13 +365,8 @@ export class NotificationService {
    * @param notification - Notification data
    */
   static async sendViaAbly(userId: string, notification: any): Promise<void> {
-    if (process.env.ENABLE_REAL_NOTIFICATIONS !== 'true') {
-      console.log('[MOCK] Ably notification:', notification);
-      return;
-    }
-
-    // TODO: Implement Ably integration (will implement in Phase 2)
-    console.log(`Would send Ably notification to user ${userId}`);
+    // Publish to user's private channel
+    await AblyService.publish(`notifications:${userId}`, 'notification', notification);
   }
 
   /**
@@ -398,9 +395,20 @@ export class NotificationService {
     ].includes(notification.type);
 
     if (isCritical) {
-      // TODO: Queue immediate email (will implement when we create email worker)
-      console.log(`Would queue immediate email for notification ${notification.id}`);
+      // Get user email
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true }
+      });
+
+      if (user?.email) {
+        await EmailService.sendEmail({
+          to: user.email,
+          subject: notification.title,
+          html: `<p>${notification.message}</p><p><a href="${notification.link}">View Details</a></p>`
+        });
+      }
     }
-    // Non-critical emails handled by daily digest job
+    // Non-critical emails handled by daily digest job (future implementation)
   }
 }
