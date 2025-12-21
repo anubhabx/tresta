@@ -5,11 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-// Dynamic import to avoid SSR issues
-let Ably: typeof import("ably") | null = null;
-if (typeof window !== "undefined") {
-  Ably = require("ably");
-}
+import Ably from "ably";
 
 interface AblyContextValue {
   isConnected: boolean;
@@ -43,7 +39,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize Ably client
   React.useEffect(() => {
-    if (!userId || !isEnabled || !Ably) {
+    if (!userId || !isEnabled) {
       return;
     }
 

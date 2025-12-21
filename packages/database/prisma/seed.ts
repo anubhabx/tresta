@@ -40,7 +40,7 @@ async function main() {
             widgets: -1,
             teamMembers: -1
         },
-        razorpayPlanId: 'plan_pro_monthly_id_placeholder' // Should be replaced with actual ID from Razorpay Dashboard
+        razorpayPlanId: 'plan_RpnLcT26kHRA7p'
     };
 
     // 3. Pro Plan (Yearly) - 5000 INR/year (2 months off)
@@ -59,7 +59,7 @@ async function main() {
             widgets: -1,
             teamMembers: -1
         },
-        razorpayPlanId: 'plan_pro_yearly_id_placeholder' // Should be replaced with actual ID from Razorpay Dashboard
+        razorpayPlanId: 'plan_RpnNFG6ZymEgPE'
     };
 
     const upsertPlans = [freePlan, proMonthly, proYearly];

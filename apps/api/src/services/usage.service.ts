@@ -14,11 +14,12 @@ export const getUsageCount = async (resource: "projects" | "widgets" | "testimon
                 }
             });
         case "testimonials":
-            // Count testimonials across all user's projects (assuming ownership via project)
-            // or direct ownership if Testimonial has userId
+            // Count testimonials across all user's projects
             return await prisma.testimonial.count({
                 where: {
-                    userId: userId
+                    Project: {
+                        userId: userId
+                    }
                 }
             });
         case "teamMembers":

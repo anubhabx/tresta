@@ -1,5 +1,6 @@
-import { prisma } from "@workspace/database/prisma";
+import { prisma, NotificationType } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
+import { NotificationService } from '../services/notification.service.js';
 import {
   BadRequestError,
   ConflictError,
@@ -20,6 +21,7 @@ import {
   checkDuplicateContent,
   analyzeReviewerBehavior,
 } from '../services/moderation.service.js';
+import { hashIp, encrypt } from '../utils/encryption.js';
 
 const createTestimonial = async (
   req: Request,
@@ -53,6 +55,14 @@ const createTestimonial = async (
       throw new ValidationError("Content is required and must be a string", {
         field: 'content',
         received: typeof content
+      });
+    }
+
+    // Email is now required for data access rights
+    if (!authorEmail || typeof authorEmail !== 'string') {
+      throw new ValidationError("Email is required for data privacy rights management", {
+        field: 'authorEmail',
+        received: typeof authorEmail
       });
     }
 
@@ -264,19 +274,23 @@ const createTestimonial = async (
       type: type || "TEXT",
       isApproved: moderationResult.status === "APPROVED",
       isPublished: moderationResult.autoPublish,
-      source: "web_form", // Track source as web form submission
-      ipAddress: req.ip, // Capture IP address for analytics
-      userAgent: req.get("user-agent"), // Capture user agent
-      isOAuthVerified, // Mark as OAuth verified
-      oauthProvider: isOAuthVerified ? "google" : null,
-      oauthSubject: oauthSubject,
-      // Auto-moderation fields
-      moderationStatus: moderationResult.status,
-      moderationScore: moderationResult.score,
-      moderationFlags:
-        moderationResult.flags.length > 0 ? moderationResult.flags : null,
       autoPublished: moderationResult.autoPublish,
     };
+
+    // Handle Privacy & Consent
+    const isAnonymousSubmission = req.headers['x-anonymous-submission'] === 'true';
+
+    if (isAnonymousSubmission) {
+      // User declined consent for technical data
+      testimonialData.ipAddress = null;
+      testimonialData.userAgent = null;
+    } else {
+      // User consented - Store processed data
+      // Hash IP for privacy (matches schema varchar constraint)
+      testimonialData.ipAddress = hashIp(req.ip || req.socket.remoteAddress || '');
+      // Encrypt User Agent
+      testimonialData.userAgent = encrypt(req.get("user-agent") || '');
+    }
 
     // Add optional fields if provided
     if (authorEmail) {
@@ -312,6 +326,40 @@ const createTestimonial = async (
       });
     } catch (error) {
       throw handlePrismaError(error);
+    }
+
+    // Send notification to project owner
+    try {
+      const notificationType = moderationResult.status === 'FLAGGED'
+        ? NotificationType.TESTIMONIAL_FLAGGED
+        : NotificationType.NEW_TESTIMONIAL;
+
+      const title = moderationResult.status === 'FLAGGED'
+        ? 'Testimonial Flagged for Review'
+        : 'New Testimonial Received';
+
+      const message = moderationResult.status === 'FLAGGED'
+        ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
+        : `You received a new testimonial from ${authorName}.`;
+
+      await NotificationService.create({
+        userId: project.userId,
+        type: notificationType,
+        title,
+        message,
+        link: `/dashboard/projects/${project.slug}?tab=testimonials`,
+        metadata: {
+          testimonialId: newTestimonial.id,
+          projectId: project.id,
+          projectSlug: project.slug,
+          authorName,
+          authorEmail,
+          moderationStatus: moderationResult.status,
+        },
+      });
+    } catch (error) {
+      // Non-blocking error - don't fail the request if notification fails
+      console.error('Failed to create notification:', error);
     }
 
     return ResponseHandler.created(res, {

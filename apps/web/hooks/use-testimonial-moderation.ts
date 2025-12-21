@@ -264,8 +264,10 @@ export function filterTestimonials(
       filtered = filtered.filter((t) => t.isOAuthVerified);
     }
   } else {
-    // Regular mode: Show only APPROVED testimonials
-    filtered = filtered.filter((t) => t.isApproved === true);
+    // Regular mode: Show only APPROVED testimonials, unless user specifically asks for pending or all
+    if (filterStatus !== "pending" && filterStatus !== "all") {
+      filtered = filtered.filter((t) => t.isApproved === true);
+    }
   }
 
   return filtered;

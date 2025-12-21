@@ -1,5 +1,7 @@
 import { NotificationType } from '@workspace/database/prisma';
 import { prisma } from '@workspace/database/prisma';
+import { EmailService } from './email.service.js';
+import { AblyService } from './ably.service.js';
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS, getTTLToMidnightUTC, getCurrentDateUTC } from '../lib/redis-keys.js';
 import { sanitizeNotificationContent, sanitizeMetadata } from '../utils/sanitize.js';
@@ -49,7 +51,7 @@ export class NotificationService {
     const redis = getRedisClient();
     const today = getCurrentDateUTC();
     const key = REDIS_KEYS.EMAIL_QUOTA(today);
-    
+
     // Lua script for atomic check-and-increment with TTL handling
     // This script is idempotent and safe for concurrent execution
     const luaScript = `
@@ -85,10 +87,10 @@ export class NotificationService {
       
       return {1, newCount}
     `;
-    
+
     // Calculate TTL to midnight UTC
     const ttl = getTTLToMidnightUTC();
-    
+
     // Execute Lua script
     const result = await redis.eval(
       luaScript,
@@ -98,16 +100,16 @@ export class NotificationService {
       priority,
       ttl.toString()
     ) as [number, number];
-    
+
     const [success, count] = result;
-    
+
     // Snapshot to DB every 10 emails (async, non-blocking)
     if (success && count % 10 === 0) {
       this.snapshotEmailUsage(today, count).catch(err => {
         console.error('Failed to snapshot email usage:', err);
       });
     }
-    
+
     return { success: success === 1, count };
   }
 
@@ -124,12 +126,12 @@ export class NotificationService {
     try {
       await prisma.emailUsage.upsert({
         where: { date },
-        update: { 
+        update: {
           count,
           lastSnapshotCount: count,
         },
-        create: { 
-          date, 
+        create: {
+          date,
           count,
           lastSnapshotCount: count,
         },
@@ -150,9 +152,9 @@ export class NotificationService {
     const redis = getRedisClient();
     const today = getCurrentDateUTC();
     const key = REDIS_KEYS.EMAIL_QUOTA(today);
-    
+
     const redisCount = parseInt(await redis.get(key) || '0');
-    
+
     if (redisCount === 0) {
       return; // No emails sent today
     }
@@ -179,10 +181,10 @@ export class NotificationService {
   static async setQuotaLock(): Promise<string> {
     const redis = getRedisClient();
     const nextRetryAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour from now
-    
+
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_LOCKED, 3600, '1');
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_NEXT_RETRY, 3600, nextRetryAt);
-    
+
     console.log(`Email quota locked until ${nextRetryAt}`);
     return nextRetryAt;
   }
@@ -308,7 +310,7 @@ export class NotificationService {
     // Enqueue job to BullMQ
     const { Queue } = await import('bullmq');
     const redisUrl = process.env.REDIS_URL;
-    
+
     if (!redisUrl) {
       throw new Error('REDIS_URL environment variable is required');
     }
@@ -363,13 +365,8 @@ export class NotificationService {
    * @param notification - Notification data
    */
   static async sendViaAbly(userId: string, notification: any): Promise<void> {
-    if (process.env.ENABLE_REAL_NOTIFICATIONS !== 'true') {
-      console.log('[MOCK] Ably notification:', notification);
-      return;
-    }
-
-    // TODO: Implement Ably integration (will implement in Phase 2)
-    console.log(`Would send Ably notification to user ${userId}`);
+    // Publish to user's private channel
+    await AblyService.publish(`notifications:${userId}`, 'notification', notification);
   }
 
   /**
@@ -398,9 +395,20 @@ export class NotificationService {
     ].includes(notification.type);
 
     if (isCritical) {
-      // TODO: Queue immediate email (will implement when we create email worker)
-      console.log(`Would queue immediate email for notification ${notification.id}`);
+      // Get user email
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true }
+      });
+
+      if (user?.email) {
+        await EmailService.sendEmail({
+          to: user.email,
+          subject: notification.title,
+          html: `<p>${notification.message}</p><p><a href="${notification.link}">View Details</a></p>`
+        });
+      }
     }
-    // Non-critical emails handled by daily digest job
+    // Non-critical emails handled by daily digest job (future implementation)
   }
 }
