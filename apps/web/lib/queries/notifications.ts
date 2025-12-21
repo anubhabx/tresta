@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { useApi } from "@/hooks/use-api";
 
 interface Notification {
   id: string;
@@ -47,29 +45,18 @@ interface PreferencesResponse {
  * Fetch notifications with cursor-based pagination
  */
 export function useNotificationList() {
-  const { getToken } = useAuth();
+  const api = useApi();
 
   return useInfiniteQuery({
     queryKey: ["notifications"],
     queryFn: async ({ pageParam }) => {
-      const token = await getToken();
-      const url = new URL(`${API_URL}/api/notifications`);
-      
+      const params: any = {};
       if (pageParam) {
-        url.searchParams.set("cursor", pageParam);
+        params.cursor = pageParam;
       }
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch notifications");
-      }
-
-      return response.json() as Promise<NotificationListResponse>;
+      const response = await api.get("/api/notifications", { params });
+      return response.data as NotificationListResponse;
     },
     getNextPageParam: (lastPage) => lastPage.data.nextCursor,
     initialPageParam: undefined as string | undefined,
@@ -81,26 +68,16 @@ export function useNotificationList() {
  * Polls every 30 seconds when Ably is disconnected
  */
 export function useUnreadCount(isAblyConnected: boolean) {
-  const { getToken } = useAuth();
+  const api = useApi();
 
   return useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: async () => {
-      const token = await getToken();
-      const response = await fetch(`${API_URL}/api/notifications/unread-count`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch unread count");
-      }
-
-      return response.json() as Promise<UnreadCountResponse>;
+      const response = await api.get("/api/notifications/unread-count");
+      return response.data as UnreadCountResponse;
     },
     // Poll every 30 seconds when Ably is disconnected
-    refetchInterval: isAblyConnected ? false : 30000,
+    refetchInterval: false,
   });
 }
 
@@ -108,23 +85,13 @@ export function useUnreadCount(isAblyConnected: boolean) {
  * Fetch notification preferences
  */
 export function useNotificationPreferences() {
-  const { getToken } = useAuth();
+  const api = useApi();
 
   return useQuery({
     queryKey: ["notifications", "preferences"],
     queryFn: async () => {
-      const token = await getToken();
-      const response = await fetch(`${API_URL}/api/notifications/preferences`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch preferences");
-      }
-
-      return response.json() as Promise<PreferencesResponse>;
+      const response = await api.get("/api/notifications/preferences");
+      return response.data as PreferencesResponse;
     },
   });
 }
@@ -133,26 +100,13 @@ export function useNotificationPreferences() {
  * Mark a notification as read
  */
 export function useMarkAsRead() {
-  const { getToken } = useAuth();
+  const api = useApi();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (notificationId: string) => {
-      const token = await getToken();
-      const response = await fetch(`${API_URL}/api/notifications/${notificationId}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isRead: true }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to mark notification as read");
-      }
-
-      return response.json();
+      const response = await api.patch(`/api/notifications/${notificationId}`, { isRead: true });
+      return response.data;
     },
     onSuccess: () => {
       // Invalidate queries to refetch
@@ -166,24 +120,13 @@ export function useMarkAsRead() {
  * Mark all notifications as read
  */
 export function useMarkAllAsRead() {
-  const { getToken } = useAuth();
+  const api = useApi();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      const token = await getToken();
-      const response = await fetch(`${API_URL}/api/notifications/mark-all-read`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to mark all as read");
-      }
-
-      return response.json();
+      const response = await api.post("/api/notifications/mark-all-read");
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
@@ -196,26 +139,13 @@ export function useMarkAllAsRead() {
  * Update notification preferences
  */
 export function useUpdatePreferences() {
-  const { getToken } = useAuth();
+  const api = useApi();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (emailEnabled: boolean) => {
-      const token = await getToken();
-      const response = await fetch(`${API_URL}/api/notifications/preferences`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ emailEnabled }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update preferences");
-      }
-
-      return response.json();
+      const response = await api.put("/api/notifications/preferences", { emailEnabled });
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications", "preferences"] });

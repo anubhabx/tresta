@@ -16,7 +16,7 @@ export const useApi = () => {
 
     instance.interceptors.request.use(async (config) => {
       const token = await getToken();
-      if (token && config.headers) {
+      if (token && config.headers && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
