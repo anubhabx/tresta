@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, Suspense } from "react";
 import { projects } from "@/lib/queries";
 import { ProjectDetailPageSkeleton } from "@/components/skeletons";
 import { Button } from "@workspace/ui/components/button";
@@ -36,7 +36,7 @@ interface ProjectPageProps {
 
 }
 
-const ProjectPage = ({ params }: ProjectPageProps) => {
+const ProjectPageContent = ({ params }: ProjectPageProps) => {
   const { slug } = use(params);
 
   const tab = useSearchParams().get("tab") as string | undefined;
@@ -156,6 +156,14 @@ const ProjectPage = ({ params }: ProjectPageProps) => {
         </TabsContent>
       </Tabs>
     </div>
+  );
+};
+
+const ProjectPage = (props: ProjectPageProps) => {
+  return (
+    <Suspense fallback={<ProjectDetailPageSkeleton />}>
+      <ProjectPageContent {...props} />
+    </Suspense>
   );
 };
 
