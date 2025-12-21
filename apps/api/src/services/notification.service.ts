@@ -51,7 +51,7 @@ export class NotificationService {
     const redis = getRedisClient();
     const today = getCurrentDateUTC();
     const key = REDIS_KEYS.EMAIL_QUOTA(today);
-    
+
     // Lua script for atomic check-and-increment with TTL handling
     // This script is idempotent and safe for concurrent execution
     const luaScript = `
@@ -87,10 +87,10 @@ export class NotificationService {
       
       return {1, newCount}
     `;
-    
+
     // Calculate TTL to midnight UTC
     const ttl = getTTLToMidnightUTC();
-    
+
     // Execute Lua script
     const result = await redis.eval(
       luaScript,
@@ -100,16 +100,16 @@ export class NotificationService {
       priority,
       ttl.toString()
     ) as [number, number];
-    
+
     const [success, count] = result;
-    
+
     // Snapshot to DB every 10 emails (async, non-blocking)
     if (success && count % 10 === 0) {
       this.snapshotEmailUsage(today, count).catch(err => {
         console.error('Failed to snapshot email usage:', err);
       });
     }
-    
+
     return { success: success === 1, count };
   }
 
@@ -126,12 +126,12 @@ export class NotificationService {
     try {
       await prisma.emailUsage.upsert({
         where: { date },
-        update: { 
+        update: {
           count,
           lastSnapshotCount: count,
         },
-        create: { 
-          date, 
+        create: {
+          date,
           count,
           lastSnapshotCount: count,
         },
@@ -152,9 +152,9 @@ export class NotificationService {
     const redis = getRedisClient();
     const today = getCurrentDateUTC();
     const key = REDIS_KEYS.EMAIL_QUOTA(today);
-    
+
     const redisCount = parseInt(await redis.get(key) || '0');
-    
+
     if (redisCount === 0) {
       return; // No emails sent today
     }
@@ -181,10 +181,10 @@ export class NotificationService {
   static async setQuotaLock(): Promise<string> {
     const redis = getRedisClient();
     const nextRetryAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour from now
-    
+
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_LOCKED, 3600, '1');
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_NEXT_RETRY, 3600, nextRetryAt);
-    
+
     console.log(`Email quota locked until ${nextRetryAt}`);
     return nextRetryAt;
   }
@@ -310,7 +310,7 @@ export class NotificationService {
     // Enqueue job to BullMQ
     const { Queue } = await import('bullmq');
     const redisUrl = process.env.REDIS_URL;
-    
+
     if (!redisUrl) {
       throw new Error('REDIS_URL environment variable is required');
     }
