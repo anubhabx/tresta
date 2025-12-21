@@ -1,5 +1,6 @@
-import { prisma } from "@workspace/database/prisma";
+import { prisma, NotificationType } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
+import { NotificationService } from '../services/notification.service.js';
 import {
   BadRequestError,
   ConflictError,
@@ -20,6 +21,7 @@ import {
   checkDuplicateContent,
   analyzeReviewerBehavior,
 } from '../services/moderation.service.js';
+import { hashIp, encrypt } from '../utils/encryption.js';
 
 const createTestimonial = async (
   req: Request,
@@ -324,6 +326,40 @@ const createTestimonial = async (
       });
     } catch (error) {
       throw handlePrismaError(error);
+    }
+
+    // Send notification to project owner
+    try {
+      const notificationType = moderationResult.status === 'FLAGGED'
+        ? NotificationType.TESTIMONIAL_FLAGGED
+        : NotificationType.NEW_TESTIMONIAL;
+
+      const title = moderationResult.status === 'FLAGGED'
+        ? 'Testimonial Flagged for Review'
+        : 'New Testimonial Received';
+
+      const message = moderationResult.status === 'FLAGGED'
+        ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
+        : `You received a new testimonial from ${authorName}.`;
+
+      await NotificationService.create({
+        userId: project.userId,
+        type: notificationType,
+        title,
+        message,
+        link: `/dashboard/projects/${project.slug}?tab=testimonials`,
+        metadata: {
+          testimonialId: newTestimonial.id,
+          projectId: project.id,
+          projectSlug: project.slug,
+          authorName,
+          authorEmail,
+          moderationStatus: moderationResult.status,
+        },
+      });
+    } catch (error) {
+      // Non-blocking error - don't fail the request if notification fails
+      console.error('Failed to create notification:', error);
     }
 
     return ResponseHandler.created(res, {
