@@ -1,4 +1,5 @@
 import { Queue } from 'bullmq';
+import { getRedisClient } from './redis.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -28,20 +29,14 @@ class QueueManager {
             return this.queues.get(name)!;
         }
 
-        const redisUrl = process.env.REDIS_URL;
-        if (!redisUrl) {
-            throw new Error('REDIS_URL environment variable is required');
-        }
+        // Reuse shared connection for Producers (Queues)
+        // This significantly reduces connection count as all queues share one connection
+        const queue = new Queue(name, {
+            connection: getRedisClient(),
+            // connection config is now handled by the shared client
+        });
 
-        // Reuse shared connection config
-        const connection = {
-            url: redisUrl,
-            ...(redisUrl.startsWith('rediss://') && {
-                tls: { rejectUnauthorized: false },
-            }),
-        };
 
-        const queue = new Queue(name, { connection });
         this.queues.set(name, queue);
 
         console.log(`Initialized queue: ${name} (Active queues: ${this.queues.size})`);

@@ -1,4 +1,5 @@
-import { Worker, Queue } from 'bullmq';
+import { Worker } from 'bullmq';
+import { getQueue } from '../lib/queues.js';
 import { prisma } from '@workspace/database/prisma';
 import { NotificationService } from '../services/notification.service.js';
 import { POP_WORKER_OPTIONS } from '../lib/worker-options.js';
@@ -76,9 +77,7 @@ export const createOutboxWorker = () => {
   });
 
   // Create queue for adding jobs
-  const outboxQueue = new Queue('outbox-processor', {
-    connection: redisConnection,
-  });
+  const outboxQueue = getQueue('outbox-processor');
 
   // Poll outbox every 10 seconds
   const intervalId = setInterval(async () => {
