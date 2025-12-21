@@ -32,19 +32,19 @@ export const listDLQJobs = async (
 ) => {
   try {
     const { queue, limit = '50', errorType } = req.query;
-    
+
     const limitNum = Math.min(parseInt(limit as string) || 50, 100);
-    
+
     const where: any = { retried: false };
-    
+
     if (queue) {
       where.queue = queue as string;
     }
-    
+
     if (errorType && (errorType === 'transient' || errorType === 'permanent')) {
       where.errorType = errorType;
     }
-    
+
     let failedJobs, total;
     try {
       [failedJobs, total] = await Promise.all([
@@ -82,7 +82,7 @@ export const requeueJob = async (
 ) => {
   try {
     const { id } = req.params;
-    
+
     let failedJob;
     try {
       failedJob = await prisma.deadLetterJob.findUnique({
@@ -101,13 +101,12 @@ export const requeueJob = async (
     }
 
     // Create appropriate queue
-    const queue = new Queue(failedJob.queue, {
-      connection: getRedisConnection(),
-    });
+    const { getQueue } = await import('../../lib/queues.js');
+    const queue = getQueue(failedJob.queue);
 
     // Determine job name based on queue
-    const jobName = failedJob.queue === 'notifications' 
-      ? 'send-notification' 
+    const jobName = failedJob.queue === 'notifications'
+      ? 'send-notification'
       : 'send-email';
 
     // Re-add to queue with retry prefix

@@ -308,21 +308,8 @@ export class NotificationService {
     }
 
     // Enqueue job to BullMQ
-    const { Queue } = await import('bullmq');
-    const redisUrl = process.env.REDIS_URL;
-
-    if (!redisUrl) {
-      throw new Error('REDIS_URL environment variable is required');
-    }
-
-    const notificationQueue = new Queue('notifications', {
-      connection: {
-        url: redisUrl,
-        ...(redisUrl.startsWith('rediss://') && {
-          tls: { rejectUnauthorized: false },
-        }),
-      },
-    });
+    const { getQueue } = await import('../lib/queues.js');
+    const notificationQueue = getQueue('notifications');
 
     await notificationQueue.add(
       'send-notification',

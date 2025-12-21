@@ -47,19 +47,8 @@ export const readinessCheck = async (
 
     // Check BullMQ queues
     try {
-      const redisUrl = process.env.REDIS_URL;
-      if (!redisUrl) {
-        throw new Error('REDIS_URL not configured');
-      }
-
-      const notificationQueue = new Queue('notifications', {
-        connection: {
-          url: redisUrl,
-          ...(redisUrl.startsWith('rediss://') && {
-            tls: { rejectUnauthorized: false },
-          }),
-        },
-      });
+      const { getQueue } = await import('../../lib/queues.js');
+      const notificationQueue = getQueue('notifications');
 
       await notificationQueue.getJobCounts();
       checks.bullmq = true;

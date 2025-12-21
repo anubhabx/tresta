@@ -103,6 +103,10 @@ async function gracefulShutdown(signal: string) {
       console.log('Workers closed');
     }
 
+    // Close shared queues (NotificationService etc)
+    const { closeAllQueues } = await import('../lib/queues.js');
+    await closeAllQueues();
+
     // Disconnect from databases
     await disconnectPrisma();
     await disconnectRedis();
