@@ -25,6 +25,15 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
 import { Badge } from "@workspace/ui/components/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@workspace/ui/components/dialog";
+import { Info } from "lucide-react";
 
 // Public API client (no credentials/cookie, no auth header)
 const publicApi = axios.create({
@@ -40,10 +49,8 @@ const testimonialFormSchema = z.object({
     .min(2, { message: "Name must be at least 2 characters" })
     .max(255, { message: "Name must be less than 255 characters" }),
   authorEmail: z
-    .string()
-    .email({ message: "Please enter a valid email address" })
-    .optional()
-    .or(z.literal("")),
+    .string({ required_error: "Email is required for verification" })
+    .email({ message: "Please enter a valid email address" }),
   authorRole: z
     .string()
     .max(255, { message: "Role must be less than 255 characters" })
@@ -91,6 +98,10 @@ export default function TestimonialSubmissionPage({
     useState<string | undefined>(undefined);
   const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
   const [isGoogleVerified, setIsGoogleVerified] = useState(false);
+
+  // Privacy Consent State
+  const [isPrivacyDialogOpen, setIsPrivacyDialogOpen] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(testimonialFormSchema),
@@ -181,6 +192,19 @@ export default function TestimonialSubmissionPage({
   };
 
   const onSubmit = async (data: FormData) => {
+    // Open privacy dialog instead of submitting directly
+    setPendingFormData(data);
+    setIsPrivacyDialogOpen(true);
+  };
+
+  const handlePrivacyChoice = async (consented: boolean) => {
+    setIsPrivacyDialogOpen(false);
+    if (!pendingFormData) return;
+
+    await executeSubmission(pendingFormData, consented);
+  };
+
+  const executeSubmission = async (data: FormData, consented: boolean) => {
     setIsSubmitting(true);
     try {
       const payload: CreateTestimonialPayload = {
@@ -219,16 +243,27 @@ export default function TestimonialSubmissionPage({
         (payload as any).googleIdToken = googleIdToken;
       }
 
+      const headers: Record<string, string> = {};
+      if (!consented) {
+        headers['x-anonymous-submission'] = 'true';
+      }
+
       await publicApi.post<ApiResponse<unknown>>(
         `/api/public/projects/${slug}/testimonials`,
         payload,
+        { headers }
       );
 
       setIsSuccess(true);
       form.reset();
       setGoogleIdToken(null);
       setIsGoogleVerified(false);
-      toast.success("Thank you! Your testimonial has been submitted.");
+
+      if (!consented) {
+        toast.success("Thank you! Your testimonial has been submitted anonymously (no IP/Device data stored).");
+      } else {
+        toast.success("Thank you! Your testimonial has been submitted.");
+      }
     } catch (error: any) {
       console.error("Failed to submit testimonial:", error);
       const status = error?.response?.status;
@@ -256,6 +291,7 @@ export default function TestimonialSubmissionPage({
       }
     } finally {
       setIsSubmitting(false);
+      setPendingFormData(null);
     }
   };
 
@@ -452,15 +488,15 @@ export default function TestimonialSubmissionPage({
                   required
                 />
 
-                {/* Email Field */}
+                {/* Email Field - Now Required */}
                 <CustomFormField
                   type="email"
                   control={form.control}
                   name="authorEmail"
                   label="Email Address"
                   placeholder="john@example.com"
-                  description="We'll never share your email or send spam"
-                  optional
+                  description="Required for identity verification and data rights."
+                  required
                 />
 
                 {/* Role Field */}
@@ -553,9 +589,105 @@ export default function TestimonialSubmissionPage({
                   {isSubmitting ? "Submitting..." : "Submit Testimonial"}
                 </Button>
 
-                <p className="text-center text-sm text-muted-foreground">
-                  Your testimonial will be reviewed before being published
-                </p>
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1.5 transition-colors"
+                      >
+                        <Info className="h-4 w-4" />
+                        How we use your data
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>How we use your data</DialogTitle>
+                        <DialogDescription>
+                          We value your privacy and transparency. Here's exactly what happens when you submit a testimonial.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 pt-2">
+                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                          <h4 className="font-semibold text-foreground flex items-center gap-2">
+                            <span className="h-2 w-2 rounded-full bg-green-500" />
+                            Publicly Visible
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            The following information will be displayed publicly on the project's website:
+                          </p>
+                          <ul className="text-sm list-disc pl-5 space-y-1">
+                            <li>Your Name</li>
+                            <li>Your Role & Company</li>
+                            <li>Your Profile Picture (if provided)</li>
+                            <li>Your Testimonial Content</li>
+                            <li>Your Video (if provided)</li>
+                          </ul>
+                        </div>
+
+                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                          <h4 className="font-semibold text-foreground flex items-center gap-2">
+                            <span className="h-2 w-2 rounded-full bg-orange-500" />
+                            Kept Private
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            These are <strong>never</strong> shared publicly:
+                          </p>
+                          <ul className="text-sm list-disc pl-5 space-y-1">
+                            <li>
+                              <strong>Email Address:</strong> Used only for verification and sending you a copy of your submission. We will never sell your email.
+                            </li>
+                            <li>
+                              <strong>IP Address & Device Info:</strong> Used strictly for spam detection and security.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {/* Privacy Consent Dialog */}
+                <Dialog open={isPrivacyDialogOpen} onOpenChange={setIsPrivacyDialogOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Data Privacy Consent</DialogTitle>
+                      <DialogDescription>
+                        We believe in transparency. Please choose how you would like to submit.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-2">
+                      <div className="bg-muted/30 p-4 rounded-lg text-sm space-y-2">
+                        <p>
+                          To prevent spam and ensure security, we collect technical data including your <strong>IP Address</strong> and <strong>Device Information</strong>.
+                        </p>
+                        <p className="text-muted-foreground">
+                          This data is encrypted/hashed for your privacy and is never shared publicly.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          onClick={() => handlePrivacyChoice(true)}
+                          className="w-full gap-2"
+                          size="lg"
+                        >
+                          <ShieldCheck className="h-4 w-4" />
+                          I Consent & Submit
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          onClick={() => handlePrivacyChoice(false)}
+                          className="w-full text-muted-foreground hover:text-foreground"
+                        >
+                          Decline & Submit Anonymously (No IP/Device Data)
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </form>
             </Form>
           </CardContent>

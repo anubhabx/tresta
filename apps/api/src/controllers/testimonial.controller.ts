@@ -56,6 +56,14 @@ const createTestimonial = async (
       });
     }
 
+    // Email is now required for data access rights
+    if (!authorEmail || typeof authorEmail !== 'string') {
+      throw new ValidationError("Email is required for data privacy rights management", {
+        field: 'authorEmail',
+        received: typeof authorEmail
+      });
+    }
+
     // Validate authorName length
     if (authorName.length < 2 || authorName.length > 255) {
       throw new ValidationError(
@@ -264,19 +272,23 @@ const createTestimonial = async (
       type: type || "TEXT",
       isApproved: moderationResult.status === "APPROVED",
       isPublished: moderationResult.autoPublish,
-      source: "web_form", // Track source as web form submission
-      ipAddress: req.ip, // Capture IP address for analytics
-      userAgent: req.get("user-agent"), // Capture user agent
-      isOAuthVerified, // Mark as OAuth verified
-      oauthProvider: isOAuthVerified ? "google" : null,
-      oauthSubject: oauthSubject,
-      // Auto-moderation fields
-      moderationStatus: moderationResult.status,
-      moderationScore: moderationResult.score,
-      moderationFlags:
-        moderationResult.flags.length > 0 ? moderationResult.flags : null,
       autoPublished: moderationResult.autoPublish,
     };
+
+    // Handle Privacy & Consent
+    const isAnonymousSubmission = req.headers['x-anonymous-submission'] === 'true';
+
+    if (isAnonymousSubmission) {
+      // User declined consent for technical data
+      testimonialData.ipAddress = null;
+      testimonialData.userAgent = null;
+    } else {
+      // User consented - Store processed data
+      // Hash IP for privacy (matches schema varchar constraint)
+      testimonialData.ipAddress = hashIp(req.ip || req.socket.remoteAddress || '');
+      // Encrypt User Agent
+      testimonialData.userAgent = encrypt(req.get("user-agent") || '');
+    }
 
     // Add optional fields if provided
     if (authorEmail) {

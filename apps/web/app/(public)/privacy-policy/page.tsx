@@ -25,7 +25,27 @@ export default function PrivacyPolicyPage() {
                             <li><strong>Contact Data:</strong> includes email address and telephone numbers.</li>
                             <li><strong>Technical Data:</strong> includes internet protocol (IP) address, your login data, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform and other technology on the devices you use to access this website.</li>
                             <li><strong>Usage Data:</strong> includes information about how you use our website, products and services.</li>
+                            <li><strong>Testimonial Data:</strong> When you submit a testimonial, we collect the content of your review along with your name, role, company, and avatar. This information is intended for public display on our customers' websites. We also privately collect your email address for verification and your IP address for spam prevention.</li>
                         </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold">Your Rights & Data Control</h2>
+                        <p>
+                            You have full control over your personal data. We provide tools for you to access, download, or delete your data at any time.
+                        </p>
+                        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                            <h3 className="font-medium mb-2">Self-Serve Data Tools</h3>
+                            <p className="mb-3 text-sm text-muted-foreground">
+                                Use our automated portal to manage your data without waiting for support.
+                            </p>
+                            <a
+                                href="/privacy/request"
+                                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 transition-colors"
+                            >
+                                Manage My Data
+                            </a>
+                        </div>
                     </section>
 
                     <section>
