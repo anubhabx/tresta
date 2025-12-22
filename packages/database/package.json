@@ -6,8 +6,8 @@
   },
   "types": "./dist/prisma.d.ts",
   "dependencies": {
-    "@prisma/client": "^6.16.1",
-    "prisma": "^6.16.1"
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
   },
   "scripts": {
     "build": "tsc && node scripts/copy-generated.js",

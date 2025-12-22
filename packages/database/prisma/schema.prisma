@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
+  engineType = "binary"
 }
 
 datasource db {
@@ -77,7 +78,6 @@ model Project {
   @@index([projectType])
 }
 
-
 model Plan {
   id             String   @id @default(cuid())
   name           String   @db.VarChar(255) // e.g., "Pro Plan", "Starter"
@@ -99,23 +99,23 @@ model Plan {
 }
 
 model Subscription {
-  id        String             @id @default(cuid())
-  userId    String             @unique
-  status    SubscriptionStatus // e.g., "active", "canceled", etc.
-  
+  id     String             @id @default(cuid())
+  userId String             @unique
+  status SubscriptionStatus // e.g., "active", "canceled", etc.
+
   // Relations
   planId String?
   plan   Plan?   @relation(fields: [planId], references: [id])
-  
+
   // Legacy/Code Enum fallback (optional, but good to keep synced)
-  userPlan UserPlan @default(FREE) @map("plan") 
+  userPlan UserPlan @default(FREE) @map("plan")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   externalSubscriptionId String? @unique // Razorpay Subscription ID
   externalCustomerId     String? // Razorpay Customer ID (optional)
-  
+
   // Razorpay Specifics
   razorpayOrderId   String?
   razorpayPaymentId String?
@@ -131,7 +131,7 @@ model Subscription {
   interval String? // "month", "year"
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([planId])
   @@index([status])
@@ -496,17 +496,17 @@ model FeatureFlag {
 // ============================================
 
 model WidgetAnalytics {
-  id           String   @id @default(cuid())
-  widgetId     String
-  projectId    String
-  loadTime     Int // Load time in milliseconds
-  layoutType   String // carousel, grid, masonry, wall, list
-  browser      String? // Browser name
-  device       String? // desktop, mobile, tablet
-  country      String? // ISO country code
-  errorCode    String? // Error code if load failed
-  version      String // Widget version
-  timestamp    DateTime @default(now())
+  id         String   @id @default(cuid())
+  widgetId   String
+  projectId  String
+  loadTime   Int // Load time in milliseconds
+  layoutType String // carousel, grid, masonry, wall, list
+  browser    String? // Browser name
+  device     String? // desktop, mobile, tablet
+  country    String? // ISO country code
+  errorCode  String? // Error code if load failed
+  version    String // Widget version
+  timestamp  DateTime @default(now())
 
   @@index([widgetId, timestamp])
   @@index([projectId, timestamp])
@@ -515,17 +515,17 @@ model WidgetAnalytics {
 }
 
 model WidgetPerformanceAlert {
-  id          String              @id @default(cuid())
+  id          String          @id @default(cuid())
   widgetId    String
   projectId   String
   alertType   WidgetAlertType
   severity    AlertSeverity
-  message     String              @db.Text
+  message     String          @db.Text
   threshold   Float // The threshold that was exceeded
   actualValue Float // The actual value that triggered the alert
-  resolved    Boolean             @default(false)
+  resolved    Boolean         @default(false)
   resolvedAt  DateTime?
-  createdAt   DateTime            @default(now())
+  createdAt   DateTime        @default(now())
 
   @@index([widgetId, createdAt])
   @@index([projectId, createdAt])
