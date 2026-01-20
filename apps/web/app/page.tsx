@@ -15,7 +15,6 @@ export default function Page() {
       <LandingNavbar />
       <main className="flex-1">
         <Hero />
-        {/* <SocialProof /> */}
         <div id="features">
           <Features />
         </div>
@@ -23,7 +22,6 @@ export default function Page() {
           <HowItWorks />
         </div>
         <InteractiveDemo />
-        {/* <Testimonials /> */}
         <div id="pricing">
           <Pricing />
         </div>

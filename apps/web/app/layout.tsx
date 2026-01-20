@@ -3,8 +3,6 @@ import { Figtree, Lora, Fira_Code } from "next/font/google";
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "@workspace/ui/components/sonner";
-import { UpgradeModal } from "@/components/billing/upgrade-modal";
 
 const fontSans = Figtree({
   subsets: ["latin"],
@@ -68,8 +66,6 @@ export default function RootLayout({
             <div className="flex min-h-svh flex-col">
               <main className="flex-1">{children}</main>
             </div>
-            <Toaster position="bottom-right" />
-            <UpgradeModal />
           </Providers>
         </body>
       </html>

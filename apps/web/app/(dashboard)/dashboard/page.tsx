@@ -3,14 +3,14 @@
 import React from "react";
 import { projects } from "@/lib/queries";
 import { DashboardPageSkeleton } from "@/components/skeletons";
-import {
-  DashboardStats,
-  RecentProjectsList,
-  DashboardEmptyState,
-  GettingStartedCard,
-  PendingActionsCard,
-  StatusOverviewCard,
-} from "@/components/dashboard";
+import dynamic from "next/dynamic";
+
+const DashboardStats = dynamic(() => import("@/components/dashboard/dashboard-stats").then((mod) => mod.DashboardStats));
+const RecentProjectsList = dynamic(() => import("@/components/dashboard/recent-projects-list").then((mod) => mod.RecentProjectsList));
+const DashboardEmptyState = dynamic(() => import("@/components/dashboard/dashboard-empty-state").then((mod) => mod.DashboardEmptyState));
+const GettingStartedCard = dynamic(() => import("@/components/dashboard/getting-started-card").then((mod) => mod.GettingStartedCard));
+const PendingActionsCard = dynamic(() => import("@/components/dashboard/pending-actions-card").then((mod) => mod.PendingActionsCard));
+const StatusOverviewCard = dynamic(() => import("@/components/dashboard/status-overview-card").then((mod) => mod.StatusOverviewCard));
 import { useUser } from "@clerk/nextjs";
 
 const DashboardPage = () => {

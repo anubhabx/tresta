@@ -5,7 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import Ably from "ably";
+// import Ably from "ably"; // Dynamically imported
 
 interface AblyContextValue {
   isConnected: boolean;
@@ -43,71 +43,80 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const client = new Ably.Realtime({
-      authCallback: async (tokenParams, callback) => {
-        try {
-          const token = await getToken();
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ably/token`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+    let client: any = null;
+    let channel: any = null;
 
-          if (!response.ok) {
-            throw new Error("Failed to fetch Ably token");
+    const initAbly = async () => {
+      const Ably = (await import("ably")).default;
+
+      client = new Ably.Realtime({
+        authCallback: async (tokenParams, callback) => {
+          try {
+            const token = await getToken();
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ably/token`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to fetch Ably token");
+            }
+
+            const tokenRequest = await response.json();
+            callback(null, tokenRequest.data);
+          } catch (error) {
+            console.error("Ably auth error:", error);
+            callback(error as any, null);
           }
+        },
+      });
 
-          const tokenRequest = await response.json();
-          callback(null, tokenRequest.data);
-        } catch (error) {
-          console.error("Ably auth error:", error);
-          callback(error as any, null);
+      // Monitor connection state
+      client.connection.on("connected", () => {
+        setIsConnected(true);
+        setConnectionState("connected");
+        console.log("Ably connected");
+      });
+
+      client.connection.on("disconnected", () => {
+        setIsConnected(false);
+        setConnectionState("disconnected");
+        console.log("Ably disconnected");
+      });
+
+      client.connection.on("failed", () => {
+        setIsConnected(false);
+        setConnectionState("failed");
+        console.error("Ably connection failed");
+      });
+
+      // Subscribe to user's notification channel
+      channel = client.channels.get(`notifications:${userId}`);
+
+      channel.subscribe("notification", (message: any) => {
+        console.log("New notification received:", message.data);
+
+        // Invalidate queries to fetch new notifications
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
+
+        // Show toast notification
+        if (message.data?.title) {
+          toast.info(message.data.title, {
+            description: message.data.message,
+          });
         }
-      },
-    });
+      });
 
-    // Monitor connection state
-    client.connection.on("connected", () => {
-      setIsConnected(true);
-      setConnectionState("connected");
-      console.log("Ably connected");
-    });
+      setAblyClient(client);
+    };
 
-    client.connection.on("disconnected", () => {
-      setIsConnected(false);
-      setConnectionState("disconnected");
-      console.log("Ably disconnected");
-    });
-
-    client.connection.on("failed", () => {
-      setIsConnected(false);
-      setConnectionState("failed");
-      console.error("Ably connection failed");
-    });
-
-    // Subscribe to user's notification channel
-    const channel = client.channels.get(`notifications:${userId}`);
-
-    channel.subscribe("notification", (message) => {
-      console.log("New notification received:", message.data);
-
-      // Invalidate queries to fetch new notifications
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
-
-      // Show toast notification
-      if (message.data?.title) {
-        toast.info(message.data.title, {
-          description: message.data.message,
-        });
-      }
-    });
-
-    setAblyClient(client);
+    initAbly();
 
     return () => {
-      channel.unsubscribe();
-      client.close();
+      if (channel) channel.unsubscribe();
+      if (client) client.close();
     };
   }, [userId, isEnabled, getToken, queryClient]);
 
