@@ -209,6 +209,12 @@ export function useProjectEditForm(slug: string) {
     isLoadingProject,
     project: projectData,
     handleLogoUpload,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit: form.handleSubmit(onSubmit, (errors) => {
+      console.log("Form validation errors:", errors);
+      const errorMessages = Object.values(errors)
+        .map((err: any) => err.message)
+        .join(", ");
+      toast.error(`Please check the form: ${errorMessages}`);
+    }),
   };
 }
