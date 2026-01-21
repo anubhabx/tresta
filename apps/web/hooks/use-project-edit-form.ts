@@ -158,9 +158,9 @@ export function useProjectEditForm(slug: string) {
       // Parse tags from comma-separated string
       const tags = data.tagsInput
         ? data.tagsInput
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter((tag) => tag.length > 0)
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
         : [];
 
       // Create update payload
