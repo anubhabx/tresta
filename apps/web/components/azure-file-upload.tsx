@@ -214,9 +214,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                         <p className="text-sm font-medium truncate">
                           {fileName || "File uploaded"}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {displayUrl}
-                        </p>
+
                       </div>
                       <Button
                         type="button"
