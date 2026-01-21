@@ -60,9 +60,9 @@ export function BrandingSection({
           accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
           maxSizeMB={5}
           preview
-          onUploadComplete={(blobUrl) => {
-            console.log("Logo uploaded to Azure:", blobUrl);
-          }}
+          // onUploadComplete={(blobUrl) => {
+          //   console.log("Logo uploaded to Azure:", blobUrl);
+          // }}
         />
 
         <Separator />
