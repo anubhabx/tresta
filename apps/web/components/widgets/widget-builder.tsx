@@ -23,7 +23,7 @@ export function WidgetBuilder({
   projectSlug,
   projectId,
   widgetId,
-  mode
+  mode,
 }: WidgetBuilderProps) {
   const router = useRouter();
 
@@ -36,7 +36,7 @@ export function WidgetBuilder({
     showAvatar: DEFAULT_WIDGET_CONFIG.showAvatar,
     maxTestimonials: 6,
     autoRotate: false,
-    rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
+    rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
   };
 
   const [previewConfig, setPreviewConfig] =
@@ -70,12 +70,15 @@ export function WidgetBuilder({
         theme: (widget.config.theme as any) || DEFAULT_WIDGET_CONFIG.theme,
         primaryColor:
           widget.config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
-        showRating: widget.config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,
-        showAvatar: widget.config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
+        showRating:
+          widget.config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,
+        showAvatar:
+          widget.config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
         maxTestimonials:
-          widget.config.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
+          widget.config.maxTestimonials ||
+          DEFAULT_WIDGET_CONFIG.maxTestimonials,
         autoRotate: false,
-        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
+        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
       });
     }
   }, [mode, widget]);
@@ -93,18 +96,18 @@ export function WidgetBuilder({
         showAvatar: data.showAvatar,
         maxTestimonials: data.maxTestimonials,
         autoRotate: false,
-        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval
+        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
       };
 
       if (mode === "create") {
         await createWidget.mutateAsync({
           projectId,
-          config: mutationPayload
+          config: mutationPayload,
         });
         toast.success("Widget created successfully!");
       } else {
         await updateWidget.mutateAsync({
-          config: mutationPayload
+          config: mutationPayload,
         });
         toast.success("Widget updated successfully!");
       }
@@ -168,12 +171,19 @@ export function WidgetBuilder({
                 <div>
                   <h3 className="font-semibold text-sm">Live Preview</h3>
                   <p className="text-xs text-muted-foreground">
-                    {previewConfig.layout.charAt(0).toUpperCase() + previewConfig.layout.slice(1)} · {previewConfig.theme === "auto" ? "System" : previewConfig.theme.charAt(0).toUpperCase() + previewConfig.theme.slice(1)} theme
+                    {previewConfig.layout.charAt(0).toUpperCase() +
+                      previewConfig.layout.slice(1)}{" "}
+                    ·{" "}
+                    {previewConfig.theme === "auto"
+                      ? "System"
+                      : previewConfig.theme.charAt(0).toUpperCase() +
+                        previewConfig.theme.slice(1)}{" "}
+                    theme
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-4 h-4 rounded-full border" 
+                  <div
+                    className="w-4 h-4 rounded-full border"
                     style={{ backgroundColor: previewConfig.primaryColor }}
                     title={`Accent: ${previewConfig.primaryColor}`}
                   />
@@ -183,7 +193,6 @@ export function WidgetBuilder({
             <div className="p-6">
               <WidgetPreview config={previewConfig} widgetId={widgetId} />
             </div>
-          </div>
           </div>
         </div>
       </div>

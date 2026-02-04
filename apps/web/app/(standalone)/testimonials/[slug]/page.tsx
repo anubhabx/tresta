@@ -266,13 +266,13 @@ export default function TestimonialSubmissionPage({
 
       const headers: Record<string, string> = {};
       if (!consented) {
-        headers['x-anonymous-submission'] = 'true';
+        headers["x-anonymous-submission"] = "true";
       }
 
       await publicApi.post<ApiResponse<unknown>>(
         `/api/public/projects/${slug}/testimonials`,
         payload,
-        { headers }
+        { headers },
       );
 
       setIsSuccess(true);
@@ -281,7 +281,9 @@ export default function TestimonialSubmissionPage({
       setIsGoogleVerified(false);
 
       if (!consented) {
-        toast.success("Thank you! Your testimonial has been submitted anonymously (no IP/Device data stored).");
+        toast.success(
+          "Thank you! Your testimonial has been submitted anonymously (no IP/Device data stored).",
+        );
       } else {
         toast.success("Thank you! Your testimonial has been submitted.");
       }
@@ -293,8 +295,7 @@ export default function TestimonialSubmissionPage({
           error?.response?.data?.message ||
           "It looks like you've already shared your experience.";
         const details =
-          error?.response?.data?.error?.details ||
-          error?.response?.data?.data;
+          error?.response?.data?.error?.details || error?.response?.data?.data;
 
         if (details?.createdAt) {
           setExistingSubmissionCreatedAt(details.createdAt);
@@ -307,7 +308,7 @@ export default function TestimonialSubmissionPage({
       } else {
         toast.error(
           error?.response?.data?.message ||
-          "Failed to submit testimonial. Please try again.",
+            "Failed to submit testimonial. Please try again.",
         );
       }
     } finally {
@@ -318,9 +319,9 @@ export default function TestimonialSubmissionPage({
 
   const formattedExistingDate = existingSubmissionCreatedAt
     ? new Intl.DateTimeFormat(undefined, {
-      dateStyle: "long",
-      timeStyle: "short",
-    }).format(new Date(existingSubmissionCreatedAt))
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(new Date(existingSubmissionCreatedAt))
     : null;
 
   if (hasExistingSubmission) {
@@ -339,9 +340,7 @@ export default function TestimonialSubmissionPage({
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold mb-3">
-                  Already Submitted
-                </h1>
+                <h1 className="text-2xl font-bold mb-3">Already Submitted</h1>
                 <p className="text-muted-foreground">
                   Thanks for your enthusiasm! We already have your testimonial
                   on file.
@@ -402,8 +401,8 @@ export default function TestimonialSubmissionPage({
               >
                 <h1 className="text-3xl font-bold mb-3">Thank You!</h1>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Your testimonial has been submitted and is pending review.
-                  We truly appreciate your feedback!
+                  Your testimonial has been submitted and is pending review. We
+                  truly appreciate your feedback!
                 </p>
               </motion.div>
 
@@ -423,10 +422,13 @@ export default function TestimonialSubmissionPage({
                     size="icon"
                     onClick={() => {
                       const text = `I just shared my testimonial for ${project?.name || "this product"}! 🎉`;
-                      const url = typeof window !== "undefined" ? window.location.origin : "";
+                      const url =
+                        typeof window !== "undefined"
+                          ? window.location.origin
+                          : "";
                       window.open(
                         `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-                        "_blank"
+                        "_blank",
                       );
                     }}
                     className="h-10 w-10"
@@ -438,10 +440,13 @@ export default function TestimonialSubmissionPage({
                     size="icon"
                     onClick={() => {
                       const text = `I just shared my testimonial for ${project?.name || "this product"}!`;
-                      const url = typeof window !== "undefined" ? window.location.origin : "";
+                      const url =
+                        typeof window !== "undefined"
+                          ? window.location.origin
+                          : "";
                       window.open(
                         `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`,
-                        "_blank"
+                        "_blank",
                       );
                     }}
                     className="h-10 w-10"
@@ -452,7 +457,7 @@ export default function TestimonialSubmissionPage({
 
                 {project && (
                   <Button variant="ghost" asChild className="mt-4">
-                    <Link href={project.url || "/"}>
+                    <Link href={project.websiteUrl || "/"}>
                       Visit {project.name}
                     </Link>
                   </Button>
@@ -508,7 +513,9 @@ export default function TestimonialSubmissionPage({
                     />
                   </div>
                 )}
-                <CardTitle className="text-2xl">Share your experience</CardTitle>
+                <CardTitle className="text-2xl">
+                  Share your experience
+                </CardTitle>
                 <CardDescription className="text-base">
                   Tell us about your experience with {project?.name || "us"}
                 </CardDescription>
@@ -550,9 +557,14 @@ export default function TestimonialSubmissionPage({
                   <div className="bg-success/5 border border-success/20 rounded-lg p-3 flex items-center gap-3">
                     <ShieldCheck className="h-5 w-5 text-success" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Verified with Google</p>
+                      <p className="text-sm font-medium">
+                        Verified with Google
+                      </p>
                     </div>
-                    <Badge variant="secondary" className="bg-success/10 text-success border-0">
+                    <Badge
+                      variant="secondary"
+                      className="bg-success/10 text-success border-0"
+                    >
                       Verified
                     </Badge>
                   </div>
@@ -562,13 +574,11 @@ export default function TestimonialSubmissionPage({
 
                 {/* Rating - Centered and prominent */}
                 <div className="text-center space-y-2">
-                  <label className="text-sm font-medium">
-                    How would you rate us?
-                  </label>
                   <CustomFormField
                     type="rating"
                     control={form.control}
                     name="rating"
+                    label="How would you rate us?"
                     max={5}
                     optional
                   />
@@ -649,6 +659,7 @@ export default function TestimonialSubmissionPage({
                       type="url"
                       control={form.control}
                       name="videoUrl"
+                      label="Video URL"
                       placeholder="https://youtube.com/watch?v=..."
                       description="YouTube, Vimeo, or Loom link"
                       optional
@@ -747,8 +758,7 @@ export default function TestimonialSubmissionPage({
                           className="w-full gap-2"
                           size="lg"
                         >
-                          <ShieldCheck className="h-4 w-4" />
-                          I Consent & Submit
+                          <ShieldCheck className="h-4 w-4" />I Consent & Submit
                         </Button>
 
                         <Button
