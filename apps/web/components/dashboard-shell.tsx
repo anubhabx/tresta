@@ -1,19 +1,19 @@
 "use client";
 
 import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
 import UISidebar from "@/components/ui-sidebar";
 import UIBreadcrumb from "@/components/ui-breadcrumbs";
 import { useUIStore } from "@/store/ui-store";
 import {
   SidebarProvider,
-  SidebarTrigger,
+  SidebarTrigger
 } from "@workspace/ui/components/sidebar";
 import { TooltipProvider } from "@workspace/ui/components/tooltip";
-import { Button } from "@workspace/ui/components/button";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
-import { NotificationBadge, NotificationCenter } from "@/components/notifications";
+import {
+  NotificationBadge,
+  NotificationCenter
+} from "@/components/notifications";
+import { CommandPalette } from "@/components/command-palette";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -25,25 +25,13 @@ interface DashboardShellProps {
  */
 export function DashboardShell({ children }: DashboardShellProps) {
   const { sidebarOpen, toggleSidebar } = useUIStore();
-  const pathname = usePathname();
-
-  /**
-   * Conditionally show "New Project" button based on current route
-   * Button appears on:
-   * - /dashboard - Main dashboard page
-   * - /projects - Projects list page
-   *
-   * Button hidden on:
-   * - /projects/new - New project form
-   * - /projects/[slug] - Project detail page
-   * - /projects/[slug]/edit - Edit project form
-   */
-  const showNewProjectButton =
-    pathname === "/dashboard" || pathname === "/projects";
 
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={toggleSidebar}>
       <TooltipProvider>
+        {/* Global Command Palette (⌘K) */}
+        <CommandPalette />
+        
         <div className="flex min-h-svh w-full overflow-x-hidden">
           <UISidebar />
           <div className="flex-1 w-full min-w-0 p-0 sm:p-2">
@@ -58,17 +46,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 </div>
               </div>
               <NotificationCenter />
-              <div className="w-full min-w-0 overflow-x-hidden">
-                {children}
-              </div>
-              {showNewProjectButton && (
-                <Link href="/projects/new" className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
-                  <Button className="flex items-center gap-2 shadow-lg h-12 sm:h-10 px-4 sm:px-4">
-                    <PlusIcon className="h-5 w-5 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">New Project</span>
-                  </Button>
-                </Link>
-              )}
+              <div className="w-full min-w-0 overflow-x-hidden">{children}</div>
             </div>
           </div>
         </div>

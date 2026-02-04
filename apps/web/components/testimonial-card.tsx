@@ -177,7 +177,7 @@ export function TestimonialCard({
       <CardContent className="p-6 h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className="flex items-start gap-2 flex-1 min-w-0">
             <CustomAvatar
               src={testimonial.authorAvatar}
               name={testimonial.authorName}
@@ -226,7 +226,7 @@ export function TestimonialCard({
         </p>
 
         {/* Metadata */}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
           {testimonial.rating && (
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, index) => (

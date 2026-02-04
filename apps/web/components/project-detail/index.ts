@@ -4,3 +4,4 @@ export { ProjectOverviewTab } from "./project-overview-tab";
 export { ProjectSettingsTab } from "./project-settings-tab";
 export { ProjectWidgetsTab } from "./project-widgets-tab";
 export { ProjectApiKeysTab } from "./project-api-keys-tab";
+export { EmbedDialog } from "./embed-dialog";

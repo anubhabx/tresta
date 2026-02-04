@@ -19,17 +19,13 @@ import {
 
 const MIN_MAX_TESTIMONIALS = 20;
 
-
 const widgetFormSchema = z.object({
-  layout: z.enum(["grid", "list"]),
+  layout: z.enum(["carousel", "grid", "masonry", "wall", "list"]),
   theme: z.enum(["light", "dark", "auto"]),
-  primaryColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/),
+  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   showRating: z.boolean(),
   showAvatar: z.boolean(),
   maxTestimonials: z.number().min(1).max(MIN_MAX_TESTIMONIALS),
-  // autoRotate and rotateInterval removed as they are carousel-specific
   autoRotate: z.boolean().optional(),
   rotateInterval: z.number().optional(),
 });
@@ -123,8 +119,14 @@ export function WidgetForm({
 }
 
 function getInitialValues(config?: WidgetConfig) {
+  // Normalize layout to one of the 5 valid options
+  const validLayouts = ["carousel", "grid", "masonry", "wall", "list"];
+  const normalizedLayout = validLayouts.includes(config?.layout || "")
+    ? config!.layout
+    : "grid";
+
   const normalized = {
-    layout: config?.layout === "list" ? "list" : "grid",
+    layout: normalizedLayout,
     theme: config?.theme || DEFAULT_WIDGET_CONFIG.theme,
     primaryColor: config?.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
     showRating:

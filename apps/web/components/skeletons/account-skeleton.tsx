@@ -68,7 +68,7 @@ export function AccountSettingsSkeleton() {
           <CardContent className="space-y-3">
             {[1, 2].map((i) => (
               <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Skeleton className="h-10 w-10 rounded" /> {/* Provider icon */}
                   <div className="space-y-1">
                     <Skeleton className="h-4 w-24" /> {/* Provider name */}

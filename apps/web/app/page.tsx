@@ -4,7 +4,6 @@ import { SocialProof } from "@/components/landing/social-proof";
 import { Features } from "@/components/landing/features";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { InteractiveDemo } from "@/components/landing/interactive-demo";
-import { Testimonials } from "@/components/landing/testimonials";
 import { Pricing } from "@/components/landing/pricing";
 import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
@@ -15,6 +14,7 @@ export default function Page() {
       <LandingNavbar />
       <main className="flex-1">
         <Hero />
+        <SocialProof />
         <div id="features">
           <Features />
         </div>

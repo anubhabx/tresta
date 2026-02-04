@@ -89,7 +89,7 @@ export function GettingStartedCardSkeleton() {
       <CardContent>
         <ul className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <li key={i} className="flex items-start gap-3">
+            <li key={i} className="flex items-start gap-2">
               <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
               <Skeleton className="h-4 flex-1" />
             </li>

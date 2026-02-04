@@ -13,7 +13,7 @@ import { Separator } from "@workspace/ui/components/separator";
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen bg-muted/40 flex items-center justify-center px-4 py-12">
-      <Card className="max-w-2xl w-full shadow-xl border-border/70">
+      <Card className="max-w-lg w-full shadow-xl border-border/70">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <div className="p-4 rounded-full bg-primary/10">

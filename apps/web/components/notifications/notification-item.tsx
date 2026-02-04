@@ -44,7 +44,7 @@ export function NotificationItem({ notification, onClose }: NotificationItemProp
         !notification.isRead && "bg-info-highlight-bg"
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2">
         {!notification.isRead && (
           <div className="mt-2 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
         )}

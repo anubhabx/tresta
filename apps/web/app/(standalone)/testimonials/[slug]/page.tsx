@@ -6,9 +6,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Ban, CheckCircle2, MessageSquare, ShieldCheck } from "lucide-react";
+import {
+  Ban,
+  CheckCircle2,
+  MessageSquare,
+  ShieldCheck,
+  Star,
+  Share2,
+  Twitter,
+  Linkedin,
+  Copy,
+  Check,
+} from "lucide-react";
 import axios from "axios";
-import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
+import { motion, AnimatePresence } from "framer-motion";
+import type {
+  ApiResponse,
+  CreateTestimonialPayload,
+  Project,
+} from "@/types/api";
 import { AzureFileUpload } from "@/components/azure-file-upload";
 import { GoogleOAuthProvider } from "@/components/google-oauth-provider";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
@@ -33,6 +49,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@workspace/ui/components/avatar";
 import { Info } from "lucide-react";
 
 // Public API client (no credentials/cookie, no auth header)
@@ -304,126 +325,198 @@ export default function TestimonialSubmissionPage({
 
   if (hasExistingSubmission) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-lg w-full">
-          <CardContent className="pt-12 pb-12 text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="p-4 rounded-full bg-primary/10">
-                <Ban className="h-16 w-16 text-primary" />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card className="max-w-lg w-full">
+            <CardContent className="pt-12 pb-12 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Ban className="h-8 w-8 text-primary" />
+                </div>
               </div>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-3">
-                Testimonial Already Submitted
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Thanks again for your enthusiasm! Each customer can submit
-                one testimonial per project, and we already have yours on
-                file.
-              </p>
-            </div>
-            {formattedExistingDate && (
-              <p className="text-sm text-muted-foreground">
-                Submitted on {formattedExistingDate}
-              </p>
-            )}
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button asChild size="lg">
-                <Link href={`/testimonials/${slug}`}>
-                  View Other Testimonials
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                asChild
-                className="border-dashed"
-              >
-                <a href="mailto:support@tresta.app?subject=Testimonial%20Update">
-                  Need to update yours?
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div>
+                <h1 className="text-2xl font-bold mb-3">
+                  Already Submitted
+                </h1>
+                <p className="text-muted-foreground">
+                  Thanks for your enthusiasm! We already have your testimonial
+                  on file.
+                </p>
+              </div>
+              {formattedExistingDate && (
+                <p className="text-sm text-muted-foreground">
+                  Submitted on {formattedExistingDate}
+                </p>
+              )}
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Button asChild>
+                  <Link href={`/testimonials/${slug}`}>View Testimonials</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <a href="mailto:support@tresta.app?subject=Testimonial%20Update">
+                    Need to update yours?
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     );
   }
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-lg w-full">
-          <CardContent className="pt-12 pb-12 text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-full bg-success-muted">
-                <CheckCircle2 className="h-16 w-16 text-success" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold mb-3">Thank You!</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Your testimonial has been submitted successfully. We truly
-              appreciate your feedback!
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+          <Card className="max-w-lg w-full">
+            <CardContent className="pt-12 pb-12 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  delay: 0.2,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                }}
+                className="flex justify-center mb-6"
+              >
+                <div className="h-20 w-20 rounded-full bg-success/10 flex items-center justify-center">
+                  <CheckCircle2 className="h-10 w-10 text-success" />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <h1 className="text-3xl font-bold mb-3">Thank You!</h1>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Your testimonial has been submitted and is pending review.
+                  We truly appreciate your feedback!
+                </p>
+              </motion.div>
+
+              {/* Social Sharing */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="space-y-4"
+              >
+                <p className="text-sm text-muted-foreground">
+                  Share your experience
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      const text = `I just shared my testimonial for ${project?.name || "this product"}! 🎉`;
+                      const url = typeof window !== "undefined" ? window.location.origin : "";
+                      window.open(
+                        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                        "_blank"
+                      );
+                    }}
+                    className="h-10 w-10"
+                  >
+                    <Twitter className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      const text = `I just shared my testimonial for ${project?.name || "this product"}!`;
+                      const url = typeof window !== "undefined" ? window.location.origin : "";
+                      window.open(
+                        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`,
+                        "_blank"
+                      );
+                    }}
+                    className="h-10 w-10"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {project && (
+                  <Button variant="ghost" asChild className="mt-4">
+                    <Link href={project.url || "/"}>
+                      Visit {project.name}
+                    </Link>
+                  </Button>
+                )}
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <GoogleOAuthProvider>
-      <div className="min-h-screen flex items-center justify-center p-4 w-full">
-        <Card className="max-w-6xl w-full">
-          <CardHeader className="space-y-1 pb-6">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+        <Card className="max-w-lg w-full">
+          <CardHeader className="text-center pb-2">
             {isLoading ? (
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-10 w-10 rounded-lg bg-muted animate-pulse" />
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
                 <div className="space-y-2">
-                  <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-                  <div className="h-4 w-64 bg-muted animate-pulse rounded" />
+                  <div className="h-6 w-48 bg-muted animate-pulse rounded mx-auto" />
+                  <div className="h-4 w-64 bg-muted animate-pulse rounded mx-auto" />
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3 mb-2">
+              <>
                 {project?.logoUrl ? (
-                  <img
-                    src={project.logoUrl}
-                    alt={`${project.name} Logo`}
-                    className="h-12 w-12 object-contain rounded-lg bg-white p-1 border"
-                  />
+                  <Avatar className="h-16 w-16 mx-auto mb-4">
+                    <AvatarImage
+                      src={project.logoUrl}
+                      alt={`${project.name} Logo`}
+                    />
+                    <AvatarFallback className="bg-primary/10">
+                      <MessageSquare className="h-6 w-6 text-primary" />
+                    </AvatarFallback>
+                  </Avatar>
                 ) : (
                   <div
-                    className="p-2 rounded-lg"
+                    className="h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center"
                     style={{
                       backgroundColor: project?.brandColorPrimary
-                        ? `${project.brandColorPrimary}15` // 10% opacity
+                        ? `${project.brandColorPrimary}15`
                         : "hsl(var(--primary) / 0.1)",
                     }}
                   >
                     <MessageSquare
                       className="h-6 w-6"
                       style={{
-                        color: project?.brandColorPrimary || "hsl(var(--primary))",
+                        color:
+                          project?.brandColorPrimary || "hsl(var(--primary))",
                       }}
                     />
                   </div>
                 )}
-                <div>
-                  <CardTitle className="text-2xl font-bold">
-                    Share Your Experience with {project?.name || "Us"}
-                  </CardTitle>
-                  <CardDescription className="text-base mt-1">
-                    Your feedback helps us improve and inspires others
-                  </CardDescription>
-                </div>
-              </div>
+                <CardTitle className="text-2xl">Share your experience</CardTitle>
+                <CardDescription className="text-base">
+                  Tell us about your experience with {project?.name || "us"}
+                </CardDescription>
+              </>
             )}
           </CardHeader>
 
-          <Separator />
-
-          <CardContent className="pt-6">
+          <CardContent className="pt-4">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -431,23 +524,20 @@ export default function TestimonialSubmissionPage({
               >
                 {/* Google Sign-In Section */}
                 {!isGoogleVerified && (
-                  <div className="bg-muted/50 rounded-lg p-6 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold">
-                        Verify with Google (Recommended)
-                      </h3>
+                  <div className="rounded-lg border border-dashed p-4 text-center space-y-3">
+                    <div className="flex items-center justify-center gap-2 text-sm font-medium">
+                      <ShieldCheck className="h-4 w-4 text-primary" />
+                      Verify with Google (Recommended)
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Sign in with Google to auto-fill your information and add
-                      a verified badge to your testimonial
+                    <p className="text-xs text-muted-foreground">
+                      Auto-fill your info and get a verified badge
                     </p>
                     <div className="flex justify-center">
                       <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleError}
                         useOneTap
-                        size="large"
+                        size="medium"
                         text="continue_with"
                         shape="rectangular"
                       />
@@ -457,122 +547,116 @@ export default function TestimonialSubmissionPage({
 
                 {/* Verified Badge */}
                 {isGoogleVerified && (
-                  <div className="bg-success-muted border border-border rounded-lg p-4 flex items-center gap-3">
+                  <div className="bg-success/5 border border-success/20 rounded-lg p-3 flex items-center gap-3">
                     <ShieldCheck className="h-5 w-5 text-success" />
                     <div className="flex-1">
-                      <p className="font-medium">
-                        Verified with Google
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Your testimonial will display a verified badge
-                      </p>
+                      <p className="text-sm font-medium">Verified with Google</p>
                     </div>
-                    <Badge
-                      variant="secondary"
-                      className="bg-success text-success-foreground"
-                    >
+                    <Badge variant="secondary" className="bg-success/10 text-success border-0">
                       Verified
                     </Badge>
                   </div>
                 )}
 
-                {isGoogleVerified && <Separator />}
+                <Separator />
 
-                {/* Name Field */}
-                <CustomFormField
-                  type="text"
-                  control={form.control}
-                  name="authorName"
-                  label="Your Name"
-                  placeholder="John Doe"
-                  required
-                />
+                {/* Rating - Centered and prominent */}
+                <div className="text-center space-y-2">
+                  <label className="text-sm font-medium">
+                    How would you rate us?
+                  </label>
+                  <CustomFormField
+                    type="rating"
+                    control={form.control}
+                    name="rating"
+                    max={5}
+                    optional
+                  />
+                </div>
 
-                {/* Email Field - Now Required */}
-                <CustomFormField
-                  type="email"
-                  control={form.control}
-                  name="authorEmail"
-                  label="Email Address"
-                  placeholder="john@example.com"
-                  description="Required for identity verification and data rights."
-                  required
-                />
-
-                {/* Role Field */}
-                <CustomFormField
-                  type="text"
-                  control={form.control}
-                  name="authorRole"
-                  label="Your Role"
-                  placeholder="e.g., CEO, Marketing Manager, Developer"
-                  description="Your job title or role"
-                  optional
-                />
-
-                {/* Company Field */}
-                <CustomFormField
-                  type="text"
-                  control={form.control}
-                  name="authorCompany"
-                  label="Company Name"
-                  placeholder="e.g., Acme Inc."
-                  description="The company or organization you represent"
-                  optional
-                />
-
-                {/* Avatar Upload - only show if not using Google */}
-                {!isGoogleVerified && (
-                  <div className="space-y-2">
-                    <AzureFileUpload
-                      control={form.control}
-                      name="authorAvatar"
-                      label="Profile Picture (Optional)"
-                      directory="avatars"
-                      accept="image/png,image/jpeg,image/jpg,image/webp"
-                      maxSizeMB={2}
-                      description="JPG, PNG, or WebP (max 2MB)"
-                    />
-                  </div>
-                )}
-
-                <Separator className="my-6" />
-
-                {/* Rating Field */}
-                <CustomFormField
-                  type="rating"
-                  control={form.control}
-                  name="rating"
-                  label="Rating"
-                  description="How would you rate your experience?"
-                  max={5}
-                  optional
-                />
-
-                {/* Content Field */}
+                {/* Testimonial Content */}
                 <CustomFormField
                   type="textarea"
                   control={form.control}
                   name="content"
-                  label="Your Testimonial"
-                  placeholder="Share your experience, what you liked, and how it helped you..."
+                  label="Your testimonial"
+                  placeholder="What did you like? How did it help you?"
                   maxLength={2000}
                   showCharacterCount
                   required
                 />
 
-                {/* Video URL Field */}
-                <CustomFormField
-                  type="url"
-                  control={form.control}
-                  name="videoUrl"
-                  label="Video Testimonial URL"
-                  placeholder="https://youtube.com/watch?v=..."
-                  description="Add a link to your video testimonial (YouTube, Vimeo, etc.)"
-                  optional
-                />
+                {/* Name & Email side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <CustomFormField
+                    type="text"
+                    control={form.control}
+                    name="authorName"
+                    label="Your Name"
+                    placeholder="John Doe"
+                    required
+                  />
+                  <CustomFormField
+                    type="email"
+                    control={form.control}
+                    name="authorEmail"
+                    label="Email"
+                    placeholder="john@example.com"
+                    required
+                  />
+                </div>
 
-                <Separator className="my-6" />
+                {/* Role & Company side by side */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <CustomFormField
+                    type="text"
+                    control={form.control}
+                    name="authorRole"
+                    label="Role"
+                    placeholder="CEO, Developer, etc."
+                    optional
+                  />
+                  <CustomFormField
+                    type="text"
+                    control={form.control}
+                    name="authorCompany"
+                    label="Company"
+                    placeholder="Acme Inc."
+                    optional
+                  />
+                </div>
+
+                {/* Avatar Upload - only show if not using Google */}
+                {!isGoogleVerified && (
+                  <AzureFileUpload
+                    control={form.control}
+                    name="authorAvatar"
+                    label="Profile Picture"
+                    directory="avatars"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    maxSizeMB={2}
+                    description="Optional · JPG, PNG, or WebP (max 2MB)"
+                  />
+                )}
+
+                {/* Video URL - collapsed by default */}
+                <details className="group">
+                  <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+                    + Add video testimonial
+                  </summary>
+                  <div className="mt-3">
+                    <CustomFormField
+                      type="url"
+                      control={form.control}
+                      name="videoUrl"
+                      placeholder="https://youtube.com/watch?v=..."
+                      description="YouTube, Vimeo, or Loom link"
+                      optional
+                    />
+                  </div>
+                </details>
+
+                <Separator />
 
                 {/* Submit Button */}
                 <Button
@@ -589,14 +673,15 @@ export default function TestimonialSubmissionPage({
                   {isSubmitting ? "Submitting..." : "Submit Testimonial"}
                 </Button>
 
-                <div className="flex items-center justify-center gap-2 mt-4">
+                {/* Privacy info link */}
+                <div className="flex items-center justify-center">
                   <Dialog>
                     <DialogTrigger asChild>
                       <button
                         type="button"
-                        className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1.5 transition-colors"
+                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                       >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-3 w-3" />
                         How we use your data
                       </button>
                     </DialogTrigger>
@@ -604,42 +689,29 @@ export default function TestimonialSubmissionPage({
                       <DialogHeader>
                         <DialogTitle>How we use your data</DialogTitle>
                         <DialogDescription>
-                          We value your privacy and transparency. Here's exactly what happens when you submit a testimonial.
+                          We value your privacy and transparency.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4 pt-2">
                         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                           <h4 className="font-semibold text-foreground flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-green-500" />
+                            <span className="h-2 w-2 rounded-full bg-success" />
                             Publicly Visible
                           </h4>
-                          <p className="text-sm text-muted-foreground">
-                            The following information will be displayed publicly on the project's website:
-                          </p>
-                          <ul className="text-sm list-disc pl-5 space-y-1">
-                            <li>Your Name</li>
-                            <li>Your Role & Company</li>
-                            <li>Your Profile Picture (if provided)</li>
-                            <li>Your Testimonial Content</li>
-                            <li>Your Video (if provided)</li>
+                          <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                            <li>Name, Role & Company</li>
+                            <li>Profile Picture</li>
+                            <li>Testimonial Content & Video</li>
                           </ul>
                         </div>
-
                         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                           <h4 className="font-semibold text-foreground flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-orange-500" />
+                            <span className="h-2 w-2 rounded-full bg-warning" />
                             Kept Private
                           </h4>
-                          <p className="text-sm text-muted-foreground">
-                            These are <strong>never</strong> shared publicly:
-                          </p>
-                          <ul className="text-sm list-disc pl-5 space-y-1">
-                            <li>
-                              <strong>Email Address:</strong> Used only for verification and sending you a copy of your submission. We will never sell your email.
-                            </li>
-                            <li>
-                              <strong>IP Address & Device Info:</strong> Used strictly for spam detection and security.
-                            </li>
+                          <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                            <li>Email Address (verification only)</li>
+                            <li>IP & Device Info (spam prevention)</li>
                           </ul>
                         </div>
                       </div>
@@ -648,22 +720,24 @@ export default function TestimonialSubmissionPage({
                 </div>
 
                 {/* Privacy Consent Dialog */}
-                <Dialog open={isPrivacyDialogOpen} onOpenChange={setIsPrivacyDialogOpen}>
+                <Dialog
+                  open={isPrivacyDialogOpen}
+                  onOpenChange={setIsPrivacyDialogOpen}
+                >
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Data Privacy Consent</DialogTitle>
+                      <DialogTitle>Data Privacy</DialogTitle>
                       <DialogDescription>
-                        We believe in transparency. Please choose how you would like to submit.
+                        Choose how you'd like to submit your testimonial.
                       </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
-                      <div className="bg-muted/30 p-4 rounded-lg text-sm space-y-2">
+                      <div className="bg-muted/30 p-4 rounded-lg text-sm">
                         <p>
-                          To prevent spam and ensure security, we collect technical data including your <strong>IP Address</strong> and <strong>Device Information</strong>.
-                        </p>
-                        <p className="text-muted-foreground">
-                          This data is encrypted/hashed for your privacy and is never shared publicly.
+                          We collect <strong>IP Address</strong> and{" "}
+                          <strong>Device Info</strong> to prevent spam. This
+                          data is encrypted and never shared.
                         </p>
                       </div>
 
@@ -680,9 +754,9 @@ export default function TestimonialSubmissionPage({
                         <Button
                           variant="outline"
                           onClick={() => handlePrivacyChoice(false)}
-                          className="w-full text-muted-foreground hover:text-foreground"
+                          className="w-full text-muted-foreground"
                         >
-                          Decline & Submit Anonymously (No IP/Device Data)
+                          Submit Anonymously
                         </Button>
                       </div>
                     </div>

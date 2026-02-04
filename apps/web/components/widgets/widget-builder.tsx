@@ -59,8 +59,14 @@ export function WidgetBuilder({
   // Initialize preview config with widget data when editing
   useEffect(() => {
     if (mode === "edit" && widget?.config) {
+      // Normalize layout to one of the 5 valid options
+      const validLayouts = ["carousel", "grid", "masonry", "wall", "list"];
+      const normalizedLayout = validLayouts.includes(widget.config.layout || "")
+        ? widget.config.layout
+        : "grid";
+
       setPreviewConfig({
-        layout: widget.config.layout === "list" ? "list" : "grid",
+        layout: normalizedLayout as WidgetFormData["layout"],
         theme: (widget.config.theme as any) || DEFAULT_WIDGET_CONFIG.theme,
         primaryColor:
           widget.config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
@@ -131,43 +137,53 @@ export function WidgetBuilder({
         </Button>
         <div>
           <h1 className="text-2xl font-bold">
-            {mode === "create" ? "Create New Widget" : "Edit Widget"}
+            {mode === "create" ? "Create Widget" : "Edit Widget"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {mode === "create"
-              ? "Configure and preview your widget in real-time"
-              : "Update widget configuration and see changes instantly"}
+            Configure your testimonial display and see changes instantly
           </p>
         </div>
       </div>
 
       {/* Split Layout: Form (Left) | Preview (Right) */}
-      <div className="relative grid space-x-6 lg:gap-6 space-y-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-5">
         {/* Left Column: Form */}
-        <div className="space-y-6 w-full">
-          <div className="rounded-lg border bg-card">
-            <div className="border-b p-6">
-              <h2 className="text-lg font-semibold">Widget Settings</h2>
-              <p className="text-sm text-muted-foreground">
-                Customize your widget appearance and behavior
-              </p>
-            </div>
-            <div className="p-6">
-              <WidgetForm
-                initialData={mode === "edit" ? widget : undefined}
-                onSubmit={handleSubmit}
-                onCancel={handleCancel}
-                isSubmitting={isSubmitting}
-                onConfigChange={handleConfigChange}
-              />
-            </div>
+        <div className="lg:col-span-2 space-y-6">
+          <div className="rounded-lg border bg-card p-6">
+            <WidgetForm
+              initialData={mode === "edit" ? widget : undefined}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              isSubmitting={isSubmitting}
+              onConfigChange={handleConfigChange}
+            />
           </div>
         </div>
 
         {/* Right Column: Live Preview - Sticky */}
-        <div className="lg:sticky lg:top-6 lg:h-fit lg:col-span-2">
-          <div className="rounded-lg border bg-card p-6">
-            <WidgetPreview config={previewConfig} widgetId={widgetId} />
+        <div className="lg:col-span-3 lg:sticky lg:top-6 lg:h-fit">
+          <div className="rounded-lg border bg-card overflow-hidden">
+            <div className="border-b p-4 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-sm">Live Preview</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {previewConfig.layout.charAt(0).toUpperCase() + previewConfig.layout.slice(1)} · {previewConfig.theme === "auto" ? "System" : previewConfig.theme.charAt(0).toUpperCase() + previewConfig.theme.slice(1)} theme
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-4 h-4 rounded-full border" 
+                    style={{ backgroundColor: previewConfig.primaryColor }}
+                    title={`Accent: ${previewConfig.primaryColor}`}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <WidgetPreview config={previewConfig} widgetId={widgetId} />
+            </div>
+          </div>
           </div>
         </div>
       </div>
