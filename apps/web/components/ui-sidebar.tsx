@@ -58,7 +58,11 @@ const UISidebar = () => {
   const userProjects = projectsData?.data || [];
 
   return (
-    <Sidebar className="border-none group/collapsible" collapsible="icon">
+    <Sidebar
+      className="border-none group/collapsible"
+      collapsible="icon"
+      variant="floating"
+    >
       <SidebarHeader className="text-lg font-semibold flex flex-row items-center justify-start group-data-[collapsible=icon]:justify-center">
         <Link
           href="/dashboard"
