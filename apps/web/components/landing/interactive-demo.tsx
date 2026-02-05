@@ -112,7 +112,7 @@ export function InteractiveDemo() {
 
   return (
     <section className="mx-auto bg-muted/30 px-4 py-24 md:px-8 md:py-32">
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-6xl">
         <SectionHeader
           title="See it in action"
           description="Choose a layout, toggle themes, and see how your testimonials will look."

@@ -33,7 +33,7 @@ const proofPoints = [
 export function SocialProof() {
   return (
     <section className="border-y border-border bg-muted/30 py-12">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-6xl">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
           {proofPoints.map((point, index) => (
             <motion.div

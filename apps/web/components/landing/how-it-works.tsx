@@ -33,7 +33,7 @@ export function HowItWorks() {
         description="From signup to embedded testimonials in under 2 minutes."
       />
 
-      <div className="relative mx-auto max-w-4xl">
+      <div className="relative mx-auto max-w-6xl">
         {/* Connecting Line (Desktop) */}
         <div className="absolute left-0 top-8 hidden h-0.5 w-full bg-border md:block" />
 
