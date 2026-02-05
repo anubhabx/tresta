@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
@@ -6,12 +5,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Code2, MessageSquareQuote, Star, Zap } from "lucide-react";
 import { CodeBlock } from "@workspace/ui/components/code-block";
-
-const stats = [
-  { value: "2 min", label: "to first embed" },
-  { value: "5", label: "widget layouts" },
-  { value: "1 line", label: "of code" },
-];
 
 export function Hero() {
   return (
@@ -69,25 +62,6 @@ export function Hero() {
                   See how it works
                 </Link>
               </Button>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-12 grid grid-cols-3 gap-8 border-t border-border pt-8"
-            >
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center sm:text-left">
-                  <div className="text-2xl font-bold text-foreground sm:text-3xl">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
             </motion.div>
           </div>
 
