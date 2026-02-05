@@ -7,6 +7,7 @@ import { InteractiveDemo } from "@/components/landing/interactive-demo";
 import { Pricing } from "@/components/landing/pricing";
 import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
+import { SiteFooter } from "@/components/site-footer";
 
 export default function Page() {
   return (
@@ -21,13 +22,18 @@ export default function Page() {
         <div id="how-it-works">
           <HowItWorks />
         </div>
-        <InteractiveDemo />
+        <div id="interactive-demo">
+          <InteractiveDemo />
+        </div>
         <div id="pricing">
           <Pricing />
         </div>
-        <FAQ />
+        <div id="faq">
+          <FAQ />
+        </div>
         <CTA />
       </main>
+      <SiteFooter />
     </div>
   );
 }

@@ -15,9 +15,7 @@ export default function PublicLayout({
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <LandingNavbar />
-      <main className="mx-auto">
-        {children}
-      </main>
+      <main className="mx-auto">{children}</main>
       <SiteFooter />
     </div>
   );
