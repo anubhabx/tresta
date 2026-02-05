@@ -67,3 +67,6 @@ packages/widget/dist
 **/demo*.css
 **/index.html
 packages/widget/.env
+
+# pnpm
+pnpm-lock.yaml
