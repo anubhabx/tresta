@@ -20,7 +20,7 @@ import { useForm } from "react-hook-form";
 
 import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { InlineLoader } from "./loader";
 import { CustomFormField } from "./custom-form-field";
 import { OAuthButtons } from "./auth/oauth-buttons";
@@ -33,6 +33,8 @@ const SignInFormSchema = z.object({
 const SignInForm = () => {
   const { signIn, setActive } = useSignIn();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect_url");
 
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -85,7 +87,7 @@ const SignInForm = () => {
       }
 
       toast.success("Signed in successfully!");
-      router.push("/dashboard");
+      router.push(redirectUrl || "/dashboard");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -99,10 +101,11 @@ const SignInForm = () => {
   };
 
   const onOAuthSignUp = (provider: "google" | "github") => {
+    const finalRedirect = redirectUrl || "/dashboard";
     void signIn?.authenticateWithRedirect({
       strategy: `oauth_${provider}`,
       redirectUrl: `${window.location.origin}/sso-callback`,
-      redirectUrlComplete: `${window.location.origin}/dashboard`,
+      redirectUrlComplete: `${window.location.origin}${finalRedirect.startsWith("/") ? finalRedirect : "/" + finalRedirect}`,
     });
   };
 
