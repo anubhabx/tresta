@@ -55,22 +55,26 @@ const primaryFeatures = [
 const secondaryFeatures = [
   {
     title: "OAuth Verification",
-    description: "Verify testimonial authors with Google OAuth for authentic social proof.",
+    description:
+      "Verify testimonial authors with Google OAuth for authentic social proof.",
     icon: Shield,
   },
   {
     title: "5 Widget Layouts",
-    description: "Carousel, grid, masonry, wall of love, and list views ready to embed.",
+    description:
+      "Carousel, grid, masonry, wall of love, and list views ready to embed.",
     icon: Sparkles,
   },
   {
     title: "Any Framework",
-    description: "Works with React, Vue, Svelte, vanilla JS, WordPress, Webflow, and more.",
+    description:
+      "Works with React, Vue, Svelte, vanilla JS, WordPress, Webflow, and more.",
     icon: Code,
   },
   {
     title: "GDPR Compliant",
-    description: "Built-in consent management and data handling that respects privacy.",
+    description:
+      "Built-in consent management and data handling that respects privacy.",
     icon: Check,
   },
 ];
@@ -86,14 +90,22 @@ function CollectionFormVisual() {
           <MessageSquare className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <div className="font-medium text-foreground">Share your experience</div>
+          <div className="font-medium text-foreground">
+            Share your experience
+          </div>
           <div className="text-sm text-muted-foreground">with Acme Inc</div>
         </div>
       </div>
       <div className="space-y-3">
         <div className="flex gap-1">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={cn("h-6 w-6", i < 4 ? "fill-warning text-warning" : "text-muted")} />
+            <Star
+              key={i}
+              className={cn(
+                "h-6 w-6",
+                i < 4 ? "fill-warning text-warning" : "text-muted",
+              )}
+            />
           ))}
         </div>
         <div className="h-20 rounded-md border border-border bg-muted/50 p-3">
@@ -123,7 +135,9 @@ function ModerationVisual() {
   return (
     <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">Review Queue</span>
+        <span className="text-sm font-medium text-foreground">
+          Review Queue
+        </span>
         <span className="text-xs text-muted-foreground">3 items</span>
       </div>
       <div className="space-y-2">
@@ -137,11 +151,13 @@ function ModerationVisual() {
                 "h-2 w-2 rounded-full",
                 item.status === "approved" && "bg-success",
                 item.status === "pending" && "bg-warning",
-                item.status === "rejected" && "bg-destructive"
+                item.status === "rejected" && "bg-destructive",
               )}
             />
             <div className="flex-1 min-w-0">
-              <div className="truncate text-sm text-foreground">{item.text}</div>
+              <div className="truncate text-sm text-foreground">
+                {item.text}
+              </div>
               <div className="text-xs text-muted-foreground">{item.author}</div>
             </div>
             {item.status === "pending" && (
@@ -209,7 +225,7 @@ export function Features() {
       />
 
       {/* Primary Features - Side by Side */}
-      <div className="space-y-24 lg:space-y-32">
+      <div className="space-y-24 lg:space-y-32 max-w-6xl mx-auto">
         {primaryFeatures.map((feature, index) => (
           <motion.div
             key={index}
@@ -219,7 +235,7 @@ export function Features() {
             viewport={{ once: true, margin: "-100px" }}
             className={cn(
               "flex flex-col items-center gap-8 lg:gap-16",
-              feature.align === "left" ? "lg:flex-row" : "lg:flex-row-reverse"
+              feature.align === "left" ? "lg:flex-row" : "lg:flex-row-reverse",
             )}
           >
             {/* Text Content */}
@@ -246,12 +262,12 @@ export function Features() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
-        className="mt-24 lg:mt-32"
+        className="mt-24 lg:mt-32 max-w-6xl mx-auto"
       >
         <h3 className="mb-8 text-center text-xl font-semibold text-foreground">
           Plus everything else you need
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           {secondaryFeatures.map((feature, index) => (
             <Card
               key={index}
