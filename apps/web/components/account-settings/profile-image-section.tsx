@@ -1,13 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { toast } from "sonner";
@@ -69,68 +62,67 @@ export function ProfileImageSection({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <UserCircleIcon className="h-5 w-5" />
           Profile Image
-        </CardTitle>
-        <CardDescription>Update your profile picture</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <CustomAvatar
-              src={user.imageUrl}
-              name={user.firstName || user.username || "User"}
-              alt={user.firstName || "User"}
-              className="h-24 w-24"
-            />
-            {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
-                <InlineLoader />
-              </div>
-            )}
-          </div>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Update your profile picture
+        </p>
+      </div>
 
-          <div className="flex-1 space-y-3">
-            <div className="flex gap-3">
+      <div className="flex items-center gap-6">
+        <div className="relative">
+          <CustomAvatar
+            src={user.imageUrl}
+            name={user.firstName || user.username || "User"}
+            alt={user.firstName || "User"}
+            className="h-24 w-24"
+          />
+          {imageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+              <InlineLoader />
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 space-y-3">
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={imageLoading}
+              onClick={() => document.getElementById("avatar-upload")?.click()}
+            >
+              <CameraIcon className="h-4 w-4 mr-2" />
+              Change Image
+            </Button>
+            {user.imageUrl && (
               <Button
                 variant="outline"
                 size="sm"
                 disabled={imageLoading}
-                onClick={() =>
-                  document.getElementById("avatar-upload")?.click()
-                }
+                onClick={handleRemoveImage}
               >
-                <CameraIcon className="h-4 w-4 mr-2" />
-                Change Image
+                Remove Image
               </Button>
-              {user.imageUrl && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={imageLoading}
-                  onClick={handleRemoveImage}
-                >
-                  Remove Image
-                </Button>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              JPG, PNG or GIF. Max size 5MB.
-            </p>
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-              disabled={imageLoading}
-            />
+            )}
           </div>
+          <p className="text-xs text-muted-foreground">
+            JPG, PNG or GIF. Max size 5MB.
+          </p>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={imageLoading}
+          />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

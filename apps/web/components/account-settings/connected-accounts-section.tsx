@@ -1,13 +1,6 @@
 "use client";
 
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { LinkIcon, CheckCircle2Icon } from "lucide-react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
@@ -27,15 +20,18 @@ export function ConnectedAccountsSection({
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <section>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <LinkIcon className="h-5 w-5" />
           Connected Accounts
-        </CardTitle>
-        <CardDescription>Manage your connected social accounts</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage your connected social accounts
+        </p>
+      </div>
+
+      <div className="space-y-3">
         {/* Google Account */}
         <div className="flex items-center justify-between p-4 border rounded-lg">
           <div className="flex items-center gap-3">
@@ -93,7 +89,7 @@ export function ConnectedAccountsSection({
             No social accounts connected
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

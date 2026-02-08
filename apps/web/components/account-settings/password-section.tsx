@@ -1,13 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { Label } from "@workspace/ui/components/label";
@@ -67,96 +60,96 @@ export function PasswordSection({ user, hasPassword }: PasswordSectionProps) {
 
   if (!hasPassword) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
             <ShieldCheckIcon className="h-5 w-5" />
             Password Authentication
-          </CardTitle>
-          <CardDescription>You signed in with a social account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-start gap-3 p-4 bg-info-highlight-bg border border-border/50 rounded-lg">
-            <ShieldCheckIcon className="h-5 w-5 text-info-text mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">OAuth Authentication Active</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Your account uses social sign-in (Google/GitHub) for
-                authentication. Password management is not available for
-                OAuth-only accounts.
-              </p>
-            </div>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            You signed in with a social account
+          </p>
+        </div>
+
+        <div className="flex items-start gap-3 p-4 bg-info-highlight-bg border border-border/50 rounded-lg">
+          <ShieldCheckIcon className="h-5 w-5 text-info-text mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium">OAuth Authentication Active</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Your account uses social sign-in (Google/GitHub) for
+              authentication. Password management is not available for
+              OAuth-only accounts.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <KeyIcon className="h-5 w-5" />
           Change Password
-        </CardTitle>
-        <CardDescription>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Update your password to keep your account secure
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleUpdatePassword} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
-            <Input
-              id="currentPassword"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
-              disabled={loading}
-            />
-          </div>
+        </p>
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password (min. 8 characters)"
-              disabled={loading}
-            />
-          </div>
+      <form onSubmit={handleUpdatePassword} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="currentPassword">Current Password</Label>
+          <Input
+            id="currentPassword"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Enter your current password"
+            disabled={loading}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              disabled={loading}
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="newPassword">New Password</Label>
+          <Input
+            id="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Enter new password (min. 8 characters)"
+            disabled={loading}
+          />
+        </div>
 
-          <Separator />
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm New Password</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            disabled={loading}
+          />
+        </div>
 
-          <div className="flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <InlineLoader />
-                  Updating...
-                </>
-              ) : (
-                "Update Password"
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        <Separator />
+
+        <div className="flex justify-start">
+          <Button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <InlineLoader />
+                Updating...
+              </>
+            ) : (
+              "Update Password"
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

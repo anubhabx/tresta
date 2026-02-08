@@ -1,13 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import { Label } from "@workspace/ui/components/label";
@@ -51,75 +44,74 @@ export function ProfileInformationSection({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <UserIcon className="h-5 w-5" />
           Profile Information
-        </CardTitle>
-        <CardDescription>Update your personal information</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleUpdateProfile} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Enter your first name"
-                disabled={loading}
-              />
-            </div>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Update your personal information
+        </p>
+      </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Enter your last name"
-                disabled={loading}
-              />
-            </div>
+      <form onSubmit={handleUpdateProfile} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter your first name"
+              disabled={loading}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="email"
-                type="email"
-                value={user.primaryEmailAddress?.emailAddress || ""}
-                disabled
-                className="opacity-60"
-              />
-              <MailIcon className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Email cannot be changed at this time
-            </p>
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter your last name"
+              disabled={loading}
+            />
           </div>
+        </div>
 
-          <Separator />
-
-          <div className="flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <InlineLoader />
-                  Updating...
-                </>
-              ) : (
-                "Update Profile"
-              )}
-            </Button>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <div className="flex items-center gap-2 relative">
+            <Input
+              id="email"
+              type="email"
+              value={user.primaryEmailAddress?.emailAddress || ""}
+              disabled
+              className="opacity-60"
+            />
+            <MailIcon className="h-4 w-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2" />
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          <p className="text-xs text-muted-foreground">
+            Email cannot be changed at this time
+          </p>
+        </div>
+
+        <div className="flex justify-start">
+          <Button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <InlineLoader />
+                Updating...
+              </>
+            ) : (
+              "Update Profile"
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
