@@ -7,6 +7,7 @@ import { ArrowRight, Star, Code2 } from "lucide-react";
 import { CodeBlock } from "@workspace/ui/components/code-block";
 import { useEffect, useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
+import { HeroGlow } from "@/components/ui/hero-glow";
 
 /**
  * Sample testimonials that rotate in the hero
@@ -249,11 +250,11 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      </div>
+      {/* Atmospheric hero glow — subtle radial gradients behind the hero */}
+      <HeroGlow />
+
+      {/* Bottom edge divider */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
     </section>
   );
 }
