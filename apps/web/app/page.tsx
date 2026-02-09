@@ -12,16 +12,10 @@ import { PageWrapper } from "@/components/landing/page-wrapper";
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col">
       <LandingNavbar />
       <main className="flex-1">
-        {/* 
-          PageWrapper provides two atmospheric background layers:
-          - Variant A: Animated SVG beams (Linear/Vercel aesthetic)
-          - Variant B: Subtle grid pattern with radial fade (Blueprint feel)
-          Both are combined by default. Switch variant="beams" or variant="grid" to isolate.
-        */}
-        <PageWrapper variant="combined" gridVariant="grid-small">
+        <PageWrapper gridVariant="grid-small">
           <Hero />
 
           <PainSection />

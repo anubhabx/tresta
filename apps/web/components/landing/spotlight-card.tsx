@@ -1,61 +1,124 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useMotionValue, motion, useMotionTemplate } from "motion/react";
+import React, { MouseEvent as ReactMouseEvent, useState } from "react";
+import { CanvasRevealEffect } from "./canvas-reveal-effect";
 import { cn } from "@workspace/ui/lib/utils";
 
-interface SpotlightCardProps {
-  children: React.ReactNode;
-  className?: string;
-  spotlightColor?: string;
-}
-
 /**
- * A card with cursor-following spotlight glow effect on borders.
- * Creates premium "Linear-style" hover physics.
+ * Spotlight color presets — themed variants for different feature card moods.
  */
-export function SpotlightCard({
-  children,
-  className,
-  spotlightColor = "hsl(var(--primary) / 0.15)",
-}: SpotlightCardProps) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+const spotlightVariants = {
+  /** Default blue/violet — tech, code, embedding */
+  default: {
+    color: "#1a1a2e",
+    canvasColors: [
+      [59, 130, 246],
+      [139, 92, 246],
+    ] as number[][],
+  },
+  /** Green pulse — realtime, live, active connections */
+  pulse: {
+    color: "#0a1a0a",
+    canvasColors: [
+      [34, 197, 94],
+      [16, 185, 129],
+    ] as number[][],
+  },
+  /** Amber action — moderation, approve/reject, warnings */
+  action: {
+    color: "#1a1508",
+    canvasColors: [
+      [245, 158, 11],
+      [234, 88, 12],
+    ] as number[][],
+  },
+  /** Cyan info — layouts, theming, configuration */
+  info: {
+    color: "#081a1a",
+    canvasColors: [
+      [6, 182, 212],
+      [59, 130, 246],
+    ] as number[][],
+  },
+  /** Rose — identity, verification, security */
+  rose: {
+    color: "#1a080e",
+    canvasColors: [
+      [244, 63, 94],
+      [236, 72, 153],
+    ] as number[][],
+  },
+} as const;
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setPosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
+export type SpotlightVariant = keyof typeof spotlightVariants;
+
+export const SpotlightCard = ({
+  children,
+  radius = 350,
+  color,
+  variant = "default",
+  className,
+  ...props
+}: {
+  radius?: number;
+  color?: string;
+  variant?: SpotlightVariant;
+  children: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>) => {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const preset = spotlightVariants[variant];
+
+  function handleMouseMove({
+    currentTarget,
+    clientX,
+    clientY,
+  }: ReactMouseEvent<HTMLDivElement>) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  const [isHovering, setIsHovering] = useState(false);
+  const handleMouseEnter = () => setIsHovering(true);
+  const handleMouseLeave = () => setIsHovering(false);
 
   return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300",
-        "hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
-        "hover:-translate-y-0.5",
+        "group/spotlight relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900",
         className,
       )}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      {...props}
     >
-      {/* Spotlight gradient overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300"
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-0 rounded-xl opacity-0 transition duration-300 group-hover/spotlight:opacity-100"
         style={{
-          opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
+          backgroundColor: color ?? preset.color,
+          maskImage: useMotionTemplate`
+            radial-gradient(
+              ${radius}px circle at ${mouseX}px ${mouseY}px,
+              white,
+              transparent 80%
+            )
+          `,
         }}
-      />
-
-      {/* Content */}
-      <div className="relative z-20">{children}</div>
-    </motion.div>
+      >
+        {isHovering && (
+          <CanvasRevealEffect
+            animationSpeed={5}
+            containerClassName="bg-transparent absolute inset-0 pointer-events-none"
+            colors={preset.canvasColors}
+            dotSize={3}
+          />
+        )}
+      </motion.div>
+      <div className="relative z-10">{children}</div>
+    </div>
   );
-}
+};
+

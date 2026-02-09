@@ -21,15 +21,15 @@ const testimonials = [
     author: "@shipfast_dev",
     badge: "GitHub",
     rating: 5,
-    time: "2 seconds ago",
+    time: "2 seconds ago"
   },
   {
     id: 2,
-    content: "Finally, testimonials that don't look like they're from 2015.",
+    content: "Finally, testimonials that don't look like they're from the 2015 era.",
     author: "@indie_maker",
     badge: "Google",
     rating: 5,
-    time: "just now",
+    time: "just now"
   },
   {
     id: 3,
@@ -38,7 +38,7 @@ const testimonials = [
     author: "@frontend_dev",
     badge: "GitHub",
     rating: 5,
-    time: "5 seconds ago",
+    time: "5 seconds ago"
   },
   {
     id: 4,
@@ -46,8 +46,8 @@ const testimonials = [
     author: "@saas_founder",
     badge: "Google",
     rating: 5,
-    time: "just now",
-  },
+    time: "just now"
+  }
 ];
 
 function LiveTestimonialCard() {
@@ -63,14 +63,14 @@ function LiveTestimonialCard() {
   const testimonial = testimonials[currentIndex]!;
 
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative w-full">
       {/* Notification-style incoming indicator */}
       <motion.div
         key={testimonial.id}
         initial={{ opacity: 0, y: -10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25, duration: 1 }}
         className="absolute -top-3 left-4 z-10"
       >
         <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
@@ -89,7 +89,7 @@ function LiveTestimonialCard() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.98 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="rounded-xl border border-border bg-card p-6 shadow-lg"
+          className="rounded-xl border border-border bg-card p-6 shadow-lg h-[200px]"
         >
           <div className="flex gap-1 mb-3">
             {[...Array(testimonial.rating)].map((_, i) => (
@@ -130,7 +130,7 @@ function LiveTestimonialCard() {
               "h-1.5 rounded-full transition-all duration-300",
               i === currentIndex
                 ? "w-6 bg-primary"
-                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50",
+                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
             )}
             aria-label={`Go to testimonial ${i + 1}`}
           />
@@ -142,7 +142,7 @@ function LiveTestimonialCard() {
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-background px-4 py-24 md:px-8 md:py-32">
+    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-transparent px-4 py-24 md:px-8 md:py-32">
       <div className="container relative z-10 mx-auto max-w-6xl">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
