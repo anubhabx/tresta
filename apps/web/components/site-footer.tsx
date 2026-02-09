@@ -11,7 +11,6 @@ const productLinks = [
 ];
 
 const resourceLinks = [
-  { label: "API Docs", href: "/docs" },
   { label: "Contact Us", href: "/contact-us" },
   { label: "FAQ", href: "/#faq" },
 ];

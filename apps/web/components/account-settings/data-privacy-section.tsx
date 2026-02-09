@@ -7,7 +7,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@workspace/ui/components/alert-dialog";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
@@ -29,7 +29,7 @@ import {
   Trash2Icon,
   ShieldAlertIcon,
   Loader2,
-  InfoIcon,
+  InfoIcon
 } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
@@ -39,7 +39,7 @@ interface DataPrivacySectionProps {
 }
 
 export function DataPrivacySection({
-  onAccountDeleted,
+  onAccountDeleted
 }: DataPrivacySectionProps) {
   const { user } = useUser();
   const api = useApi();
@@ -60,22 +60,22 @@ export function DataPrivacySection({
       const widgetsPromises = projects.map((project: any) =>
         api
           .get(`/api/projects/${project.slug}/widgets`)
-          .catch(() => ({ data: { data: [] } })),
+          .catch(() => ({ data: { data: [] } }))
       );
       const widgetsResponses = await Promise.all(widgetsPromises);
       const widgets = widgetsResponses.flatMap(
-        (response) => response.data?.data || [],
+        (response) => response.data?.data || []
       );
 
       // Fetch user's testimonials (from all projects)
       const testimonialsPromises = projects.map((project: any) =>
         api
           .get(`/api/projects/${project.slug}/testimonials`)
-          .catch(() => ({ data: { data: [] } })),
+          .catch(() => ({ data: { data: [] } }))
       );
       const testimonialsResponses = await Promise.all(testimonialsPromises);
       const testimonials = testimonialsResponses.flatMap(
-        (response) => response.data?.data || [],
+        (response) => response.data?.data || []
       );
 
       // Compile all user data
@@ -88,12 +88,12 @@ export function DataPrivacySection({
           username: user.username,
           imageUrl: user.imageUrl,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
+          updatedAt: user.updatedAt
         },
         externalAccounts: user.externalAccounts?.map((account) => ({
           provider: account.provider,
           emailAddress: account.emailAddress,
-          username: account.username,
+          username: account.username
         })),
         projects: projects.map((project: any) => ({
           id: project.id,
@@ -104,7 +104,7 @@ export function DataPrivacySection({
           logo: project.logo,
           visibility: project.visibility,
           createdAt: project.createdAt,
-          updatedAt: project.updatedAt,
+          updatedAt: project.updatedAt
         })),
         widgets: widgets.map((widget: any) => ({
           id: widget.id,
@@ -113,7 +113,7 @@ export function DataPrivacySection({
           layout: widget.layout,
           config: widget.config,
           createdAt: widget.createdAt,
-          updatedAt: widget.updatedAt,
+          updatedAt: widget.updatedAt
         })),
         testimonials: testimonials.map((testimonial: any) => ({
           id: testimonial.id,
@@ -125,14 +125,14 @@ export function DataPrivacySection({
           verified: testimonial.verified,
           featured: testimonial.featured,
           status: testimonial.status,
-          createdAt: testimonial.createdAt,
+          createdAt: testimonial.createdAt
         })),
-        exportedAt: new Date().toISOString(),
+        exportedAt: new Date().toISOString()
       };
 
       // Create and download JSON file
       const blob = new Blob([JSON.stringify(userData, null, 2)], {
-        type: "application/json",
+        type: "application/json"
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -277,7 +277,7 @@ export function DataPrivacySection({
                           autoComplete="off"
                           onChange={(e) => {
                             const btn = document.getElementById(
-                              "confirm-delete-btn",
+                              "confirm-delete-btn"
                             ) as HTMLButtonElement;
                             if (btn)
                               btn.disabled =

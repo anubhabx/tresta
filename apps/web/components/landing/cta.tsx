@@ -25,7 +25,7 @@ export function CTA() {
           viewport={{ once: true }}
           className="mb-8 max-w-xl text-lg text-muted-foreground"
         >
-          Free for your first 50 testimonials. No credit card required.
+          Free for your first 10 testimonials. No credit card required.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

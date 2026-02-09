@@ -57,12 +57,6 @@ const productLinks = [
 
 const resourceLinks = [
   {
-    title: "API Docs",
-    href: "/docs",
-    description: "Fetch testimonials programmatically",
-    icon: BookOpen,
-  },
-  {
     title: "Contact Us",
     href: "/contact-us",
     description: "Get in touch with our team",

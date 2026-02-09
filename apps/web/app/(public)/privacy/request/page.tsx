@@ -58,8 +58,8 @@ export default function PrivacyRequestPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/10">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen max-w-xl flex items-center justify-center p-4 bg-muted/10">
+        <Card className="w-full">
           <CardContent className="pt-12 pb-12 text-center space-y-6">
             <div className="flex justify-center">
               <div className="p-4 rounded-full bg-primary/10">
