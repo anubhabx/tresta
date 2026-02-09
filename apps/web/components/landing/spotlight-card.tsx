@@ -14,41 +14,41 @@ const spotlightVariants = {
     color: "#1a1a2e",
     canvasColors: [
       [59, 130, 246],
-      [139, 92, 246],
-    ] as number[][],
+      [139, 92, 246]
+    ] as number[][]
   },
   /** Green pulse — realtime, live, active connections */
   pulse: {
     color: "#0a1a0a",
     canvasColors: [
       [34, 197, 94],
-      [16, 185, 129],
-    ] as number[][],
+      [16, 185, 129]
+    ] as number[][]
   },
   /** Amber action — moderation, approve/reject, warnings */
   action: {
     color: "#1a1508",
     canvasColors: [
       [245, 158, 11],
-      [234, 88, 12],
-    ] as number[][],
+      [234, 88, 12]
+    ] as number[][]
   },
   /** Cyan info — layouts, theming, configuration */
   info: {
     color: "#081a1a",
     canvasColors: [
       [6, 182, 212],
-      [59, 130, 246],
-    ] as number[][],
+      [59, 130, 246]
+    ] as number[][]
   },
   /** Rose — identity, verification, security */
   rose: {
     color: "#1a080e",
     canvasColors: [
       [244, 63, 94],
-      [236, 72, 153],
-    ] as number[][],
-  },
+      [236, 72, 153]
+    ] as number[][]
+  }
 } as const;
 
 export type SpotlightVariant = keyof typeof spotlightVariants;
@@ -73,7 +73,7 @@ export const SpotlightCard = ({
   function handleMouseMove({
     currentTarget,
     clientX,
-    clientY,
+    clientY
   }: ReactMouseEvent<HTMLDivElement>) {
     const { left, top } = currentTarget.getBoundingClientRect();
     mouseX.set(clientX - left);
@@ -88,7 +88,7 @@ export const SpotlightCard = ({
     <div
       className={cn(
         "group/spotlight relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900",
-        className,
+        className
       )}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
@@ -105,13 +105,13 @@ export const SpotlightCard = ({
               white,
               transparent 80%
             )
-          `,
+          `
         }}
       >
         {isHovering && (
           <CanvasRevealEffect
             animationSpeed={5}
-            containerClassName="bg-transparent absolute inset-0 pointer-events-none"
+            containerClassName="bg-transparent absolute inset-0 pointer-events-none opacity-50"
             colors={preset.canvasColors}
             dotSize={3}
           />
