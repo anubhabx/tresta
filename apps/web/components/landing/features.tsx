@@ -1,175 +1,220 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { SectionHeader } from "./section-header";
-import { motion } from "framer-motion";
-import {
-  Check,
-  Code,
   Link2,
-  MessageSquare,
-  Shield,
-  Sparkles,
-  Star,
+  Code2,
+  LayoutGrid,
+  Palette,
   Zap,
+  Shield,
+  Check,
+  Star,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { SectionHeader } from "./section-header";
 
 /**
- * Primary features with side-by-side layout and visual demonstrations
- * These are the key value propositions shown prominently
+ * Features Bento Grid - Stability First
+ *
+ * All content visible by default (opacity-100).
+ * CSS-only animations as enhancements.
+ * Zinc color palette with proper contrast.
  */
-const primaryFeatures = [
-  {
-    title: "Branded collection forms",
-    description:
-      "Send customers a simple link. They submit feedback in seconds. No account required for submitters.",
-    align: "left" as const,
-    visual: "collection-form",
-  },
-  {
-    title: "One-click moderation",
-    description:
-      "Approve, reject, or flag testimonials. AI auto-moderates spam and inappropriate content.",
-    align: "right" as const,
-    visual: "moderation",
-  },
-  {
-    title: "Embed with one line of code",
-    description:
-      "Copy a script tag. Paste it anywhere. Choose from 5 layouts: carousel, grid, masonry, wall, or list.",
-    align: "left" as const,
-    visual: "embed-code",
-  },
-];
+
+const layouts = ["grid", "carousel", "wall", "masonry", "list"] as const;
 
 /**
- * Secondary features displayed in a compact grid
+ * Card wrapper with hover effects (CSS-only)
  */
-const secondaryFeatures = [
-  {
-    title: "OAuth Verification",
-    description:
-      "Verify testimonial authors with Google OAuth for authentic social proof.",
-    icon: Shield,
-  },
-  {
-    title: "5 Widget Layouts",
-    description:
-      "Carousel, grid, masonry, wall of love, and list views ready to embed.",
-    icon: Sparkles,
-  },
-  {
-    title: "Any Framework",
-    description:
-      "Works with React, Vue, Svelte, vanilla JS, WordPress, Webflow, and more.",
-    icon: Code,
-  },
-  {
-    title: "GDPR Compliant",
-    description:
-      "Built-in consent management and data handling that respects privacy.",
-    icon: Check,
-  },
-];
-
-/**
- * Visual preview component for collection form feature
- */
-function CollectionFormVisual() {
+function BentoCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-          <MessageSquare className="h-5 w-5 text-primary" />
+    <div
+      className={cn(
+        "group relative overflow-hidden rounded-xl",
+        "bg-zinc-900 border border-zinc-800",
+        "transition-all duration-300",
+        "hover:border-zinc-700 hover:bg-zinc-900/80",
+        className,
+      )}
+    >
+      {/* Subtle glow on hover - CSS only */}
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-b from-primary/5 to-transparent" />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Card 1: Collect Link
+ */
+function CollectCard() {
+  return (
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <Link2 className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <div className="font-medium text-foreground">
-            Share your experience
-          </div>
-          <div className="text-sm text-muted-foreground">with Acme Inc</div>
+          <h3 className="font-semibold text-zinc-100">Collect</h3>
+          <p className="text-sm text-zinc-400">Share a link. Get feedback.</p>
         </div>
       </div>
-      <div className="space-y-3">
-        <div className="flex gap-1">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "h-6 w-6",
-                i < 4 ? "fill-warning text-warning" : "text-muted",
-              )}
-            />
-          ))}
-        </div>
-        <div className="h-20 rounded-md border border-border bg-muted/50 p-3">
-          <div className="h-3 w-3/4 rounded bg-foreground/10" />
-          <div className="mt-2 h-3 w-1/2 rounded bg-foreground/10" />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="h-9 rounded-md border border-border bg-muted/50" />
-          <div className="h-9 rounded-md border border-border bg-muted/50" />
-        </div>
-        <div className="h-10 rounded-md bg-primary" />
+
+      {/* URL display - always visible */}
+      <div className="mt-auto rounded-lg border border-zinc-700 bg-zinc-800 p-4 font-mono text-sm">
+        <span className="text-zinc-500">tresta.app/</span>
+        <span className="text-primary">your-project</span>
       </div>
     </div>
   );
 }
 
 /**
- * Visual preview component for moderation feature
+ * Card 2: Embed Anywhere with high-contrast code
  */
-function ModerationVisual() {
-  const testimonials = [
-    { status: "approved", author: "Jane D.", text: "Amazing product!" },
-    { status: "pending", author: "John S.", text: "Really helped our team..." },
-    { status: "rejected", author: "Bot", text: "Buy cheap watches..." },
-  ];
+function EmbedCard() {
+  const [selectedLayout, setSelectedLayout] =
+    useState<(typeof layouts)[number]>("carousel");
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">
-          Review Queue
-        </span>
-        <span className="text-xs text-muted-foreground">3 items</span>
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <Code2 className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-zinc-100">Embed anywhere</h3>
+          <p className="text-sm text-zinc-400">
+            One script tag. That&apos;s it.
+          </p>
+        </div>
       </div>
-      <div className="space-y-2">
-        {testimonials.map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 rounded-md border border-border bg-muted/30 p-3"
-          >
-            <div
-              className={cn(
-                "h-2 w-2 rounded-full",
-                item.status === "approved" && "bg-success",
-                item.status === "pending" && "bg-warning",
-                item.status === "rejected" && "bg-destructive",
-              )}
-            />
-            <div className="flex-1 min-w-0">
-              <div className="truncate text-sm text-foreground">
-                {item.text}
-              </div>
-              <div className="text-xs text-muted-foreground">{item.author}</div>
-            </div>
-            {item.status === "pending" && (
-              <div className="flex gap-1">
-                <button className="rounded bg-success/10 px-2 py-1 text-xs text-success hover:bg-success/20">
-                  ✓
-                </button>
-                <button className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive hover:bg-destructive/20">
-                  ✕
-                </button>
-              </div>
+
+      {/* Layout selector */}
+      <div className="flex flex-wrap gap-1.5 mb-3">
+        {layouts.map((layout) => (
+          <button
+            key={layout}
+            onClick={() => setSelectedLayout(layout)}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-200",
+              selectedLayout === layout
+                ? "bg-primary text-zinc-900"
+                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300",
             )}
+          >
+            {layout}
+          </button>
+        ))}
+      </div>
+
+      {/* High-contrast code block */}
+      <pre className="mt-auto rounded-lg border border-zinc-700 bg-zinc-950 p-4 text-xs font-mono overflow-x-auto">
+        <code>
+          <span className="text-zinc-500">&lt;</span>
+          <span className="text-emerald-400">script</span>
+          {"\n  "}
+          <span className="text-sky-400">src</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-amber-300">
+            &quot;tresta.app/widget.js&quot;
+          </span>
+          {"\n  "}
+          <span className="text-sky-400">data-project</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-amber-300">&quot;demo&quot;</span>
+          {"\n  "}
+          <span className="text-sky-400">data-layout</span>
+          <span className="text-zinc-500">=</span>
+          <span className="text-amber-300">&quot;{selectedLayout}&quot;</span>
+          {"\n"}
+          <span className="text-zinc-500">&gt;&lt;/</span>
+          <span className="text-emerald-400">script</span>
+          <span className="text-zinc-500">&gt;</span>
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+/**
+ * Card 3: 5 Layouts - CSS hover highlight
+ */
+function LayoutsCard() {
+  const layoutIcons: Record<(typeof layouts)[number], React.ReactNode> = {
+    grid: (
+      <div className="grid grid-cols-2 gap-0.5">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-2 w-2 rounded-sm bg-current" />
+        ))}
+      </div>
+    ),
+    carousel: (
+      <div className="flex items-center gap-0.5">
+        <div className="h-3 w-0.5 rounded bg-current opacity-50" />
+        <div className="h-3 w-3 rounded bg-current" />
+        <div className="h-3 w-3 rounded bg-current" />
+        <div className="h-3 w-0.5 rounded bg-current opacity-50" />
+      </div>
+    ),
+    wall: (
+      <div className="grid grid-cols-3 gap-0.5">
+        <div className="col-span-2 h-2 rounded-sm bg-current" />
+        <div className="h-2 rounded-sm bg-current" />
+        <div className="h-2 rounded-sm bg-current" />
+        <div className="col-span-2 h-2 rounded-sm bg-current" />
+      </div>
+    ),
+    masonry: (
+      <div className="grid grid-cols-2 gap-0.5">
+        <div className="h-4 rounded-sm bg-current" />
+        <div className="h-2 rounded-sm bg-current" />
+        <div className="h-2 rounded-sm bg-current" />
+        <div className="h-4 rounded-sm bg-current" />
+      </div>
+    ),
+    list: (
+      <div className="space-y-0.5">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-1.5 w-6 rounded bg-current" />
+        ))}
+      </div>
+    ),
+  };
+
+  return (
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <LayoutGrid className="h-5 w-5 text-primary" />
+        </div>
+        <h3 className="font-semibold text-zinc-100">5 Layouts</h3>
+      </div>
+
+      <p className="mb-4 text-sm text-zinc-400">
+        Grid, carousel, wall, masonry, or list.
+      </p>
+
+      {/* Layout icons - CSS hover highlight */}
+      <div className="mt-auto grid grid-cols-5 gap-2">
+        {layouts.map((layout) => (
+          <div
+            key={layout}
+            className="group/layout flex flex-col items-center gap-2"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-500 transition-all duration-200 group-hover/layout:border-primary group-hover/layout:bg-primary/10 group-hover/layout:text-primary">
+              {layoutIcons[layout]}
+            </div>
+            <span className="text-[10px] capitalize text-zinc-500 transition-colors group-hover/layout:text-zinc-300">
+              {layout}
+            </span>
           </div>
         ))}
       </div>
@@ -178,116 +223,210 @@ function ModerationVisual() {
 }
 
 /**
- * Visual preview component for embed code feature
+ * Card 4: Brand Theming
  */
-function EmbedCodeVisual() {
+function BrandingCard() {
   return (
-    <div className="space-y-3">
-      <div className="rounded-lg border border-border bg-muted/50 p-4 font-mono text-sm">
-        <div className="text-muted-foreground">&lt;script</div>
-        <div className="pl-4">
-          <span className="text-primary">src</span>=
-          <span className="text-success">&quot;tresta.app/widget.js&quot;</span>
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <Palette className="h-5 w-5 text-primary" />
         </div>
-        <div className="pl-4">
-          <span className="text-primary">data-project</span>=
-          <span className="text-success">&quot;acme&quot;</span>
-        </div>
-        <div className="text-muted-foreground">&gt;&lt;/script&gt;</div>
+        <h3 className="font-semibold text-zinc-100">Theming</h3>
       </div>
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Link2 className="h-3 w-3" />
-        <span>Works on any website</span>
+
+      <p className="mb-4 text-sm text-zinc-400">
+        Light, dark, or match your site.
+      </p>
+
+      {/* Theme preview - always visible */}
+      <div className="mt-auto grid grid-cols-2 gap-2">
+        <div className="rounded-lg bg-zinc-950 border border-zinc-700 p-3 transition-all duration-200 hover:border-primary">
+          <div className="text-xs font-medium text-zinc-100 mb-1">Dark</div>
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-zinc-400" />
+            <div className="h-2 flex-1 rounded bg-zinc-700" />
+          </div>
+        </div>
+        <div className="rounded-lg bg-white border border-zinc-300 p-3 transition-all duration-200 hover:border-primary">
+          <div className="text-xs font-medium text-zinc-900 mb-1">Light</div>
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-zinc-500" />
+            <div className="h-2 flex-1 rounded bg-zinc-200" />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function FeatureVisual({ type }: { type: string }) {
-  switch (type) {
-    case "collection-form":
-      return <CollectionFormVisual />;
-    case "moderation":
-      return <ModerationVisual />;
-    case "embed-code":
-      return <EmbedCodeVisual />;
-    default:
-      return null;
-  }
+/**
+ * Card 5: Realtime with CSS animation bubbles
+ */
+function RealtimeCard() {
+  return (
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <Zap className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-zinc-100">Realtime</h3>
+          <p className="text-sm text-zinc-400">WebSocket updates</p>
+        </div>
+      </div>
+
+      {/* Live indicator */}
+      <div className="mb-3 flex items-center gap-2 text-xs text-zinc-400">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        </span>
+        Live
+      </div>
+
+      {/* Simulated chat bubbles - visible by default, animation is enhancement */}
+      <div className="mt-auto space-y-2 overflow-hidden">
+        {[
+          { initials: "JD", text: "Amazing tool!", delay: "0s" },
+          { initials: "SK", text: "Works perfectly", delay: "3s" },
+          { initials: "AL", text: "Love it!", delay: "6s" },
+        ].map((bubble, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 p-2 animate-fade-in"
+            style={{ animationDelay: bubble.delay }}
+          >
+            <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium text-primary shrink-0">
+              {bubble.initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex gap-0.5 mb-0.5">
+                {[...Array(5)].map((_, j) => (
+                  <Star
+                    key={j}
+                    className="h-2 w-2 fill-amber-400 text-amber-400"
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-zinc-300 truncate">
+                &ldquo;{bubble.text}&rdquo;
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Card 6: OAuth Verified
+ */
+function OAuthCard() {
+  const providers = [
+    { name: "Google", abbr: "G", color: "text-red-400" },
+    { name: "GitHub", abbr: "GH", color: "text-zinc-100" },
+    { name: "LinkedIn", abbr: "in", color: "text-sky-400" },
+  ];
+
+  return (
+    <div className="flex h-full flex-col p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <Shield className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-semibold text-zinc-100">Verified Identity</h3>
+          <p className="text-sm text-zinc-400">OAuth with major providers</p>
+        </div>
+      </div>
+
+      {/* Provider icons - always visible */}
+      <div className="mt-auto flex items-center justify-center gap-4">
+        {providers.map((provider) => (
+          <div
+            key={provider.name}
+            className="flex flex-col items-center gap-2 group/provider"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-sm font-medium text-zinc-400 transition-all duration-200 group-hover/provider:border-primary group-hover/provider:bg-primary/10 group-hover/provider:text-primary">
+              {provider.abbr}
+            </div>
+            <span className="text-[10px] text-zinc-500">{provider.name}</span>
+          </div>
+        ))}
+
+        {/* Checkmark */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-[10px] text-emerald-400">Verified</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function Features() {
   return (
-    <section className="container mx-auto px-4 py-24 md:px-8 md:py-32">
-      <SectionHeader
-        title="Built for developers who ship fast"
-        description="Everything you need to collect, moderate, and display testimonials. No complexity, no bloat."
-      />
+    <section className="bg-zinc-950 py-24 md:py-32">
+      <div className="container mx-auto px-4 md:px-8">
+        <SectionHeader
+          title="Everything you need. Nothing you don't."
+          description="Collect, moderate, and display testimonials. No complexity, no bloat."
+        />
 
-      {/* Primary Features - Side by Side */}
-      <div className="space-y-24 lg:space-y-32 max-w-6xl mx-auto">
-        {primaryFeatures.map((feature, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className={cn(
-              "flex flex-col items-center gap-8 lg:gap-16",
-              feature.align === "left" ? "lg:flex-row" : "lg:flex-row-reverse",
-            )}
-          >
-            {/* Text Content */}
-            <div className="flex-1 space-y-4 text-center lg:text-left">
-              <h3 className="text-2xl font-bold text-foreground lg:text-3xl">
-                {feature.title}
-              </h3>
-              <p className="text-lg text-muted-foreground">
-                {feature.description}
-              </p>
-            </div>
+        {/* Bento Grid */}
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-4 md:grid-cols-3 md:grid-rows-[repeat(3,minmax(180px,auto))]">
+            {/* Row 1: Collect (1x1) + Embed (1x2) */}
+            <BentoCard>
+              <CollectCard />
+            </BentoCard>
 
-            {/* Visual */}
-            <div className="w-full max-w-md flex-1">
-              <FeatureVisual type={feature.visual} />
-            </div>
-          </motion.div>
-        ))}
+            <BentoCard className="md:col-span-2">
+              <EmbedCard />
+            </BentoCard>
+
+            {/* Row 2: Layouts (2x1) + Branding (1x1) + Realtime (1x1) */}
+            <BentoCard className="md:row-span-2">
+              <LayoutsCard />
+            </BentoCard>
+
+            <BentoCard>
+              <BrandingCard />
+            </BentoCard>
+
+            <BentoCard>
+              <RealtimeCard />
+            </BentoCard>
+
+            {/* Row 3: OAuth (1x2) */}
+            <BentoCard className="md:col-span-2">
+              <OAuthCard />
+            </BentoCard>
+          </div>
+        </div>
       </div>
 
-      {/* Secondary Features - Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-        className="mt-24 lg:mt-32 max-w-6xl mx-auto"
-      >
-        <h3 className="mb-8 text-center text-xl font-semibold text-foreground">
-          Plus everything else you need
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {secondaryFeatures.map((feature, index) => (
-            <Card
-              key={index}
-              className="border-border bg-card transition-colors hover:border-primary/50"
-            >
-              <CardHeader className="pb-2">
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <feature.icon className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-base">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </motion.div>
+      {/* CSS animation keyframes */}
+      <style jsx global>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
     </section>
   );
 }

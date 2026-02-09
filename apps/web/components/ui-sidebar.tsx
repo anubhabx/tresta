@@ -35,7 +35,6 @@ import {
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { projects } from "@/lib/queries";
-import { NotificationSidebarSection } from "@/components/notifications/notification-sidebar-section";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
 import { useUpgradeModal } from "@/components/billing/upgrade-modal";
@@ -166,9 +165,6 @@ const UISidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="px-2 border-t border-border">
-        {/* Notifications Section */}
-        <NotificationSidebarSection />
-
         {/* Theme Toggle */}
         <ThemeToggle />
 

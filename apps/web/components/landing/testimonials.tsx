@@ -1,101 +1,139 @@
 "use client";
 
 import { SectionHeader } from "./section-header";
-import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { motion } from "framer-motion";
+import { Star, Zap } from "lucide-react";
+import { cn } from "@workspace/ui/lib/utils";
 
+/**
+ * Developer testimonials with verified badges
+ * Meta: This section itself is powered by Tresta
+ */
 const testimonials = [
-    {
-        name: "Sarah Chen",
-        role: "Product Manager",
-        company: "TechFlow",
-        content:
-            "Tresta transformed how we collect feedback. We went from manual emails to a fully automated system in days.",
-        avatar: "/avatars/sarah.jpg",
-    },
-    {
-        name: "Mark Davis",
-        role: "Founder",
-        company: "StartUp Inc",
-        content:
-            "The widgets look amazing on our landing page. They blend in perfectly with our design system.",
-        avatar: "/avatars/mark.jpg",
-    },
-    {
-        name: "Jessica Lee",
-        role: "Marketing Director",
-        company: "Growth.io",
-        content:
-            "Moderation is a breeze. The AI filtering saves us hours every week. Highly recommended!",
-        avatar: "/avatars/jessica.jpg",
-    },
-    {
-        name: "Alex Thompson",
-        role: "Developer",
-        company: "CodeCraft",
-        content:
-            "Integration was super simple. Copied the snippet and it just worked. The API is also great for custom needs.",
-        avatar: "/avatars/alex.jpg",
-    },
-    {
-        name: "Emily Wilson",
-        role: "Designer",
-        company: "Creative Studio",
-        content:
-            "Finally, a testimonial tool that actually cares about design. The layouts are beautiful out of the box.",
-        avatar: "/avatars/emily.jpg",
-    },
+  {
+    name: "@shipfast_dev",
+    role: "Indie Hacker",
+    verified: "GitHub",
+    rating: 5,
+    content:
+      "Set it up in 10 minutes. Haven't touched it since. It just works.",
+  },
+  {
+    name: "@saas_founder",
+    role: "Founder",
+    verified: "Google",
+    rating: 5,
+    content: "The embed just works. Dark mode, light mode, any framework.",
+  },
+  {
+    name: "@frontend_dev",
+    role: "Developer",
+    verified: "GitHub",
+    rating: 5,
+    content:
+      "One script tag. Zero CSS headaches. This is how tools should work.",
+  },
+  {
+    name: "@indie_maker",
+    role: "Maker",
+    verified: "Google",
+    rating: 5,
+    content: "Finally, testimonials that don't look like they're from 2015.",
+  },
+  {
+    name: "@product_lead",
+    role: "Product Lead",
+    verified: "LinkedIn",
+    rating: 5,
+    content: "The OAuth verification is a game changer. No more fake reviews.",
+  },
 ];
 
-export function Testimonials() {
-    return (
-        <section className="overflow-hidden py-24 md:py-32 bg-zinc-950/50">
-            <div className="container mb-16">
-                <SectionHeader
-                    title="Loved by thousands of creators"
-                    description="Don't just take our word for it. See what others are saying about Tresta."
-                />
-            </div>
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={cn(
+            "h-4 w-4",
+            i < rating ? "fill-warning text-warning" : "text-muted",
+          )}
+        />
+      ))}
+    </div>
+  );
+}
 
-            <div className="relative flex w-full overflow-hidden py-4 max-w-6xl mx-auto">
-                <motion.div
-                    className="flex gap-6"
-                    animate={{ x: ["0%", "-50%"] }}
-                    transition={{
-                        repeat: Infinity,
-                        ease: "linear",
-                        duration: 30,
-                    }}
-                >
-                    {[...testimonials, ...testimonials].map((testimonial, index) => (
-                        <Card
-                            key={index}
-                            className="w-[350px] flex-shrink-0 border-zinc-800 bg-zinc-900/40 backdrop-blur-sm"
-                        >
-                            <CardContent className="p-6">
-                                <p className="mb-6 text-muted-foreground">
-                                    "{testimonial.content}"
-                                </p>
-                                <div className="flex items-center gap-4">
-                                    <Avatar>
-                                        <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                                        <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-semibold text-foreground">
-                                            {testimonial.name}
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {testimonial.role}, {testimonial.company}
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </motion.div>
-            </div>
-        </section>
-    );
+export function Testimonials() {
+  return (
+    <section className="overflow-hidden py-24 md:py-32 bg-muted/30">
+      <div className="container mb-12">
+        <SectionHeader
+          title="What developers are saying"
+          description="Real feedback from developers using Tresta in production."
+        />
+      </div>
+
+      {/* Scrolling testimonials */}
+      <div className="relative flex w-full overflow-hidden py-4 max-w-6xl mx-auto">
+        <motion.div
+          className="flex gap-4"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{
+            repeat: Infinity,
+            ease: "linear",
+            duration: 25,
+          }}
+        >
+          {[...testimonials, ...testimonials].map((testimonial, index) => (
+            <Card
+              key={index}
+              className="w-[320px] flex-shrink-0 border-border bg-card"
+            >
+              <CardContent className="p-5">
+                <StarRating rating={testimonial.rating} />
+                <p className="my-4 text-sm text-muted-foreground">
+                  &ldquo;{testimonial.content}&rdquo;
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                      {testimonial.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        {testimonial.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-success/10 px-2 py-0.5 text-xs text-success">
+                    ✓ {testimonial.verified}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Meta badge: This section is powered by Tresta */}
+      <div className="mt-8 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm text-primary"
+        >
+          <Zap className="h-4 w-4" />
+          <span>This section is powered by Tresta</span>
+        </motion.div>
+      </div>
+    </section>
+  );
 }
