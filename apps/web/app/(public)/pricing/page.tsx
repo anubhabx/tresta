@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PricingTable } from "@/components/billing/pricing-table";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
@@ -55,7 +56,9 @@ export default function PricingPage() {
       </div>
 
       {/* Pricing Cards */}
-      <PricingTable />
+      <Suspense>
+        <PricingTable />
+      </Suspense>
 
       {/* Plan Justifications */}
       <div className="mt-24 max-w-5xl mx-auto">
