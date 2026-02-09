@@ -8,7 +8,7 @@ import { GridBackground } from "@/components/ui/grid-background";
 export function PageWrapper({
   children,
   className,
-  gridVariant = "grid-small"
+  gridVariant = "grid-small",
 }: {
   children: React.ReactNode;
   className?: string;

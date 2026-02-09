@@ -27,8 +27,8 @@ export default function UnauthorizedPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted rounded-lg p-4 text-sm text-muted-foreground">
-            Tip: If you just signed out, signing back in will return you to
-            this page automatically.
+            Tip: If you just signed out, signing back in will return you to this
+            page automatically.
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" className="flex-1">
@@ -38,9 +38,7 @@ export default function UnauthorizedPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild size="lg" className="flex-1">
-              <Link href="/">
-                Return home
-              </Link>
+              <Link href="/">Return home</Link>
             </Button>
           </div>
         </CardContent>

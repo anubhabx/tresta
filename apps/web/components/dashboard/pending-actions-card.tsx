@@ -31,7 +31,8 @@ export function PendingActionsCard({ projects }: PendingActionsCardProps) {
 
   // Don't show if there are no pending actions
   const hasPendingActions =
-    projectsNeedingTestimonials.length > 0 || recentlyUpdatedProjects.length > 0;
+    projectsNeedingTestimonials.length > 0 ||
+    recentlyUpdatedProjects.length > 0;
 
   if (!hasPendingActions) {
     return null;

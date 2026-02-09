@@ -1,11 +1,7 @@
 "use client";
 
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 
 /**
  * Skeleton for dashboard stats cards (3 cards)

@@ -3,7 +3,10 @@
 import { Bell } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
-import { useNotificationList, useUnreadCount } from "@/lib/queries/notifications";
+import {
+  useNotificationList,
+  useUnreadCount,
+} from "@/lib/queries/notifications";
 import { useAbly } from "@/components/ably-provider";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@workspace/ui/lib/utils";
@@ -23,7 +26,8 @@ export function NotificationSidebarSection() {
   const { data: listData } = useNotificationList();
 
   const unreadCount = countData?.data?.count || 0;
-  const recentNotifications = listData?.pages[0]?.data?.notifications?.slice(0, 3) || [];
+  const recentNotifications =
+    listData?.pages[0]?.data?.notifications?.slice(0, 3) || [];
 
   return (
     <SidebarMenu>
@@ -58,7 +62,7 @@ export function NotificationSidebarSection() {
                   onClick={toggleCenter}
                   className={cn(
                     "flex-col items-start gap-1 py-2 h-auto",
-                    !notification.isRead && "bg-info-highlight-bg"
+                    !notification.isRead && "bg-info-highlight-bg",
                   )}
                 >
                   <div className="flex items-start gap-2 w-full">

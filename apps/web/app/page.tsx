@@ -24,7 +24,7 @@ export default function Page() {
 
           <InteractiveDemo />
 
-          <Testimonials />
+          {/* <Testimonials /> */}
 
           <IntegrationSection />
 

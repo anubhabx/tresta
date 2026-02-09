@@ -45,21 +45,24 @@ interface BaseFormFieldProps<TFieldValues extends FieldValues> {
 }
 
 // Props for text-based inputs
-interface TextFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface TextFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "text" | "email" | "url" | "number";
   onChange?: (value: string) => void;
 }
 
 // Props for password input
-interface PasswordFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface PasswordFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "password";
 }
 
 // Props for textarea
-interface TextareaFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface TextareaFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "textarea";
   rows?: number;
   maxLength?: number;
@@ -67,22 +70,25 @@ interface TextareaFormFieldProps<TFieldValues extends FieldValues>
 }
 
 // Props for rating
-interface RatingFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface RatingFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "rating";
   max?: number;
 }
 
 // Props for color picker
-interface ColorPickerFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface ColorPickerFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "color";
   onChange?: (value: string) => void;
 }
 
 // Props for file upload
-interface FileUploadFormFieldProps<TFieldValues extends FieldValues>
-  extends BaseFormFieldProps<TFieldValues> {
+interface FileUploadFormFieldProps<
+  TFieldValues extends FieldValues,
+> extends BaseFormFieldProps<TFieldValues> {
   type: "file";
   onChange?: (files: File[]) => void;
 }

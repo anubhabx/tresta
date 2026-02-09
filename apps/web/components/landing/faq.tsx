@@ -5,30 +5,30 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger
+  AccordionTrigger,
 } from "@workspace/ui/components/accordion";
 
 const faqs = [
   {
     question: "Do I need coding skills to use Tresta?",
     answer:
-      "Not at all! You can create forms and widgets using our visual editor. Embedding them is as simple as copying and pasting a single line of code."
+      "Not at all! You can create forms and widgets using our visual editor. Embedding them is as simple as copying and pasting a single line of code.",
   },
   {
     question: "Can I import existing testimonials?",
     answer:
-      "Yes, you can manually add existing testimonials or import them via CSV (coming soon). We also plan to add support for importing from Twitter and other platforms."
+      "Yes, you can manually add existing testimonials or import them via CSV (coming soon). We also plan to add support for importing from Twitter and other platforms.",
   },
   {
     question: "Is there a free trial?",
     answer:
-      "We offer a generous free tier that is free forever. You only need to upgrade if you need more advanced features or higher limits."
+      "We offer a generous free tier that is free forever. You only need to upgrade if you need more advanced features or higher limits.",
   },
   {
     question: "Can I customize the design?",
     answer:
-      "Absolutely. Our widgets are fully customizable to match your brand's colors, fonts, and style."
-  }
+      "Absolutely. Our widgets are fully customizable to match your brand's colors, fonts, and style.",
+  },
 ];
 
 export function FAQ() {

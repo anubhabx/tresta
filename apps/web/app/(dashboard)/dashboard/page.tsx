@@ -10,36 +10,38 @@ import { Plus } from "lucide-react";
 
 const DashboardStats = dynamic(() =>
   import("@/components/dashboard/dashboard-stats").then(
-    (mod) => mod.DashboardStats
-  )
+    (mod) => mod.DashboardStats,
+  ),
 );
 const RecentProjectsList = dynamic(() =>
   import("@/components/dashboard/recent-projects-list").then(
-    (mod) => mod.RecentProjectsList
-  )
+    (mod) => mod.RecentProjectsList,
+  ),
 );
 const DashboardEmptyState = dynamic(() =>
   import("@/components/dashboard/dashboard-empty-state").then(
-    (mod) => mod.DashboardEmptyState
-  )
+    (mod) => mod.DashboardEmptyState,
+  ),
 );
 const PendingActionsCard = dynamic(() =>
   import("@/components/dashboard/pending-actions-card").then(
-    (mod) => mod.PendingActionsCard
-  )
+    (mod) => mod.PendingActionsCard,
+  ),
 );
 const QuickEmbedCard = dynamic(() =>
   import("@/components/dashboard/quick-embed-card").then(
-    (mod) => mod.QuickEmbedCard
-  )
+    (mod) => mod.QuickEmbedCard,
+  ),
 );
 const ActivityFeed = dynamic(() =>
-  import("@/components/dashboard/activity-feed").then((mod) => mod.ActivityFeed)
+  import("@/components/dashboard/activity-feed").then(
+    (mod) => mod.ActivityFeed,
+  ),
 );
 const KeyboardShortcutsCard = dynamic(() =>
   import("@/components/dashboard/keyboard-shortcuts-card").then(
-    (mod) => mod.KeyboardShortcutsCard
-  )
+    (mod) => mod.KeyboardShortcutsCard,
+  ),
 );
 import { useUser } from "@clerk/nextjs";
 
@@ -57,7 +59,7 @@ const DashboardPage = () => {
   const totalProjects = projectsList.length;
   const totalTestimonials = projectsList.reduce(
     (acc, project) => acc + (project._count?.testimonials || 0),
-    0
+    0,
   );
   const activeProjects = projectsList.filter((p) => p.isActive).length;
 
@@ -72,7 +74,7 @@ const DashboardPage = () => {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const recentProjectsCount = projectsList.filter(
-    (p) => new Date(p.createdAt) > sevenDaysAgo
+    (p) => new Date(p.createdAt) > sevenDaysAgo,
   ).length;
 
   const recentProjects = projectsList.slice(0, 5);

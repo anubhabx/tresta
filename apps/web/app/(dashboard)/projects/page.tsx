@@ -26,7 +26,12 @@ import { useSubscription } from "@/hooks/use-subscription";
 const ProjectsPage = () => {
   const { data: projectsData, isLoading: isLoadingProjects } =
     projects.queries.useList(1, 100);
-  const { usage, plan, isPro, isLoading: isLoadingSubscription } = useSubscription();
+  const {
+    usage,
+    plan,
+    isPro,
+    isLoading: isLoadingSubscription,
+  } = useSubscription();
 
   if (isLoadingProjects) {
     return <ProjectsListPageSkeleton />;
@@ -111,7 +116,10 @@ const ProjectsPage = () => {
                       </div>
                     </div>
                     {!project.isActive && (
-                      <Badge variant="outline" className="text-xs flex-shrink-0">
+                      <Badge
+                        variant="outline"
+                        className="text-xs flex-shrink-0"
+                      >
                         Inactive
                       </Badge>
                     )}
@@ -132,9 +140,7 @@ const ProjectsPage = () => {
                   <div className="flex items-center justify-between pt-3 border-t text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <MessageSquareIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span>
-                        {project._count?.testimonials || 0}
-                      </span>
+                      <span>{project._count?.testimonials || 0}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <CalendarIcon className="h-3.5 w-3.5 flex-shrink-0" />

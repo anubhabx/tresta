@@ -11,7 +11,8 @@ interface NotificationListProps {
 }
 
 export function NotificationList({ onClose }: NotificationListProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useNotificationList();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useNotificationList();
 
   if (isLoading) {
     return (
@@ -21,7 +22,8 @@ export function NotificationList({ onClose }: NotificationListProps) {
     );
   }
 
-  const notifications = data?.pages.flatMap((page) => page.data.notifications) || [];
+  const notifications =
+    data?.pages.flatMap((page) => page.data.notifications) || [];
 
   if (notifications.length === 0) {
     return <NotificationEmptyState />;

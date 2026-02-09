@@ -9,7 +9,10 @@ import { AblyProvider } from "./ably-provider";
 import { Toaster } from "@workspace/ui/components/sonner";
 import dynamic from "next/dynamic";
 
-const UpgradeModal = dynamic(() => import("./billing/upgrade-modal").then(mod => mod.UpgradeModal), { ssr: false });
+const UpgradeModal = dynamic(
+  () => import("./billing/upgrade-modal").then((mod) => mod.UpgradeModal),
+  { ssr: false },
+);
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

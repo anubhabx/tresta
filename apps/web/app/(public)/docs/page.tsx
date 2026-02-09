@@ -7,7 +7,7 @@ import { cn } from "@workspace/ui/lib/utils";
 export const metadata: Metadata = {
   title: "API Documentation | Tresta",
   description:
-    "Fetch testimonials programmatically using our REST API. Learn about authentication, endpoints, and response formats."
+    "Fetch testimonials programmatically using our REST API. Learn about authentication, endpoints, and response formats.",
 };
 
 // Endpoint documentation component
@@ -15,7 +15,7 @@ function EndpointDoc({
   method,
   path,
   description,
-  children
+  children,
 }: {
   method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
@@ -26,7 +26,7 @@ function EndpointDoc({
     GET: "bg-success/10 text-success border-success/20",
     POST: "bg-primary/10 text-primary border-primary/20",
     PUT: "bg-warning/10 text-warning border-warning/20",
-    DELETE: "bg-destructive/10 text-destructive border-destructive/20"
+    DELETE: "bg-destructive/10 text-destructive border-destructive/20",
   };
 
   return (

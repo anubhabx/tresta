@@ -63,7 +63,12 @@ function ActivityIcon({ type }: { type: ActivityType }) {
   const { icon: Icon, className } = config[type];
 
   return (
-    <div className={cn("flex h-8 w-8 items-center justify-center rounded-full", className)}>
+    <div
+      className={cn(
+        "flex h-8 w-8 items-center justify-center rounded-full",
+        className,
+      )}
+    >
       <Icon className="h-4 w-4" />
     </div>
   );
@@ -121,7 +126,7 @@ function ActivityDescription({ item }: { item: ActivityItem }) {
 /**
  * Activity Feed component for the dashboard
  * Shows recent activity across all projects
- * 
+ *
  * Note: This generates activity items from project data.
  * In a full implementation, this would come from an activity log API.
  */

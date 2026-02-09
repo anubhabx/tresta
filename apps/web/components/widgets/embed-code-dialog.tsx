@@ -6,21 +6,21 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import {
   CopyIcon,
   CheckIcon,
   Code2Icon,
   ExternalLinkIcon,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,7 +55,7 @@ function CodeTab({
   copiedTab,
   onCopy,
   extraAction,
-  additionalContent
+  additionalContent,
 }: CodeTabProps) {
   return (
     <div className="space-y-3 min-h-[300px]">
@@ -100,7 +100,7 @@ export function EmbedCodeDialog({
   apiKey,
   projectSlug,
   isOpen,
-  onClose
+  onClose,
 }: EmbedCodeDialogProps) {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
@@ -156,7 +156,7 @@ function TestimonialWidget() {
 }`,
 
     api: `curl -X GET "${apiEndpointUrl}" \\
-  -H "Authorization: Bearer ${displayApiKey}"`
+  -H "Authorization: Bearer ${displayApiKey}"`,
   };
 
   const tabConfigs = [
@@ -166,7 +166,7 @@ function TestimonialWidget() {
       title: "Vanilla JavaScript",
       code: embedCodes.script,
       description:
-        "Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials with the configured layout and styling."
+        "Paste this code anywhere in your HTML. The widget will automatically load and display your testimonials with the configured layout and styling.",
     },
     {
       id: "iframe",
@@ -174,7 +174,7 @@ function TestimonialWidget() {
       title: "iframe Embed",
       code: embedCodes.iframe,
       description:
-        "Simple iframe embed. Adjust width and height as needed for your design."
+        "Simple iframe embed. Adjust width and height as needed for your design.",
     },
     {
       id: "react",
@@ -182,7 +182,7 @@ function TestimonialWidget() {
       title: "React Component",
       code: embedCodes.react,
       description:
-        "For React/Next.js projects. The widget script handles all rendering automatically with your configured settings."
+        "For React/Next.js projects. The widget script handles all rendering automatically with your configured settings.",
     },
     {
       id: "api",
@@ -197,10 +197,10 @@ function TestimonialWidget() {
         onClick: () => {
           // Open with API key in authorization header (browser can't set headers directly, so just show the URL)
           toast.info(
-            "Include Authorization: Bearer YOUR_API_KEY header when making requests"
+            "Include Authorization: Bearer YOUR_API_KEY header when making requests",
           );
           window.open(apiEndpointUrl, "_blank");
-        }
+        },
       },
       additionalContent: (
         <div>
@@ -224,8 +224,8 @@ function TestimonialWidget() {
 }`}</code>
           </pre>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const handleCopy = async (code: string, tab: string) => {

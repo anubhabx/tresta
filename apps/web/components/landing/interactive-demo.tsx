@@ -65,7 +65,11 @@ const sampleTestimonials = [
 
 type LayoutType = "grid" | "list" | "carousel" | "masonry" | "wall";
 
-const layoutOptions: { id: LayoutType; label: string; icon: typeof LayoutGrid }[] = [
+const layoutOptions: {
+  id: LayoutType;
+  label: string;
+  icon: typeof LayoutGrid;
+}[] = [
   { id: "grid", label: "Grid", icon: LayoutGrid },
   { id: "list", label: "List", icon: List },
   { id: "carousel", label: "Carousel", icon: GalleryHorizontal },
@@ -81,7 +85,7 @@ function StarRating({ rating }: { rating: number }) {
           key={i}
           className={cn(
             "h-4 w-4",
-            i < rating ? "fill-warning text-warning" : "text-muted"
+            i < rating ? "fill-warning text-warning" : "text-muted",
           )}
         />
       ))}
@@ -162,7 +166,7 @@ export function InteractiveDemo() {
           <div
             className={cn(
               "min-h-[400px] p-6 transition-colors duration-300",
-              theme === "dark" ? "bg-[#0A0A0A]" : "bg-[#FAFAFA]"
+              theme === "dark" ? "bg-[#0A0A0A]" : "bg-[#FAFAFA]",
             )}
           >
             <div className={cn("grid gap-4", getGridClasses())}>
@@ -173,7 +177,7 @@ export function InteractiveDemo() {
                     "transition-all duration-300",
                     theme === "dark"
                       ? "border-[#2E2E2E] bg-[#141414]"
-                      : "border-[#E5E5E5] bg-white"
+                      : "border-[#E5E5E5] bg-white",
                   )}
                 >
                   <CardContent className="p-5">
@@ -181,7 +185,7 @@ export function InteractiveDemo() {
                     <p
                       className={cn(
                         "my-4 text-sm",
-                        theme === "dark" ? "text-[#A3A3A3]" : "text-[#737373]"
+                        theme === "dark" ? "text-[#A3A3A3]" : "text-[#737373]",
                       )}
                     >
                       &ldquo;{testimonial.content}&rdquo;
@@ -190,7 +194,7 @@ export function InteractiveDemo() {
                       <div
                         className={cn(
                           "flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white",
-                          testimonial.color
+                          testimonial.color,
                         )}
                       >
                         {testimonial.initials}
@@ -199,7 +203,9 @@ export function InteractiveDemo() {
                         <p
                           className={cn(
                             "text-sm font-medium",
-                            theme === "dark" ? "text-[#FAFAFA]" : "text-[#0A0A0A]"
+                            theme === "dark"
+                              ? "text-[#FAFAFA]"
+                              : "text-[#0A0A0A]",
                           )}
                         >
                           {testimonial.name}
@@ -207,7 +213,9 @@ export function InteractiveDemo() {
                         <p
                           className={cn(
                             "text-xs",
-                            theme === "dark" ? "text-[#737373]" : "text-[#A3A3A3]"
+                            theme === "dark"
+                              ? "text-[#737373]"
+                              : "text-[#A3A3A3]",
                           )}
                         >
                           {testimonial.role}

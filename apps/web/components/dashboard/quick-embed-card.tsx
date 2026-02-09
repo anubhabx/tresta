@@ -26,12 +26,12 @@ interface QuickEmbedCardProps {
 /**
  * Quick Embed Card for the dashboard sidebar
  * Allows quick copying of embed code and collection links
- * 
+ *
  * Design principle: Developer-first, copy-paste focused
  */
 export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
   const [selectedProjectSlug, setSelectedProjectSlug] = useState<string>(
-    projects[0]?.slug || ""
+    projects[0]?.slug || "",
   );
 
   const selectedProject = projects.find((p) => p.slug === selectedProjectSlug);
@@ -63,7 +63,10 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Project Selector */}
-        <Select value={selectedProjectSlug} onValueChange={setSelectedProjectSlug}>
+        <Select
+          value={selectedProjectSlug}
+          onValueChange={setSelectedProjectSlug}
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a project" />
           </SelectTrigger>
@@ -80,7 +83,7 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
         {selectedProjectSlug && (
           <>
             <CodeBlock code={embedCode} language="html" copyable />
-            
+
             {/* Collection Link Button */}
             <Button
               variant="outline"

@@ -52,8 +52,6 @@ export function WidgetForm({
     defaultValues: getInitialValues(initialData?.config),
   });
 
-
-
   // Use ref to store the callback to avoid dependency issues
   const onConfigChangeRef = useRef(onConfigChange);
 
@@ -63,7 +61,9 @@ export function WidgetForm({
 
   // Subscribe to form changes and notify parent with debounce
   useEffect(() => {
-    const timeoutId = { current: undefined as ReturnType<typeof setTimeout> | undefined };
+    const timeoutId = {
+      current: undefined as ReturnType<typeof setTimeout> | undefined,
+    };
 
     const subscription = form.watch((value) => {
       if (timeoutId.current) {
@@ -92,9 +92,7 @@ export function WidgetForm({
         <WidgetBasicSection control={form.control} />
         <WidgetAppearanceSection control={form.control} />
         <WidgetDisplaySection control={form.control} />
-        <WidgetLayoutSection
-          control={form.control}
-        />
+        <WidgetLayoutSection control={form.control} />
 
         <Separator />
 
@@ -145,7 +143,7 @@ function getInitialValues(config?: WidgetConfig) {
 
   normalized.maxTestimonials = Math.min(
     Math.max(normalized.maxTestimonials, 1),
-    MIN_MAX_TESTIMONIALS
+    MIN_MAX_TESTIMONIALS,
   );
 
   return normalized;

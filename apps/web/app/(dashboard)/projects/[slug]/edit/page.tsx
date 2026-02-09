@@ -101,7 +101,11 @@ const ProjectEditPage = ({ params }: ProjectEditPageProps) => {
 
           <URLsSection control={control} />
 
-          <BrandingSection control={control} onLogoUpload={handleLogoUpload} isPro={isPro} />
+          <BrandingSection
+            control={control}
+            onLogoUpload={handleLogoUpload}
+            isPro={isPro}
+          />
 
           <SocialLinksSection control={control} />
 

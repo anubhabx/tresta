@@ -63,9 +63,9 @@ export function BulkActionsBar({
                 Clear
               </Button>
             </div>
-            
+
             <div className="hidden sm:block h-6 w-px bg-border" />
-            
+
             {/* Action Buttons */}
             <div className="flex items-center gap-2 flex-1">
               <TooltipProvider>
@@ -89,7 +89,10 @@ export function BulkActionsBar({
                               </span>
                             )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="A" className="hidden sm:flex" />
+                        <KeyboardShortcutBadge
+                          shortcut="A"
+                          className="hidden sm:flex"
+                        />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -131,7 +134,10 @@ export function BulkActionsBar({
                             </span>
                           )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="F" className="hidden sm:flex" />
+                        <KeyboardShortcutBadge
+                          shortcut="F"
+                          className="hidden sm:flex"
+                        />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -174,7 +180,10 @@ export function BulkActionsBar({
                               </span>
                             )}
                         </div>
-                        <KeyboardShortcutBadge shortcut="R" className="hidden sm:flex" />
+                        <KeyboardShortcutBadge
+                          shortcut="R"
+                          className="hidden sm:flex"
+                        />
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -196,9 +205,9 @@ export function BulkActionsBar({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            
+
             <div className="hidden sm:block h-6 w-px bg-border" />
-            
+
             {/* Clear button - desktop only */}
             <Button
               onClick={onClear}

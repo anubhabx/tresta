@@ -25,7 +25,7 @@ const shortcuts: ShortcutItem[] = [
 /**
  * Keyboard Shortcuts Card for the dashboard sidebar
  * Shows common keyboard shortcuts for power users
- * 
+ *
  * Design principle: Developer-first, keyboard navigation
  */
 export function KeyboardShortcutsCard() {

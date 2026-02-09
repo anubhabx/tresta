@@ -133,7 +133,8 @@ export function WidgetPreview({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const resolvedTestimonials = testimonials ?? DEFAULT_PREVIEW_TESTIMONIALS;
-  const documentNonce = typeof window !== "undefined" ? getDocumentNonce() : undefined;
+  const documentNonce =
+    typeof window !== "undefined" ? getDocumentNonce() : undefined;
 
   useEffect(() => {
     setIsMounted(true);
@@ -243,7 +244,9 @@ export function WidgetPreview({
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               Ensure the widget assets are built:
-              <code className="bg-muted px-1.5 py-0.5 rounded ml-1">cd packages/widget &amp;&amp; pnpm build</code>
+              <code className="bg-muted px-1.5 py-0.5 rounded ml-1">
+                cd packages/widget &amp;&amp; pnpm build
+              </code>
             </p>
             <button
               onClick={() => setIframeKey((k) => k + 1)}
@@ -341,7 +344,9 @@ function buildMockApiResponse({
   };
 }
 
-function normalizePreviewConfig(config: WidgetFormData): NormalizedPreviewConfig {
+function normalizePreviewConfig(
+  config: WidgetFormData,
+): NormalizedPreviewConfig {
   const layout = config.layout === "list" ? "list" : "grid";
 
   return {
@@ -577,7 +582,9 @@ function buildPreviewDocument(payload: PreviewDocumentPayload): string {
 }
 
 function serializeForInlineScript(value: unknown) {
-  return JSON.stringify(value).replace(/</g, "\\u003C").replace(/>/g, "\\u003E");
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003C")
+    .replace(/>/g, "\\u003E");
 }
 
 function getDocumentNonce(): string | undefined {
@@ -585,6 +592,7 @@ function getDocumentNonce(): string | undefined {
     return undefined;
   }
 
-  const scriptWithNonce = document.querySelector<HTMLScriptElement>("script[nonce]");
+  const scriptWithNonce =
+    document.querySelector<HTMLScriptElement>("script[nonce]");
   return scriptWithNonce?.getAttribute("nonce") ?? undefined;
 }

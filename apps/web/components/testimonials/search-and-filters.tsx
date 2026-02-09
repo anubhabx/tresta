@@ -86,10 +86,9 @@ export function SearchAndFilters({
             className="pl-10 h-11 sm:h-10 text-sm"
           />
         </div>
-        
+
         {/* Filter Selects */}
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-
           {/* Basic Status Filter - Normal mode only */}
           {!moderationMode && (
             <Select value={filterStatus} onValueChange={onFilterStatusChange}>

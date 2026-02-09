@@ -30,12 +30,14 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [ablyClient, setAblyClient] = React.useState<any>(null);
   const [isConnected, setIsConnected] = React.useState(false);
-  const [connectionState, setConnectionState] = React.useState<string>("initialized");
+  const [connectionState, setConnectionState] =
+    React.useState<string>("initialized");
   const inactivityTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const wasManuallyDisconnectedRef = React.useRef(false);
 
   // Check if real notifications are enabled
-  const isEnabled = process.env.NEXT_PUBLIC_ENABLE_REAL_NOTIFICATIONS === "true";
+  const isEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_REAL_NOTIFICATIONS === "true";
 
   // Initialize Ably client
   React.useEffect(() => {
@@ -53,11 +55,14 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
         authCallback: async (tokenParams, callback) => {
           try {
             const token = await getToken();
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ably/token`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/ably/token`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
               },
-            });
+            );
 
             if (!response.ok) {
               throw new Error("Failed to fetch Ably token");
@@ -99,7 +104,9 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
 
         // Invalidate queries to fetch new notifications
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
-        queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
+        queryClient.invalidateQueries({
+          queryKey: ["notifications", "unread-count"],
+        });
 
         // Show toast notification
         if (message.data?.title) {
@@ -131,15 +138,24 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(inactivityTimerRef.current);
       }
 
-      inactivityTimerRef.current = setTimeout(() => {
-        console.log("Disconnecting Ably due to inactivity");
-        wasManuallyDisconnectedRef.current = true;
-        ablyClient.close();
-      }, 30 * 60 * 1000); // 30 minutes
+      inactivityTimerRef.current = setTimeout(
+        () => {
+          console.log("Disconnecting Ably due to inactivity");
+          wasManuallyDisconnectedRef.current = true;
+          ablyClient.close();
+        },
+        30 * 60 * 1000,
+      ); // 30 minutes
     };
 
     // Track user activity
-    const activityEvents = ["mousemove", "keypress", "click", "scroll", "touchstart"];
+    const activityEvents = [
+      "mousemove",
+      "keypress",
+      "click",
+      "scroll",
+      "touchstart",
+    ];
 
     activityEvents.forEach((event) => {
       window.addEventListener(event, resetInactivityTimer);

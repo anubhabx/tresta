@@ -114,7 +114,7 @@ function LayoutSwitcherHeader() {
           return (
             <motion.div
               key={item.label}
-              className="flex flex-col items-center gap-2"
+              className="flex flex-col items-center justify-between"
               animate={{
                 scale: isActive ? 1.15 : 1,
               }}
@@ -124,7 +124,7 @@ function LayoutSwitcherHeader() {
                 className={cn(
                   "flex h-11 w-11 items-center justify-center rounded-lg border transition-all duration-300",
                   isActive
-                    ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                    ? "border-cyan-500/50 bg-slate-800 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                     : "border-zinc-700 bg-zinc-800/50 text-zinc-500",
                 )}
               >
@@ -155,7 +155,7 @@ function ModerationHeader() {
   return (
     <div className="relative flex h-full items-center justify-center px-4">
       {/* Mock testimonial card */}
-      <div className="relative w-full max-w-[220px] rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3">
+      <div className="relative w-full max-w-[220px] rounded-lg border border-zinc-700/50 bg-zinc-800 p-3">
         {/* Stars */}
         <div className="mb-2 flex gap-0.5">
           {[...Array(5)].map((_, i) => (
@@ -275,8 +275,9 @@ function RealtimeFeedHeader() {
                   type: "spring",
                   stiffness: 400,
                   damping: 25,
+                  duration: 1,
                 }}
-                className="flex items-center gap-2 rounded-md border border-zinc-700/50 bg-zinc-800/50 p-2"
+                className="flex items-center gap-2 rounded-md border border-zinc-700/50 bg-zinc-800 p-2"
               >
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[9px] font-bold text-primary">
                   {item.initials}
@@ -399,7 +400,6 @@ export function Features() {
           />
         </BentoGrid>
       </div>
-
     </section>
   );
 }

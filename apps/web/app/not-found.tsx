@@ -22,8 +22,8 @@ export default function NotFoundPage() {
           </div>
           <CardTitle className="text-3xl font-bold">Page Not Found</CardTitle>
           <CardDescription className="text-base">
-            We couldn&apos;t find the page you were looking for. It may have been
-            moved, deleted, or never existed.
+            We couldn&apos;t find the page you were looking for. It may have
+            been moved, deleted, or never existed.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -44,7 +44,9 @@ export default function NotFoundPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild size="lg" className="flex-1">
-              <a href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}`}>
+              <a
+                href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@tresta.app"}`}
+              >
                 <LifeBuoy className="mr-2 h-4 w-4" />
                 Contact support
               </a>

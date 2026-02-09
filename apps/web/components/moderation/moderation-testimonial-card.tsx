@@ -144,7 +144,9 @@ export function ModerationTestimonialCard({
         {/* Moderation Notes */}
         {flags.length > 0 && (
           <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-muted/50 border">
-            <p className="text-xs font-medium mb-1.5 sm:mb-2">Moderation Notes:</p>
+            <p className="text-xs font-medium mb-1.5 sm:mb-2">
+              Moderation Notes:
+            </p>
             <ul className="space-y-1">
               {flags.map((flag, index) => (
                 <li key={index} className="text-xs flex items-start gap-2">
@@ -172,10 +174,14 @@ export function ModerationTestimonialCard({
             {testimonial.moderationStatus}
           </Badge>
           {testimonial.isPublished && (
-            <Badge variant="secondary" className="text-xs">Published</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Published
+            </Badge>
           )}
           {testimonial.autoPublished && (
-            <Badge variant="secondary" className="text-xs">Auto-Approved</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Auto-Approved
+            </Badge>
           )}
         </div>
 

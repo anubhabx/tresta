@@ -10,7 +10,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import {
   Select,
   SelectContent,
@@ -39,19 +44,22 @@ const layouts: { id: LayoutType; label: string }[] = [
 
 /**
  * Embed Dialog Component
- * 
+ *
  * Provides easy access to embed codes in multiple formats:
  * - Script tag (recommended)
  * - iframe
  * - React component
- * 
+ *
  * Design principle: Developer-first, copy-paste focused
  */
 export function EmbedDialog({ project, trigger }: EmbedDialogProps) {
   const [selectedLayout, setSelectedLayout] = useState<LayoutType>("carousel");
   const [open, setOpen] = useState(false);
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://tresta.app";
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://tresta.app";
 
   const scriptCode = `<!-- Tresta Testimonial Widget -->
 <div id="tresta-widget"></div>
@@ -102,7 +110,10 @@ function App() {
         {/* Layout Selector */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Layout:</span>
-          <Select value={selectedLayout} onValueChange={(v) => setSelectedLayout(v as LayoutType)}>
+          <Select
+            value={selectedLayout}
+            onValueChange={(v) => setSelectedLayout(v as LayoutType)}
+          >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -133,7 +144,8 @@ function App() {
 
           <TabsContent value="iframe" className="mt-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Use an iframe for sandboxed embedding. Simple but less customizable.
+              Use an iframe for sandboxed embedding. Simple but less
+              customizable.
             </p>
             <CodeBlock code={iframeCode} language="html" copyable />
           </TabsContent>

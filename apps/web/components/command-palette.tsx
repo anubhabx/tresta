@@ -73,7 +73,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       setCommandOpen(false);
       command();
     },
-    [setCommandOpen]
+    [setCommandOpen],
   );
 
   return (
@@ -90,17 +90,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         {/* Quick Actions */}
         <CommandGroup heading="Quick Actions">
           <CommandItem
-            onSelect={() =>
-              runCommand(() => router.push("/projects/new"))
-            }
+            onSelect={() => runCommand(() => router.push("/projects/new"))}
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             New Project
           </CommandItem>
           <CommandItem
-            onSelect={() =>
-              runCommand(() => router.push("/dashboard"))
-            }
+            onSelect={() => runCommand(() => router.push("/dashboard"))}
           >
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Go to Dashboard
@@ -122,9 +118,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 <CommandItem
                   key={project.id}
                   onSelect={() =>
-                    runCommand(() =>
-                      router.push(`/projects/${project.slug}`)
-                    )
+                    runCommand(() => router.push(`/projects/${project.slug}`))
                   }
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
@@ -136,9 +130,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               ))}
               {totalProjects > 5 && (
                 <CommandItem
-                  onSelect={() =>
-                    runCommand(() => router.push("/projects"))
-                  }
+                  onSelect={() => runCommand(() => router.push("/projects"))}
                 >
                   <Search className="mr-2 h-4 w-4" />
                   View all {totalProjects} projects...
@@ -152,9 +144,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
         {/* Navigation */}
         <CommandGroup heading="Navigation">
-          <CommandItem
-            onSelect={() => runCommand(() => router.push("/docs"))}
-          >
+          <CommandItem onSelect={() => runCommand(() => router.push("/docs"))}>
             <FileText className="mr-2 h-4 w-4" />
             API Documentation
           </CommandItem>
@@ -223,9 +213,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               Account
             </CommandItem>
             <CommandItem
-              onSelect={() =>
-                runCommand(() => signOut({ redirectUrl: "/" }))
-              }
+              onSelect={() => runCommand(() => signOut({ redirectUrl: "/" }))}
               className="text-destructive"
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -241,7 +229,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <CommandItem
             onSelect={() =>
               runCommand(() =>
-                window.open("mailto:support@tresta.app", "_blank")
+                window.open("mailto:support@tresta.app", "_blank"),
               )
             }
           >

@@ -12,8 +12,10 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 import { useSasUrl } from "@/hooks/use-sas-url";
 
-interface SasImageProps
-  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
+interface SasImageProps extends Omit<
+  React.ImgHTMLAttributes<HTMLImageElement>,
+  "src"
+> {
   /** The blob URL (with or without SAS token) */
   src: string | undefined | null;
   /** Alt text for the image */

@@ -21,15 +21,16 @@ const testimonials = [
     author: "@shipfast_dev",
     badge: "GitHub",
     rating: 5,
-    time: "2 seconds ago"
+    time: "2 seconds ago",
   },
   {
     id: 2,
-    content: "Finally, testimonials that don't look like they're from the 2015 era.",
+    content:
+      "Finally, testimonials that don't look like they're from the 2015 era.",
     author: "@indie_maker",
     badge: "Google",
     rating: 5,
-    time: "just now"
+    time: "just now",
   },
   {
     id: 3,
@@ -38,7 +39,7 @@ const testimonials = [
     author: "@frontend_dev",
     badge: "GitHub",
     rating: 5,
-    time: "5 seconds ago"
+    time: "5 seconds ago",
   },
   {
     id: 4,
@@ -46,8 +47,8 @@ const testimonials = [
     author: "@saas_founder",
     badge: "Google",
     rating: 5,
-    time: "just now"
-  }
+    time: "just now",
+  },
 ];
 
 function LiveTestimonialCard() {
@@ -70,7 +71,12 @@ function LiveTestimonialCard() {
         initial={{ opacity: 0, y: -10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25, duration: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25,
+          duration: 1,
+        }}
         className="absolute -top-3 left-4 z-10"
       >
         <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
@@ -130,7 +136,7 @@ function LiveTestimonialCard() {
               "h-1.5 rounded-full transition-all duration-300",
               i === currentIndex
                 ? "w-6 bg-primary"
-                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50",
             )}
             aria-label={`Go to testimonial ${i + 1}`}
           />

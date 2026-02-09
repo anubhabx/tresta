@@ -87,6 +87,6 @@ export function QuickInsightsCard({ projects }: QuickInsightsCardProps) {
           </Link>
         </div>
       </CardContent>
-    </Card >
-  )
+    </Card>
+  );
 }

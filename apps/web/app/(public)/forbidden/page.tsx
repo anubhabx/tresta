@@ -21,9 +21,9 @@ export default function ForbiddenPage() {
           </div>
           <CardTitle className="text-3xl">Access restricted</CardTitle>
           <CardDescription className="text-base">
-            You found an area that exists, but your account doesn&apos;t have the
-            required permissions. Reach out to your workspace admin if you need
-            access.
+            You found an area that exists, but your account doesn&apos;t have
+            the required permissions. Reach out to your workspace admin if you
+            need access.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

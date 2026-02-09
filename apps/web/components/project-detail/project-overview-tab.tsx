@@ -115,7 +115,9 @@ export function ProjectOverviewTab({
                 <div className="flex items-start gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">No testimonials yet</h4>
+                    <h4 className="text-xs sm:text-sm font-medium">
+                      No testimonials yet
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Share your collection URL to start gathering testimonials
                     </p>
@@ -138,7 +140,9 @@ export function ProjectOverviewTab({
                 <div className="flex items-start gap-2 mb-2">
                   <TrendingUp className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">Create a widget</h4>
+                    <h4 className="text-xs sm:text-sm font-medium">
+                      Create a widget
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Display testimonials on your website
                     </p>
@@ -162,7 +166,9 @@ export function ProjectOverviewTab({
                 <div className="flex items-start gap-2 mb-2">
                   <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">Review testimonials</h4>
+                    <h4 className="text-xs sm:text-sm font-medium">
+                      Review testimonials
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Moderate and approve submissions
                     </p>
@@ -186,7 +192,9 @@ export function ProjectOverviewTab({
                 <div className="flex items-start gap-2 mb-2">
                   <BarChart3 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">Manage widgets</h4>
+                    <h4 className="text-xs sm:text-sm font-medium">
+                      Manage widgets
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Edit or create new display widgets
                     </p>
@@ -224,14 +232,22 @@ export function ProjectOverviewTab({
             <div className="space-y-2">
               {project.autoModeration && (
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Badge variant="secondary" className="text-xs">Enabled</Badge>
-                  <span className="text-muted-foreground">AI-powered content moderation</span>
+                  <Badge variant="secondary" className="text-xs">
+                    Enabled
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    AI-powered content moderation
+                  </span>
                 </div>
               )}
               {project.autoApproveVerified && (
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Badge variant="secondary" className="text-xs">Enabled</Badge>
-                  <span className="text-muted-foreground">Auto-approve verified users</span>
+                  <Badge variant="secondary" className="text-xs">
+                    Enabled
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    Auto-approve verified users
+                  </span>
                 </div>
               )}
               {project.profanityFilterLevel && (
@@ -239,7 +255,9 @@ export function ProjectOverviewTab({
                   <Badge variant="secondary" className="text-xs capitalize">
                     {project.profanityFilterLevel.toLowerCase()}
                   </Badge>
-                  <span className="text-muted-foreground">Profanity filter level</span>
+                  <span className="text-muted-foreground">
+                    Profanity filter level
+                  </span>
                 </div>
               )}
             </div>

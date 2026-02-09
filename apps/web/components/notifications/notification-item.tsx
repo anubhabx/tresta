@@ -17,7 +17,10 @@ interface NotificationItemProps {
   onClose?: () => void;
 }
 
-export function NotificationItem({ notification, onClose }: NotificationItemProps) {
+export function NotificationItem({
+  notification,
+  onClose,
+}: NotificationItemProps) {
   const router = useRouter();
   const markAsRead = useMarkAsRead();
 
@@ -41,7 +44,7 @@ export function NotificationItem({ notification, onClose }: NotificationItemProp
       onClick={handleClick}
       className={cn(
         "w-full text-left p-4 hover:bg-accent transition-colors border-b last:border-b-0",
-        !notification.isRead && "bg-info-highlight-bg"
+        !notification.isRead && "bg-info-highlight-bg",
       )}
     >
       <div className="flex items-start gap-2">
@@ -49,17 +52,21 @@ export function NotificationItem({ notification, onClose }: NotificationItemProp
           <div className="mt-2 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
         )}
         <div className="flex-1 min-w-0">
-          <p className={cn(
-            "text-sm font-medium mb-1",
-            !notification.isRead && "font-semibold"
-          )}>
+          <p
+            className={cn(
+              "text-sm font-medium mb-1",
+              !notification.isRead && "font-semibold",
+            )}
+          >
             {notification.title}
           </p>
           <p className="text-sm text-muted-foreground line-clamp-2">
             {notification.message}
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+            {formatDistanceToNow(new Date(notification.createdAt), {
+              addSuffix: true,
+            })}
           </p>
         </div>
       </div>

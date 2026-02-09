@@ -97,7 +97,7 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                           "flex flex-col items-center gap-2 p-4 rounded-lg border transition-all text-center",
                           isSelected
                             ? "border-primary bg-primary/5 ring-1 ring-primary"
-                            : "border-border hover:border-primary/50 hover:bg-muted/50"
+                            : "border-border hover:border-primary/50 hover:bg-muted/50",
                         )}
                       >
                         <Icon
@@ -105,13 +105,13 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                             "h-6 w-6",
                             isSelected
                               ? "text-primary"
-                              : "text-muted-foreground"
+                              : "text-muted-foreground",
                           )}
                         />
                         <span
                           className={cn(
                             "text-sm font-medium",
-                            isSelected ? "text-primary" : "text-foreground"
+                            isSelected ? "text-primary" : "text-foreground",
                           )}
                         >
                           {layout.label}
@@ -154,7 +154,7 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                           "flex items-center justify-center gap-2 p-3 rounded-lg border transition-all",
                           isSelected
                             ? "border-primary bg-primary/5 ring-1 ring-primary"
-                            : "border-border hover:border-primary/50 hover:bg-muted/50"
+                            : "border-border hover:border-primary/50 hover:bg-muted/50",
                         )}
                       >
                         <Icon
@@ -162,13 +162,13 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
                             "h-4 w-4",
                             isSelected
                               ? "text-primary"
-                              : "text-muted-foreground"
+                              : "text-muted-foreground",
                           )}
                         />
                         <span
                           className={cn(
                             "text-sm font-medium",
-                            isSelected ? "text-primary" : "text-foreground"
+                            isSelected ? "text-primary" : "text-foreground",
                           )}
                         >
                           {theme.label}

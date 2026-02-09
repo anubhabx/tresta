@@ -67,9 +67,13 @@ export function AccountSettingsSkeleton() {
           </CardHeader>
           <CardContent className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 border rounded-lg"
+              >
                 <div className="flex items-center gap-2">
-                  <Skeleton className="h-10 w-10 rounded" /> {/* Provider icon */}
+                  <Skeleton className="h-10 w-10 rounded" />{" "}
+                  {/* Provider icon */}
                   <div className="space-y-1">
                     <Skeleton className="h-4 w-24" /> {/* Provider name */}
                     <Skeleton className="h-3 w-40" /> {/* Email */}
@@ -94,7 +98,8 @@ export function AccountSettingsSkeleton() {
             </div>
             <div className="border-t pt-4">
               <Skeleton className="h-4 w-40 mb-2" />
-              <Skeleton className="h-9 w-36 bg-destructive/10" /> {/* Delete button */}
+              <Skeleton className="h-9 w-36 bg-destructive/10" />{" "}
+              {/* Delete button */}
             </div>
           </CardContent>
         </Card>

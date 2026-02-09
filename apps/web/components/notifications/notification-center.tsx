@@ -33,7 +33,10 @@ export function NotificationCenter() {
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCenter}>
-      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md p-0 flex flex-col"
+      >
         <SheetHeader className="p-6 pb-4 border-b">
           <div className="flex items-center justify-between">
             <SheetTitle>Notifications</SheetTitle>
