@@ -1,56 +1,53 @@
-import { TestimonialCard } from "./TestimonialCard";
+/**
+ * WidgetRoot — Root component for the Tresta Widget.
+ *
+ * Delegates layout rendering to dedicated layout components.
+ * Handles theme wrapper and branding badge.
+ */
+
 import type { WidgetData } from "@/types";
+import {
+  GridLayout,
+  ListLayout,
+  MasonryLayout,
+  CarouselLayout,
+  WallOfLoveLayout,
+  MarqueeLayout,
+} from "./layouts";
 
 interface WidgetRootProps {
   data: WidgetData;
-}
-
-/**
- * Resolve CSS grid classes based on the configured layout type.
- * Phase 2 will swap these with dedicated layout components.
- */
-function getLayoutClasses(type: string, columns: number = 3): string {
-  switch (type) {
-    case "list":
-      return "grid grid-cols-1 gap-4";
-    case "masonry":
-      // Phase 2: CSS columns / masonry component
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(columns, 3)} gap-4`;
-    case "carousel":
-      // Phase 2: Horizontal slider with auto-rotate
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(columns, 3)} gap-4`;
-    case "wall":
-      // Phase 2: Dense overlapping cards
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(columns, 4)} gap-3`;
-    case "marquee":
-      // Phase 2: Infinite horizontal scroll
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(columns, 3)} gap-4`;
-    case "grid":
-    default:
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(columns, 3)} gap-4`;
-  }
 }
 
 export function WidgetRoot({ data }: WidgetRootProps) {
   const { testimonials, config } = data;
   const { layout, display, theme } = config;
 
-  const layoutClasses = getLayoutClasses(layout.type, layout.columns);
+  const layoutProps = { testimonials, displayOptions: display, theme, layout };
+
+  function renderLayout() {
+    switch (layout.type) {
+      case "list":
+        return <ListLayout {...layoutProps} />;
+      case "masonry":
+        return <MasonryLayout {...layoutProps} />;
+      case "carousel":
+        return <CarouselLayout {...layoutProps} />;
+      case "wall":
+        return <WallOfLoveLayout {...layoutProps} />;
+      case "marquee":
+        return <MarqueeLayout {...layoutProps} />;
+      case "grid":
+      default:
+        return <GridLayout {...layoutProps} />;
+    }
+  }
 
   return (
     <div
       className={`tresta-widget-root w-full ${theme.mode === "dark" ? "dark" : ""}`}
     >
-      <div className={layoutClasses}>
-        {testimonials.map((testimonial) => (
-          <TestimonialCard
-            key={testimonial.id}
-            testimonial={testimonial}
-            displayOptions={display}
-            theme={theme}
-          />
-        ))}
-      </div>
+      {renderLayout()}
 
       {/* Branding Badge */}
       <div className="mt-4 flex justify-center">

@@ -45,7 +45,7 @@ export interface WidgetDisplayConfig {
 }
 
 export interface LayoutConfig {
-  type: 'carousel' | 'grid' | 'masonry' | 'wall' | 'list';
+  type: "carousel" | "grid" | "masonry" | "wall" | "list" | "marquee";
   maxTestimonials?: number;
   autoRotate?: boolean;
   rotateInterval?: number;
@@ -54,11 +54,11 @@ export interface LayoutConfig {
 }
 
 export interface ThemeConfig {
-  mode: 'light' | 'dark' | 'auto';
+  mode: "light" | "dark" | "auto";
   primaryColor: string;
   secondaryColor: string;
   fontFamily?: string;
-  cardStyle: 'default' | 'minimal' | 'bordered';
+  cardStyle: "default" | "minimal" | "bordered" | "glass";
 }
 
 export interface DisplayOptions {
@@ -87,30 +87,30 @@ export interface Testimonial {
     company?: string;
   };
   media?: {
-    type: 'image' | 'video';
+    type: "image" | "video";
     url: string;
     thumbnail?: string;
   };
 }
 
 export enum WidgetErrorCode {
-  INVALID_WIDGET_ID = 'INVALID_WIDGET_ID',
-  API_TIMEOUT = 'API_TIMEOUT',
-  API_ERROR = 'API_ERROR',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  RATE_LIMITED = 'RATE_LIMITED',
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  PARSE_ERROR = 'PARSE_ERROR',
-  RENDER_ERROR = 'RENDER_ERROR',
+  INVALID_WIDGET_ID = "INVALID_WIDGET_ID",
+  API_TIMEOUT = "API_TIMEOUT",
+  API_ERROR = "API_ERROR",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  RATE_LIMITED = "RATE_LIMITED",
+  UNAUTHORIZED = "UNAUTHORIZED",
+  PARSE_ERROR = "PARSE_ERROR",
+  RENDER_ERROR = "RENDER_ERROR",
 }
 
 export class WidgetError extends Error {
   constructor(
     public code: WidgetErrorCode,
     message: string,
-    public recoverable: boolean = true
+    public recoverable: boolean = true,
   ) {
     super(message);
-    this.name = 'WidgetError';
+    this.name = "WidgetError";
   }
 }

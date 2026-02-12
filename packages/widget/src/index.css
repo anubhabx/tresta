@@ -39,21 +39,21 @@
 
   @keyframes accordion-down {
     from {
-      height: 0
+      height: 0;
     }
 
     to {
-      height: var(--radix-accordion-content-height)
+      height: var(--radix-accordion-content-height);
     }
   }
 
   @keyframes accordion-up {
     from {
-      height: var(--radix-accordion-content-height)
+      height: var(--radix-accordion-content-height);
     }
 
     to {
-      height: 0
+      height: 0;
     }
   }
 }
@@ -67,7 +67,6 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-
   *,
   ::after,
   ::before,
@@ -146,5 +145,162 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Layout: Grid — responsive columns via data-cols
+   ───────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .tresta-grid[data-cols="2"],
+  .tresta-grid[data-cols="3"],
+  .tresta-grid[data-cols="4"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .tresta-grid[data-cols="3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .tresta-grid[data-cols="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Layout: Masonry — responsive CSS columns
+   ───────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .tresta-masonry[data-cols="2"],
+  .tresta-masonry[data-cols="3"],
+  .tresta-masonry[data-cols="4"] {
+    column-count: 2;
+  }
+}
+@media (min-width: 1024px) {
+  .tresta-masonry[data-cols="3"] {
+    column-count: 3;
+  }
+  .tresta-masonry[data-cols="4"] {
+    column-count: 4;
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Layout: Wall of Love — responsive CSS columns
+   ───────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .tresta-wall[data-cols="2"],
+  .tresta-wall[data-cols="3"],
+  .tresta-wall[data-cols="4"] {
+    column-count: 2;
+  }
+}
+@media (min-width: 1024px) {
+  .tresta-wall[data-cols="3"] {
+    column-count: 3;
+  }
+  .tresta-wall[data-cols="4"] {
+    column-count: 4;
+  }
+}
+.tresta-wall-item:hover {
+  transform: rotate(0deg) scale(1.02) !important;
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────────────────
+   Layout: Carousel — navigation & dots
+   ───────────────────────────────────────────────────── */
+.tresta-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.tresta-carousel-prev,
+.tresta-carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+  backdrop-filter: blur(4px);
+}
+.tresta-carousel-prev {
+  left: 8px;
+}
+.tresta-carousel-next {
+  right: 8px;
+}
+.tresta-carousel-prev:hover,
+.tresta-carousel-next:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.tresta-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+.tresta-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(128, 128, 128, 0.4);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+  padding: 0;
+}
+.tresta-carousel-dot.active {
+  background: var(--color-primary, #0066ff);
+  transform: scale(1.25);
+}
+
+/* ─────────────────────────────────────────────────────
+   Layout: Marquee — infinite horizontal scroll
+   ───────────────────────────────────────────────────── */
+.tresta-marquee-row {
+  overflow: hidden;
+  width: 100%;
+}
+.tresta-marquee-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: tresta-marquee-scroll 30s linear infinite;
+}
+.tresta-marquee-reverse .tresta-marquee-track {
+  animation-direction: reverse;
+}
+.tresta-marquee:hover .tresta-marquee-track {
+  animation-play-state: paused;
+}
+.tresta-marquee-item {
+  flex: 0 0 320px;
+  max-width: 320px;
+  min-width: 280px;
+}
+
+@keyframes tresta-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
