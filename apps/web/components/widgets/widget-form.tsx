@@ -20,7 +20,7 @@ import {
 const MIN_MAX_TESTIMONIALS = 20;
 
 const widgetFormSchema = z.object({
-  layout: z.enum(["carousel", "grid", "masonry", "wall", "list"]),
+  layout: z.enum(["carousel", "grid", "masonry", "wall", "list", "marquee"]),
   theme: z.enum(["light", "dark", "auto"]),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   showRating: z.boolean(),
@@ -117,8 +117,15 @@ export function WidgetForm({
 }
 
 function getInitialValues(config?: WidgetConfig) {
-  // Normalize layout to one of the 5 valid options
-  const validLayouts = ["carousel", "grid", "masonry", "wall", "list"];
+  // Normalize layout to one of the 6 valid options
+  const validLayouts = [
+    "carousel",
+    "grid",
+    "masonry",
+    "wall",
+    "list",
+    "marquee",
+  ];
   const normalizedLayout = validLayouts.includes(config?.layout || "")
     ? config!.layout
     : "grid";
@@ -137,8 +144,9 @@ function getInitialValues(config?: WidgetConfig) {
         : DEFAULT_WIDGET_CONFIG.showAvatar,
     maxTestimonials:
       config?.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
-    autoRotate: false,
-    rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
+    autoRotate: config?.autoRotate ?? false,
+    rotateInterval:
+      config?.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
   } as WidgetFormData;
 
   normalized.maxTestimonials = Math.min(

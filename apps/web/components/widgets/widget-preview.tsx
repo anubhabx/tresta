@@ -95,7 +95,7 @@ interface WidgetPreviewProps {
 }
 
 type NormalizedPreviewConfig = {
-  layout: "grid" | "list";
+  layout: "grid" | "list" | "masonry" | "carousel" | "wall" | "marquee";
   theme: "light" | "dark" | "auto";
   primaryColor: string;
   showRating: boolean;
@@ -292,7 +292,7 @@ function buildMockApiResponse({
     showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
     columns: config.layout === "grid" ? 3 : 1,
     showNavigation: false,
-  } satisfies WidgetConfig;
+  } as WidgetConfig;
 
   defaultedSettings.maxTestimonials = config.maxTestimonials;
   defaultedSettings.autoRotate = false;
@@ -347,10 +347,8 @@ function buildMockApiResponse({
 function normalizePreviewConfig(
   config: WidgetFormData,
 ): NormalizedPreviewConfig {
-  const layout = config.layout === "list" ? "list" : "grid";
-
   return {
-    layout,
+    layout: config.layout ?? "grid",
     theme: config.theme ?? DEFAULT_WIDGET_CONFIG.theme,
     primaryColor: config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
     showRating: config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,

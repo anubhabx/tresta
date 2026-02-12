@@ -24,25 +24,30 @@ import {
   Columns3,
   Heart,
   GalleryHorizontal,
+  MoveHorizontal,
   Sun,
   Moon,
   Monitor,
+  Crown,
 } from "lucide-react";
 import type { WidgetFormData } from "./widget-form";
+import { PRO_LAYOUTS } from "@workspace/types";
+import type { WidgetLayout } from "@workspace/types";
 
 // Layout options with visual icons
 const layouts = [
-  {
-    id: "carousel",
-    label: "Carousel",
-    icon: GalleryHorizontal,
-    description: "Rotating testimonials",
-  },
   {
     id: "grid",
     label: "Grid",
     icon: LayoutGrid,
     description: "Card-based layout",
+  },
+  { id: "list", label: "List", icon: List, description: "Vertical stack" },
+  {
+    id: "carousel",
+    label: "Carousel",
+    icon: GalleryHorizontal,
+    description: "Rotating testimonials",
   },
   {
     id: "masonry",
@@ -56,7 +61,12 @@ const layouts = [
     icon: Heart,
     description: "Dense, impactful",
   },
-  { id: "list", label: "List", icon: List, description: "Vertical stack" },
+  {
+    id: "marquee",
+    label: "Marquee",
+    icon: MoveHorizontal,
+    description: "Infinite scroll",
+  },
 ] as const;
 
 // Theme options with icons
@@ -84,22 +94,31 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
                   {layouts.map((layout) => {
                     const Icon = layout.icon;
                     const isSelected = field.value === layout.id;
+                    const isPro = (PRO_LAYOUTS as readonly string[]).includes(
+                      layout.id,
+                    );
                     return (
                       <button
                         key={layout.id}
                         type="button"
                         onClick={() => field.onChange(layout.id)}
                         className={cn(
-                          "flex flex-col items-center gap-2 p-4 rounded-lg border transition-all text-center",
+                          "relative flex flex-col items-center gap-2 p-4 rounded-lg border transition-all text-center",
                           isSelected
                             ? "border-primary bg-primary/5 ring-1 ring-primary"
                             : "border-border hover:border-primary/50 hover:bg-muted/50",
                         )}
                       >
+                        {isPro && (
+                          <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            <Crown className="h-2.5 w-2.5" />
+                            Pro
+                          </span>
+                        )}
                         <Icon
                           className={cn(
                             "h-6 w-6",

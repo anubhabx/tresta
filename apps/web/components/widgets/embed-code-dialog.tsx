@@ -115,8 +115,7 @@ export function EmbedCodeDialog({
     script: `<!-- Tresta Widget -->
 <script 
   src="${widgetScriptUrl}" 
-    data-widget-id="${widgetId}"
-    data-tresta-widget="${widgetId}" 
+  data-tresta-widget="${widgetId}" 
   data-api-url="${apiUrl}"
   data-api-key="${displayApiKey}">
 </script>`,

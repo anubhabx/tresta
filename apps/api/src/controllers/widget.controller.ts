@@ -9,17 +9,17 @@ import {
   ForbiddenError,
   InternalServerError,
   ValidationError,
-  handlePrismaError
-} from '../lib/errors.js';
-import { ResponseHandler } from '../lib/response.js';
+  handlePrismaError,
+} from "../lib/errors.js";
+import { ResponseHandler } from "../lib/response.js";
 import {
   DEFAULT_WIDGET_CONFIG,
-  MVP_WIDGET_CONFIG_FIELDS,
-  type WidgetConfig
+  WIDGET_CONFIG_FIELDS,
+  type WidgetConfig,
 } from "@workspace/types";
-import { validateWidgetConfig } from '../validators/widget.validator.js';
-import type { WidgetData } from '../../types/api-responses.js';
-import { validateApiKey } from '../services/api-key.service.js';
+import { validateWidgetConfig } from "../validators/widget.validator.js";
+import type { WidgetData } from "../../types/api-responses.js";
+import { validateApiKey } from "../services/api-key.service.js";
 
 const escapeHtmlAttribute = (value: string): string =>
   value
@@ -31,7 +31,7 @@ const escapeHtmlAttribute = (value: string): string =>
 const createWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { projectId, config } = req.body;
@@ -40,7 +40,7 @@ const createWidget = async (
     if (!projectId || typeof projectId !== "string") {
       throw new ValidationError("Project ID is required and must be a string", {
         field: "projectId",
-        received: typeof projectId
+        received: typeof projectId,
       });
     }
 
@@ -50,8 +50,8 @@ const createWidget = async (
         "Widget configuration is required and must be an object",
         {
           field: "config",
-          received: typeof config
-        }
+          received: typeof config,
+        },
       );
     }
 
@@ -63,8 +63,8 @@ const createWidget = async (
         `Invalid widget configuration: ${error.message}`,
         {
           field: "config",
-          error: error.message
-        }
+          error: error.message,
+        },
       );
     }
 
@@ -72,7 +72,7 @@ const createWidget = async (
     let project;
     try {
       project = await prisma.project.findUnique({
-        where: { id: projectId }
+        where: { id: projectId },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -81,7 +81,7 @@ const createWidget = async (
     if (!project) {
       throw new NotFoundError(`Project with ID "${projectId}" not found`, {
         projectId,
-        suggestion: "Please check the project ID"
+        suggestion: "Please check the project ID",
       });
     }
 
@@ -93,8 +93,8 @@ const createWidget = async (
       widget = await prisma.widget.create({
         data: {
           projectId,
-          config: normalizedConfig as any
-        }
+          config: normalizedConfig as any,
+        },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -102,7 +102,7 @@ const createWidget = async (
 
     ResponseHandler.success(res, {
       message: "Widget created successfully",
-      data: widget
+      data: widget,
     });
   } catch (error) {
     next(error);
@@ -115,7 +115,7 @@ const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
 
     // Find project by slug
     const project = await prisma.project.findUnique({
-      where: { slug }
+      where: { slug },
     });
 
     if (!project) {
@@ -124,12 +124,12 @@ const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
 
     // Fetch widgets for the project
     const widgets = await prisma.widget.findMany({
-      where: { projectId: project.id }
+      where: { projectId: project.id },
     });
 
     ResponseHandler.success(res, {
       message: "Widgets fetched successfully",
-      data: widgets
+      data: widgets,
     });
   } catch (error) {
     next(error);
@@ -139,7 +139,7 @@ const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
 const updateWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
@@ -152,7 +152,7 @@ const updateWidget = async (
 
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
-      where: { id: widgetId }
+      where: { id: widgetId },
     });
 
     if (!existingWidget) {
@@ -169,7 +169,7 @@ const updateWidget = async (
         validatedConfig = validateWidgetConfig(config);
       } catch (error: any) {
         throw new BadRequestError(
-          `Invalid widget configuration: ${error.message}`
+          `Invalid widget configuration: ${error.message}`,
         );
       }
     }
@@ -179,14 +179,14 @@ const updateWidget = async (
     try {
       const nextConfig = normalizeWidgetConfig({
         ...(existingWidget.config as WidgetConfig),
-        ...(validatedConfig ?? {})
+        ...(validatedConfig ?? {}),
       });
 
       updatedWidget = await prisma.widget.update({
         where: { id: widgetId },
         data: {
-          config: nextConfig as any
-        }
+          config: nextConfig as any,
+        },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -194,7 +194,7 @@ const updateWidget = async (
 
     ResponseHandler.success(res, {
       message: "Widget updated successfully",
-      data: updatedWidget
+      data: updatedWidget,
     });
   } catch (error) {
     next(error);
@@ -204,7 +204,7 @@ const updateWidget = async (
 const deleteWidget = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
@@ -213,7 +213,7 @@ const deleteWidget = async (
     if (!widgetId || typeof widgetId !== "string") {
       throw new ValidationError("Widget ID is required and must be a string", {
         field: "widgetId",
-        received: typeof widgetId
+        received: typeof widgetId,
       });
     }
 
@@ -221,7 +221,7 @@ const deleteWidget = async (
     let existingWidget;
     try {
       existingWidget = await prisma.widget.findUnique({
-        where: { id: widgetId }
+        where: { id: widgetId },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -230,21 +230,21 @@ const deleteWidget = async (
     if (!existingWidget) {
       throw new NotFoundError(`Widget with ID "${widgetId}" not found`, {
         widgetId,
-        suggestion: "The widget may have already been deleted"
+        suggestion: "The widget may have already been deleted",
       });
     }
 
     // Delete the widget
     try {
       await prisma.widget.delete({
-        where: { id: widgetId }
+        where: { id: widgetId },
       });
     } catch (error) {
       throw handlePrismaError(error);
     }
 
     ResponseHandler.success(res, {
-      message: "Widget deleted successfully"
+      message: "Widget deleted successfully",
     });
   } catch (error) {
     next(error);
@@ -259,7 +259,7 @@ const deleteWidget = async (
 const fetchPublicWidgetData = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
@@ -284,10 +284,10 @@ const fetchPublicWidgetData = async (
             brandColorPrimary: true,
             brandColorSecondary: true,
             isActive: true,
-            visibility: true
-          }
-        }
-      }
+            visibility: true,
+          },
+        },
+      },
     });
 
     console.log("📦 Widget found:", widget ? "YES" : "NO");
@@ -296,7 +296,7 @@ const fetchPublicWidgetData = async (
         id: widget.id,
         hasProject: !!widget.Project,
         projectName: widget.Project?.name,
-        projectVisibility: widget.Project?.visibility
+        projectVisibility: widget.Project?.visibility,
       });
     }
 
@@ -317,14 +317,14 @@ const fetchPublicWidgetData = async (
     // Only PUBLIC projects can have their widgets embedded
     if (widget.Project.visibility !== "PUBLIC") {
       throw new ForbiddenError(
-        "Widgets can only be embedded for public projects"
+        "Widgets can only be embedded for public projects",
       );
     }
 
     // Verify API key has access to this project
     if (req.apiKey && req.apiKey.projectId !== widget.Project.id) {
       throw new ForbiddenError(
-        "API key does not have permission to access this widget's project"
+        "API key does not have permission to access this widget's project",
       );
     }
 
@@ -333,7 +333,7 @@ const fetchPublicWidgetData = async (
       where: {
         projectId: widget.Project.id,
         isPublished: true, // Only published testimonials
-        isApproved: true // Must be approved
+        isApproved: true, // Must be approved
       },
       select: {
         id: true,
@@ -347,17 +347,19 @@ const fetchPublicWidgetData = async (
         type: true,
         createdAt: true,
         isOAuthVerified: true,
-        oauthProvider: true
+        oauthProvider: true,
         // Exclude sensitive data (email, IP, user agent, OAuth subject, etc.)
       },
       orderBy: {
-        createdAt: "desc"
+        createdAt: "desc",
       },
-      take: 100 // Limit to prevent abuse
+      take: 100, // Limit to prevent abuse
     });
 
     // Parse widget config (it's stored as JSON)
-    const runtimeConfig = mergeWithWidgetDefaults(widget.config as WidgetConfig);
+    const runtimeConfig = mergeWithWidgetDefaults(
+      widget.config as WidgetConfig,
+    );
 
     // Prepare response data - flatten config for widget consumption
     const widgetData = {
@@ -368,16 +370,16 @@ const fetchPublicWidgetData = async (
         layout: runtimeConfig.layout || "grid",
         theme: {
           primaryColor: runtimeConfig.primaryColor,
-          secondaryColor: runtimeConfig.secondaryColor
+          secondaryColor: runtimeConfig.secondaryColor,
         },
-        settings: runtimeConfig
+        settings: runtimeConfig,
       },
       project: {
         name: widget.Project.name,
         slug: widget.Project.slug,
         logoUrl: widget.Project.logoUrl,
         brandColorPrimary: widget.Project.brandColorPrimary,
-        brandColorSecondary: widget.Project.brandColorSecondary
+        brandColorSecondary: widget.Project.brandColorSecondary,
       },
       testimonials: testimonials.map((t) => ({
         id: t.id,
@@ -391,12 +393,12 @@ const fetchPublicWidgetData = async (
         type: t.type,
         createdAt: t.createdAt.toISOString(),
         isOAuthVerified: t.isOAuthVerified,
-        oauthProvider: t.oauthProvider
+        oauthProvider: t.oauthProvider,
       })),
       meta: {
         total: testimonials.length,
-        fetchedAt: new Date().toISOString()
-      }
+        fetchedAt: new Date().toISOString(),
+      },
     };
 
     // Set aggressive caching headers for CDN and browser caching
@@ -406,12 +408,12 @@ const fetchPublicWidgetData = async (
         "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
       "CDN-Cache-Control": "public, max-age=300",
       Vary: "Accept-Encoding",
-      ETag: `W/"${widgetId}-${testimonials.length}-${Date.now()}"`
+      ETag: `W/"${widgetId}-${testimonials.length}-${Date.now()}"`,
     });
 
     return ResponseHandler.success(res, {
       message: "Widget data fetched successfully",
-      data: widgetData
+      data: widgetData,
     });
   } catch (error) {
     next(error);
@@ -424,14 +426,12 @@ const fetchPublicWidgetData = async (
 const renderWidgetPage = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { widgetId } = req.params;
     const apiKeyParam = req.query.apiKey;
-    const apiKey = Array.isArray(apiKeyParam)
-      ? apiKeyParam[0]
-      : apiKeyParam;
+    const apiKey = Array.isArray(apiKeyParam) ? apiKeyParam[0] : apiKeyParam;
 
     if (!widgetId) {
       throw new BadRequestError("Widget ID is required");
@@ -439,7 +439,7 @@ const renderWidgetPage = async (
 
     if (!apiKey || typeof apiKey !== "string") {
       throw new BadRequestError(
-        "API key is required. Append ?apiKey=YOUR_API_KEY to the iframe URL."
+        "API key is required. Append ?apiKey=YOUR_API_KEY to the iframe URL.",
       );
     }
 
@@ -447,7 +447,7 @@ const renderWidgetPage = async (
 
     if (!apiKeyValidation.isValid) {
       throw new UnauthorizedError(
-        apiKeyValidation.reason || "Invalid API key provided"
+        apiKeyValidation.reason || "Invalid API key provided",
       );
     }
 
@@ -488,7 +488,7 @@ const renderWidgetPage = async (
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "public, max-age=300, s-maxage=600",
       "X-Frame-Options": "ALLOWALL",
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
     });
 
     return res.send(html);
@@ -503,7 +503,7 @@ export {
   listWidgets,
   deleteWidget,
   fetchPublicWidgetData,
-  renderWidgetPage
+  renderWidgetPage,
 };
 
 const MAX_MVP_TESTIMONIALS = 20;
@@ -517,19 +517,19 @@ function clamp(value: number, min: number, max: number) {
 function mergeWithWidgetDefaults(config?: WidgetConfig | null): WidgetConfig {
   const merged = {
     ...DEFAULT_WIDGET_CONFIG,
-    ...(config ?? {})
+    ...(config ?? {}),
   } as WidgetConfig;
 
   merged.maxTestimonials = clamp(
     merged.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
     1,
-    MAX_MVP_TESTIMONIALS
+    MAX_MVP_TESTIMONIALS,
   );
 
   merged.rotateInterval = clamp(
     merged.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
     MIN_ROTATE_INTERVAL,
-    MAX_ROTATE_INTERVAL
+    MAX_ROTATE_INTERVAL,
   );
 
   if (merged.layout !== "carousel") {
@@ -553,7 +553,7 @@ function mergeWithWidgetDefaults(config?: WidgetConfig | null): WidgetConfig {
 
 function normalizeWidgetConfig(config?: Partial<WidgetConfig>): WidgetConfig {
   const merged = mergeWithWidgetDefaults(config as WidgetConfig);
-  return MVP_WIDGET_CONFIG_FIELDS.reduce((acc, key) => {
+  return WIDGET_CONFIG_FIELDS.reduce((acc, key) => {
     (acc as Record<string, unknown>)[key as string] = merged[key];
     return acc;
   }, {} as WidgetConfig);

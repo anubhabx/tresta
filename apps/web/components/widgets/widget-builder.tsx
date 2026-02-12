@@ -59,8 +59,15 @@ export function WidgetBuilder({
   // Initialize preview config with widget data when editing
   useEffect(() => {
     if (mode === "edit" && widget?.config) {
-      // Normalize layout to one of the 5 valid options
-      const validLayouts = ["carousel", "grid", "masonry", "wall", "list"];
+      // Normalize layout to one of the 6 valid options
+      const validLayouts = [
+        "carousel",
+        "grid",
+        "masonry",
+        "wall",
+        "list",
+        "marquee",
+      ];
       const normalizedLayout = validLayouts.includes(widget.config.layout || "")
         ? widget.config.layout
         : "grid";
@@ -77,8 +84,9 @@ export function WidgetBuilder({
         maxTestimonials:
           widget.config.maxTestimonials ||
           DEFAULT_WIDGET_CONFIG.maxTestimonials,
-        autoRotate: false,
-        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
+        autoRotate: widget.config.autoRotate ?? false,
+        rotateInterval:
+          widget.config.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
       });
     }
   }, [mode, widget]);
@@ -95,8 +103,9 @@ export function WidgetBuilder({
         showRating: data.showRating,
         showAvatar: data.showAvatar,
         maxTestimonials: data.maxTestimonials,
-        autoRotate: false,
-        rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
+        autoRotate: data.autoRotate ?? false,
+        rotateInterval:
+          data.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
       };
 
       if (mode === "create") {

@@ -6,14 +6,40 @@
 /**
  * Widget layout types
  */
-export type WidgetLayout = "carousel" | "grid" | "masonry" | "wall" | "list";
+export type WidgetLayout =
+  | "grid"
+  | "list"
+  | "masonry"
+  | "carousel"
+  | "wall"
+  | "marquee";
 
 /**
- * Subset of layouts we expose in the MVP embed builder.
+ * All valid layout values as a const array.
  */
-export const MVP_WIDGET_LAYOUTS = ["grid", "carousel"] as const;
+export const ALL_WIDGET_LAYOUTS = [
+  "grid",
+  "list",
+  "masonry",
+  "carousel",
+  "wall",
+  "marquee",
+] as const;
 
-export type MvpWidgetLayout = (typeof MVP_WIDGET_LAYOUTS)[number];
+/**
+ * Layouts available on the Free plan.
+ */
+export const FREE_LAYOUTS: readonly WidgetLayout[] = ["grid", "list"] as const;
+
+/**
+ * Layouts that require a Pro subscription.
+ */
+export const PRO_LAYOUTS: readonly WidgetLayout[] = [
+  "masonry",
+  "carousel",
+  "wall",
+  "marquee",
+] as const;
 
 /**
  * Widget theme types
@@ -25,12 +51,12 @@ export const MVP_WIDGET_THEMES = ["light", "dark", "auto"] as const;
 /**
  * Card style types
  */
-export type CardStyle = "default" | "minimal" | "bordered";
+export type CardStyle = "default" | "minimal" | "bordered" | "glass";
 
 /**
  * Animation types
  */
-export type AnimationType = "fade" | "slide" | "none";
+export type AnimationType = "none" | "fadeIn" | "slideUp" | "scale";
 
 /**
  * Widget Configuration
@@ -60,11 +86,18 @@ export interface WidgetConfig {
   // Styling
   cardStyle?: CardStyle;
   animation?: AnimationType;
+  fontFamily?: string;
+  cardRadius?: number; // px
+  cardShadow?: boolean;
 
   // Carousel Behavior
   autoRotate?: boolean;
   rotateInterval?: number; // milliseconds
   showNavigation?: boolean;
+  showDots?: boolean;
+
+  // Branding
+  showBranding?: boolean; // "Powered by Tresta" badge
 }
 
 /**
@@ -72,39 +105,69 @@ export interface WidgetConfig {
  */
 export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
   layout: "grid",
-  theme: "light",
+  theme: "dark",
   primaryColor: "#0066FF",
-  secondaryColor: "#00CC99",
+  secondaryColor: "#1a1a2e",
   showRating: true,
   showDate: true,
-  showAvatar: false,
+  showAvatar: true,
   showAuthorRole: true,
   showAuthorCompany: true,
   maxTestimonials: 10,
   columns: 3,
-  gap: 24,
+  gap: 16,
   cardStyle: "default",
-  animation: "fade",
+  animation: "fadeIn",
+  fontFamily: "Inter, system-ui, sans-serif",
+  cardRadius: 12,
+  cardShadow: true,
   autoRotate: false,
   rotateInterval: 5000,
   showNavigation: true,
+  showDots: true,
+  showBranding: true,
 };
+
+/**
+ * Free-tier limits
+ */
+export const FREE_TIER_LIMITS = {
+  maxTestimonials: 10,
+  maxWidgets: 1,
+} as const;
 
 /**
  * Fields surfaced in the MVP-level customization UI.
  */
-export const MVP_WIDGET_CONFIG_FIELDS = [
+/**
+ * Fields surfaced in the widget customization UI.
+ */
+export const WIDGET_CONFIG_FIELDS = [
   "layout",
   "theme",
   "primaryColor",
+  "secondaryColor",
   "showRating",
   "showAvatar",
+  "showDate",
+  "showAuthorRole",
+  "showAuthorCompany",
   "maxTestimonials",
+  "columns",
+  "gap",
+  "cardStyle",
+  "animation",
+  "fontFamily",
+  "cardRadius",
+  "cardShadow",
   "autoRotate",
   "rotateInterval",
+  "showNavigation",
+  "showDots",
+  "showBranding",
 ] as const satisfies ReadonlyArray<keyof WidgetConfig>;
 
-export type MvpWidgetConfigField = (typeof MVP_WIDGET_CONFIG_FIELDS)[number];
+export type WidgetConfigField = (typeof WIDGET_CONFIG_FIELDS)[number];
 
 /**
  * Widget entity (database model)
