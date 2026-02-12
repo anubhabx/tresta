@@ -45,17 +45,17 @@ export function WidgetRoot({ data }: WidgetRootProps) {
 
   return (
     <div
-      className={`tresta-widget-root w-full ${theme.mode === "dark" ? "dark" : ""}`}
+      className={`tresta-widget-root ${theme.mode === "dark" ? "tresta-widget-root--dark" : ""}`}
     >
       {renderLayout()}
 
       {/* Branding Badge */}
-      <div className="mt-4 flex justify-center">
+      <div className="tresta-branding">
         <a
           href="https://tresta.dev"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-[#00796b] transition-colors"
+          className="tresta-branding__link"
         >
           Powered by Tresta
         </a>

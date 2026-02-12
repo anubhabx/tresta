@@ -1,12 +1,36 @@
-import { Card, CardContent } from "@/components/ui/card";
+/**
+ * TestimonialCard — Widget embed component
+ *
+ * Uses vanilla CSS classes (tresta-card-*) instead of Tailwind utilities
+ * and inlines the Star SVG instead of importing lucide-preact.
+ * This keeps the widget bundle lightweight.
+ */
+
 import { cn } from "@/lib/utils";
 import type { Testimonial, DisplayOptions, ThemeConfig } from "@/types";
-import { Star } from "lucide-preact";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
   displayOptions: DisplayOptions;
   theme: ThemeConfig;
+}
+
+function StarIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill={filled ? "#eab308" : "none"}
+      stroke={filled ? "#eab308" : "currentColor"}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      className="tresta-star"
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
 }
 
 export function TestimonialCard({
@@ -15,76 +39,58 @@ export function TestimonialCard({
   theme,
 }: TestimonialCardProps) {
   const isDark = theme.mode === "dark";
-  const cardStyle = (theme as any).cardStyle ?? "default";
+  const cardStyle = theme.cardStyle ?? "default";
+
+  const cardClass = cn(
+    "tresta-card",
+    isDark ? "tresta-card--dark" : "tresta-card--light",
+    `tresta-card--${cardStyle}`,
+  );
 
   return (
-    <Card
-      className={cn(
-        "transition-all duration-300 h-full",
-        // Base theme coloring
-        isDark ? "text-white" : "text-zinc-900",
-        // Card style variants
-        cardStyle === "glass" &&
-          (isDark
-            ? "border-white/10 bg-white/5 backdrop-blur-md"
-            : "border-zinc-200/50 bg-white/60 backdrop-blur-md"),
-        cardStyle === "minimal" &&
-          (isDark
-            ? "border-transparent bg-transparent shadow-none"
-            : "border-transparent bg-transparent shadow-none"),
-        cardStyle === "bordered" &&
-          (isDark
-            ? "border-zinc-700 bg-transparent"
-            : "border-zinc-300 bg-transparent"),
-        (cardStyle === "default" || !cardStyle) &&
-          (isDark ? "border-zinc-800 bg-zinc-900" : "border-zinc-200 bg-white"),
-      )}
-    >
-      <CardContent className="p-6 flex flex-col h-full">
+    <div className={cardClass}>
+      <div className="tresta-card__body">
+        {/* Star Rating */}
         {displayOptions.showRating && testimonial.rating > 0 && (
-          <div className="mb-4 flex gap-1">
+          <div className="tresta-card__stars">
             {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={cn(
-                  "h-4 w-4",
-                  star <= testimonial.rating
-                    ? "fill-yellow-500 text-yellow-500"
-                    : "text-zinc-300 dark:text-zinc-700",
-                )}
-              />
+              <StarIcon key={star} filled={star <= testimonial.rating} />
             ))}
           </div>
         )}
 
+        {/* Content */}
         <p
           className={cn(
-            "mb-4 text-sm flex-grow",
-            isDark ? "text-zinc-400" : "text-zinc-600",
+            "tresta-card__content",
+            isDark
+              ? "tresta-card__content--dark"
+              : "tresta-card__content--light",
           )}
         >
           &quot;{testimonial.content}&quot;
         </p>
 
-        <div className="flex items-center gap-3 mt-auto">
+        {/* Author */}
+        <div className="tresta-card__author">
           {displayOptions.showAvatar && (
             <div
               className={cn(
-                "h-8 w-8 rounded-full flex items-center justify-center overflow-hidden shrink-0",
+                "tresta-card__avatar",
                 isDark
-                  ? "bg-zinc-800 text-zinc-300"
-                  : "bg-zinc-100 text-zinc-600",
+                  ? "tresta-card__avatar--dark"
+                  : "tresta-card__avatar--light",
               )}
             >
               {testimonial.author.avatar ? (
                 <img
                   src={testimonial.author.avatar}
                   alt={testimonial.author.name}
-                  className="h-full w-full object-cover"
+                  className="tresta-card__avatar-img"
                   loading="lazy"
                 />
               ) : (
-                <span className="text-xs font-medium">
+                <span className="tresta-card__avatar-initials">
                   {getInitials(testimonial.author.name)}
                 </span>
               )}
@@ -92,15 +98,10 @@ export function TestimonialCard({
           )}
 
           <div>
-            <p className="text-sm font-semibold">{testimonial.author.name}</p>
+            <p className="tresta-card__name">{testimonial.author.name}</p>
             {(displayOptions.showAuthorRole ||
               displayOptions.showAuthorCompany) && (
-              <p
-                className={cn(
-                  "text-xs",
-                  isDark ? "text-zinc-500" : "text-zinc-500",
-                )}
-              >
+              <p className="tresta-card__meta">
                 {displayOptions.showAuthorRole && testimonial.author.role}
                 {displayOptions.showAuthorRole &&
                   displayOptions.showAuthorCompany &&
@@ -111,11 +112,12 @@ export function TestimonialCard({
           </div>
         </div>
 
+        {/* Date */}
         {displayOptions.showDate && (
           <div
             className={cn(
-              "mt-4 text-xs",
-              isDark ? "text-zinc-600" : "text-zinc-400",
+              "tresta-card__date",
+              isDark ? "tresta-card__date--dark" : "tresta-card__date--light",
             )}
           >
             {new Date(testimonial.createdAt).toLocaleDateString(undefined, {
@@ -125,8 +127,8 @@ export function TestimonialCard({
             })}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

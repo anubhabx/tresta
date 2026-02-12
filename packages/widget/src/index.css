@@ -1,156 +1,201 @@
-@import "tailwindcss";
-
-@theme {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-
-  --color-tresta-primary: hsl(var(--tresta-primary));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-
-    to {
-      height: var(--radix-accordion-content-height);
-    }
-  }
-
-  @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height);
-    }
-
-    to {
-      height: 0;
-    }
-  }
-}
-
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-
-    --tresta-primary: oklch(0.5166 0.0931 181.0803);
-
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --tresta-primary: oklch(0.5166 0.0931 181.0803);
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
 /* ─────────────────────────────────────────────────────
-   Layout: Grid — responsive columns via data-cols
+   Tresta Widget — Vanilla CSS (no Tailwind)
+   
+   All styles use the tresta- prefix to avoid
+   collisions inside host pages / Shadow DOM.
    ───────────────────────────────────────────────────── */
+
+/* ─── Reset (scoped) ───────────────────────────────── */
+.tresta-widget-root,
+.tresta-widget-root *,
+.tresta-widget-root *::before,
+.tresta-widget-root *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Root ─────────────────────────────────────────── */
+.tresta-widget-root {
+  width: 100%;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Branding Badge ───────────────────────────────── */
+.tresta-branding {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+.tresta-branding__link {
+  font-size: 10px;
+  color: #00796b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.tresta-branding__link:hover {
+  color: #004d40;
+}
+
+/* ═════════════════════════════════════════════════════
+   Testimonial Card
+   ═════════════════════════════════════════════════════ */
+.tresta-card {
+  border-radius: 12px;
+  border: 1px solid;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+/* ─── Theme Variants ───────────────────────────────── */
+.tresta-card--light {
+  color: #18181b;
+}
+.tresta-card--dark {
+  color: #fff;
+}
+
+/* ─── Card Style Variants ──────────────────────────── */
+.tresta-card--default.tresta-card--light {
+  border-color: #e4e4e7;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.tresta-card--default.tresta-card--dark {
+  border-color: #27272a;
+  background: #18181b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.tresta-card--minimal {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tresta-card--bordered.tresta-card--light {
+  border-color: #d4d4d8;
+  background: transparent;
+}
+.tresta-card--bordered.tresta-card--dark {
+  border-color: #3f3f46;
+  background: transparent;
+}
+
+.tresta-card--glass.tresta-card--light {
+  border-color: rgba(228, 228, 231, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.tresta-card--glass.tresta-card--dark {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Card Body ────────────────────────────────────── */
+.tresta-card__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ─── Stars ────────────────────────────────────────── */
+.tresta-card__stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.tresta-star {
+  width: 16px;
+  height: 16px;
+}
+
+/* ─── Content ──────────────────────────────────────── */
+.tresta-card__content {
+  margin-bottom: 16px;
+  font-size: 14px;
+  flex-grow: 1;
+}
+.tresta-card__content--light {
+  color: #52525b;
+}
+.tresta-card__content--dark {
+  color: #a1a1aa;
+}
+
+/* ─── Author ───────────────────────────────────────── */
+.tresta-card__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+.tresta-card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.tresta-card__avatar--light {
+  background: #f4f4f5;
+  color: #52525b;
+}
+.tresta-card__avatar--dark {
+  background: #27272a;
+  color: #d4d4d8;
+}
+
+.tresta-card__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tresta-card__avatar-initials {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tresta-card__name {
+  font-size: 14px;
+  font-weight: 600;
+}
+.tresta-card__meta {
+  font-size: 12px;
+  color: #71717a;
+}
+
+/* ─── Date ─────────────────────────────────────────── */
+.tresta-card__date {
+  margin-top: 16px;
+  font-size: 12px;
+}
+.tresta-card__date--light {
+  color: #a1a1aa;
+}
+.tresta-card__date--dark {
+  color: #52525b;
+}
+
+/* ═════════════════════════════════════════════════════
+   Layout: Grid
+   ═════════════════════════════════════════════════════ */
+.tresta-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
 @media (min-width: 640px) {
   .tresta-grid[data-cols="2"],
   .tresta-grid[data-cols="3"],
@@ -167,9 +212,26 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────
-   Layout: Masonry — responsive CSS columns
-   ───────────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════
+   Layout: List
+   ═════════════════════════════════════════════════════ */
+.tresta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ═════════════════════════════════════════════════════
+   Layout: Masonry
+   ═════════════════════════════════════════════════════ */
+.tresta-masonry {
+  column-count: 1;
+  column-gap: 16px;
+}
+.tresta-masonry-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
 @media (min-width: 640px) {
   .tresta-masonry[data-cols="2"],
   .tresta-masonry[data-cols="3"],
@@ -186,9 +248,22 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────
-   Layout: Wall of Love — responsive CSS columns
-   ───────────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════
+   Layout: Wall of Love
+   ═════════════════════════════════════════════════════ */
+.tresta-wall {
+  column-count: 1;
+  column-gap: 12px;
+}
+.tresta-wall-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+.tresta-wall-item:hover {
+  transform: rotate(0deg) scale(1.02) !important;
+  z-index: 1;
+}
 @media (min-width: 640px) {
   .tresta-wall[data-cols="2"],
   .tresta-wall[data-cols="3"],
@@ -204,16 +279,30 @@
     column-count: 4;
   }
 }
-.tresta-wall-item:hover {
-  transform: rotate(0deg) scale(1.02) !important;
-  z-index: 1;
+
+/* ═════════════════════════════════════════════════════
+   Layout: Carousel
+   ═════════════════════════════════════════════════════ */
+.tresta-carousel {
+  position: relative;
+  width: 100%;
 }
 
-/* ─────────────────────────────────────────────────────
-   Layout: Carousel — navigation & dots
-   ───────────────────────────────────────────────────── */
+.tresta-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  gap: 16px;
+}
 .tresta-carousel-track::-webkit-scrollbar {
   display: none;
+}
+
+.tresta-carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  min-width: 0;
 }
 
 .tresta-carousel-prev,
@@ -232,10 +321,9 @@
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    opacity 0.2s;
+  transition: background 0.2s;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .tresta-carousel-prev {
   left: 8px;
@@ -267,17 +355,23 @@
   padding: 0;
 }
 .tresta-carousel-dot.active {
-  background: var(--color-primary, #0066ff);
+  background: #0066ff;
   transform: scale(1.25);
 }
 
-/* ─────────────────────────────────────────────────────
-   Layout: Marquee — infinite horizontal scroll
-   ───────────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════
+   Layout: Marquee
+   ═════════════════════════════════════════════════════ */
+.tresta-marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
 .tresta-marquee-row {
   overflow: hidden;
   width: 100%;
 }
+
 .tresta-marquee-track {
   display: flex;
   gap: 16px;

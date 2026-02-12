@@ -1,44 +1,42 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { defineConfig } from "vite";
+import { resolve } from "path";
 // import compression from 'vite-plugin-compression';
 // import { visualizer } from 'rollup-plugin-visualizer';
-import preact from '@preact/preset-vite';
-import tailwindcss from '@tailwindcss/vite';
+import preact from "@preact/preset-vite";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'TrestaWidgetLib',
-      formats: ['iife'],
-      fileName: () => 'tresta-widget.js',
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "TrestaWidgetLib",
+      formats: ["iife"],
+      fileName: () => "tresta-widget.js",
     },
     rollupOptions: {
       output: {
         // Use named exports to avoid default export warning
-        exports: 'named',
+        exports: "named",
         // Inline all imports for IIFE format (single bundle)
         inlineDynamicImports: true,
       },
     },
     sourcemap: true,
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
-        drop_console: mode === 'production' ? ['debug'] : false,
+        drop_console: mode === "production" ? ["debug"] : false,
         passes: 2,
       },
       mangle: {
         safari10: true,
       },
     },
-    target: 'es2020',
+    target: "es2020",
     cssCodeSplit: false,
   },
   plugins: [
     preact(),
-    tailwindcss(),
     // Gzip compression
     // compression({
     //   algorithm: 'gzip',
@@ -62,13 +60,13 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      react: 'preact/compat',
-      'react-dom/test-utils': 'preact/test-utils',
-      'react-dom': 'preact/compat',
+      "@": resolve(__dirname, "./src"),
+      react: "preact/compat",
+      "react-dom/test-utils": "preact/test-utils",
+      "react-dom": "preact/compat",
     },
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(mode),
+    "process.env.NODE_ENV": JSON.stringify(mode),
   },
-}))
+}));
