@@ -8,7 +8,7 @@ const toc = [
   { id: "how-we-use-data", title: "How We Use Your Data", level: 2 as const },
   { id: "data-security", title: "Data Security", level: 2 as const },
   { id: "third-party-links", title: "Third-Party Links", level: 2 as const },
-  { id: "contact", title: "Contact Us", level: 2 as const }
+  { id: "contact", title: "Contact Us", level: 2 as const },
 ];
 
 export default function PrivacyPolicyPage() {
