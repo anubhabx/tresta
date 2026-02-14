@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
 import {
   FormControl,
@@ -19,16 +19,7 @@ import {
 import { Info, Star, X } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Button } from "@workspace/ui/components/button";
-import type Color from "color";
-import {
-  ColorPicker,
-  ColorPickerSelection,
-  ColorPickerHue,
-  ColorPickerAlpha,
-  ColorPickerEyeDropper,
-  ColorPickerOutput,
-  ColorPickerFormat,
-} from "@/components/color-picker";
+import { ColorPicker } from "@/components/color-picker";
 import { FileUpload } from "@workspace/ui/components/file-upload";
 
 // Base props shared by all field types
@@ -45,24 +36,21 @@ interface BaseFormFieldProps<TFieldValues extends FieldValues> {
 }
 
 // Props for text-based inputs
-interface TextFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface TextFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "text" | "email" | "url" | "number";
   onChange?: (value: string) => void;
 }
 
 // Props for password input
-interface PasswordFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface PasswordFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "password";
 }
 
 // Props for textarea
-interface TextareaFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface TextareaFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "textarea";
   rows?: number;
   maxLength?: number;
@@ -70,25 +58,22 @@ interface TextareaFormFieldProps<
 }
 
 // Props for rating
-interface RatingFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface RatingFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "rating";
   max?: number;
 }
 
 // Props for color picker
-interface ColorPickerFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface ColorPickerFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "color";
   onChange?: (value: string) => void;
 }
 
 // Props for file upload
-interface FileUploadFormFieldProps<
-  TFieldValues extends FieldValues,
-> extends BaseFormFieldProps<TFieldValues> {
+interface FileUploadFormFieldProps<TFieldValues extends FieldValues>
+  extends BaseFormFieldProps<TFieldValues> {
   type: "file";
   onChange?: (files: File[]) => void;
 }
@@ -325,27 +310,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
         control={control}
         name={name}
         render={({ field }) => {
-          // Provide a default color if value is empty or undefined
           const colorValue = field.value || placeholder || "#000000";
-
-          // Memoize the onChange handler to prevent infinite re-renders
-          const handleColorChange = useCallback(
-            (rgba: Parameters<typeof Color.rgb>[0]) => {
-              // Convert RGBA to HEX
-              const colorArray = Array.isArray(rgba) ? rgba : [0, 0, 0];
-              const [r = 0, g = 0, b = 0] = colorArray;
-              const hex = `#${[r, g, b]
-                .map((x) => Math.round(x).toString(16).padStart(2, "0"))
-                .join("")}`;
-
-              // Update the form field value
-              field.onChange(hex);
-              if (props.onChange) {
-                props.onChange(hex);
-              }
-            },
-            [field.onChange],
-          );
 
           return (
             <FormItem className={className}>
@@ -353,26 +318,14 @@ export function CustomFormField<TFieldValues extends FieldValues>(
               <ColorPicker
                 value={colorValue}
                 defaultValue={colorValue}
-                onChange={handleColorChange as any}
-                className="w-full"
-              >
-                <div className="flex gap-2">
-                  <div className="flex flex-col gap-2 flex-1">
-                    <ColorPickerSelection className="h-32" />
-                    <div className="flex gap-2">
-                      <ColorPickerHue />
-                      <ColorPickerAlpha />
-                    </div>
-                    <div className="flex gap-2">
-                      <ColorPickerFormat className="flex-1" />
-                      <div className="flex gap-1">
-                        <ColorPickerOutput />
-                        <ColorPickerEyeDropper />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ColorPicker>
+                onChange={(hex: string) => {
+                  field.onChange(hex);
+                  if (props.onChange) {
+                    props.onChange(hex);
+                  }
+                }}
+                disabled={disabled}
+              />
               <FormMessage />
             </FormItem>
           );

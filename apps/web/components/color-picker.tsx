@@ -1,555 +1,568 @@
+/**
+ * Color Picker
+ *
+ * A compact, popover-based color picker built with the app's design system.
+ * Uses Popover for the dropdown, Radix Slider for the hue track, and DS Input
+ * for hex editing. No external color libraries — all conversion math is inlined.
+ *
+ * @module components/color-picker
+ */
+
 "use client";
 
-import Color from "color";
-import { PipetteIcon } from "lucide-react";
-import { Slider } from "radix-ui";
+import * as React from "react";
 import {
-  type ComponentProps,
-  createContext,
-  type HTMLAttributes,
-  memo,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { PipetteIcon } from "lucide-react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 
-interface ColorPickerContextValue {
+// ============================================================================
+// COLOR CONVERSION UTILITIES (no external deps)
+// ============================================================================
+
+/** Clamp a number between min and max */
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+/** HSL (h: 0-360, s: 0-100, l: 0-100) → RGB (0-255 each) */
+function hslToRgb(
+  h: number,
+  s: number,
+  l: number,
+): [number, number, number] {
+  const sn = s / 100;
+  const ln = l / 100;
+  const c = (1 - Math.abs(2 * ln - 1)) * sn;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = ln - c / 2;
+  let r = 0,
+    g = 0,
+    b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255),
+  ];
+}
+
+/** RGB (0-255 each) → HSL (h: 0-360, s: 0-100, l: 0-100) */
+function rgbToHsl(
+  r: number,
+  g: number,
+  b: number,
+): [number, number, number] {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const d = max - min;
+  const l = (max + min) / 2;
+  if (d === 0) return [0, 0, Math.round(l * 100)];
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) * 60;
+  else if (max === gn) h = ((bn - rn) / d + 2) * 60;
+  else h = ((rn - gn) / d + 4) * 60;
+  return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+}
+
+/** Hex string → RGB tuple */
+function hexToRgb(hex: string): [number, number, number] {
+  const clean = hex.replace("#", "");
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean;
+  return [
+    parseInt(full.slice(0, 2), 16),
+    parseInt(full.slice(2, 4), 16),
+    parseInt(full.slice(4, 6), 16),
+  ];
+}
+
+/** RGB → 6-digit hex (uppercase) */
+function rgbToHex(r: number, g: number, b: number): string {
+  return `#${[r, g, b]
+    .map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
+/** Hex → HSL */
+function hexToHsl(hex: string): [number, number, number] {
+  return rgbToHsl(...hexToRgb(hex));
+}
+
+/** HSL → Hex */
+function hslToHex(h: number, s: number, l: number): string {
+  return rgbToHex(...hslToRgb(h, s, l));
+}
+
+/** Validate a 3 or 6 char hex string */
+function isValidHex(hex: string): boolean {
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
+}
+
+// ============================================================================
+// COLOR PICKER COMPONENT
+// ============================================================================
+
+export interface ColorPickerProps {
+  /** Current hex color value (controlled) */
+  value?: string;
+  /** Default hex color (uncontrolled fallback) */
+  defaultValue?: string;
+  /** Called with a 6-digit uppercase hex string on change */
+  onChange?: (hex: string) => void;
+  /** Disable all interaction */
+  disabled?: boolean;
+  /** Additional class name for the trigger */
+  className?: string;
+  /** Placeholder text for the hex input */
+  placeholder?: string;
+}
+
+export function ColorPicker({
+  value,
+  defaultValue = "#3B82F6",
+  onChange,
+  disabled = false,
+  className,
+  placeholder = "#000000",
+}: ColorPickerProps) {
+  // Derive initial HSL from value or default
+  const initialHex = value || defaultValue;
+  const [initH, initS, initL] = hexToHsl(
+    isValidHex(initialHex) ? initialHex : "#000000",
+  );
+
+  const [hue, setHue] = useState(initH);
+  const [saturation, setSaturation] = useState(initS);
+  const [lightness, setLightness] = useState(initL);
+  const [hexInput, setHexInput] = useState(
+    isValidHex(initialHex) ? initialHex.toUpperCase() : "#000000",
+  );
+
+  // Track whether we're being externally controlled to avoid loops
+  const isExternalUpdate = useRef(false);
+
+  // Sync from external value prop
+  useEffect(() => {
+    if (value && isValidHex(value)) {
+      const [h, s, l] = hexToHsl(value);
+      const currentHex = hslToHex(hue, saturation, lightness);
+      // Only update if the external value is actually different
+      if (currentHex.toUpperCase() !== value.toUpperCase()) {
+        isExternalUpdate.current = true;
+        setHue(h);
+        setSaturation(s);
+        setLightness(l);
+        setHexInput(value.toUpperCase());
+      }
+    }
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Notify parent when internal state changes (not from external sync)
+  useEffect(() => {
+    if (isExternalUpdate.current) {
+      isExternalUpdate.current = false;
+      return;
+    }
+    const hex = hslToHex(hue, saturation, lightness);
+    setHexInput(hex);
+    onChange?.(hex);
+  }, [hue, saturation, lightness]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Handle hex text input
+  const handleHexInput = useCallback(
+    (raw: string) => {
+      // Always update the text field so the user can type freely
+      const val = raw.startsWith("#") ? raw : `#${raw}`;
+      setHexInput(val);
+      if (isValidHex(val)) {
+        const [h, s, l] = hexToHsl(val);
+        isExternalUpdate.current = true; // prevent double-fire
+        setHue(h);
+        setSaturation(s);
+        setLightness(l);
+        onChange?.(val.toUpperCase());
+      }
+    },
+    [onChange],
+  );
+
+  // EyeDropper
+  const handleEyeDropper = useCallback(async () => {
+    try {
+      // @ts-expect-error - EyeDropper API is experimental
+      const dropper = new EyeDropper();
+      const result = await dropper.open();
+      handleHexInput(result.sRGBHex);
+    } catch {
+      // User cancelled or API not available
+    }
+  }, [handleHexInput]);
+
+  const currentHex = hslToHex(hue, saturation, lightness);
+  const hasEyeDropper = typeof window !== "undefined" && "EyeDropper" in window;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild disabled={disabled}>
+        <button
+          type="button"
+          disabled={disabled}
+          className={cn(
+            "flex h-9 items-center gap-2 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-all duration-150",
+            "hover:border-ring hover:bg-accent/50",
+            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20",
+            "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+            "dark:bg-input/30",
+            className,
+          )}
+        >
+          <span
+            className="h-5 w-5 shrink-0 rounded border border-border"
+            style={{ backgroundColor: currentHex }}
+          />
+          <span className="font-mono text-xs text-muted-foreground">
+            {currentHex}
+          </span>
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        className="w-64 p-3 space-y-3"
+        align="start"
+        sideOffset={6}
+      >
+        {/* Saturation / Lightness canvas */}
+        <SaturationPanel
+          hue={hue}
+          saturation={saturation}
+          lightness={lightness}
+          onSaturationChange={setSaturation}
+          onLightnessChange={setLightness}
+        />
+
+        {/* Hue slider */}
+        <HueSlider hue={hue} onHueChange={setHue} />
+
+        {/* Hex input + eyedropper */}
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-1">
+            <Input
+              className="h-8 font-mono text-xs pl-3 pr-2 uppercase"
+              value={hexInput}
+              onChange={(e) => handleHexInput(e.target.value)}
+              placeholder={placeholder}
+              maxLength={7}
+            />
+          </div>
+          {hasEyeDropper && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={handleEyeDropper}
+            >
+              <PipetteIcon className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+// ============================================================================
+// SATURATION / LIGHTNESS PANEL
+// ============================================================================
+
+interface SaturationPanelProps {
   hue: number;
   saturation: number;
   lightness: number;
-  alpha: number;
-  mode: string;
-  setHue: (hue: number) => void;
-  setSaturation: (saturation: number) => void;
-  setLightness: (lightness: number) => void;
-  setAlpha: (alpha: number) => void;
-  setMode: (mode: string) => void;
+  onSaturationChange: (s: number) => void;
+  onLightnessChange: (l: number) => void;
 }
 
-const ColorPickerContext = createContext<ColorPickerContextValue | undefined>(
-  undefined,
-);
+function SaturationPanel({
+  hue,
+  saturation,
+  lightness,
+  onSaturationChange,
+  onLightnessChange,
+}: SaturationPanelProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
 
-export const useColorPicker = () => {
-  const context = useContext(ColorPickerContext);
+  // Convert HSL to canvas position
+  const positionX = useMemo(() => {
+    if (saturation === 0 && lightness === 0) return 0;
+    if (saturation === 0 && lightness === 100) return 0;
+    return clamp(saturation / 100, 0, 1);
+  }, [saturation, lightness]);
 
-  if (!context) {
-    throw new Error("useColorPicker must be used within a ColorPickerProvider");
-  }
+  const positionY = useMemo(() => {
+    const topLightness = saturation < 1 ? 100 : 50 + 50 * (1 - saturation / 100);
+    const y = topLightness === 0 ? 1 : 1 - lightness / topLightness;
+    return clamp(y, 0, 1);
+  }, [saturation, lightness]);
 
-  return context;
-};
+  const updateFromPosition = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = clamp((clientX - rect.left) / rect.width, 0, 1);
+      const y = clamp((clientY - rect.top) / rect.height, 0, 1);
 
-export type ColorPickerProps = HTMLAttributes<HTMLDivElement> & {
-  value?: Parameters<typeof Color>[0];
-  defaultValue?: Parameters<typeof Color>[0];
-  onChange?: (value: Parameters<typeof Color.rgb>[0]) => void;
-};
+      const newSaturation = x * 100;
+      const topLightness = x < 0.01 ? 100 : 50 + 50 * (1 - x);
+      const newLightness = topLightness * (1 - y);
 
-export const ColorPicker = ({
-  value,
-  defaultValue = "#000000",
-  onChange,
-  className,
-  ...props
-}: ColorPickerProps) => {
-  const selectedColor = Color(value);
-  const defaultColor = Color(defaultValue);
-
-  const [hue, setHue] = useState(
-    selectedColor.hue() || defaultColor.hue() || 0,
+      onSaturationChange(newSaturation);
+      onLightnessChange(newLightness);
+    },
+    [onSaturationChange, onLightnessChange],
   );
-  const [saturation, setSaturation] = useState(
-    selectedColor.saturationl() || defaultColor.saturationl() || 100,
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      isDragging.current = true;
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      updateFromPosition(e.clientX, e.clientY);
+    },
+    [updateFromPosition],
   );
-  const [lightness, setLightness] = useState(
-    selectedColor.lightness() || defaultColor.lightness() || 50,
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging.current) return;
+      updateFromPosition(e.clientX, e.clientY);
+    },
+    [updateFromPosition],
   );
-  const [alpha, setAlpha] = useState(() => {
-    const selectedAlpha = selectedColor.alpha();
-    const defaultAlpha = defaultColor.alpha();
-    if (selectedAlpha !== undefined && selectedAlpha !== null) {
-      return selectedAlpha * 100;
-    }
-    if (defaultAlpha !== undefined && defaultAlpha !== null) {
-      return defaultAlpha * 100;
-    }
-    return 100;
-  });
-  const [mode, setMode] = useState("hex");
 
-  // Update color when controlled value changes
-  useEffect(() => {
-    if (value) {
-      const color = Color(value);
-      const hslValues = color.hsl().array();
-      const alphaValue = color.alpha();
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
 
-      setHue(hslValues[0] as number);
-      setSaturation(hslValues[1] as number);
-      setLightness(hslValues[2] as number);
-      setAlpha((alphaValue ?? 1) * 100);
-    }
-  }, [value]);
-
-  // Notify parent of changes
-  useEffect(() => {
-    if (onChange) {
-      const color = Color.hsl(hue, saturation, lightness).alpha(alpha / 100);
-      const rgba = color.rgb().array();
-
-      onChange([rgba[0], rgba[1], rgba[2], alpha / 100]);
-    }
-  }, [hue, saturation, lightness, alpha, onChange]);
+  const bgGradient = useMemo(
+    () =>
+      `linear-gradient(0deg, #000, transparent), linear-gradient(90deg, #fff, transparent), hsl(${hue}, 100%, 50%)`,
+    [hue],
+  );
 
   return (
-    <ColorPickerContext.Provider
-      value={{
-        hue,
-        saturation,
-        lightness,
-        alpha,
-        mode,
-        setHue,
-        setSaturation,
-        setLightness,
-        setAlpha,
-        setMode,
-      }}
+    <div
+      ref={containerRef}
+      className="relative h-32 w-full cursor-crosshair rounded-md border border-border overflow-hidden"
+      style={{ background: bgGradient }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
     >
       <div
-        className={cn("flex size-full flex-col gap-4", className)}
-        {...props}
-      />
-    </ColorPickerContext.Provider>
-  );
-};
-
-export type ColorPickerSelectionProps = HTMLAttributes<HTMLDivElement>;
-
-export const ColorPickerSelection = memo(
-  ({ className, ...props }: ColorPickerSelectionProps) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [positionX, setPositionX] = useState(0);
-    const [positionY, setPositionY] = useState(0);
-    const { hue, setSaturation, setLightness } = useColorPicker();
-
-    const backgroundGradient = useMemo(() => {
-      return `linear-gradient(0deg, rgba(0,0,0,1), rgba(0,0,0,0)),
-            linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)),
-            hsl(${hue}, 100%, 50%)`;
-    }, [hue]);
-
-    const handlePointerMove = useCallback(
-      (event: PointerEvent) => {
-        if (!(isDragging && containerRef.current)) {
-          return;
-        }
-        const rect = containerRef.current.getBoundingClientRect();
-        const x = Math.max(
-          0,
-          Math.min(1, (event.clientX - rect.left) / rect.width),
-        );
-        const y = Math.max(
-          0,
-          Math.min(1, (event.clientY - rect.top) / rect.height),
-        );
-        setPositionX(x);
-        setPositionY(y);
-        setSaturation(x * 100);
-        const topLightness = x < 0.01 ? 100 : 50 + 50 * (1 - x);
-        const lightness = topLightness * (1 - y);
-
-        setLightness(lightness);
-      },
-      [isDragging, setSaturation, setLightness],
-    );
-
-    useEffect(() => {
-      const handlePointerUp = () => setIsDragging(false);
-
-      if (isDragging) {
-        window.addEventListener("pointermove", handlePointerMove);
-        window.addEventListener("pointerup", handlePointerUp);
-      }
-
-      return () => {
-        window.removeEventListener("pointermove", handlePointerMove);
-        window.removeEventListener("pointerup", handlePointerUp);
-      };
-    }, [isDragging, handlePointerMove]);
-
-    return (
-      <div
-        className={cn("relative size-full cursor-crosshair rounded", className)}
-        onPointerDown={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-          handlePointerMove(e.nativeEvent);
-        }}
-        ref={containerRef}
+        className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white"
         style={{
-          background: backgroundGradient,
+          left: `${positionX * 100}%`,
+          top: `${positionY * 100}%`,
+          boxShadow: "0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.1)",
         }}
-        {...props}
-      >
-        <div
-          className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute h-4 w-4 rounded-full border-2 border-white"
-          style={{
-            left: `${positionX * 100}%`,
-            top: `${positionY * 100}%`,
-            boxShadow: "0 0 0 1px rgba(0,0,0,0.5)",
-          }}
-        />
-      </div>
-    );
-  },
-);
-
-ColorPickerSelection.displayName = "ColorPickerSelection";
-
-export type ColorPickerHueProps = ComponentProps<typeof Slider.Root>;
-
-export const ColorPickerHue = ({
-  className,
-  ...props
-}: ColorPickerHueProps) => {
-  const { hue, setHue } = useColorPicker();
-
-  return (
-    <Slider.Root
-      className={cn("relative flex h-4 w-full touch-none", className)}
-      max={360}
-      onValueChange={([hue]) => setHue(hue as number)}
-      step={1}
-      value={[hue]}
-      {...props}
-    >
-      <Slider.Track className="relative my-0.5 h-3 w-full grow rounded-full bg-[linear-gradient(90deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)]">
-        <Slider.Range className="absolute h-full" />
-      </Slider.Track>
-      <Slider.Thumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
-    </Slider.Root>
-  );
-};
-
-export type ColorPickerAlphaProps = ComponentProps<typeof Slider.Root>;
-
-export const ColorPickerAlpha = ({
-  className,
-  ...props
-}: ColorPickerAlphaProps) => {
-  const { alpha, setAlpha } = useColorPicker();
-
-  return (
-    <Slider.Root
-      className={cn("relative flex h-4 w-full touch-none", className)}
-      max={100}
-      onValueChange={([alpha]) => setAlpha(alpha as number)}
-      step={1}
-      value={[alpha]}
-      {...props}
-    >
-      <Slider.Track
-        className="relative my-0.5 h-3 w-full grow rounded-full"
-        style={{
-          background:
-            'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==") left center',
-        }}
-      >
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent to-black/50" />
-        <Slider.Range className="absolute h-full rounded-full bg-transparent" />
-      </Slider.Track>
-      <Slider.Thumb className="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50" />
-    </Slider.Root>
-  );
-};
-
-export type ColorPickerEyeDropperProps = ComponentProps<typeof Button>;
-
-export const ColorPickerEyeDropper = ({
-  className,
-  ...props
-}: ColorPickerEyeDropperProps) => {
-  const { setHue, setSaturation, setLightness, setAlpha } = useColorPicker();
-
-  const handleEyeDropper = async () => {
-    try {
-      // @ts-expect-error - EyeDropper API is experimental
-      const eyeDropper = new EyeDropper();
-      const result = await eyeDropper.open();
-      const color = Color(result.sRGBHex);
-      const [h, s, l] = color.hsl().array();
-
-      setHue(h as number);
-      setSaturation(s as number);
-      setLightness(l as number);
-      setAlpha(100);
-    } catch (error) {
-      console.error("EyeDropper failed:", error);
-    }
-  };
-
-  return (
-    <Button
-      className={cn("shrink-0 text-muted-foreground", className)}
-      onClick={handleEyeDropper}
-      size="icon"
-      variant="outline"
-      type="button"
-      {...props}
-    >
-      <PipetteIcon size={16} />
-    </Button>
-  );
-};
-
-export type ColorPickerOutputProps = ComponentProps<typeof SelectTrigger>;
-
-const formats = ["hex", "rgb", "css", "hsl"];
-
-export const ColorPickerOutput = ({
-  className,
-  ...props
-}: ColorPickerOutputProps) => {
-  const { mode, setMode } = useColorPicker();
-
-  return (
-    <Select onValueChange={setMode} value={mode}>
-      <SelectTrigger className="h-8 w-20 shrink-0 text-xs" {...props}>
-        <SelectValue placeholder="Mode" />
-      </SelectTrigger>
-      <SelectContent>
-        {formats.map((format) => (
-          <SelectItem className="text-xs" key={format} value={format}>
-            {format.toUpperCase()}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-};
-
-type PercentageInputProps = ComponentProps<typeof Input>;
-
-const PercentageInput = ({
-  className,
-  value,
-  ...props
-}: PercentageInputProps) => {
-  return (
-    <div className="relative">
-      <Input
-        readOnly
-        type="text"
-        value={value ?? 100}
-        {...props}
-        className={cn(
-          "h-8 w-[3.25rem] rounded-l-none bg-secondary px-2 text-xs shadow-none",
-          className,
-        )}
       />
-      <span className="-translate-y-1/2 absolute top-1/2 right-2 text-muted-foreground text-xs">
-        %
-      </span>
     </div>
   );
-};
+}
 
-export type ColorPickerFormatProps = HTMLAttributes<HTMLDivElement>;
+// ============================================================================
+// HUE SLIDER
+// ============================================================================
 
-export const ColorPickerFormat = ({
+interface HueSliderProps {
+  hue: number;
+  onHueChange: (hue: number) => void;
+}
+
+function HueSlider({ hue, onHueChange }: HueSliderProps) {
+  return (
+    <SliderPrimitive.Root
+      className="relative flex h-4 w-full touch-none items-center select-none"
+      min={0}
+      max={360}
+      step={1}
+      value={[hue]}
+      onValueChange={([h]) => onHueChange(h!)}
+    >
+      <SliderPrimitive.Track className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-[linear-gradient(90deg,#FF0000,#FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)]">
+        <SliderPrimitive.Range className="absolute h-full bg-transparent" />
+      </SliderPrimitive.Track>
+      <SliderPrimitive.Thumb className="border-primary bg-background ring-ring/50 block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden" />
+    </SliderPrimitive.Root>
+  );
+}
+
+// ============================================================================
+// INLINE COLOR PICKER (non-popover variant for embedding)
+// ============================================================================
+
+export interface InlineColorPickerProps {
+  /** Current hex color value */
+  value?: string;
+  /** Default hex color */
+  defaultValue?: string;
+  /** Called with a 6-digit uppercase hex string on change */
+  onChange?: (hex: string) => void;
+  /** Disable interaction */
+  disabled?: boolean;
+  /** Additional class name */
+  className?: string;
+}
+
+/**
+ * An inline (non-popover) version of the color picker.
+ * Renders the saturation panel, hue slider, and hex input directly.
+ * Used when the picker should always be visible (e.g., in form fields).
+ */
+export function InlineColorPicker({
+  value,
+  defaultValue = "#3B82F6",
+  onChange,
+  disabled = false,
   className,
-  ...props
-}: ColorPickerFormatProps) => {
-  const {
-    hue,
-    saturation,
-    lightness,
-    alpha,
-    mode,
-    setHue,
-    setSaturation,
-    setLightness,
-  } = useColorPicker();
-  const color = Color.hsl(hue, saturation, lightness, alpha / 100);
+}: InlineColorPickerProps) {
+  const initialHex = value || defaultValue;
+  const [initH, initS, initL] = hexToHsl(
+    isValidHex(initialHex) ? initialHex : "#000000",
+  );
 
-  if (mode === "hex") {
-    const hex = color.hex();
+  const [hue, setHue] = useState(initH);
+  const [saturation, setSaturation] = useState(initS);
+  const [lightness, setLightness] = useState(initL);
+  const [hexInput, setHexInput] = useState(
+    isValidHex(initialHex) ? initialHex.toUpperCase() : "#000000",
+  );
 
-    const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      try {
-        // Only update if it's a valid hex color
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-          const newColor = Color(value);
-          const hslValues = newColor.hsl().array();
-          setHue(hslValues[0] as number);
-          setSaturation(hslValues[1] as number);
-          setLightness(hslValues[2] as number);
-        }
-      } catch (error) {
-        // Invalid color, ignore
+  const isExternalUpdate = useRef(false);
+
+  useEffect(() => {
+    if (value && isValidHex(value)) {
+      const [h, s, l] = hexToHsl(value);
+      const currentHex = hslToHex(hue, saturation, lightness);
+      if (currentHex.toUpperCase() !== value.toUpperCase()) {
+        isExternalUpdate.current = true;
+        setHue(h);
+        setSaturation(s);
+        setLightness(l);
+        setHexInput(value.toUpperCase());
       }
-    };
+    }
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    return (
-      <div
-        className={cn(
-          "-space-x-px relative flex w-full items-center rounded-md shadow-sm",
-          className,
-        )}
-        {...props}
-      >
+  useEffect(() => {
+    if (isExternalUpdate.current) {
+      isExternalUpdate.current = false;
+      return;
+    }
+    const hex = hslToHex(hue, saturation, lightness);
+    setHexInput(hex);
+    onChange?.(hex);
+  }, [hue, saturation, lightness]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleHexInput = useCallback(
+    (raw: string) => {
+      const val = raw.startsWith("#") ? raw : `#${raw}`;
+      setHexInput(val);
+      if (isValidHex(val)) {
+        const [h, s, l] = hexToHsl(val);
+        isExternalUpdate.current = true;
+        setHue(h);
+        setSaturation(s);
+        setLightness(l);
+        onChange?.(val.toUpperCase());
+      }
+    },
+    [onChange],
+  );
+
+  const handleEyeDropper = useCallback(async () => {
+    try {
+      // @ts-expect-error - EyeDropper API is experimental
+      const dropper = new EyeDropper();
+      const result = await dropper.open();
+      handleHexInput(result.sRGBHex);
+    } catch {
+      // User cancelled or API not available
+    }
+  }, [handleHexInput]);
+
+  const hasEyeDropper = typeof window !== "undefined" && "EyeDropper" in window;
+
+  return (
+    <div
+      className={cn(
+        "space-y-3",
+        disabled && "pointer-events-none opacity-50",
+        className,
+      )}
+    >
+      <SaturationPanel
+        hue={hue}
+        saturation={saturation}
+        lightness={lightness}
+        onSaturationChange={setSaturation}
+        onLightnessChange={setLightness}
+      />
+      <HueSlider hue={hue} onHueChange={setHue} />
+      <div className="flex items-center gap-1.5">
         <Input
-          className="h-8 rounded-r-none bg-secondary px-2 text-xs shadow-none"
-          type="text"
-          value={hex}
-          onChange={handleHexChange}
+          className="h-8 font-mono text-xs pl-3 pr-2 uppercase flex-1"
+          value={hexInput}
+          onChange={(e) => handleHexInput(e.target.value)}
           placeholder="#000000"
+          maxLength={7}
+          disabled={disabled}
         />
-        <PercentageInput value={alpha} />
-      </div>
-    );
-  }
-
-  if (mode === "rgb") {
-    const rgb = color
-      .rgb()
-      .array()
-      .map((value) => Math.round(value));
-
-    const handleRgbChange = (index: number, value: string) => {
-      try {
-        const numValue = parseInt(value, 10);
-        if (!isNaN(numValue) && numValue >= 0 && numValue <= 255) {
-          const newRgb = [...rgb];
-          newRgb[index] = numValue;
-          const newColor = Color.rgb(
-            newRgb[0] ?? 0,
-            newRgb[1] ?? 0,
-            newRgb[2] ?? 0,
-          );
-          const hslValues = newColor.hsl().array();
-          setHue(hslValues[0] as number);
-          setSaturation(hslValues[1] as number);
-          setLightness(hslValues[2] as number);
-        }
-      } catch (error) {
-        // Invalid color, ignore
-      }
-    };
-
-    return (
-      <div
-        className={cn(
-          "-space-x-px flex items-center rounded-md shadow-sm",
-          className,
+        {hasEyeDropper && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={handleEyeDropper}
+            disabled={disabled}
+          >
+            <PipetteIcon className="h-3.5 w-3.5" />
+          </Button>
         )}
-        {...props}
-      >
-        {rgb.map((value, index) => (
-          <Input
-            className={cn(
-              "h-8 rounded-r-none bg-secondary px-2 text-xs shadow-none",
-              index && "rounded-l-none",
-              className,
-            )}
-            key={index}
-            type="text"
-            value={value}
-            onChange={(e) => handleRgbChange(index, e.target.value)}
-          />
-        ))}
-        <PercentageInput value={alpha} />
       </div>
-    );
-  }
-
-  if (mode === "css") {
-    const rgb = color
-      .rgb()
-      .array()
-      .map((value) => Math.round(value));
-
-    return (
-      <div className={cn("w-full rounded-md shadow-sm", className)} {...props}>
-        <Input
-          className="h-8 w-full bg-secondary px-2 text-xs shadow-none"
-          readOnly
-          type="text"
-          value={`rgba(${rgb.join(", ")}, ${alpha}%)`}
-          {...props}
-        />
-      </div>
-    );
-  }
-
-  if (mode === "hsl") {
-    const hsl = color
-      .hsl()
-      .array()
-      .map((value) => Math.round(value));
-
-    const handleHslChange = (index: number, value: string) => {
-      try {
-        const numValue = parseInt(value, 10);
-        const maxValues = [360, 100, 100]; // H: 0-360, S: 0-100, L: 0-100
-        if (
-          !isNaN(numValue) &&
-          numValue >= 0 &&
-          numValue <= (maxValues[index] ?? 100)
-        ) {
-          const newHsl = [...hsl];
-          newHsl[index] = numValue;
-          setHue(newHsl[0] ?? 0);
-          setSaturation(newHsl[1] ?? 0);
-          setLightness(newHsl[2] ?? 0);
-        }
-      } catch (error) {
-        // Invalid color, ignore
-      }
-    };
-
-    return (
-      <div
-        className={cn(
-          "-space-x-px flex items-center rounded-md shadow-sm",
-          className,
-        )}
-        {...props}
-      >
-        {hsl.map((value, index) => (
-          <Input
-            className={cn(
-              "h-8 rounded-r-none bg-secondary px-2 text-xs shadow-none",
-              index && "rounded-l-none",
-              className,
-            )}
-            key={index}
-            type="text"
-            value={value}
-            onChange={(e) => handleHslChange(index, e.target.value)}
-          />
-        ))}
-        <PercentageInput value={alpha} />
-      </div>
-    );
-  }
-
-  return null;
-};
+    </div>
+  );
+}
