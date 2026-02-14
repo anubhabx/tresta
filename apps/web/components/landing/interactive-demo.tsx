@@ -13,6 +13,7 @@ import {
   GalleryHorizontal,
   Heart,
   Star,
+  MoveRight,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -63,7 +64,7 @@ const sampleTestimonials = [
   },
 ];
 
-type LayoutType = "grid" | "list" | "carousel" | "masonry" | "wall";
+type LayoutType = "grid" | "list" | "carousel" | "masonry" | "wall" | "marquee";
 
 const layoutOptions: {
   id: LayoutType;
@@ -75,6 +76,7 @@ const layoutOptions: {
   { id: "carousel", label: "Carousel", icon: GalleryHorizontal },
   { id: "masonry", label: "Masonry", icon: Columns },
   { id: "wall", label: "Wall", icon: Heart },
+  { id: "marquee", label: "Marquee", icon: MoveRight },
 ];
 
 function StarRating({ rating }: { rating: number }) {
@@ -109,6 +111,8 @@ export function InteractiveDemo() {
         return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
       case "wall":
         return "grid-cols-2 md:grid-cols-4";
+      case "marquee":
+        return "grid-cols-1 md:grid-cols-3 overflow-x-hidden";
       default:
         return "grid-cols-1 md:grid-cols-2";
     }
@@ -231,7 +235,7 @@ export function InteractiveDemo() {
 
         {/* Call to action */}
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          All 5 layouts are available in the free plan
+          All 6 layouts are available in the free plan
         </p>
       </div>
     </section>

@@ -21,7 +21,7 @@ const testimonials = [
     author: "@shipfast_dev",
     badge: "GitHub",
     rating: 5,
-    time: "2 seconds ago"
+    time: "2 seconds ago",
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const testimonials = [
     author: "@indie_maker",
     badge: "Google",
     rating: 5,
-    time: "just now"
+    time: "just now",
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ const testimonials = [
     author: "@frontend_dev",
     badge: "GitHub",
     rating: 5,
-    time: "5 seconds ago"
+    time: "5 seconds ago",
   },
   {
     id: 4,
@@ -47,8 +47,8 @@ const testimonials = [
     author: "@saas_founder",
     badge: "Google",
     rating: 5,
-    time: "just now"
-  }
+    time: "just now",
+  },
 ];
 
 function LiveTestimonialCard() {
@@ -75,7 +75,7 @@ function LiveTestimonialCard() {
           type: "spring",
           stiffness: 300,
           damping: 25,
-          duration: 1
+          duration: 1,
         }}
         className="absolute -top-3 left-4 z-10"
       >
@@ -136,7 +136,7 @@ function LiveTestimonialCard() {
               "h-1.5 rounded-full transition-all duration-300",
               i === currentIndex
                 ? "w-6 bg-primary"
-                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50",
             )}
             aria-label={`Go to testimonial ${i + 1}`}
           />
