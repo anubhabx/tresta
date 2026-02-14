@@ -435,6 +435,7 @@ export class Widget implements WidgetInstance {
 
     // Update the priority if needed
     this.liveRegion.setAttribute('aria-live', priority);
+    this.liveRegion.setAttribute('tresta-sr-only', "true")
 
     // Update the message
     this.liveRegion.textContent = message;

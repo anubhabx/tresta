@@ -15,6 +15,7 @@ import { ResponseHandler } from "../lib/response.js";
 import {
   DEFAULT_WIDGET_CONFIG,
   WIDGET_CONFIG_FIELDS,
+  isFreeColor,
   type WidgetConfig,
 } from "@workspace/types";
 import { validateWidgetConfig } from "../validators/widget.validator.js";
@@ -83,6 +84,20 @@ const createWidget = async (
         projectId,
         suggestion: "Please check the project ID",
       });
+    }
+
+    // Plan-gate custom accent colors: free users can only use palette colors
+    if (validatedConfig.primaryColor) {
+      const projectOwner = await prisma.user.findUnique({
+        where: { id: project.userId },
+        select: { plan: true },
+      });
+
+      if (projectOwner?.plan === 'FREE' && !isFreeColor(validatedConfig.primaryColor)) {
+        throw new ForbiddenError(
+          "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+        );
+      }
     }
 
     // Create the widget with validated config
@@ -157,6 +172,27 @@ const updateWidget = async (
 
     if (!existingWidget) {
       throw new NotFoundError("Widget not found");
+    }
+
+    // Plan-gate custom accent colors: free users can only use palette colors
+    if (config?.primaryColor) {
+      const widgetProject = await prisma.project.findUnique({
+        where: { id: existingWidget.projectId },
+        select: { userId: true },
+      });
+
+      if (widgetProject) {
+        const projectOwner = await prisma.user.findUnique({
+          where: { id: widgetProject.userId },
+          select: { plan: true },
+        });
+
+        if (projectOwner?.plan === 'FREE' && !isFreeColor(config.primaryColor)) {
+          throw new ForbiddenError(
+            "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+          );
+        }
+      }
     }
 
     // Validate the config if provided
@@ -264,8 +300,6 @@ const fetchPublicWidgetData = async (
   try {
     const { widgetId } = req.params;
 
-    console.log("🔍 Fetching widget with ID:", widgetId);
-
     // Validate widget ID
     if (!widgetId) {
       throw new BadRequestError("Widget ID is required");
@@ -289,16 +323,6 @@ const fetchPublicWidgetData = async (
         },
       },
     });
-
-    console.log("📦 Widget found:", widget ? "YES" : "NO");
-    if (widget) {
-      console.log("📋 Widget details:", {
-        id: widget.id,
-        hasProject: !!widget.Project,
-        projectName: widget.Project?.name,
-        projectVisibility: widget.Project?.visibility,
-      });
-    }
 
     // Check if widget exists
     if (!widget) {

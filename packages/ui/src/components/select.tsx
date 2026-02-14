@@ -46,7 +46,7 @@ function SelectTrigger({
         // Dark mode
         "dark:bg-input/30 dark:hover:bg-input/50",
         // Focus state - Linear-style double ring
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20",
+        // "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20",
         // Error state
         "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/30",
         // Disabled state

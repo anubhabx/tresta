@@ -7,7 +7,7 @@
 "use client";
 
 import * as React from "react";
-import { Control } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { Sun, Moon, Monitor, Lock, Palette } from "lucide-react";
 
 import {
@@ -19,11 +19,11 @@ import {
 } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { CustomFormField } from "@/components/custom-form-field";
 import { AzureFileUpload } from "@/components/azure-file-upload";
 import { UploadDirectory } from "@/hooks/use-azure-sas";
 import { ProjectFormData } from "@/lib/schemas/project-schema";
-import { LockedToggle, ProBadge } from "@/components/paywall";
+import { LockedToggle } from "@/components/paywall";
+import { ConditionalColorPicker } from "@/components/conditional-color-picker";
 
 // ============================================================================
 // THEME OPTIONS
@@ -58,6 +58,11 @@ export function BrandingWizardSection({
   isPro = false,
 }: BrandingWizardSectionProps) {
   const [selectedTheme, setSelectedTheme] = React.useState("auto");
+
+  const { field: brandColorField } = useController({
+    control,
+    name: "brandColorPrimary",
+  });
 
   return (
     <Card>
@@ -130,29 +135,13 @@ export function BrandingWizardSection({
         </div>
 
         {/* Brand Color */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">Brand Color</label>
-            {!isPro && <ProBadge size="sm" />}
-          </div>
-
-          <CustomFormField
-            control={control}
-            name="brandColorPrimary"
-            type="color"
-            label="Primary Brand Color"
-            placeholder="#6366f1"
-            description="Used for accents in your testimonial widgets"
-            optional
-            disabled={!isPro}
-          />
-
-          {!isPro && (
-            <p className="text-xs text-muted-foreground">
-              Upgrade to Pro to customize brand colors
-            </p>
-          )}
-        </div>
+        <ConditionalColorPicker
+          isPro={isPro}
+          value={brandColorField.value || ""}
+          onChange={(hex) => brandColorField.onChange(hex)}
+          label="Brand Color"
+          description="Used for accents in your testimonial widgets"
+        />
 
         {/* Remove Branding Toggle */}
         <LockedToggle

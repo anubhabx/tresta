@@ -67,6 +67,8 @@ export interface DisplayOptions {
   showAvatar: boolean;
   showAuthorRole: boolean;
   showAuthorCompany: boolean;
+  showBranding?: boolean;
+  customCss?: string;
   maxTestimonials?: number;
 }
 

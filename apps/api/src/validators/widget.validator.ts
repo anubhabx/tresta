@@ -53,6 +53,9 @@ export const WidgetConfigSchema = z
 
     // Branding
     showBranding: z.boolean().optional(),
+
+    // Advanced
+    customCss: z.string().max(2000).optional(),
   })
   .passthrough();
 

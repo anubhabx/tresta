@@ -98,6 +98,9 @@ export interface WidgetConfig {
 
   // Branding
   showBranding?: boolean; // "Powered by Tresta" badge
+
+  // Advanced
+  customCss?: string; // Custom CSS injected into the widget
 }
 
 /**
@@ -126,6 +129,7 @@ export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
   showNavigation: true,
   showDots: true,
   showBranding: true,
+  customCss: "",
 };
 
 /**

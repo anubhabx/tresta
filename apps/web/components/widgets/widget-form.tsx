@@ -15,6 +15,7 @@ import {
   WidgetAppearanceSection,
   WidgetDisplaySection,
   WidgetLayoutSection,
+  WidgetAdvancedSection,
 } from "./widget-form-sections";
 
 const MIN_MAX_TESTIMONIALS = 20;
@@ -25,9 +26,11 @@ const widgetFormSchema = z.object({
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   showRating: z.boolean(),
   showAvatar: z.boolean(),
+  showBranding: z.boolean(),
   maxTestimonials: z.number().min(1).max(MIN_MAX_TESTIMONIALS),
   autoRotate: z.boolean().optional(),
   rotateInterval: z.number().optional(),
+  customCss: z.string().max(2000).optional(),
 });
 
 export type WidgetFormData = z.infer<typeof widgetFormSchema>;
@@ -37,6 +40,7 @@ interface WidgetFormProps {
   onSubmit: (data: WidgetFormData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  isPro?: boolean;
   onConfigChange?: (config: WidgetFormData) => void;
 }
 
@@ -45,6 +49,7 @@ export function WidgetForm({
   onSubmit,
   onCancel,
   isSubmitting = false,
+  isPro = false,
   onConfigChange,
 }: WidgetFormProps) {
   const form = useForm<WidgetFormData>({
@@ -74,7 +79,7 @@ export function WidgetForm({
         if (onConfigChangeRef.current) {
           onConfigChangeRef.current(value as WidgetFormData);
         }
-      }, 500);
+      }, 150);
     });
 
     return () => {
@@ -89,10 +94,11 @@ export function WidgetForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Use extracted section components */}
-        <WidgetBasicSection control={form.control} />
-        <WidgetAppearanceSection control={form.control} />
-        <WidgetDisplaySection control={form.control} />
+        <WidgetBasicSection control={form.control} isPro={isPro} />
+        <WidgetAppearanceSection control={form.control} isPro={isPro} />
+        <WidgetDisplaySection control={form.control} isPro={isPro} />
         <WidgetLayoutSection control={form.control} />
+        <WidgetAdvancedSection control={form.control} isPro={isPro} />
 
         <Separator />
 
@@ -142,11 +148,16 @@ function getInitialValues(config?: WidgetConfig) {
       typeof config?.showAvatar === "boolean"
         ? config.showAvatar
         : DEFAULT_WIDGET_CONFIG.showAvatar,
+    showBranding:
+      typeof config?.showBranding === "boolean"
+        ? config.showBranding
+        : DEFAULT_WIDGET_CONFIG.showBranding,
     maxTestimonials:
       config?.maxTestimonials || DEFAULT_WIDGET_CONFIG.maxTestimonials,
     autoRotate: config?.autoRotate ?? false,
     rotateInterval:
       config?.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
+    customCss: config?.customCss || DEFAULT_WIDGET_CONFIG.customCss,
   } as WidgetFormData;
 
   normalized.maxTestimonials = Math.min(

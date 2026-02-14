@@ -49,17 +49,24 @@ export function WidgetRoot({ data }: WidgetRootProps) {
     >
       {renderLayout()}
 
-      {/* Branding Badge */}
-      <div className="tresta-branding">
-        <a
-          href="https://tresta.dev"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="tresta-branding__link"
-        >
-          Powered by Tresta
-        </a>
-      </div>
+      {/* Branding Badge — hidden when showBranding is false (Pro feature) */}
+      {config.display?.showBranding !== false && (
+        <div className="tresta-branding">
+          <a
+            href="https://tresta.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tresta-branding__link"
+          >
+            Powered by Tresta
+          </a>
+        </div>
+      )}
+
+      {/* Custom CSS Injection */}
+      {display.customCss && (
+        <style dangerouslySetInnerHTML={{ __html: display.customCss }} />
+      )}
     </div>
   );
 }

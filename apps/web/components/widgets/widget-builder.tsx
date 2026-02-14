@@ -11,6 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useCallback, useEffect } from "react";
 import { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
+import { useSubscription } from "@/hooks/use-subscription";
 
 interface WidgetBuilderProps {
   projectSlug: string;
@@ -26,6 +27,7 @@ export function WidgetBuilder({
   mode,
 }: WidgetBuilderProps) {
   const router = useRouter();
+  const { isPro } = useSubscription();
 
   // Default config for preview
   const defaultConfig: WidgetFormData = {
@@ -34,6 +36,7 @@ export function WidgetBuilder({
     primaryColor: DEFAULT_WIDGET_CONFIG.primaryColor,
     showRating: DEFAULT_WIDGET_CONFIG.showRating,
     showAvatar: DEFAULT_WIDGET_CONFIG.showAvatar,
+    showBranding: DEFAULT_WIDGET_CONFIG.showBranding,
     maxTestimonials: 6,
     autoRotate: false,
     rotateInterval: DEFAULT_WIDGET_CONFIG.rotateInterval,
@@ -81,6 +84,8 @@ export function WidgetBuilder({
           widget.config.showRating ?? DEFAULT_WIDGET_CONFIG.showRating,
         showAvatar:
           widget.config.showAvatar ?? DEFAULT_WIDGET_CONFIG.showAvatar,
+        showBranding:
+          widget.config.showBranding ?? DEFAULT_WIDGET_CONFIG.showBranding,
         maxTestimonials:
           widget.config.maxTestimonials ||
           DEFAULT_WIDGET_CONFIG.maxTestimonials,
@@ -102,6 +107,7 @@ export function WidgetBuilder({
         primaryColor: data.primaryColor,
         showRating: data.showRating,
         showAvatar: data.showAvatar,
+        showBranding: data.showBranding,
         maxTestimonials: data.maxTestimonials,
         autoRotate: data.autoRotate ?? false,
         rotateInterval:
@@ -167,6 +173,7 @@ export function WidgetBuilder({
               onSubmit={handleSubmit}
               onCancel={handleCancel}
               isSubmitting={isSubmitting}
+              isPro={isPro}
               onConfigChange={handleConfigChange}
             />
           </div>

@@ -1,31 +1,41 @@
 import { Router } from "express";
-import { attachUser } from '../middleware/auth.middleware.js';
-import { validateApiKeyMiddleware, requirePermission } from '../middleware/api-key.middleware.js';
-import { publicRateLimitMiddleware } from '../middleware/rate-limiter.js';
-import { auditLog } from '../middleware/audit-log.middleware.js';
+import { attachUser } from "../middleware/auth.middleware.js";
+import {
+  validateApiKeyMiddleware,
+  requirePermission,
+} from "../middleware/api-key.middleware.js";
+import { publicRateLimitMiddleware } from "../middleware/rate-limiter.js";
+import { auditLog } from "../middleware/audit-log.middleware.js";
+import { checkUsageLimit } from "../middleware/usage-limits.js";
 import {
   createWidget,
   updateWidget,
   listWidgets,
   deleteWidget,
   fetchPublicWidgetData,
-} from '../controllers/widget.controller.js';
+} from "../controllers/widget.controller.js";
 
 const router: Router = Router();
 
 // Public widget data endpoint - requires API key authentication
 // GET /api/widgets/:widgetId/public - Fetch widget data for embedding
 router.get(
-  "/:widgetId/public", 
+  "/:widgetId/public",
   publicRateLimitMiddleware,
-  validateApiKeyMiddleware, 
-  requirePermission('widgets'), 
-  fetchPublicWidgetData
+  validateApiKeyMiddleware,
+  requirePermission("widgets"),
+  fetchPublicWidgetData,
 );
 
 // Protected routes - require authentication (use global restrictive CORS)
 // POST /api/widgets - Create a new widget
-router.post("/", attachUser, auditLog, createWidget);
+router.post(
+  "/",
+  attachUser,
+  checkUsageLimit("widgets"),
+  auditLog,
+  createWidget,
+);
 
 // GET /api/widgets/project/:slug - List all widgets for a project
 router.get("/project/:slug", attachUser, listWidgets);

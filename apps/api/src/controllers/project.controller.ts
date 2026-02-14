@@ -28,6 +28,7 @@ import type {
   UpdateProjectPayload,
   ProjectData,
 } from "../../types/api-responses.js";
+import { isFreeColor } from "@workspace/types";
 
 /**
  * Helper to serialize Prisma Project to ProjectData
@@ -151,6 +152,25 @@ const createProject = async (
       throw new BadRequestError(
         "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
       );
+    }
+
+    // Plan-gate custom brand colors: free users can only use palette colors
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { plan: true },
+    });
+
+    if (user?.plan === 'FREE') {
+      if (brandColorPrimary && !isFreeColor(brandColorPrimary)) {
+        throw new ForbiddenError(
+          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+        );
+      }
+      if (brandColorSecondary && !isFreeColor(brandColorSecondary)) {
+        throw new ForbiddenError(
+          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+        );
+      }
     }
 
     if (socialLinks) {
@@ -447,12 +467,21 @@ const updateProject = async (
     });
     // In our schema User.plan is an Enum "FREE" | "PRO"
 
-    // Check if trying to update brand colors
+    // Check if trying to update brand colors — free users can only use palette colors
     if (
       (payload.brandColorPrimary !== undefined || payload.brandColorSecondary !== undefined) &&
       user?.plan === 'FREE'
     ) {
-      throw new ForbiddenError("Brand color customization is available only for Pro plans.");
+      if (payload.brandColorPrimary && !isFreeColor(payload.brandColorPrimary)) {
+        throw new ForbiddenError(
+          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+        );
+      }
+      if (payload.brandColorSecondary && !isFreeColor(payload.brandColorSecondary)) {
+        throw new ForbiddenError(
+          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
+        );
+      }
     }
 
     // Check if project exists and belongs to user

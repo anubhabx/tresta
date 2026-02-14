@@ -1,4 +1,4 @@
-import { Control } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -33,6 +33,11 @@ import {
 import type { WidgetFormData } from "./widget-form";
 import { PRO_LAYOUTS } from "@workspace/types";
 import type { WidgetLayout } from "@workspace/types";
+import {
+  PremiumWarningBanner,
+  LockedToggle,
+} from "@/components/paywall/PaywallComponents";
+import { ConditionalColorPicker } from "@/components/conditional-color-picker";
 
 // Layout options with visual icons
 const layouts = [
@@ -78,9 +83,13 @@ const themes = [
 
 interface WidgetBasicSectionProps {
   control: Control<WidgetFormData>;
+  isPro?: boolean;
 }
 
-export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
+export function WidgetBasicSection({
+  control,
+  isPro = false,
+}: WidgetBasicSectionProps) {
   return (
     <div className="space-y-6">
       {/* Layout Selector - Visual Thumbnails */}
@@ -147,6 +156,24 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
             </FormItem>
           )}
         />
+
+        {/* Pro Layout Warning Banner — teaser pattern */}
+        <FormField
+          control={control}
+          name="layout"
+          render={({ field }) => {
+            const isProLayout = (PRO_LAYOUTS as readonly string[]).includes(
+              field.value,
+            );
+            return (
+              <PremiumWarningBanner
+                show={!isPro && isProLayout}
+                featureName={`${field.value.charAt(0).toUpperCase() + field.value.slice(1)} layout`}
+                requiredPlan="pro"
+              />
+            );
+          }}
+        />
       </div>
 
       {/* Theme Selector */}
@@ -208,59 +235,45 @@ export function WidgetBasicSection({ control }: WidgetBasicSectionProps) {
 
 interface WidgetAppearanceSectionProps {
   control: Control<WidgetFormData>;
+  isPro?: boolean;
 }
 
 export function WidgetAppearanceSection({
   control,
+  isPro = false,
 }: WidgetAppearanceSectionProps) {
+  const { field: primaryColorField } = useController({
+    control,
+    name: "primaryColor",
+  });
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
         Appearance
       </h3>
-      <FormField
-        control={control}
-        name="primaryColor"
-        render={({ field }) => (
-          <FormItem>
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Accent Color</FormLabel>
-                <FormDescription>
-                  Brand color for highlights and actions
-                </FormDescription>
-              </div>
-              <FormControl>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    className="h-10 w-10 rounded-md border border-border cursor-pointer bg-transparent"
-                  />
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    className="w-24 h-10 px-3 text-sm font-mono rounded-md border border-border bg-background"
-                    placeholder="#2563EB"
-                  />
-                </div>
-              </FormControl>
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="rounded-lg border p-4">
+        <ConditionalColorPicker
+          isPro={isPro}
+          value={primaryColorField.value || ""}
+          onChange={(hex) => primaryColorField.onChange(hex)}
+          label="Accent Color"
+          description="Brand color for highlights and actions"
+        />
+      </div>
     </div>
   );
 }
 
 interface WidgetDisplaySectionProps {
   control: Control<WidgetFormData>;
+  isPro?: boolean;
 }
 
-export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
+export function WidgetDisplaySection({
+  control,
+  isPro = false,
+}: WidgetDisplaySectionProps) {
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -307,6 +320,24 @@ export function WidgetDisplaySection({ control }: WidgetDisplaySectionProps) {
           )}
         />
       </div>
+
+      {/* Branding Toggle — Pro gated with LockedToggle */}
+      <FormField
+        control={control}
+        name="showBranding"
+        render={({ field }) => (
+          <FormItem>
+            <LockedToggle
+              isPro={isPro}
+              featureName="remove_branding"
+              checked={!field.value}
+              onCheckedChange={(checked) => field.onChange(!checked)}
+              label="Remove 'Powered by Tresta'"
+              description="Hide the attribution badge from your widget"
+            />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
@@ -347,6 +378,67 @@ export function WidgetLayoutSection({ control }: WidgetLayoutSectionProps) {
             <FormDescription className="mt-2">
               Limit how many testimonials the embed renders
             </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  );
+}
+
+interface WidgetAdvancedSectionProps {
+  control: Control<WidgetFormData>;
+  isPro?: boolean;
+}
+
+export function WidgetAdvancedSection({
+  control,
+  isPro = false,
+}: WidgetAdvancedSectionProps) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          Advanced
+        </h3>
+        <span className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+          <Crown className="h-2.5 w-2.5" />
+          Pro
+        </span>
+      </div>
+
+      <FormField
+        control={control}
+        name="customCss"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Custom CSS</FormLabel>
+            <FormDescription>
+              Inject custom styles to override default widget styling.
+            </FormDescription>
+            <FormControl>
+              {isPro ? (
+                <textarea
+                  className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder=".tresta-card { background: black; }"
+                  {...field}
+                />
+              ) : (
+                <div className="relative">
+                  <textarea
+                    className="flex min-h-[120px] w-full rounded-md border border-input bg-muted px-3 py-2 text-sm font-mono opacity-50 cursor-not-allowed"
+                    placeholder=".tresta-card { background: black; }"
+                    disabled
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/5 backdrop-blur-[1px]">
+                    <div className="bg-background/80 px-4 py-2 rounded-lg border shadow-sm flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                      <Crown className="h-4 w-4 text-amber-500" />
+                      Upgrade to edit Custom CSS
+                    </div>
+                  </div>
+                </div>
+              )}
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
