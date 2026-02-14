@@ -42,6 +42,7 @@ import {
   generateSlug,
 } from "@/lib/schemas/project-schema";
 import { ProjectType, ProjectVisibility, type SocialLinks } from "@/types/api";
+import type { UpdateProjectPayload } from "@/types/api";
 
 // Types
 import type {
@@ -92,15 +93,21 @@ interface ProjectWizardProps {
   initialData?: Partial<ProjectFormData>;
   /** Mode: create or edit */
   mode?: "create" | "edit";
+  /** Project slug for edit mode */
+  slug?: string;
 }
 
 export function ProjectWizard({
   initialData,
   mode = "create",
+  slug,
 }: ProjectWizardProps) {
   const router = useRouter();
   const api = useApi();
   const createProject = projects.mutations.useCreate();
+  const updateProject = projects.mutations.useUpdate(slug || "");
+  const { data: projectData, isLoading: isLoadingProject } =
+    projects.queries.useDetail(mode === "edit" ? (slug || "") : "");
   const {
     isPro,
     usage,
@@ -137,6 +144,35 @@ export function ProjectWizard({
       tagsInput: initialData?.tagsInput || "",
     },
   });
+
+  // Populate form when project data loads (edit mode)
+  useEffect(() => {
+    if (mode === "edit" && projectData) {
+      const socialLinks = projectData.socialLinks || {};
+      const tagsString = projectData.tags?.join(", ") || "";
+
+      form.reset({
+        name: projectData.name,
+        shortDescription: projectData.shortDescription || "",
+        description: projectData.description || "",
+        slug: projectData.slug,
+        logoUrl: projectData.logoUrl || "",
+        projectType: projectData.projectType || ProjectType.OTHER,
+        websiteUrl: projectData.websiteUrl || "",
+        collectionFormUrl: projectData.collectionFormUrl || "",
+        brandColorPrimary: projectData.brandColorPrimary || "",
+        brandColorSecondary: projectData.brandColorSecondary || "",
+        visibility: projectData.visibility || ProjectVisibility.PRIVATE,
+        twitter: socialLinks.twitter || "",
+        linkedin: socialLinks.linkedin || "",
+        github: socialLinks.github || "",
+        facebook: socialLinks.facebook || "",
+        instagram: socialLinks.instagram || "",
+        youtube: socialLinks.youtube || "",
+        tagsInput: tagsString,
+      });
+    }
+  }, [mode, projectData, form]);
 
   const watchedValues = form.watch();
 
@@ -205,7 +241,7 @@ export function ProjectWizard({
             .filter((tag) => tag.length > 0)
         : [];
 
-      // Create project payload
+      // Build payload
       const payload = {
         name: data.name,
         shortDescription: data.shortDescription || undefined,
@@ -221,19 +257,23 @@ export function ProjectWizard({
           Object.keys(socialLinks).length > 0 ? socialLinks : undefined,
         tags: tags.length > 0 ? tags : undefined,
         visibility: data.visibility,
-        // Store emoji and gradient as metadata (if your schema supports it)
-        // metadata: { emoji: selectedEmoji, gradient: selectedGradient },
       };
 
-      await createProject.mutateAsync(payload);
-
-      toast.success("Project created successfully!", {
-        description: "You can now start collecting testimonials.",
-      });
-      router.push(`/projects/${data.slug}`);
+      if (mode === "edit") {
+        await updateProject.mutateAsync(payload as UpdateProjectPayload);
+        toast.success("Project updated successfully!");
+        router.push(`/projects/${data.slug}`);
+      } else {
+        await createProject.mutateAsync(payload);
+        toast.success("Project created successfully!", {
+          description: "You can now start collecting testimonials.",
+        });
+        router.push(`/projects/${data.slug}`);
+      }
     } catch (error: any) {
       toast.error(
-        error.message || "Failed to create project. Please try again.",
+        error.message ||
+          `Failed to ${mode === "edit" ? "update" : "create"} project. Please try again.`,
       );
     } finally {
       setIsSubmitting(false);
@@ -247,7 +287,7 @@ export function ProjectWizard({
     plan?.limits?.projects !== undefined &&
     usage.projects >= plan.limits.projects;
 
-  if (subscriptionLoading) {
+  if (subscriptionLoading || (mode === "edit" && isLoadingProject)) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -255,7 +295,24 @@ export function ProjectWizard({
     );
   }
 
-  if (isLimitReached) {
+  if (mode === "edit" && !isLoadingProject && !projectData) {
+    return (
+      <div className="flex flex-col gap-4 w-full h-[60vh] items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Project Not Found</h2>
+          <p className="text-muted-foreground mt-2">
+            The project you&apos;re looking for doesn&apos;t exist or you don&apos;t have
+            access to it.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/projects">Back to Projects</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLimitReached && mode === "create") {
     return (
       <div className="container mx-auto max-w-lg py-16 px-4 text-center">
         <div className="flex justify-center mb-6">
@@ -349,11 +406,11 @@ export function ProjectWizard({
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
+                        {mode === "edit" ? "Saving..." : "Creating..."}
                       </>
                     ) : (
                       <>
-                        Create Project
+                        {mode === "edit" ? "Save Changes" : "Create Project"}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
