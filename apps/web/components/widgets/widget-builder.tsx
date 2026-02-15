@@ -13,6 +13,11 @@ import { useState, useCallback, useEffect } from "react";
 import { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
 import { useSubscription } from "@/hooks/use-subscription";
 
+const isTheme = (
+  theme: unknown,
+): theme is WidgetFormData["theme"] =>
+  theme === "light" || theme === "dark" || theme === "auto";
+
 interface WidgetBuilderProps {
   projectSlug: string;
   projectId: string;
@@ -77,7 +82,9 @@ export function WidgetBuilder({
 
       setPreviewConfig({
         layout: normalizedLayout as WidgetFormData["layout"],
-        theme: (widget.config.theme as any) || DEFAULT_WIDGET_CONFIG.theme,
+        theme: isTheme(widget.config.theme)
+          ? widget.config.theme
+          : DEFAULT_WIDGET_CONFIG.theme,
         primaryColor:
           widget.config.primaryColor || DEFAULT_WIDGET_CONFIG.primaryColor,
         showRating:
@@ -126,8 +133,10 @@ export function WidgetBuilder({
         });
         toast.success("Widget updated successfully!");
       }
-    } catch (error: any) {
-      toast.error(error?.message || `Failed to ${mode} widget`);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : `Failed to ${mode} widget`;
+      toast.error(message);
     }
   };
 

@@ -12,6 +12,32 @@ interface AblyContextValue {
   connectionState: string;
 }
 
+type NotificationMessage = {
+  data?: {
+    title?: string;
+    message?: string;
+  };
+};
+
+type AblyChannelLike = {
+  subscribe: (
+    eventName: string,
+    listener: (message: NotificationMessage) => void,
+  ) => void;
+  unsubscribe: () => void;
+};
+
+type AblyClientLike = {
+  connection: {
+    on: (eventName: string, listener: () => void) => void;
+  };
+  channels: {
+    get: (channelName: string) => AblyChannelLike;
+  };
+  close: () => void;
+  connect: () => void;
+};
+
 const AblyContext = React.createContext<AblyContextValue>({
   isConnected: false,
   connectionState: "initialized",
@@ -28,7 +54,9 @@ export function useAbly() {
 export function AblyProvider({ children }: { children: React.ReactNode }) {
   const { userId, getToken } = useAuth();
   const queryClient = useQueryClient();
-  const [ablyClient, setAblyClient] = React.useState<any>(null);
+  const [ablyClient, setAblyClient] = React.useState<AblyClientLike | null>(
+    null,
+  );
   const [isConnected, setIsConnected] = React.useState(false);
   const [connectionState, setConnectionState] =
     React.useState<string>("initialized");
@@ -45,8 +73,8 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    let client: any = null;
-    let channel: any = null;
+    let client: AblyClientLike | null = null;
+    let channel: AblyChannelLike | null = null;
 
     const initAbly = async () => {
       const Ably = (await import("ably")).default;
@@ -72,10 +100,15 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
             callback(null, tokenRequest.data);
           } catch (error) {
             console.error("Ably auth error:", error);
-            callback(error as any, null);
+            callback(
+              error instanceof Error
+                ? error.message
+                : "Ably authentication failed",
+              null,
+            );
           }
         },
-      });
+      }) as AblyClientLike;
 
       // Monitor connection state
       client.connection.on("connected", () => {
@@ -99,7 +132,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
       // Subscribe to user's notification channel
       channel = client.channels.get(`notifications:${userId}`);
 
-      channel.subscribe("notification", (message: any) => {
+      channel.subscribe("notification", (message: NotificationMessage) => {
         console.log("New notification received:", message.data);
 
         // Invalidate queries to fetch new notifications

@@ -175,7 +175,7 @@ const updateWidget = async (
     }
 
     // Plan-gate custom accent colors: free users can only use palette colors
-    if (config?.primaryColor) {
+    if (config?.primaryColor && existingWidget.projectId) {
       const widgetProject = await prisma.project.findUnique({
         where: { id: existingWidget.projectId },
         select: { userId: true },

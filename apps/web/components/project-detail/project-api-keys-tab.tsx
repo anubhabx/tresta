@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -50,6 +50,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import type { Project } from "@/types/api";
+import { useAuth } from "@clerk/nextjs";
 
 interface ApiKey {
   id: string;
@@ -70,6 +71,7 @@ interface ProjectApiKeysTabProps {
 }
 
 export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
+  const { getToken } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -79,14 +81,14 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
   const [keyToRevoke, setKeyToRevoke] = useState<string | null>(null);
 
   // Fetch API keys
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${project.slug}/api-keys`,
         {
           headers: {
-            Authorization: `Bearer ${await (window as any).Clerk.session.getToken()}`,
+            Authorization: `Bearer ${await getToken()}`,
           },
         },
       );
@@ -103,7 +105,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [project.slug, getToken]);
 
   // Create API key
   const handleCreateKey = async () => {
@@ -120,7 +122,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${await (window as any).Clerk.session.getToken()}`,
+            Authorization: `Bearer ${await getToken()}`,
           },
           body: JSON.stringify({
             name: newKeyName,
@@ -155,7 +157,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${await (window as any).Clerk.session.getToken()}`,
+            Authorization: `Bearer ${await getToken()}`,
           },
         },
       );
@@ -182,7 +184,7 @@ export function ProjectApiKeysTab({ project }: ProjectApiKeysTabProps) {
   // Load keys on mount
   useEffect(() => {
     fetchApiKeys();
-  }, [project.slug]);
+  }, [fetchApiKeys]);
 
   return (
     <div className="space-y-6">

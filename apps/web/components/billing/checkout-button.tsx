@@ -5,6 +5,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useApi } from "@/hooks/use-api";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
+import axios from "axios";
 
 interface CheckoutButtonProps {
   planId: string;
@@ -12,7 +13,50 @@ interface CheckoutButtonProps {
   price: number;
 }
 
-const loadRazorpayCallback = () => {
+type RazorpaySuccessResponse = {
+  razorpay_payment_id: string;
+  razorpay_subscription_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayOptions = {
+  key: string;
+  subscription_id: string;
+  name: string;
+  description: string;
+  handler: (response: RazorpaySuccessResponse) => Promise<void>;
+  modal: {
+    ondismiss: () => void;
+  };
+  prefill: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+  theme: {
+    color: string;
+  };
+};
+
+type RazorpayInstance = {
+  open: () => void;
+};
+
+type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (axios.isAxiosError<{ message?: string }>(error)) {
+    return error.response?.data?.message || error.message || fallback;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
+const loadRazorpayCallback = (): Promise<boolean> => {
   return new Promise((resolve) => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -57,7 +101,7 @@ export const CheckoutButton = forwardRef<
         subscription_id: subscriptionId,
         name: "Tresta",
         description: `Subscribe to ${name}`,
-        handler: async (response: any) => {
+        handler: async (response: RazorpaySuccessResponse) => {
           try {
             await api.post("/api/payments/verify", {
               razorpay_payment_id: response.razorpay_payment_id,
@@ -88,16 +132,25 @@ export const CheckoutButton = forwardRef<
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
+      const razorpayCtor = (
+        window as unknown as { Razorpay?: RazorpayConstructor }
+      ).Razorpay;
+
+      if (!razorpayCtor) {
+        toast.error("Razorpay SDK is unavailable. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      const paymentObject = new razorpayCtor(options);
 
       // If payment modal is opened, we keep loading true until it's closed or completed
       // The ondismiss handler takes care of resetting loading to false on close.
       paymentObject.open();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Payment error:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Something went wrong initiating payment.",
+        getErrorMessage(error, "Something went wrong initiating payment."),
       );
       setLoading(false);
     }

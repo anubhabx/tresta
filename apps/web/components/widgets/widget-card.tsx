@@ -60,8 +60,10 @@ export function WidgetCard({
     try {
       await onDelete(widget.id);
       toast.success("Widget deleted successfully");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete widget");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Failed to delete widget";
+      toast.error(message);
       setIsDeleting(false);
     }
   };

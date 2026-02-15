@@ -30,6 +30,22 @@ export type ModerationSettingsFormData = z.infer<
   typeof moderationSettingsFormSchema
 >;
 
+type ModerationSettingsPayload = {
+  minContentLength?: number;
+  maxUrlCount?: number;
+  allowedDomains?: string[];
+  blockedDomains?: string[];
+  customProfanityList?: string[];
+  brandKeywords?: string[];
+};
+
+type ProjectModerationInput = {
+  autoModeration?: boolean;
+  autoApproveVerified?: boolean;
+  profanityFilterLevel?: string | null;
+  moderationSettings?: ModerationSettingsPayload | null;
+};
+
 /**
  * Convert form data to API payload format
  */
@@ -64,7 +80,7 @@ export function convertModerationFormToPayload(
  * Convert API data to form format
  */
 export function convertModerationPayloadToForm(
-  project: any,
+  project: ProjectModerationInput,
 ): ModerationSettingsFormData {
   const settings = project.moderationSettings || {};
 

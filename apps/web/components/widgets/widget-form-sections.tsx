@@ -7,16 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
 import { Switch } from "@workspace/ui/components/switch";
 import { Slider } from "@workspace/ui/components/slider";
-import { Label } from "@workspace/ui/components/label";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   LayoutGrid,
@@ -32,7 +24,6 @@ import {
 } from "lucide-react";
 import type { WidgetFormData } from "./widget-form";
 import { PRO_LAYOUTS } from "@workspace/types";
-import type { WidgetLayout } from "@workspace/types";
 import {
   PremiumWarningBanner,
   LockedToggle,

@@ -20,7 +20,6 @@ import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
 import { Separator } from "@workspace/ui/components/separator";
-import { cn } from "@workspace/ui/lib/utils";
 
 // Icons
 import { ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
@@ -39,14 +38,12 @@ import { projects } from "@/lib/queries";
 import {
   projectFormSchema,
   ProjectFormData,
-  generateSlug,
 } from "@/lib/schemas/project-schema";
 import { ProjectType, ProjectVisibility, type SocialLinks } from "@/types/api";
 import type { UpdateProjectPayload } from "@/types/api";
 
 // Types
 import type {
-  ProjectWizardFormData,
   IndustryPreset,
   ProjectIdentity,
 } from "./types";

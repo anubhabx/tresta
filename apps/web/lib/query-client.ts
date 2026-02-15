@@ -1,12 +1,26 @@
-
-import { useApi } from "@/hooks/use-api";
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { useUpgradeModal } from "@/components/billing/upgrade-modal";
 
-const globalErrorHandler = (error: any) => {
+type LimitExceededError = {
+  response?: {
+    data?: {
+      code?: string;
+    };
+  };
+};
+
+const isLimitExceededError = (error: unknown): error is LimitExceededError => {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+
+  const maybeError = error as LimitExceededError;
+  return maybeError.response?.data?.code === "LIMIT_EXCEEDED";
+};
+
+const globalErrorHandler = (error: unknown) => {
   // Check for LIMIT_EXCEEDED error code from backend
-  if (error?.response?.data?.code === "LIMIT_EXCEEDED") {
+  if (isLimitExceededError(error)) {
     useUpgradeModal.getState().open();
     return;
   }

@@ -5,10 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import {
   Star,
   Mail,
-  User,
   Video,
-  Briefcase,
-  Building2,
   AlertTriangle,
   CheckCircle,
   Eye,
@@ -40,7 +37,6 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { StatusBadge, TestimonialActions } from "./testimonials";
 import { Button } from "@workspace/ui/components/button";
 
 interface TestimonialCardProps {

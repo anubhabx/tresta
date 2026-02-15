@@ -38,6 +38,13 @@ interface TestimonialListProps {
   moderationMode?: boolean;
 }
 
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+};
+
 export function TestimonialList({
   projectSlug,
   moderationMode = false,
@@ -82,7 +89,9 @@ export function TestimonialList({
   const bulkModerationMutation =
     moderation.mutations.useBulkAction(projectSlug);
 
-  const allTestimonials = (data?.data as Testimonial[]) ?? [];
+  const allTestimonials = useMemo<Testimonial[]>(() => {
+    return Array.isArray(data?.data) ? (data.data as Testimonial[]) : [];
+  }, [data?.data]);
 
   // Calculate stats for moderation mode
   const stats = useMemo(
@@ -126,8 +135,8 @@ export function TestimonialList({
       toast.success(
         "Testimonial approved! View in Testimonials tab to publish it.",
       );
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to approve testimonial");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to approve testimonial"));
     } finally {
       setLoadingState(null);
     }
@@ -144,8 +153,8 @@ export function TestimonialList({
         },
       });
       toast.success("Testimonial rejected");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to reject testimonial");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to reject testimonial"));
     } finally {
       setLoadingState(null);
     }
@@ -156,8 +165,11 @@ export function TestimonialList({
     try {
       await updateMutation.mutateAsync({ id, data: { isPublished: true } });
       toast.success("Testimonial published!");
-    } catch (error: any) {
-      const errorMessage = error?.message || "Failed to publish testimonial";
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(
+        error,
+        "Failed to publish testimonial",
+      );
       // Check if it's the approval workflow error
       if (errorMessage.includes("approved")) {
         toast.error(
@@ -176,8 +188,8 @@ export function TestimonialList({
     try {
       await updateMutation.mutateAsync({ id, data: { isPublished: false } });
       toast.success("Testimonial unpublished");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to unpublish testimonial");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to unpublish testimonial"));
     } finally {
       setLoadingState(null);
     }
@@ -188,8 +200,8 @@ export function TestimonialList({
     try {
       await deleteMutation.mutateAsync(id);
       toast.success("Testimonial deleted");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete testimonial");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete testimonial"));
     } finally {
       setLoadingState(null);
     }
@@ -243,8 +255,8 @@ export function TestimonialList({
 
       // Remove this action from history
       setActionHistory((prev) => prev.filter((a) => a.id !== actionId));
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to undo action");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to undo action"));
     }
   };
 
@@ -315,8 +327,8 @@ export function TestimonialList({
       }
 
       setSelectedIds([]);
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to approve testimonials");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to approve testimonials"));
     }
   };
 
@@ -386,8 +398,8 @@ export function TestimonialList({
       }
 
       setSelectedIds([]);
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to reject testimonials");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to reject testimonials"));
     }
   };
 
@@ -457,8 +469,8 @@ export function TestimonialList({
       }
 
       setSelectedIds([]);
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to flag testimonials");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to flag testimonials"));
     }
   };
 

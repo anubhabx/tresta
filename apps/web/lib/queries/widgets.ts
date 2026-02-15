@@ -134,7 +134,7 @@ export const useCreateWidget = () => {
       );
       return response.data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate widget lists for this project
       queryClient.invalidateQueries({
         queryKey: widgetKeys.lists(),
@@ -158,7 +158,7 @@ export const useUpdateWidget = (widgetId: string) => {
       );
       return response.data.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate widget lists and detail
       queryClient.invalidateQueries({
         queryKey: widgetKeys.lists(),

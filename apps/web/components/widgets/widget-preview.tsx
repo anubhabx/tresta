@@ -23,6 +23,10 @@ type PreviewTestimonial = {
   rating: number;
   createdAt: string;
   authorAvatar?: string;
+  videoUrl?: string;
+  type?: "text" | "video";
+  isOAuthVerified?: boolean;
+  oauthProvider?: string | null;
 };
 
 const DEFAULT_PREVIEW_TESTIMONIALS: ReadonlyArray<PreviewTestimonial> = [
@@ -91,7 +95,7 @@ const DEFAULT_PREVIEW_TESTIMONIALS: ReadonlyArray<PreviewTestimonial> = [
 interface WidgetPreviewProps {
   config: WidgetFormData;
   widgetId?: string;
-  testimonials?: any[];
+  testimonials?: PreviewTestimonial[];
 }
 
 type NormalizedPreviewConfig = {
@@ -177,7 +181,7 @@ export function WidgetPreview({
         showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
       },
     };
-  }, [config, widgetId, resolvedTestimonials, isMounted]);
+  }, [config, widgetId, resolvedTestimonials, isMounted, documentNonce]);
 
   const iframeDocument = useMemo(() => {
     if (!previewPayload) {
@@ -276,7 +280,7 @@ export function WidgetPreview({
 interface MockResponseConfig {
   widgetId: string;
   config: NormalizedPreviewConfig;
-  testimonials: ReadonlyArray<any>;
+  testimonials: ReadonlyArray<PreviewTestimonial>;
 }
 
 function buildMockApiResponse({

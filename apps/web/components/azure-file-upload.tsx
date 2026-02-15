@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Upload, X, Loader2, CheckCircle2 } from "lucide-react";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -90,7 +91,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
 
       // Upload to Azure
       const result = await uploadFile(file, directory, {
-        onProgress: (p) => {
+        onProgress: () => {
           // Progress is automatically tracked by the hook
         },
         onSuccess: (r) => {
@@ -200,9 +201,12 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                   <div className="space-y-2">
                     <div className="flex items-center gap-4 p-4 border rounded-lg">
                       {preview && isImage ? (
-                        <img
+                        <Image
                           src={displayUrl}
                           alt="Upload preview"
+                          width={64}
+                          height={64}
+                          unoptimized
                           className="w-16 h-16 object-cover rounded"
                         />
                       ) : (

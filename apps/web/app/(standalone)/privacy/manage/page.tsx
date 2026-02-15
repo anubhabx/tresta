@@ -1,8 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import axios from "axios";
+import { Suspense } from "react";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import {

@@ -8,14 +8,13 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 import { useSasUrl } from "@/hooks/use-sas-url";
 
-interface SasImageProps extends Omit<
-  React.ImgHTMLAttributes<HTMLImageElement>,
-  "src"
-> {
+interface SasImageProps
+  extends Omit<React.ComponentProps<typeof Image>, "src" | "alt"> {
   /** The blob URL (with or without SAS token) */
   src: string | undefined | null;
   /** Alt text for the image */
@@ -107,9 +106,12 @@ export function SasImage({
 
   // Success - render image
   return (
-    <img
+    <Image
       src={sasUrl}
       alt={alt}
+      width={200}
+      height={200}
+      unoptimized
       className={className}
       onError={() => setImageError(true)}
       {...props}

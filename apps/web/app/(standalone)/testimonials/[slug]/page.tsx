@@ -101,6 +101,22 @@ const testimonialFormSchema = z.object({
 
 type FormData = z.infer<typeof testimonialFormSchema>;
 
+type CreateTestimonialPayloadWithGoogle = CreateTestimonialPayload & {
+  googleIdToken?: string;
+};
+
+type TestimonialErrorResponse = {
+  message?: string;
+  error?: {
+    details?: {
+      createdAt?: string;
+    };
+  };
+  data?: {
+    createdAt?: string;
+  };
+};
+
 interface TestimonialSubmissionPageProps {
   params: Promise<{
     slug: string;
@@ -228,7 +244,7 @@ export default function TestimonialSubmissionPage({
   const executeSubmission = async (data: FormData, consented: boolean) => {
     setIsSubmitting(true);
     try {
-      const payload: CreateTestimonialPayload = {
+      const payload: CreateTestimonialPayloadWithGoogle = {
         authorName: data.authorName,
         content: data.content,
         type: "TEXT",
@@ -261,7 +277,7 @@ export default function TestimonialSubmissionPage({
 
       // Include Google ID token if user signed in with Google
       if (googleIdToken) {
-        (payload as any).googleIdToken = googleIdToken;
+        payload.googleIdToken = googleIdToken;
       }
 
       const headers: Record<string, string> = {};
@@ -287,15 +303,19 @@ export default function TestimonialSubmissionPage({
       } else {
         toast.success("Thank you! Your testimonial has been submitted.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to submit testimonial:", error);
-      const status = error?.response?.status;
+      const axiosError = axios.isAxiosError<TestimonialErrorResponse>(error)
+        ? error
+        : null;
+      const status = axiosError?.response?.status;
       if (status === 409) {
         const responseMessage =
-          error?.response?.data?.message ||
+          axiosError?.response?.data?.message ||
           "It looks like you've already shared your experience.";
         const details =
-          error?.response?.data?.error?.details || error?.response?.data?.data;
+          axiosError?.response?.data?.error?.details ||
+          axiosError?.response?.data?.data;
 
         if (details?.createdAt) {
           setExistingSubmissionCreatedAt(details.createdAt);
@@ -307,7 +327,7 @@ export default function TestimonialSubmissionPage({
         toast.info(responseMessage);
       } else {
         toast.error(
-          error?.response?.data?.message ||
+          axiosError?.response?.data?.message ||
             "Failed to submit testimonial. Please try again.",
         );
       }
