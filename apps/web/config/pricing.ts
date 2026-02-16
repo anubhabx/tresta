@@ -45,6 +45,7 @@ export const PLANS: PlanConfig[] = [
       "1 Project",
       "10 Testimonials",
       "1 Widget",
+      "API access (GET testimonials, rate-limited)",
       "Basic embed customization",
       "Email support",
     ],
@@ -72,9 +73,8 @@ export const PLANS: PlanConfig[] = [
       "Unlimited Widgets",
       "Video testimonials (up to 5 min each)",
       "Custom branding & colors",
-      "Advanced analytics",
+      "API access (GET testimonials, rate-limited)",
       "Priority support",
-      "API access",
     ],
     quota: {
       testimonials: -1,

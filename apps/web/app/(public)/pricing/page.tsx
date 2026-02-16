@@ -16,14 +16,14 @@ const planJustifications = [
     title: "Free Plan",
     subtitle: "No Strings Attached",
     description:
-      "We believe you should try before you buy. The Free plan gives you everything you need to validate testimonials as a growth lever. One project, 10 testimonials, and a production-ready widget. No credit card required.",
+      "We believe you should try before you buy. The Free plan gives you everything you need to validate testimonials as a growth lever: one project, 10 testimonials, one production-ready widget, and API access for fetching testimonials with rate limits. No credit card required.",
   },
   {
     icon: Rocket,
     title: "Pro Plan",
     subtitle: "Unlimited Everything",
     description:
-      "When social proof becomes central to your business, limits become friction. Pro removes all caps: unlimited projects, unlimited testimonials, unlimited widgets. Plus video testimonials, custom branding, and API access for developers who want to integrate deeply.",
+      "When social proof becomes central to your business, limits become friction. Pro removes core caps: unlimited projects, unlimited testimonials, and unlimited widgets. Plus video testimonials, custom branding, and priority support.",
   },
   {
     icon: Gift,

@@ -181,7 +181,7 @@ export function AdvancedSection({
                   {!isPro && <ProBadge size="sm" />}
                 </div>
                 <p className="text-xs text-muted-foreground font-normal">
-                  Custom domain, API access & more
+                  Custom domain and advanced controls
                 </p>
               </div>
             </div>

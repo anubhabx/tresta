@@ -18,7 +18,6 @@ import {
   Check,
   Zap,
   Shield,
-  BarChart3,
   Video,
   Palette,
   Code,
@@ -35,7 +34,6 @@ const featureIcons: Record<string, React.ReactNode> = {
   Custom: <Palette className="h-4 w-4" />,
   API: <Code className="h-4 w-4" />,
   Priority: <HeadphonesIcon className="h-4 w-4" />,
-  Analytics: <BarChart3 className="h-4 w-4" />,
   Early: <Shield className="h-4 w-4" />,
 };
 
