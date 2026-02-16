@@ -52,6 +52,8 @@ interface PricingCardProps {
   currentPlanId?: string | null;
   onUnauthenticatedClick: (planId: string) => void;
   autoTriggerCheckout?: boolean;
+  compact?: boolean;
+  keyFeatureCount?: number;
 }
 
 function PricingCard({
@@ -60,11 +62,17 @@ function PricingCard({
   currentPlanId,
   onUnauthenticatedClick,
   autoTriggerCheckout,
+  compact = false,
+  keyFeatureCount = 4,
 }: PricingCardProps) {
   const isPopular = plan.popular;
   const isFree = plan.price === 0;
   const isCurrentPlan = currentPlanId === plan.id || (isFree && !currentPlanId);
   const checkoutButtonRef = useRef<HTMLButtonElement>(null);
+  const visibleFeatures = compact
+    ? plan.features.slice(0, keyFeatureCount)
+    : plan.features;
+  const hiddenFeaturesCount = Math.max(plan.features.length - visibleFeatures.length, 0);
 
   // Auto-trigger checkout if returning from sign-in with checkout param
   useEffect(() => {
@@ -81,7 +89,8 @@ function PricingCard({
     <Card
       className={cn(
         "relative flex flex-col transition-all duration-200 hover:shadow-lg",
-        isPopular && "border-primary shadow-md scale-[1.02]",
+        isPopular && !compact && "border-primary shadow-md scale-[1.02]",
+        isPopular && compact && "border-primary shadow-md",
       )}
     >
       {plan.badge && (
@@ -93,18 +102,20 @@ function PricingCard({
         </Badge>
       )}
 
-      <CardHeader className="text-center pb-2">
-        <CardTitle className="text-2xl">{plan.name}</CardTitle>
+      <CardHeader className={cn("text-center pb-2", compact && "pb-1")}> 
+        <CardTitle className={cn("text-2xl", compact && "text-xl")}>
+          {plan.name}
+        </CardTitle>
         <CardDescription className="text-sm">
           {plan.description}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-6">
+      <CardContent className={cn("flex-1 space-y-6", compact && "space-y-4")}>
         {/* Price */}
         <div className="text-center">
           <div className="flex items-baseline justify-center gap-1">
-            <span className="text-4xl font-bold tracking-tight">
+            <span className={cn("text-4xl font-bold tracking-tight", compact && "text-3xl")}>
               {isFree ? "Free" : formatPrice(plan.price, plan.currency)}
             </span>
             {!isFree && (
@@ -121,7 +132,7 @@ function PricingCard({
 
         {/* Features */}
         <ul className="space-y-3">
-          {plan.features.map((feature, idx) => (
+          {visibleFeatures.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-3 text-sm">
               <span className="mt-0.5 text-primary shrink-0">
                 {getFeatureIcon(feature)}
@@ -131,42 +142,50 @@ function PricingCard({
           ))}
         </ul>
 
-        {/* Quota Details */}
-        <div className="pt-4 border-t border-border/50">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-            Limits
+        {compact && hiddenFeaturesCount > 0 && (
+          <p className="text-xs text-muted-foreground">
+            +{hiddenFeaturesCount} more feature{hiddenFeaturesCount > 1 ? "s" : ""}
           </p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <span className="font-medium">
-                {plan.quota.projects === -1 ? "∞" : plan.quota.projects}
-              </span>{" "}
-              <span className="text-muted-foreground">Projects</span>
-            </div>
-            <div>
-              <span className="font-medium">
-                {plan.quota.testimonials === -1 ? "∞" : plan.quota.testimonials}
-              </span>{" "}
-              <span className="text-muted-foreground">Testimonials</span>
-            </div>
-            <div>
-              <span className="font-medium">
-                {plan.quota.widgets === -1 ? "∞" : plan.quota.widgets}
-              </span>{" "}
-              <span className="text-muted-foreground">Widgets</span>
-            </div>
-            <div>
-              <span className="font-medium">
-                {plan.quota.video_minutes === -1
-                  ? "∞"
-                  : plan.quota.video_minutes === 0
-                    ? "—"
-                    : `${plan.quota.video_minutes}min`}
-              </span>{" "}
-              <span className="text-muted-foreground">Video</span>
+        )}
+
+        {/* Quota Details */}
+        {!compact && (
+          <div className="pt-4 border-t border-border/50">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              Limits
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="font-medium">
+                  {plan.quota.projects === -1 ? "∞" : plan.quota.projects}
+                </span>{" "}
+                <span className="text-muted-foreground">Projects</span>
+              </div>
+              <div>
+                <span className="font-medium">
+                  {plan.quota.testimonials === -1 ? "∞" : plan.quota.testimonials}
+                </span>{" "}
+                <span className="text-muted-foreground">Testimonials</span>
+              </div>
+              <div>
+                <span className="font-medium">
+                  {plan.quota.widgets === -1 ? "∞" : plan.quota.widgets}
+                </span>{" "}
+                <span className="text-muted-foreground">Widgets</span>
+              </div>
+              <div>
+                <span className="font-medium">
+                  {plan.quota.video_minutes === -1
+                    ? "∞"
+                    : plan.quota.video_minutes === 0
+                      ? "—"
+                      : `${plan.quota.video_minutes}min`}
+                </span>{" "}
+                <span className="text-muted-foreground">Video</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </CardContent>
 
       <CardFooter>
@@ -211,6 +230,18 @@ function PricingCard({
 }
 
 export function PricingTable() {
+  return <PricingTableView />;
+}
+
+interface PricingTableViewProps {
+  compact?: boolean;
+  keyFeatureCount?: number;
+}
+
+export function PricingTableView({
+  compact = false,
+  keyFeatureCount = 4,
+}: PricingTableViewProps = {}) {
   const { isSignedIn } = useUser();
   const { plan: currentPlan } = useSubscription();
   const router = useRouter();
@@ -228,7 +259,14 @@ export function PricingTable() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+    <div
+      className={cn(
+        "grid max-w-6xl mx-auto",
+        compact
+          ? "grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5"
+          : "grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8",
+      )}
+    >
       {PLANS.map((plan) => (
         <PricingCard
           key={plan.id}
@@ -237,6 +275,8 @@ export function PricingTable() {
           currentPlanId={currentPlan?.id}
           onUnauthenticatedClick={handleUnauthenticatedClick}
           autoTriggerCheckout={checkoutPlanId === plan.id}
+          compact={compact}
+          keyFeatureCount={keyFeatureCount}
         />
       ))}
     </div>

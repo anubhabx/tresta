@@ -6,6 +6,12 @@ import { useApi } from "@/hooks/use-api";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
+import type {
+  ApiSuccessResponse,
+  CreateSubscriptionRequest,
+  CreateSubscriptionResponseData,
+  VerifyPaymentRequest,
+} from "@workspace/types";
 
 interface CheckoutButtonProps {
   planId: string;
@@ -90,25 +96,38 @@ export const CheckoutButton = forwardRef<
         return;
       }
 
-      const { data: response } = await api.post("/api/payments/subscription", {
-        planId,
-      });
+      const subscriptionPayload: CreateSubscriptionRequest = { planId };
+      const { data: response } =
+        await api.post<ApiSuccessResponse<CreateSubscriptionResponseData>>(
+          "/api/payments/subscription",
+          subscriptionPayload,
+        );
 
       const { subscriptionId, key, planName: name } = response.data;
 
-      const options = {
+      if (!key) {
+        toast.error(
+          "Payment configuration is unavailable. Please contact support.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      const options: RazorpayOptions = {
         key,
         subscription_id: subscriptionId,
         name: "Tresta",
         description: `Subscribe to ${name}`,
         handler: async (response: RazorpaySuccessResponse) => {
           try {
-            await api.post("/api/payments/verify", {
+            const verificationPayload: VerifyPaymentRequest = {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_subscription_id: response.razorpay_subscription_id,
               razorpay_signature: response.razorpay_signature,
               planId,
-            });
+            };
+
+            await api.post("/api/payments/verify", verificationPayload);
             toast.success("Subscription activated successfully!");
             window.location.reload();
           } catch (error) {

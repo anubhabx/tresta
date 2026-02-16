@@ -1,16 +1,18 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@workspace/ui/components/dialog";
-import { PricingTable } from "./pricing-table";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@workspace/ui/components/drawer";
+import { PricingTableView } from "./pricing-table";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
+import Link from "next/link";
+import { Button } from "@workspace/ui/components/button";
 
 // Global state for Upgrade Modal using Zustand (simple store)
 interface UpgradeModalStore {
@@ -26,7 +28,7 @@ export const useUpgradeModal = create<UpgradeModalStore>((set) => ({
 }));
 
 export function UpgradeModal() {
-  const { isOpen, close } = useUpgradeModal();
+  const { isOpen, close, open } = useUpgradeModal();
   const pathname = usePathname();
 
   // Close modal on route change
@@ -35,20 +37,38 @@ export function UpgradeModal() {
   }, [pathname, close]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={close}>
-      <DialogContent className="w-full sm:max-w-7xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">
+    <Drawer
+      open={isOpen}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
+          open();
+          return;
+        }
+        close();
+      }}
+    >
+      <DrawerContent className="h-[92vh] max-h-[92vh] overflow-hidden">
+        <DrawerHeader className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+          <DrawerTitle className="text-2xl font-bold text-center md:text-left">
             Upgrade Your Plan
-          </DialogTitle>
-          <DialogDescription className="text-center">
+          </DrawerTitle>
+          <DrawerDescription className="text-center md:text-left">
             Choose a plan that fits your needs to unlock more features.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="mt-6">
-          <PricingTable />
+          </DrawerDescription>
+          <div className="mt-2 flex justify-center md:justify-start">
+            <Button variant="link" className="h-auto p-0" asChild>
+              <Link href="/pricing" onClick={close}>
+                See all benefits
+              </Link>
+            </Button>
+          </div>
+        </DrawerHeader>
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-6 px-4 sm:px-6">
+          <div className="mx-auto mt-2 w-full max-w-7xl">
+            <PricingTableView compact keyFeatureCount={3} />
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }
