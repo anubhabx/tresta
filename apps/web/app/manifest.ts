@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
 
+import { siteConfig } from "@/config/site";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Tresta - Collect & Showcase Social Proof",
-    short_name: "Tresta",
+    name: siteConfig.title,
+    short_name: siteConfig.name,
     description:
       "The all-in-one platform to collect, manage, and showcase authentic customer testimonials.",
     start_url: "/",
