@@ -15,6 +15,7 @@ import systemRouter from './system.route.js';
 import featureFlagsRouter from './feature-flags.route.js';
 import widgetAnalyticsRouter from './widgets.route.js';
 import plansRouter from './plans.route.js';
+import billingRouter from './billing.route.js';
 
 const router: Router = Router();
 
@@ -37,5 +38,6 @@ router.use('/admin', systemRouter);
 router.use('/admin', featureFlagsRouter);
 router.use('/admin', widgetAnalyticsRouter);
 router.use('/admin', plansRouter);
+router.use('/admin', billingRouter);
 
 export default router;
