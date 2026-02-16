@@ -26,41 +26,34 @@ type RazorpayEventPayload = {
         id?: string;
         status?: string;
         subscription_id?: string;
+        amount?: number;
+        currency?: string;
+        notes?: Record<string, unknown>;
       };
     };
     invoice?: {
       entity?: {
+        id?: string;
         status?: string;
         subscription_id?: string;
         payment_id?: string;
+        amount?: number;
+        amount_paid?: number;
+        currency?: string;
+        notes?: Record<string, unknown>;
+        line_items?: Array<{
+          subscription_id?: string;
+        }>;
       };
     };
   };
 };
 
-const SUPPORTED_WEBHOOK_EVENTS = new Set([
-  // Subscription lifecycle
-  "subscription.authenticated",
-  "subscription.activated",
-  "subscription.charged",
-  "subscription.pending",
-  "subscription.halted",
-  "subscription.cancelled",
-  "subscription.paused",
-  "subscription.resumed",
-  // Payment lifecycle
-  "payment.authorized",
-  "payment.captured",
-  "payment.failed",
-  "payment.refunded",
-  // Invoice lifecycle
-  "invoice.issued",
-  "invoice.paid",
-  "invoice.partially_paid",
-  "invoice.payment_failed",
-  "invoice.cancelled",
-  "invoice.expired",
-]);
+const SUPPORTED_EVENT_PREFIXES = ["subscription.", "invoice.", "payment."] as const;
+
+const isSupportedWebhookEvent = (eventName: string): boolean => {
+  return SUPPORTED_EVENT_PREFIXES.some((prefix) => eventName.startsWith(prefix));
+};
 
 const getRawBody = (req: Request): Buffer => {
   const maybeRawBody = (req as Request & { rawBody?: Buffer }).rawBody;
@@ -87,12 +80,121 @@ const toDate = (epochSeconds?: number): Date | undefined => {
   return new Date(epochSeconds * 1000);
 };
 
+const getNoteString = (
+  notes: Record<string, unknown> | undefined,
+  key: string,
+): string | undefined => {
+  if (!notes || typeof notes[key] !== "string") {
+    return undefined;
+  }
+
+  const value = String(notes[key]).trim();
+  return value.length > 0 ? value : undefined;
+};
+
 const getSubscriptionId = (payload: RazorpayEventPayload): string | undefined => {
+  const paymentNotes = payload.payload?.payment?.entity?.notes;
+  const invoiceNotes = payload.payload?.invoice?.entity?.notes;
+  const invoiceLineItems = payload.payload?.invoice?.entity?.line_items;
+
   return (
     payload.payload?.subscription?.entity?.id ||
     payload.payload?.payment?.entity?.subscription_id ||
-    payload.payload?.invoice?.entity?.subscription_id
+    getNoteString(paymentNotes, "subscription_id") ||
+    getNoteString(paymentNotes, "razorpay_subscription_id") ||
+    payload.payload?.invoice?.entity?.subscription_id ||
+    getNoteString(invoiceNotes, "subscription_id") ||
+    getNoteString(invoiceNotes, "razorpay_subscription_id") ||
+    invoiceLineItems?.find((lineItem) => lineItem.subscription_id)?.subscription_id
   );
+};
+
+const getPaymentId = (payload: RazorpayEventPayload): string | undefined => {
+  return payload.payload?.payment?.entity?.id || payload.payload?.invoice?.entity?.payment_id;
+};
+
+const getInvoiceId = (payload: RazorpayEventPayload): string | undefined => {
+  return payload.payload?.invoice?.entity?.id;
+};
+
+const getProviderStatusFromEvent = (eventName: string): string | undefined => {
+  const [scope, state] = eventName.split(".");
+  if (scope !== "subscription" || !state) {
+    return undefined;
+  }
+
+  switch (state) {
+    case "activated":
+    case "resumed":
+    case "charged":
+      return "active";
+    case "authenticated":
+      return "authenticated";
+    case "cancelled":
+      return "cancelled";
+    case "completed":
+      return "completed";
+    case "pending":
+      return "pending";
+    case "halted":
+      return "halted";
+    case "paused":
+      return "paused";
+    default:
+      return undefined;
+  }
+};
+
+const getInvoiceStatusFromEvent = (eventName: string): string | undefined => {
+  switch (eventName) {
+    case "invoice.paid":
+      return "paid";
+    case "invoice.partially_paid":
+      return "partially_paid";
+    case "invoice.expired":
+      return "expired";
+    default:
+      return undefined;
+  }
+};
+
+const getPaymentStatusFromEvent = (eventName: string): string | undefined => {
+  switch (eventName) {
+    case "payment.captured":
+      return "captured";
+    case "payment.authorized":
+      return "authorized";
+    case "payment.failed":
+      return "failed";
+    default:
+      return undefined;
+  }
+};
+
+const getInternalStatusOverride = (
+  eventName: string,
+): "ACTIVE" | "PAST_DUE" | "PAUSED" | "CANCELED" | undefined => {
+  switch (eventName) {
+    case "subscription.activated":
+    case "subscription.resumed":
+    case "subscription.charged":
+    case "invoice.paid":
+    case "payment.captured":
+      return "ACTIVE";
+    case "subscription.pending":
+    case "subscription.halted":
+    case "invoice.partially_paid":
+    case "invoice.expired":
+    case "payment.failed":
+      return "PAST_DUE";
+    case "subscription.paused":
+      return "PAUSED";
+    case "subscription.cancelled":
+    case "subscription.completed":
+      return "CANCELED";
+    default:
+      return undefined;
+  }
 };
 
 const getProviderEventId = (req: Request, rawBody: Buffer): string => {
@@ -156,7 +258,7 @@ export const handleRazorpayWebhook = async (
     return;
   }
 
-  if (!SUPPORTED_WEBHOOK_EVENTS.has(payload.event)) {
+  if (!isSupportedWebhookEvent(payload.event)) {
     await prisma.paymentWebhookEvent.create({
       data: {
         provider: "razorpay",
@@ -170,14 +272,13 @@ export const handleRazorpayWebhook = async (
       },
     });
 
-    res.status(200).json({
-      success: true,
-      message: `Event ${payload.event} ignored`,
-    });
+    res.status(200).json({ success: true, message: `Event ${payload.event} ignored` });
     return;
   }
 
-  const subscriptionId = getSubscriptionId(payload);
+  const subscriptionIdFromPayload = getSubscriptionId(payload);
+  const paymentIdFromPayload = getPaymentId(payload);
+  const invoiceIdFromPayload = getInvoiceId(payload);
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -186,26 +287,23 @@ export const handleRazorpayWebhook = async (
           provider: "razorpay",
           providerEventId,
           eventType: payload.event,
-          subscriptionId,
+          subscriptionId: subscriptionIdFromPayload,
           payload: payload as unknown as Prisma.InputJsonValue,
           status: "processing",
         },
       });
 
-      if (!subscriptionId) {
-        await tx.paymentWebhookEvent.update({
-          where: { providerEventId },
-          data: {
-            status: "ignored",
-            processedAt: new Date(),
-          },
-        });
-        return;
-      }
+      let subscription = subscriptionIdFromPayload
+        ? await tx.subscription.findUnique({
+            where: { externalSubscriptionId: subscriptionIdFromPayload },
+          })
+        : null;
 
-      const subscription = await tx.subscription.findUnique({
-        where: { externalSubscriptionId: subscriptionId },
-      });
+      if (!subscription && paymentIdFromPayload) {
+        subscription = await tx.subscription.findFirst({
+          where: { razorpayPaymentId: paymentIdFromPayload },
+        });
+      }
 
       if (!subscription) {
         await tx.paymentWebhookEvent.update({
@@ -232,19 +330,30 @@ export const handleRazorpayWebhook = async (
       }
 
       const providerStatusFromPayload = payload.payload?.subscription?.entity?.status;
-      const providerStatus = providerStatusFromPayload || subscription.providerStatus || undefined;
+      const providerStatusFromEvent = getProviderStatusFromEvent(payload.event);
+      const providerStatus =
+        providerStatusFromPayload ||
+        providerStatusFromEvent ||
+        subscription.providerStatus ||
+        undefined;
 
       const paymentEntity = payload.payload?.payment?.entity;
       const invoiceEntity = payload.payload?.invoice?.entity;
 
-      const lastPaymentStatus = paymentEntity?.status || subscription.lastPaymentStatus || undefined;
-      const lastInvoiceStatus = invoiceEntity?.status || subscription.lastInvoiceStatus || undefined;
+      const paymentStatusFromEvent = getPaymentStatusFromEvent(payload.event);
+      const invoiceStatusFromEvent = getInvoiceStatusFromEvent(payload.event);
 
-      const mappedStatus = mapProviderSignalsToInternal(
+      const lastPaymentStatus =
+        paymentEntity?.status || paymentStatusFromEvent || subscription.lastPaymentStatus || undefined;
+      const lastInvoiceStatus =
+        invoiceEntity?.status || invoiceStatusFromEvent || subscription.lastInvoiceStatus || undefined;
+
+      const mappedStatusFromSignals = mapProviderSignalsToInternal(
         providerStatus,
         lastInvoiceStatus,
         lastPaymentStatus,
       );
+      const mappedStatus = getInternalStatusOverride(payload.event) || mappedStatusFromSignals;
 
       const currentPeriodStart =
         toDate(payload.payload?.subscription?.entity?.current_start) ||
@@ -267,10 +376,15 @@ export const handleRazorpayWebhook = async (
           currentPeriodStart,
           currentPeriodEnd,
           cancelAtPeriodEnd:
-            Boolean(payload.payload?.subscription?.entity?.cancel_at_cycle_end) ||
-            subscription.cancelAtPeriodEnd,
+            payload.payload?.subscription?.entity?.cancel_at_cycle_end !== undefined
+              ? Boolean(payload.payload?.subscription?.entity?.cancel_at_cycle_end)
+              : subscription.cancelAtPeriodEnd,
           razorpayPaymentId:
-            paymentEntity?.id || invoiceEntity?.payment_id || subscription.razorpayPaymentId || undefined,
+            paymentEntity?.id ||
+            invoiceEntity?.payment_id ||
+            paymentIdFromPayload ||
+            subscription.razorpayPaymentId ||
+            undefined,
           lastPaymentStatus,
           lastInvoiceStatus,
           lastWebhookEventId: providerEventId,
@@ -278,6 +392,67 @@ export const handleRazorpayWebhook = async (
           lastWebhookAt: eventCreatedAt,
         },
       });
+
+      const hasPaymentSignal = payload.event.startsWith("payment.") || payload.event.startsWith("invoice.");
+      if (hasPaymentSignal && (paymentIdFromPayload || invoiceIdFromPayload)) {
+        const paymentAmount =
+          payload.payload?.payment?.entity?.amount ||
+          payload.payload?.invoice?.entity?.amount_paid ||
+          payload.payload?.invoice?.entity?.amount ||
+          subscription.amount ||
+          null;
+        const paymentCurrency =
+          payload.payload?.payment?.entity?.currency ||
+          payload.payload?.invoice?.entity?.currency ||
+          subscription.currency ||
+          null;
+
+        const paymentRecordData = {
+          provider: "razorpay",
+          externalPaymentId: paymentIdFromPayload,
+          externalInvoiceId: invoiceIdFromPayload,
+          externalSubscriptionId: subscription.externalSubscriptionId,
+          userId: subscription.userId,
+          subscriptionId: subscription.id,
+          planId: subscription.planId,
+          paymentStatus: lastPaymentStatus,
+          invoiceStatus: lastInvoiceStatus,
+          amount: paymentAmount,
+          currency: paymentCurrency,
+          eventType: payload.event,
+          eventCreatedAt,
+          paidAt:
+            payload.event === "payment.captured" || payload.event === "invoice.paid"
+              ? eventCreatedAt
+              : undefined,
+          failedAt: payload.event === "payment.failed" ? eventCreatedAt : undefined,
+          rawSnapshot: payload as unknown as Prisma.InputJsonValue,
+        };
+
+        if (paymentIdFromPayload) {
+          await tx.subscriptionPayment.upsert({
+            where: {
+              provider_externalPaymentId: {
+                provider: "razorpay",
+                externalPaymentId: paymentIdFromPayload,
+              },
+            },
+            create: paymentRecordData,
+            update: paymentRecordData,
+          });
+        } else if (invoiceIdFromPayload) {
+          await tx.subscriptionPayment.upsert({
+            where: {
+              provider_externalInvoiceId: {
+                provider: "razorpay",
+                externalInvoiceId: invoiceIdFromPayload,
+              },
+            },
+            create: paymentRecordData,
+            update: paymentRecordData,
+          });
+        }
+      }
 
       if (mappedStatus === "ACTIVE") {
         await tx.user.update({

@@ -28,6 +28,7 @@ model User {
   testimonials Testimonial[]
   apiKeys      ApiKey[]
   subscription Subscription? // null for free tier users
+  subscriptionPayments SubscriptionPayment[]
 
   // Notification system relations
   notifications           Notification[]
@@ -92,6 +93,7 @@ model Plan {
   type           UserPlan @default(FREE) // Mapping to enum for code compatibility
 
   subscriptions Subscription[]
+  subscriptionPayments SubscriptionPayment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,12 +143,48 @@ model Subscription {
   interval String? // "month", "year"
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments SubscriptionPayment[]
 
   @@index([userId])
   @@index([planId])
   @@index([status])
   @@index([providerStatus])
   @@index([lastWebhookAt])
+}
+
+model SubscriptionPayment {
+  id                     String    @id @default(cuid())
+  provider               String    @default("razorpay") @db.VarChar(32)
+  externalPaymentId      String?   @db.VarChar(64)
+  externalInvoiceId      String?   @db.VarChar(64)
+  externalSubscriptionId String?   @db.VarChar(64)
+  userId                 String
+  subscriptionId         String
+  planId                 String?
+  paymentStatus          String?   @db.VarChar(32)
+  invoiceStatus          String?   @db.VarChar(32)
+  amount                 Int?
+  currency               String?   @db.VarChar(8)
+  eventType              String    @db.VarChar(128)
+  eventCreatedAt         DateTime?
+  paidAt                 DateTime?
+  failedAt               DateTime?
+  rawSnapshot            Json?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  plan         Plan?        @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, externalPaymentId])
+  @@unique([provider, externalInvoiceId])
+  @@index([userId, createdAt])
+  @@index([subscriptionId, createdAt])
+  @@index([planId])
+  @@index([paymentStatus])
+  @@index([invoiceStatus])
+  @@index([eventType, eventCreatedAt])
 }
 
 model PaymentWebhookEvent {
