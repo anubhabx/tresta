@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
+import { siteConfig } from "@/config/site";
 import { ClerkProvider } from "@clerk/nextjs";
 
 const fontSans = Inter({
@@ -14,16 +16,16 @@ const fontMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-export const metadata = {
-  title: "Tresta - Collect & Showcase Social Proof",
-  description:
-    "The all-in-one platform to collect, manage, and showcase authentic customer testimonials. Turn customer love into growth with Tresta.",
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: siteConfig.title,
+  description: siteConfig.description,
   openGraph: {
-    title: "Tresta - Collect & Showcase Social Proof",
+    title: siteConfig.title,
     description:
       "The all-in-one platform to collect, manage, and showcase authentic customer testimonials.",
-    url: "https://tresta.app",
-    siteName: "Tresta",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
     locale: "en_US",
     type: "website",
   },
