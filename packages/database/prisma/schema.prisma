@@ -104,6 +104,10 @@ model Subscription {
   userId String             @unique
   status SubscriptionStatus // e.g., "active", "canceled", etc.
 
+  // Mirror of provider lifecycle states (Razorpay)
+  // Expected values: created, authenticated, active, pending, halted, paused, cancelled, completed, expired
+  providerStatus String? @db.VarChar(32)
+
   // Relations
   planId String?
   plan   Plan?   @relation(fields: [planId], references: [id])
@@ -121,6 +125,11 @@ model Subscription {
   razorpayOrderId   String?
   razorpayPaymentId String?
   razorpaySignature String?
+  lastPaymentStatus String? @db.VarChar(32)
+  lastInvoiceStatus String? @db.VarChar(32)
+  lastWebhookEventId   String?   @db.VarChar(255)
+  lastWebhookEventType String?   @db.VarChar(128)
+  lastWebhookAt        DateTime?
 
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
@@ -136,6 +145,25 @@ model Subscription {
   @@index([userId])
   @@index([planId])
   @@index([status])
+  @@index([providerStatus])
+  @@index([lastWebhookAt])
+}
+
+model PaymentWebhookEvent {
+  id              String    @id @default(cuid())
+  provider        String    @db.VarChar(32)
+  providerEventId String    @unique @db.VarChar(255)
+  eventType       String    @db.VarChar(128)
+  subscriptionId  String?
+  payload         Json
+  status          String    @default("processed") @db.VarChar(32)
+  error           String?   @db.Text
+  receivedAt      DateTime  @default(now())
+  processedAt     DateTime?
+
+  @@index([provider, eventType])
+  @@index([subscriptionId])
+  @@index([receivedAt])
 }
 
 model Testimonial {

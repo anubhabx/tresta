@@ -84,6 +84,19 @@ export const verifyRazorpayOrderSignature = (
     return generatedSignature === razorpaySignature;
 };
 
+export const verifyRazorpayWebhookSignature = (
+    rawBody: string,
+    razorpaySignature: string,
+    webhookSecret: string,
+) => {
+    const generatedSignature = crypto
+        .createHmac("sha256", webhookSecret)
+        .update(rawBody)
+        .digest("hex");
+
+    return generatedSignature === razorpaySignature;
+};
+
 export const cancelRazorpaySubscription = async (
     subscriptionId: string
 ): Promise<unknown> => {

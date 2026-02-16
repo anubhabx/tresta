@@ -3,10 +3,25 @@ export type PlanType = "FREE" | "PRO";
 export type SubscriptionStatus =
   | "INCOMPLETE"
   | "ACTIVE"
+  | "CANCELED"
   | "CANCELLED"
+  | "PAST_DUE"
   | "EXPIRED"
   | "PAUSED"
   | "COMPLETED"
+  | "TRIALING"
+  | (string & {});
+
+export type ProviderSubscriptionStatus =
+  | "created"
+  | "authenticated"
+  | "active"
+  | "pending"
+  | "halted"
+  | "paused"
+  | "cancelled"
+  | "completed"
+  | "expired"
   | (string & {});
 
 export interface ApiSuccessResponse<T> {
@@ -55,6 +70,7 @@ export interface SubscriptionPlanSummary {
 export interface SubscriptionSummary {
   id: string;
   status: SubscriptionStatus;
+  providerStatus?: ProviderSubscriptionStatus | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
 }

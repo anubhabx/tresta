@@ -12,6 +12,7 @@ import {
   createRazorpaySubscription,
   verifyRazorpaySignature,
 } from "../services/razorpay.service.js";
+import { mapProviderStatusToInternal } from "../services/subscription-status.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
 import { ZodError } from "zod";
 import {
@@ -119,7 +120,8 @@ export const createSubscription = async (
       create: {
         userId,
         planId: dbPlanId,
-        status: "INCOMPLETE", // Will be ACTIVE after verification
+        status: "INCOMPLETE", // Final state is reconciled through provider events/webhooks
+        providerStatus: subscription.status || "created",
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
         currentPeriodStart: subscription.current_start
@@ -132,6 +134,7 @@ export const createSubscription = async (
       update: {
         planId: dbPlanId,
         status: "INCOMPLETE",
+        providerStatus: subscription.status || "created",
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
         currentPeriodStart: subscription.current_start
@@ -199,14 +202,22 @@ export const verifyPayment = async (
       throw new BadRequestError("Invalid payment signature");
     }
 
-    // Update Subscription status to ACTIVE
-    // Fetch latest details from Razorpay to get updated start/end times
+    // Fetch latest details from Razorpay. Webhook remains source-of-truth.
     const { getSubscription } = await import("../services/razorpay.service.js");
     let currentPeriodStart: Date | undefined;
     let currentPeriodEnd: Date | undefined;
+    let providerStatus: string | undefined;
+    let mappedStatus:
+      | "ACTIVE"
+      | "INCOMPLETE"
+      | "PAST_DUE"
+      | "PAUSED"
+      | "CANCELED" = "INCOMPLETE";
 
     try {
       const subDetails = await getSubscription(razorpay_subscription_id);
+      providerStatus = subDetails.status;
+      mappedStatus = mapProviderStatusToInternal(providerStatus);
       if (subDetails.current_start)
         currentPeriodStart = new Date(subDetails.current_start * 1000);
       if (subDetails.current_end)
@@ -222,7 +233,8 @@ export const verifyPayment = async (
     const subscription = await prisma.subscription.update({
       where: { externalSubscriptionId: razorpay_subscription_id },
       data: {
-        status: "ACTIVE",
+        status: mappedStatus,
+        providerStatus,
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
         razorpayOrderId: razorpay_subscription_id,
@@ -239,15 +251,17 @@ export const verifyPayment = async (
     });
     const userPlanType = plan?.type || "PRO";
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        plan: userPlanType,
-      },
-    });
+    if (mappedStatus === "ACTIVE") {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          plan: userPlanType,
+        },
+      });
+    }
 
     return ResponseHandler.success(res, {
-      message: "Payment verified and subscription active",
+      message: "Payment verified. Subscription state updated from provider status.",
       data: subscription,
     });
   } catch (error) {
@@ -343,6 +357,7 @@ export const getSubscriptionDetails = async (
         ? {
             id: subscription.id,
             status: subscription.status,
+            providerStatus: subscription.providerStatus,
             currentPeriodEnd: subscription.currentPeriodEnd
               ? subscription.currentPeriodEnd.toISOString()
               : null,

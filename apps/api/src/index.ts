@@ -40,9 +40,14 @@ app.use(helmet.hidePoweredBy());
 // Apply dynamic CORS (checks path and applies appropriate policy)
 app.use(dynamicCors);
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      (req as express.Request & { rawBody?: Buffer }).rawBody = Buffer.from(buf);
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
-app.use(express.raw({ type: "application/json" }));
 app.use(clerkMiddleware());
 
 app.get("/health", (req, res) => {

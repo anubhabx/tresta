@@ -128,7 +128,7 @@ export const CheckoutButton = forwardRef<
             };
 
             await api.post("/api/payments/verify", verificationPayload);
-            toast.success("Subscription activated successfully!");
+            toast.success("Payment verified. Final activation is syncing via webhook.");
             window.location.reload();
           } catch (error) {
             toast.error("Payment verification failed. Please contact support.");
