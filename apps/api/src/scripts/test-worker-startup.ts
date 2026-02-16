@@ -23,12 +23,14 @@ async function testWorkerStartup() {
     console.log('1. Importing cron jobs...');
     const { dailyDigestJob, startDailyDigestJob } = await import('../jobs/daily-digest.job.js');
     const { reconciliationJob, startReconciliationJob } = await import('../jobs/reconciliation.job.js');
+    const { subscriptionReconciliationJob, startSubscriptionReconciliationJob } = await import('../jobs/subscription-reconciliation.job.js');
     console.log('   ✅ Cron jobs imported successfully');
 
     // Test 2: Verify cron expressions
     console.log('\n2. Verifying cron expressions...');
     console.log(`   Daily Digest: ${dailyDigestJob.cronTime.source}`);
     console.log(`   Reconciliation: ${reconciliationJob.cronTime.source}`);
+    console.log(`   Subscription Reconciliation: ${subscriptionReconciliationJob.cronTime.source}`);
 
     if (dailyDigestJob.cronTime.source !== '0 9 * * *') {
       throw new Error('Daily digest cron expression is incorrect');
@@ -42,6 +44,7 @@ async function testWorkerStartup() {
     console.log('\n3. Starting cron jobs...');
     startDailyDigestJob();
     startReconciliationJob();
+    startSubscriptionReconciliationJob();
     console.log('   ✅ Cron jobs started');
 
     // Test 4: Verify jobs can be stopped (means they started)
@@ -52,6 +55,7 @@ async function testWorkerStartup() {
     console.log('\n5. Stopping cron jobs...');
     dailyDigestJob.stop();
     reconciliationJob.stop();
+    subscriptionReconciliationJob.stop();
     console.log('   ✅ Cron jobs stopped');
 
     console.log('\n🎉 Worker startup test passed!\n');

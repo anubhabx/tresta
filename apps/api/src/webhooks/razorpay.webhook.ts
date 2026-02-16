@@ -38,6 +38,30 @@ type RazorpayEventPayload = {
   };
 };
 
+const SUPPORTED_WEBHOOK_EVENTS = new Set([
+  // Subscription lifecycle
+  "subscription.authenticated",
+  "subscription.activated",
+  "subscription.charged",
+  "subscription.pending",
+  "subscription.halted",
+  "subscription.cancelled",
+  "subscription.paused",
+  "subscription.resumed",
+  // Payment lifecycle
+  "payment.authorized",
+  "payment.captured",
+  "payment.failed",
+  "payment.refunded",
+  // Invoice lifecycle
+  "invoice.issued",
+  "invoice.paid",
+  "invoice.partially_paid",
+  "invoice.payment_failed",
+  "invoice.cancelled",
+  "invoice.expired",
+]);
+
 const getRawBody = (req: Request): Buffer => {
   const maybeRawBody = (req as Request & { rawBody?: Buffer }).rawBody;
   if (Buffer.isBuffer(maybeRawBody)) {
@@ -129,6 +153,27 @@ export const handleRazorpayWebhook = async (
 
   if (existingEvent) {
     res.status(200).json({ success: true, message: "Already processed" });
+    return;
+  }
+
+  if (!SUPPORTED_WEBHOOK_EVENTS.has(payload.event)) {
+    await prisma.paymentWebhookEvent.create({
+      data: {
+        provider: "razorpay",
+        providerEventId,
+        eventType: payload.event,
+        subscriptionId: getSubscriptionId(payload),
+        payload: payload as unknown as Prisma.InputJsonValue,
+        status: "ignored",
+        processedAt: new Date(),
+        error: "Unsupported event type",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Event ${payload.event} ignored`,
+    });
     return;
   }
 

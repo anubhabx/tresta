@@ -20,6 +20,7 @@ import { disconnectRedis } from '../lib/redis.js';
 // import { emailWorker } from './email.worker.js';
 import { startDailyDigestJob } from '../jobs/daily-digest.job.js';
 import { startReconciliationJob } from '../jobs/reconciliation.job.js';
+import { startSubscriptionReconciliationJob } from '../jobs/subscription-reconciliation.job.js';
 import { scheduleWidgetAnalyticsJobs } from '../jobs/widget-analytics.job.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -68,6 +69,7 @@ const workers: any = {};
 if (process.env.DISABLE_WORKERS !== 'true') {
   startDailyDigestJob();
   startReconciliationJob();
+  startSubscriptionReconciliationJob();
   scheduleWidgetAnalyticsJobs();
 
   const { createOutboxWorker } = await import('./outbox.worker.js');
@@ -87,9 +89,11 @@ async function gracefulShutdown(signal: string) {
     // Stop cron jobs
     const { dailyDigestJob } = await import('../jobs/daily-digest.job.js');
     const { reconciliationJob } = await import('../jobs/reconciliation.job.js');
+    const { subscriptionReconciliationJob } = await import('../jobs/subscription-reconciliation.job.js');
     const { performanceCheckJob, analyticsCleanupJob } = await import('../jobs/widget-analytics.job.js');
     dailyDigestJob.stop();
     reconciliationJob.stop();
+    subscriptionReconciliationJob.stop();
     performanceCheckJob.stop();
     analyticsCleanupJob.stop();
     console.log('Cron jobs stopped');

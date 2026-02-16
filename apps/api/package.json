@@ -12,7 +12,8 @@
     "start": "node dist/apps/api/src/index.js",
     "start:workers": "node dist/apps/api/src/workers/index.js",
     "start:all": "concurrently --kill-others-on-fail -n api,worker -c auto \"pnpm run start\" \"pnpm run start:workers\"",
-    "migrate:testimonials": "ts-node src/scripts/migrate-existing-testimonials.ts"
+    "migrate:testimonials": "ts-node src/scripts/migrate-existing-testimonials.ts",
+    "reconcile:subscriptions": "pnpm dlx tsx src/scripts/reconcile-subscriptions.ts"
   },
   "keywords": [],
   "author": "",
