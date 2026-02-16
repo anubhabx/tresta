@@ -19,6 +19,7 @@ import { projectRouter } from './routes/project.route.js';
 import { mediaRouter } from './routes/media.route.js';
 import { widgetRouter } from './routes/widget.route.js';
 import apiKeyRouter from './routes/api-key.route.js';
+import accountApiKeyRouter from './routes/account-api-key.route.js';
 import adminRouter from './routes/admin/index.js';
 import notificationsRouter from './routes/notifications.route.js';
 import ablyRouter from './routes/ably/token.route.js';
@@ -84,6 +85,7 @@ app.use("/api/public", publicRouter);
 // Protected routes (use global restrictive CORS)
 app.use("/api/projects", attachUser, projectRouter);
 app.use("/api/projects", apiKeyRouter); // API key routes (has its own auth middleware)
+app.use("/api/account", accountApiKeyRouter);
 app.use("/api/media", attachUser, mediaRouter);
 app.use("/api/widgets", widgetRouter);
 app.use("/api/widget-analytics", widgetAnalyticsRouter);

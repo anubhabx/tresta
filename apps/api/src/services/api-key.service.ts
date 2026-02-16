@@ -114,7 +114,7 @@ export async function createApiKey(
         keyPrefix,
         userId,
         projectId,
-        permissions: options?.permissions || { widgets: true },
+        permissions: options?.permissions || { widgets: true, testimonials: true },
         usageLimit: options?.usageLimit,
         rateLimit: options?.rateLimit || 100,
         expiresAt: options?.expiresAt,

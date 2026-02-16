@@ -163,7 +163,7 @@ export async function createApiKeyHandler(
         name.trim(),
         environment as ApiKeyEnvironment,
         {
-          permissions: permissions || { widgets: true },
+          permissions: permissions || { widgets: true, testimonials: true },
           usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
           rateLimit: rateLimit ? parseInt(rateLimit) : 100,
           expiresAt: expirationDate,
@@ -507,6 +507,283 @@ export async function revokeApiKeyHandler(
         revokedAt: new Date(),
         note: 'This API key can no longer be used to access the API'
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * List all API keys for the authenticated account across projects
+ * GET /api/account/api-keys
+ */
+export async function listAccountApiKeysHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new BadRequestError('User authentication required');
+    }
+
+    const apiKeys = await prisma.apiKey.findMany({
+      where: { userId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            isActive: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const formattedKeys = apiKeys.map((key) => ({
+      id: key.id,
+      name: key.name,
+      keyPrefix: key.keyPrefix,
+      permissions: key.permissions,
+      usageCount: key.usageCount,
+      usageLimit: key.usageLimit,
+      rateLimit: key.rateLimit,
+      isActive: key.isActive,
+      lastUsedAt: key.lastUsedAt,
+      expiresAt: key.expiresAt,
+      createdAt: key.createdAt,
+      updatedAt: key.updatedAt,
+      project: key.project,
+    }));
+
+    ResponseHandler.success(res, {
+      message:
+        formattedKeys.length === 0
+          ? 'No API keys found for your account'
+          : `Found ${formattedKeys.length} API key${formattedKeys.length === 1 ? '' : 's'}`,
+      data: {
+        keys: formattedKeys,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Create a new API key from account settings for a selected project
+ * POST /api/account/api-keys
+ */
+export async function createAccountApiKeyHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    const {
+      name,
+      projectSlug,
+      environment = 'live',
+      permissions,
+      usageLimit,
+      rateLimit,
+      expiresAt,
+    } = req.body;
+
+    if (!userId) {
+      throw new BadRequestError('User authentication required');
+    }
+
+    if (!name || typeof name !== 'string') {
+      throw new ValidationError('API key name is required and must be a string', {
+        field: 'name',
+        received: typeof name,
+      });
+    }
+
+    if (name.trim().length < 3) {
+      throw new ValidationError('API key name must be at least 3 characters long', {
+        field: 'name',
+        minLength: 3,
+        received: name.trim().length,
+      });
+    }
+
+    if (!projectSlug || typeof projectSlug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'projectSlug',
+        received: typeof projectSlug,
+      });
+    }
+
+    if (environment !== 'live' && environment !== 'test') {
+      throw new ValidationError('Environment must be either "live" or "test"', {
+        field: 'environment',
+        allowed: ['live', 'test'],
+        received: environment,
+      });
+    }
+
+    if (usageLimit !== undefined) {
+      const parsedLimit = parseInt(usageLimit);
+      if (isNaN(parsedLimit) || parsedLimit < 1) {
+        throw new ValidationError('Usage limit must be a positive number', {
+          field: 'usageLimit',
+          received: usageLimit,
+        });
+      }
+    }
+
+    if (rateLimit !== undefined) {
+      const parsedRate = parseInt(rateLimit);
+      if (isNaN(parsedRate) || parsedRate < 1 || parsedRate > 10000) {
+        throw new ValidationError('Rate limit must be between 1 and 10000 requests per hour', {
+          field: 'rateLimit',
+          min: 1,
+          max: 10000,
+          received: rateLimit,
+        });
+      }
+    }
+
+    if (permissions !== undefined && typeof permissions !== 'object') {
+      throw new ValidationError('Permissions must be an object', {
+        field: 'permissions',
+        received: typeof permissions,
+      });
+    }
+
+    const project = await prisma.project.findFirst({
+      where: {
+        slug: projectSlug,
+        userId,
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundError('Project not found or you do not have access', {
+        projectSlug,
+      });
+    }
+
+    let expirationDate: Date | undefined;
+    if (expiresAt) {
+      expirationDate = new Date(expiresAt);
+      if (isNaN(expirationDate.getTime())) {
+        throw new ValidationError('Invalid expiration date format', {
+          field: 'expiresAt',
+          received: expiresAt,
+        });
+      }
+      if (expirationDate <= new Date()) {
+        throw new ValidationError('Expiration date must be in the future', {
+          field: 'expiresAt',
+          received: expirationDate.toISOString(),
+          minimum: new Date().toISOString(),
+        });
+      }
+    }
+
+    const apiKey = await createApiKey(userId, project.id, name.trim(), environment as ApiKeyEnvironment, {
+      permissions: permissions || { widgets: true, testimonials: true },
+      usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
+      rateLimit: rateLimit ? parseInt(rateLimit) : 100,
+      expiresAt: expirationDate,
+    });
+
+    ResponseHandler.created(res, {
+      message: 'API key created successfully',
+      data: {
+        id: apiKey.id,
+        name: apiKey.name,
+        key: apiKey.key,
+        keyPrefix: apiKey.keyPrefix,
+        environment,
+        createdAt: apiKey.createdAt,
+        project,
+        warning: '⚠️ This is the only time you will see the full API key. Please save it securely.',
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Revoke API key from account settings
+ * DELETE /api/account/api-keys/:keyId
+ */
+export async function revokeAccountApiKeyHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    const { keyId } = req.params;
+
+    if (!userId) {
+      throw new BadRequestError('User authentication required');
+    }
+
+    if (!keyId || typeof keyId !== 'string') {
+      throw new ValidationError('API key ID is required', {
+        field: 'keyId',
+        received: keyId,
+      });
+    }
+
+    const apiKey = await prisma.apiKey.findFirst({
+      where: {
+        id: keyId,
+        userId,
+      },
+      include: {
+        project: {
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!apiKey) {
+      throw new NotFoundError(`API key with ID "${keyId}" not found`);
+    }
+
+    if (!apiKey.isActive) {
+      throw new BadRequestError('This API key has already been revoked', {
+        keyId,
+        keyPrefix: apiKey.keyPrefix,
+        revokedAt: apiKey.updatedAt,
+      });
+    }
+
+    await revokeApiKey(keyId);
+
+    ResponseHandler.success(res, {
+      message: `API key "${apiKey.name}" revoked successfully`,
+      data: {
+        id: apiKey.id,
+        name: apiKey.name,
+        keyPrefix: apiKey.keyPrefix,
+        project: apiKey.project,
+        revokedAt: new Date(),
+      },
     });
   } catch (error) {
     next(error);

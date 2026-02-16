@@ -23,6 +23,82 @@ import {
 } from '../services/moderation.service.js';
 import { hashIp, encrypt } from '../utils/encryption.js';
 
+const FALLBACK_TESTIMONIAL_LIMIT = 10;
+
+const resolvePlanLimit = (plan: { limits?: unknown } | null): number | null => {
+  if (!plan || !plan.limits || typeof plan.limits !== 'object') {
+    return null;
+  }
+
+  const rawLimit = (plan.limits as Record<string, unknown>).testimonials;
+
+  if (typeof rawLimit === 'number' && Number.isFinite(rawLimit)) {
+    return rawLimit;
+  }
+
+  if (typeof rawLimit === 'string') {
+    const parsed = Number(rawLimit);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+};
+
+const enforceTestimonialLimit = async (userId: string): Promise<void> => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      subscription: {
+        include: {
+          plan: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new UnauthorizedError('User not found');
+  }
+
+  let effectivePlan = user.subscription?.status === 'ACTIVE'
+    ? user.subscription.plan
+    : null;
+
+  if (!effectivePlan) {
+    effectivePlan = await prisma.plan.findFirst({
+      where: { type: 'FREE', isActive: true },
+    });
+  }
+
+  const resolvedLimit = resolvePlanLimit(effectivePlan);
+  const limit = resolvedLimit ?? FALLBACK_TESTIMONIAL_LIMIT;
+
+  if (limit === -1) {
+    return;
+  }
+
+  const used = await prisma.testimonial.count({
+    where: {
+      Project: {
+        userId,
+      },
+    },
+  });
+
+  if (used >= limit) {
+    throw new ForbiddenError(
+      `You have reached the limit for testimonials (${limit}) on your current plan.`,
+      {
+        resource: 'testimonials',
+        limit,
+        current: used,
+      },
+    );
+  }
+};
+
 const createTestimonial = async (
   req: Request,
   res: Response,
@@ -175,6 +251,9 @@ const createTestimonial = async (
         suggestion: 'Please contact the project owner'
       });
     }
+
+    // Enforce owner plan testimonial quota for both authenticated and public submissions
+    await enforceTestimonialLimit(project.userId);
 
     // Prevent duplicate testimonials from the same reviewer (account/IP/device)
     const normalizedEmail = authorEmail?.trim().toLowerCase();
@@ -423,6 +502,92 @@ const listTestimonials = async (
       limit,
       total,
       message: "Testimonials retrieved successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listPublicTestimonialsByApiKey = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+
+    if (!slug || typeof slug !== 'string') {
+      throw new ValidationError('Project slug is required', {
+        field: 'slug',
+        received: typeof slug,
+      });
+    }
+
+    if (!req.apiKey) {
+      throw new UnauthorizedError('API key validation required');
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        isActive: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundError(`Project with slug "${slug}" not found`);
+    }
+
+    if (!project.isActive) {
+      throw new ForbiddenError('This project is not active');
+    }
+
+    if (req.apiKey.projectId !== project.id) {
+      throw new ForbiddenError('API key does not have access to this project');
+    }
+
+    const testimonials = await prisma.testimonial.findMany({
+      where: {
+        projectId: project.id,
+        isApproved: true,
+        isPublished: true,
+      },
+      select: {
+        id: true,
+        authorName: true,
+        authorAvatar: true,
+        authorRole: true,
+        authorCompany: true,
+        content: true,
+        rating: true,
+        type: true,
+        videoUrl: true,
+        createdAt: true,
+        isOAuthVerified: true,
+        oauthProvider: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return ResponseHandler.success(res, {
+      message: 'Public testimonials retrieved successfully',
+      data: {
+        project: {
+          id: project.id,
+          slug: project.slug,
+          name: project.name,
+        },
+        testimonials: testimonials.map((testimonial) => ({
+          ...testimonial,
+          createdAt: testimonial.createdAt.toISOString(),
+        })),
+        total: testimonials.length,
+      },
     });
   } catch (error) {
     next(error);
@@ -829,6 +994,7 @@ const updateModerationStatus = async (
 export {
   createTestimonial,
   listTestimonials,
+  listPublicTestimonialsByApiKey,
   getTestimonialById,
   updateTestimonial,
   deleteTestimonial,
