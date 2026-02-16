@@ -27,7 +27,6 @@ import { toast } from "sonner";
 interface EmbedCodeDialogProps {
   widgetId: string;
   apiKey?: string; // API key for the widget (optional for backward compatibility)
-  projectSlug?: string; // Project slug to link to API keys page
   isOpen: boolean;
   onClose: () => void;
 }
@@ -98,7 +97,6 @@ function CodeTab({
 export function EmbedCodeDialog({
   widgetId,
   apiKey,
-  projectSlug,
   isOpen,
   onClose,
 }: EmbedCodeDialogProps) {
@@ -258,8 +256,8 @@ function TestimonialWidget() {
               <div className="flex-1 text-sm text-info-text">
                 <p className="font-medium">API Key Required</p>
                 <p className="text-xs mt-1">
-                  Create an API key in the <strong>API Keys</strong> tab to
-                  enable widget embedding. Replace{" "}
+                  Create an API key from <strong>Account Settings → API &amp; Tokens</strong>{" "}
+                  to enable widget embedding. Replace{" "}
                   <code className="px-1 py-0.5 bg-info-highlight-bg rounded">
                     YOUR_API_KEY_HERE
                   </code>{" "}

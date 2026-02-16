@@ -25,7 +25,6 @@ import {
   ProjectOverviewTab,
   ProjectSettingsTab,
   ProjectWidgetsTab,
-  ProjectApiKeysTab,
 } from "@/components/project-detail";
 import { useSearchParams } from "next/navigation";
 
@@ -39,6 +38,16 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
   const { slug } = use(params);
 
   const tab = useSearchParams().get("tab") as string | undefined;
+  const initialTab =
+    tab === "overview" ||
+    tab === "testimonials" ||
+    tab === "moderation" ||
+    tab === "widgets" ||
+    tab === "settings"
+      ? tab
+      : tab === "api-keys"
+        ? "settings"
+        : "overview";
 
   const { data: project, isLoading: isLoadingProject } =
     projects.queries.useDetail(slug as string);
@@ -87,7 +96,7 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
         <ProjectStatsCards project={project} />
       </section>
 
-      <Tabs defaultValue={tab || "overview"} className="w-full">
+      <Tabs defaultValue={initialTab} className="w-full">
         <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0">
           <TabsList className="w-max sm:w-auto inline-flex">
             <TabsTrigger
@@ -113,12 +122,6 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
               className="text-xs sm:text-sm whitespace-nowrap"
             >
               Widgets
-            </TabsTrigger>
-            <TabsTrigger
-              value="api-keys"
-              className="text-xs sm:text-sm whitespace-nowrap"
-            >
-              API Keys
             </TabsTrigger>
             <TabsTrigger
               value="settings"
@@ -192,13 +195,6 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
               <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent
-          value="api-keys"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <ProjectApiKeysTab project={project} />
         </TabsContent>
 
         <TabsContent
