@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 import "@workspace/ui/globals.css";
@@ -14,7 +15,8 @@ const fontMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://www.tresta.app"),
   title: "Tresta - Collect & Showcase Social Proof",
   description:
     "The all-in-one platform to collect, manage, and showcase authentic customer testimonials. Turn customer love into growth with Tresta.",
@@ -22,7 +24,7 @@ export const metadata = {
     title: "Tresta - Collect & Showcase Social Proof",
     description:
       "The all-in-one platform to collect, manage, and showcase authentic customer testimonials.",
-    url: "https://tresta.app",
+    url: "https://www.tresta.app",
     siteName: "Tresta",
     locale: "en_US",
     type: "website",
