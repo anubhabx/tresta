@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import { Prisma, prisma } from "@workspace/database/prisma";
 
-import { verifyRazorpayWebhookSignature } from "../services/razorpay.service.js";
+import { verifyRazorpaySignature } from "../services/razorpay.service.js";
 import { mapProviderSignalsToInternal } from "../services/subscription-status.service.js";
 
 type RazorpayEventPayload = {
@@ -223,7 +223,7 @@ export const handleRazorpayWebhook = async (
   const rawBody = getRawBody(req);
   const rawBodyString = rawBody.toString("utf8");
 
-  const isValidSignature = verifyRazorpayWebhookSignature(
+  const isValidSignature = verifyRazorpaySignature(
     rawBodyString,
     signature,
     secret,

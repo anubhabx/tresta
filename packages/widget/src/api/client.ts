@@ -142,7 +142,7 @@ export class APIClient {
       if (this.logger) {
         this.logger.error('Invalid API response structure:', errorDetails);
       } else {
-        this.logger.error('Invalid API response structure:', errorDetails);
+        console.error('Invalid API response structure:', errorDetails);
       }
       throw new WidgetError(
         WidgetErrorCode.PARSE_ERROR,
