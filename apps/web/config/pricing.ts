@@ -71,10 +71,10 @@ export const PLANS: PlanConfig[] = [
       "Unlimited Projects",
       "Unlimited Testimonials",
       "Unlimited Widgets",
-      "Video testimonials (up to 5 min each)",
       "Custom branding & colors",
       "API access (GET testimonials, rate-limited)",
       "Priority support",
+      "Video testimonials (coming soon)",
     ],
     quota: {
       testimonials: -1,

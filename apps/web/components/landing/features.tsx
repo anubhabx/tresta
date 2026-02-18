@@ -85,7 +85,7 @@ function CodeWindowHeader() {
 }
 
 /**
- * Header 2: "5 Layouts" — Icon grid with staggered hover glow
+ * Header 2: "6 Layouts" — Icon grid with staggered hover glow
  */
 const layoutItems = [
   { icon: Grid3X3, label: "Grid" },
@@ -93,6 +93,7 @@ const layoutItems = [
   { icon: Layers, label: "Wall" },
   { icon: GalleryVerticalEnd, label: "Masonry" },
   { icon: LayoutList, label: "List" },
+  { icon: Zap, label: "Marquee" },
 ] as const;
 
 function LayoutSwitcherHeader() {
@@ -254,7 +255,7 @@ function RealtimeFeedHeader() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          WebSocket Connected
+          Notifications
         </div>
         <span className="text-[10px] text-zinc-600 font-mono">3 new</span>
       </div>
@@ -369,12 +370,12 @@ export function Features() {
             header={<CodeWindowHeader />}
           />
 
-          {/* Item 2: 5 Layouts — Visual Switcher */}
+          {/* Item 2: 6 Layouts — Visual Switcher */}
           <BentoFeatureCard
             className="md:col-span-1"
             spotlightVariant="info"
-            title="5 Layouts"
-            description="Grid, carousel, wall, masonry, or list. One prop change."
+            title="6 Layouts"
+            description="Grid, carousel, wall, masonry, list, or marquee. One prop change."
             icon={<LayoutGrid className="h-5 w-5 text-cyan-400" />}
             header={<LayoutSwitcherHeader />}
           />
@@ -383,18 +384,18 @@ export function Features() {
           <BentoFeatureCard
             className="md:col-span-1"
             spotlightVariant="action"
-            title="Smart moderation"
-            description="AI-flagged content. One-click approve or reject."
+            title="Auto-moderation"
+            description="Heuristic content filtering with spam and profanity detection. One-click approve or reject."
             icon={<Shield className="h-5 w-5 text-amber-400" />}
             header={<ModerationHeader />}
           />
 
-          {/* Item 4 (wide): Realtime — Live Feed Pulse */}
+          {/* Item 4 (wide): Notifications — Live Feed */}
           <BentoFeatureCard
             className="md:col-span-2"
             spotlightVariant="pulse"
-            title="Realtime updates"
-            description="WebSocket-powered live feed. See new testimonials the instant they arrive."
+            title="Instant notifications"
+            description="Get notified when new testimonials arrive via in-app alerts. Never miss a review."
             icon={<Zap className="h-5 w-5 text-emerald-400" />}
             header={<RealtimeFeedHeader />}
           />

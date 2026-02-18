@@ -171,9 +171,30 @@
   font-size: 14px;
   font-weight: 600;
 }
+.tresta-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .tresta-card__meta {
   font-size: 12px;
   color: #71717a;
+}
+
+/* ─── Verification Badge ───────────────────────────── */
+.tresta-verification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+.tresta-card--dark .tresta-verification-badge {
+  color: #60a5fa;
+}
+.tresta-verification-badge__icon {
+  width: 14px;
+  height: 14px;
 }
 
 /* ─── Date ─────────────────────────────────────────── */
@@ -410,4 +431,30 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ─── Focus Visible (WCAG 2.1 AA) ─────────────────── */
+.tresta-widget-root *:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.tresta-card--dark *:focus-visible,
+.tresta-widget-root[data-theme="dark"] *:focus-visible {
+  outline-color: #60a5fa;
+}
+.tresta-carousel:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+.tresta-carousel-prev:focus-visible,
+.tresta-carousel-next:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.5);
+}
+.tresta-carousel-dot:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }

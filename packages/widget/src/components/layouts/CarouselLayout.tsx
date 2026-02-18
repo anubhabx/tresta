@@ -57,10 +57,40 @@ export function CarouselLayout({
   const prev = useCallback(() => goTo(current - 1), [current, goTo]);
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
 
+  // Keyboard navigation for the carousel
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          prev();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          next();
+          break;
+        case "Home":
+          e.preventDefault();
+          goTo(0);
+          break;
+        case "End":
+          e.preventDefault();
+          goTo(total - 1);
+          break;
+      }
+    },
+    [prev, next, goTo, total],
+  );
+
   return (
     <div
       className="tresta-carousel"
       style={{ position: "relative", width: "100%" }}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Testimonials"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
     >
       {/* Track */}
       <div
@@ -74,10 +104,14 @@ export function CarouselLayout({
           gap: "16px",
         }}
       >
-        {testimonials.map((testimonial) => (
+        {testimonials.map((testimonial, idx) => (
           <div
             key={testimonial.id}
             className="tresta-carousel-slide"
+            role="tabpanel"
+            aria-roledescription="slide"
+            aria-label={`Testimonial ${idx + 1} of ${total}`}
+            aria-hidden={idx !== current}
             style={{
               flex: "0 0 100%",
               scrollSnapAlign: "start",
@@ -139,14 +173,17 @@ export function CarouselLayout({
 
       {/* Dot Indicators */}
       {total > 1 && (
-        <div className="tresta-carousel-dots">
+        <div className="tresta-carousel-dots" role="tablist" aria-label="Testimonial slides">
           {testimonials.map((_, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => goTo(idx)}
               className={`tresta-carousel-dot ${idx === current ? "active" : ""}`}
+              role="tab"
+              aria-selected={idx === current}
               aria-label={`Go to testimonial ${idx + 1}`}
+              tabIndex={idx === current ? 0 : -1}
             />
           ))}
         </div>

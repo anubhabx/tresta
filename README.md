@@ -43,7 +43,7 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - ✅ Live widget preview embedded in the dashboard builder with instant config sync
 - ✅ WCAG 2.1 AA accessibility sweep for the widget (keyboard nav, ARIA, live regions)
 - ✅ CSP compliance toolkit with runtime validator + CI audit script
-- ✅ Auto-moderation system with sentiment analysis
+- ✅ Auto-moderation system with heuristic rules and optional AI classification
 - ✅ Google OAuth verification with trust badges
 - ✅ Custom account settings with GDPR compliance
 - ✅ Integrated moderation UI with bulk actions
@@ -55,9 +55,9 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 ### Core Features (MVP - Completed)
 
 - ✅ **OAuth Verification** - Google Sign-In for verified testimonials with trust badges
-- ✅ **Auto-Moderation** - AI-powered spam and profanity filtering with sentiment analysis
+- ✅ **Auto-Moderation** - Hybrid moderation with heuristic rules and optional AI classification (OpenAI Moderation API)
 - ✅ **Avatar Support** - Auto-sync from OAuth providers, Azure Blob Storage integration
-- ✅ **Embeddable Widgets** - Standalone JavaScript widgets (carousel, grid, masonry, wall, list)
+- ✅ **Embeddable Widgets** - Standalone JavaScript widgets (carousel, grid, masonry, wall, list, marquee)
 - ✅ **Project Management** - Create and manage multiple testimonial projects
 - ✅ **Testimonial Forms** - Public-facing forms with customizable branding
 - ✅ **Admin Dashboard** - Full-featured management interface with bulk moderation
@@ -67,9 +67,10 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 
 ### Moderation Features
 
-- 🛡️ **Advanced Sentiment Analysis** - Weighted keyword detection with 5-category sentiment scoring
-- 🤖 **Profanity Detection** - Multi-category filtering (severe, mild, offensive)
-- 🚫 **Spam Detection** - Pattern matching for excessive caps, repetition, and URLs
+- 🛡️ **Sentiment Analysis** - Weighted keyword detection with negation handling and 5-category scoring
+- 🤖 **Profanity Detection** - Multi-category filtering (severe, mild, offensive) with obfuscation detection
+- 🚫 **Spam Detection** - Pattern matching for excessive caps, repetition, URLs, and promotional language
+- 🧠 **AI Classification** - Optional OpenAI Moderation API integration for hate speech, harassment, and violence detection
 - 📊 **Risk Scoring** - 0-1 scale for problematic content identification
 - ⚙️ **Project-Level Settings** - Configurable moderation rules and auto-approval
 - 🔍 **Inline Moderation UI** - Integrated filters, badges, and bulk actions
@@ -78,12 +79,12 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 
 ### Widget Features
 
-- 🎨 **5 Layout Types**: Carousel, Grid, Masonry, Wall, List
+- 🎨 **6 Layout Types**: Carousel, Grid, Masonry, Wall, List, Marquee
 - 🎭 **Theme Customization**: Colors, fonts, border radius via data attributes
 - 🔧 **Configurable Settings**: Ratings, dates, author info, autoplay
-- 📦 **Zero Dependencies**: Pure vanilla JavaScript, CDN-ready
+- 📦 **Lightweight**: Preact-based widget (~42 KB gzipped), CDN-ready
 - ⚡ **Auto-initialization**: Detects and initializes from script tags
-- 🎯 **Performance**: Optimized bundle (42.39 KB IIFE, 58.61 KB ESM)
+- 🎯 **Performance**: Optimized IIFE bundle for fast loading
 - ✅ **Verified Badges**: Display OAuth verification status in all layouts
 - ♿ **Accessibility**: WCAG 2.1 AA compliant (keyboard nav, focus states, screen readers)
 - 🛡️ **CSP Compliance**: Runtime validator + CI audit script for strict security policies
@@ -94,8 +95,8 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - 🔐 **Clerk Authentication** - Secure user management and OAuth
 - 🛡️ **CORS Protection** - Configured for secure cross-origin requests
 - 🔒 **JWT Tokens** - Bearer token authentication for API
-- 🔑 **OAuth Providers** - Google, GitHub integration
-- 🚫 **Rate Limiting** - Protection against abuse (planned)
+- 🔑 **OAuth Providers** - Google (testimonial verification), GitHub (platform login)
+- 🚫 **Rate Limiting** - Redis-backed multi-tier protection (API, email, admin, public, per-key)
 
 ### Coming Soon (In Development)
 
@@ -130,9 +131,10 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 
 ### Widget
 
-- **Language**: Vanilla TypeScript (no dependencies)
-- **Build**: Vite (IIFE + ESM formats)
+- **Framework**: Preact (lightweight React alternative)
+- **Build**: Vite (IIFE format)
 - **Distribution**: CDN-ready standalone library
+- **Dependencies**: clsx, DOMPurify
 
 ### Infrastructure
 

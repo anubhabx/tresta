@@ -1,10 +1,15 @@
 import { prisma } from "@workspace/database/prisma";
+import { checkWithAI, formatAIFlags } from "./ai-moderation.service.js";
 
 /**
  * Auto-Moderation Service
  *
- * Heuristic-based content moderation for testimonials.
- * Future: Can be enhanced with AI moderation APIs (OpenAI, Perspective API)
+ * Hybrid content moderation combining heuristic rules with optional
+ * AI-powered classification via the OpenAI Moderation API.
+ *
+ * When OPENAI_API_KEY is set, AI moderation runs in parallel with
+ * the heuristic checks and its results are merged. The system
+ * degrades gracefully to heuristic-only when AI is unavailable.
  */
 
 interface ModerationResult {
@@ -867,6 +872,33 @@ export async function moderateTestimonial(
     issues.push(...behaviorSignals.suspiciousReasons);
 
     if (behaviorSignals.riskLevel === "high") {
+      status = "REJECTED";
+    } else if (status === "PENDING") {
+      status = "FLAGGED";
+    }
+  }
+
+  // AI-powered moderation (OpenAI Moderation API)
+  // Runs only when OPENAI_API_KEY is configured; degrades gracefully
+  const aiResult = await checkWithAI(content);
+  if (aiResult?.flagged) {
+    const aiFlags = formatAIFlags(aiResult);
+    issues.push(...aiFlags);
+    // AI flag → at minimum FLAGGED; high-severity categories → REJECTED
+    const severeCategories = [
+      "hate",
+      "hate/threatening",
+      "harassment/threatening",
+      "sexual/minors",
+      "self-harm/intent",
+      "self-harm/instructions",
+      "violence/graphic",
+      "illicit/violent",
+    ];
+    const hasSevere = aiResult.flaggedCategories.some((c) =>
+      severeCategories.includes(c),
+    );
+    if (hasSevere) {
       status = "REJECTED";
     } else if (status === "PENDING") {
       status = "FLAGGED";
