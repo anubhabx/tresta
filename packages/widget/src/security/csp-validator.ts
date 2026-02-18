@@ -8,6 +8,7 @@
  * - Validates no inline scripts or eval() usage
  */
 
+import { widgetLog } from '../utils/logger.js';
 import {
   WIDGET_ALLOWED_DOMAINS,
   WIDGET_API_BASE_URL,
@@ -238,7 +239,7 @@ export class CSPValidator {
           directive: event.violatedDirective,
         });
 
-        console.warn('[TrestaWidget] CSP violation detected:', {
+        widgetLog.warn('CSP violation detected:', {
           directive: event.violatedDirective,
           blockedURI: event.blockedURI,
           sourceFile: event.sourceFile,

@@ -109,6 +109,7 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
       }
     } catch (err) {
       console.error("Upload error:", err);
+      toast.error("File upload failed. Please try again.");
       setPreviewUrl(null);
       setFileName(null);
     }

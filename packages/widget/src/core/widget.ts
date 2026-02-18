@@ -318,8 +318,12 @@ export class Widget implements WidgetInstance {
       }
     }
 
-    // TODO: Use Preact Error Component
-    this.contentRoot.innerHTML = `<div class="tresta-error">${message}</div>`;
+    const errorEl = document.createElement('div');
+    errorEl.className = 'tresta-error';
+    errorEl.setAttribute('role', 'alert');
+    errorEl.setAttribute('aria-live', 'assertive');
+    errorEl.textContent = message;
+    this.contentRoot.replaceChildren(errorEl);
   }
 
   /**
@@ -381,7 +385,7 @@ export class Widget implements WidgetInstance {
 
       this.logger.debug('Unmounted successfully');
     } catch (error) {
-      console.error('[TrestaWidget] Unmount failed:', error);
+      this.logger.error('Unmount failed:', error);
     }
   }
 

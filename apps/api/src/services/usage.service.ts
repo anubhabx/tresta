@@ -23,7 +23,6 @@ export const getUsageCount = async (resource: "projects" | "widgets" | "testimon
                 }
             });
         case "teamMembers":
-            // Placeholder: Team members not fully implemented yet
             return 0;
         default:
             return 0;

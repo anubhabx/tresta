@@ -22,7 +22,8 @@ router.post(
   trackWidgetLoad
 );
 
-// Protected analytics endpoints (require authentication)
+// @deprecated — these authenticated endpoints are unused by the web frontend.
+// The admin app uses /admin/widgets/* routes instead. Kept for backward compat.
 router.get(
   "/:widgetId",
   attachUser,

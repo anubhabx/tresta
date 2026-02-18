@@ -71,10 +71,11 @@ export function auditLog(
     // Write audit log asynchronously (don't block response)
     writeAuditLog(completeAuditEntry).catch((error) => {
       console.error('Failed to write audit log:', error);
-      // Add to Redis retry queue
       addToRetryQueue(completeAuditEntry).catch((retryError) => {
-        console.error('Failed to add audit log to retry queue:', retryError);
-        // TODO: Send Slack alert for audit log failure
+        console.error(
+          `[CRITICAL] Audit log ${completeAuditEntry.id} lost — write and retry queue both failed.`,
+          { writeError: error, retryError },
+        );
       });
     });
 
@@ -206,8 +207,10 @@ export async function retryFailedAuditLogs(): Promise<void> {
         if (entry.retryCount < 5) {
           await redis.lpush('audit_logs:retry_queue', JSON.stringify(entry));
         } else {
-          console.error(`Audit log ${entry.id} exceeded max retries, dropping`);
-          // TODO: Send Slack alert for dropped audit log
+          console.error(
+            `[CRITICAL] Audit log ${entry.id} dropped after ${entry.retryCount} retries`,
+            { action: entry.action, adminId: entry.adminId, timestamp: entry.timestamp },
+          );
         }
       }
     }

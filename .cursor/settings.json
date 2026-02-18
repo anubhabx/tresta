@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "parallel": {
+      "enabled": true
+    },
+    "context7-plugin": {
+      "enabled": true
+    },
+    "superpowers": {
+      "enabled": true
+    }
+  }
+}

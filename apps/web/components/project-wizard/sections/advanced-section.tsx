@@ -9,6 +9,7 @@
 import * as React from "react";
 import { Control, UseFormRegister } from "react-hook-form";
 import { ChevronDown, Globe, Share2, Tags, Settings2 } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   Accordion,
@@ -193,7 +194,9 @@ export function AdvancedSection({
                 isPro={isPro}
                 featureName="custom_domain"
                 checked={false}
-                onCheckedChange={() => {}}
+                onCheckedChange={() => {
+                  toast.info("Coming soon! Custom domains are not yet available.");
+                }}
                 label="Custom Domain"
                 description="Use yourdomain.com for your testimonial pages"
               />

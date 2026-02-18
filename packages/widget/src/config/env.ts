@@ -1,6 +1,5 @@
 const DEFAULT_CDN_BASE_URL = 'https://api.tresta.app';
 const DEFAULT_API_BASE_URL = 'https://api.tresta.app';
-const DEFAULT_BRANDING_URL = 'https://tresta.app';
 
 type EnvRecord = Record<string, string | undefined>;
 
@@ -80,11 +79,6 @@ export const WIDGET_TELEMETRY_ENDPOINT =
   normalizeUrl(
     getEnvValue('VITE_WIDGET_TELEMETRY_ENDPOINT', 'NEXT_PUBLIC_WIDGET_TELEMETRY_ENDPOINT')
   ) ?? `${WIDGET_API_BASE_URL}/telemetry`;
-
-export const WIDGET_BRANDING_URL =
-  normalizeUrl(
-    getEnvValue('VITE_WIDGET_BRANDING_URL', 'NEXT_PUBLIC_WIDGET_BRANDING_URL')
-  ) ?? DEFAULT_BRANDING_URL;
 
 const additionalDomains = parseCommaSeparated(
   getEnvValue('VITE_WIDGET_ALLOWED_DOMAINS', 'NEXT_PUBLIC_WIDGET_ALLOWED_DOMAINS')

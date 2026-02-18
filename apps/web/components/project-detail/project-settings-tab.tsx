@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog";
 import { TrashIcon } from "lucide-react";
+import { toast } from "sonner";
 import type { Project } from "@/types/api";
 import { ModerationSettingsForm } from "./moderation-settings-form";
 
@@ -41,6 +42,7 @@ export function ProjectSettingsTab({
       await onDelete();
     } catch (error) {
       console.error("Failed to delete project:", error);
+      toast.error("Failed to delete project. Please try again.");
       setIsDeleting(false);
     }
   };

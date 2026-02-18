@@ -4,7 +4,7 @@
  * Single source of truth for all pricing data.
  * Eliminates DB latency on landing page and makes copy tweaks instant.
  *
- * NOTE: Replace PLACEHOLDER_* IDs with actual Razorpay Plan IDs before production.
+ * Plan IDs are configured per-environment (dev vs prod Razorpay plans).
  */
 
 export interface PlanQuota {

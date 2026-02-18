@@ -9,6 +9,7 @@
  */
 
 import type { TelemetryEvent, TelemetryConfig, TelemetryData } from './types.js';
+import { widgetLog } from '../utils/logger.js';
 import { TelemetrySampler } from './sampler.js';
 import { WIDGET_TELEMETRY_ENDPOINT } from '../config/env.js';
 
@@ -164,7 +165,7 @@ export class TelemetryTracker {
         navigator.sendBeacon(this.config.endpoint, blob);
       } catch (error) {
         // Silently fail - telemetry should never break the widget
-        console.debug('[TrestaWidget] Telemetry sendBeacon failed:', error);
+        widgetLog.debug('Telemetry sendBeacon failed:', error);
       }
     } else {
       // Fallback to fetch with keepalive
@@ -183,7 +184,7 @@ export class TelemetryTracker {
         });
       } catch (error) {
         // Silently fail - telemetry should never break the widget
-        console.debug('[TrestaWidget] Telemetry fetch failed:', error);
+        widgetLog.debug('Telemetry fetch failed:', error);
       }
     }
   }

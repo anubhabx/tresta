@@ -36,9 +36,8 @@ describe('Widget', () => {
       expect(widget.getState().mounted).toBe(false);
     });
 
-    it.skip('should log initialization in debug mode', () => {
-      // TODO: Fix test - console.log format expectation (expects single string, gets multiple args)
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should log initialization in debug mode', () => {
+      const consoleSpy = vi.spyOn(console, 'debug');
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -47,8 +46,9 @@ describe('Widget', () => {
 
       new Widget(config);
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget v1.0.0] Initialized with config:'),
-        config
+        '[TrestaWidget v1.0.0]',
+        'Initialized with config:',
+        expect.objectContaining({ widgetId: 'test-123' })
       );
 
       consoleSpy.mockRestore();
@@ -135,9 +135,8 @@ describe('Widget', () => {
       consoleSpy.mockRestore();
     });
 
-    it.skip('should log mount success in debug mode', async () => {
-      // TODO: Fix test - console.log format expectation (expects single string, gets multiple args)
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should log mount success in debug mode', async () => {
+      const consoleSpy = vi.spyOn(console, 'debug');
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -148,7 +147,8 @@ describe('Widget', () => {
       await widget.mount(container);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget] Mounted successfully'),
+        '[TrestaWidget v1.0.0]',
+        'Mounted successfully to container',
         container
       );
 
@@ -189,9 +189,8 @@ describe('Widget', () => {
       expect(() => widget.unmount()).not.toThrow();
     });
 
-    it.skip('should log unmount in debug mode', async () => {
-      // TODO: Fix test - console.log format expectation (expects single string, gets multiple args)
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should log unmount in debug mode', async () => {
+      const consoleSpy = vi.spyOn(console, 'debug');
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -201,12 +200,13 @@ describe('Widget', () => {
       const widget = new Widget(config);
       await widget.mount(container);
 
-      consoleSpy.mockClear(); // Clear mount logs
+      consoleSpy.mockClear();
 
       widget.unmount();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget] Unmounted successfully')
+        '[TrestaWidget v1.0.0]',
+        'Unmounted successfully'
       );
 
       consoleSpy.mockRestore();
@@ -375,9 +375,8 @@ describe('Widget', () => {
   });
 
   describe('refresh', () => {
-    it.skip('should log refresh in debug mode', async () => {
-      // TODO: Fix test - console.log format expectation (expects single string, gets multiple args)
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should log refresh in debug mode', async () => {
+      const consoleSpy = vi.spyOn(console, 'debug');
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -392,14 +391,14 @@ describe('Widget', () => {
       await widget.refresh();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget v1.0.0] Refresh requested')
+        '[TrestaWidget v1.0.0]',
+        'Refresh requested'
       );
 
       consoleSpy.mockRestore();
     });
 
-    it.skip('should warn when refreshing unmounted widget', async () => {
-      // TODO: Fix test - console.warn format expectation (expects single string, gets multiple args)
+    it('should warn when refreshing unmounted widget', async () => {
       const consoleSpy = vi.spyOn(console, 'warn');
       const config: WidgetConfig = {
         widgetId: 'test-123',
@@ -411,7 +410,8 @@ describe('Widget', () => {
       await widget.refresh();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Cannot refresh: widget not mounted')
+        '[TrestaWidget v1.0.0]',
+        'Cannot refresh: widget not mounted'
       );
 
       consoleSpy.mockRestore();
@@ -631,8 +631,7 @@ describe('Widget', () => {
       expect(emptyState?.textContent).toContain(customMessage);
     });
 
-    it.skip('should log errors with widget ID and version', async () => {
-      // TODO: Fix test - console.error format expectation (expects widget ID in first arg)
+    it('should log errors with widget ID and version', async () => {
       const consoleSpy = vi.spyOn(console, 'error');
       const config: WidgetConfig = {
         widgetId: 'test-123',
@@ -642,11 +641,9 @@ describe('Widget', () => {
 
       const widget = new Widget(config);
 
-      // Mock storage manager to return null (no cache)
       const storageManager = (widget as any).storageManager;
       vi.spyOn(storageManager, 'get').mockResolvedValue(null);
 
-      // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
         new Error('Network error')
@@ -654,11 +651,13 @@ describe('Widget', () => {
 
       await widget.mount(container);
 
-      // Check that error was logged with widget ID and version
       expect(consoleSpy).toHaveBeenCalled();
-      const errorCall = consoleSpy.mock.calls[0];
-      expect(errorCall[0]).toContain('[TrestaWidget v1.0.0]');
-      expect(errorCall[0]).toContain('widget test-123');
+      const errorCall = consoleSpy.mock.calls.find(
+        (call) => typeof call[0] === 'string' && call[0].includes('[TrestaWidget')
+      );
+      expect(errorCall).toBeDefined();
+      expect(errorCall![0]).toContain('[TrestaWidget v1.0.0]');
+      expect(errorCall![1]).toContain('widget test-123');
 
       consoleSpy.mockRestore();
     });
@@ -682,8 +681,7 @@ describe('Widget', () => {
       await expect(widget.mount(container)).resolves.not.toThrow();
     });
 
-    it.skip('should add ARIA live region to error state', async () => {
-      // TODO: Fix test - expects aria-live="polite" but code uses "assertive" (which is better for errors)
+    it('should add ARIA live region to error state', async () => {
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: false,
@@ -692,11 +690,9 @@ describe('Widget', () => {
 
       const widget = new Widget(config);
 
-      // Mock storage manager to return null (no cache)
       const storageManager = (widget as any).storageManager;
       vi.spyOn(storageManager, 'get').mockResolvedValue(null);
 
-      // Mock API client to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(
         new Error('Network error')
@@ -705,14 +701,13 @@ describe('Widget', () => {
       await widget.mount(container);
 
       const contentRoot = widget.getContentRoot();
-      const errorState = contentRoot?.querySelector('.tresta-widget-error-state');
+      const errorState = contentRoot?.querySelector('.tresta-error');
       expect(errorState?.getAttribute('role')).toBe('alert');
-      expect(errorState?.getAttribute('aria-live')).toBe('polite');
+      expect(errorState?.getAttribute('aria-live')).toBe('assertive');
     });
 
-    it.skip('should log empty state in debug mode', async () => {
-      // TODO: Fix test - console.log format expectation (expects single string, gets multiple args)
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should log empty state in debug mode', async () => {
+      const consoleSpy = vi.spyOn(console, 'debug');
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -736,7 +731,7 @@ describe('Widget', () => {
       await widget.mount(container);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget v1.0.0] empty')
+        '[TrestaWidget v1.0.0] empty'
       );
 
       consoleSpy.mockRestore();
@@ -744,8 +739,7 @@ describe('Widget', () => {
   });
 
   describe('maxTestimonials Limiting', () => {
-    it.skip('should limit testimonials based on layoutConfig.maxTestimonials', async () => {
-      // TODO: Fix test - console.log format expectation
+    it('should limit testimonials based on layoutConfig.maxTestimonials', async () => {
       const config: WidgetConfig = {
         widgetId: 'test-123',
         debug: true,
@@ -1187,8 +1181,7 @@ describe('Widget', () => {
       expect(errorState).toBeNull();
     });
 
-    it.skip('should log when using cached data', async () => {
-      // TODO: Fix test - console.warn format expectation
+    it('should log when using cached data', async () => {
       const consoleSpy = vi.spyOn(console, 'warn');
       const config: WidgetConfig = {
         widgetId: 'test-123',
@@ -1232,7 +1225,8 @@ describe('Widget', () => {
       await widget.mount(container);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Using cached data due to API error')
+        '[TrestaWidget v1.0.0]',
+        'Using cached data due to API error'
       );
 
       consoleSpy.mockRestore();

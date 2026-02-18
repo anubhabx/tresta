@@ -12,61 +12,7 @@ import {
   createRazorpaySubscription,
   verifyRazorpaySignature,
 } from "../services/razorpay.service.js";
-import { mapProviderStatusToInternal } from "../services/subscription-status.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
-import { ZodError } from "zod";
-import {
-  parseCreateSubscriptionRequest,
-  parseVerifyPaymentRequest,
-} from "../validators/payments.validator.js";
-import type {
-  PlanLimits,
-  SubscriptionDetailsData,
-  SubscriptionPlanSummary,
-} from "@workspace/types";
-
-const getErrorMessage = (error: unknown): string => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "Unknown provider error";
-};
-
-const getNumberLimit = (
-  limits: Record<string, unknown>,
-  key: string,
-  fallback: number,
-): number => {
-  const value = limits[key];
-  return typeof value === "number" && Number.isFinite(value)
-    ? value
-    : fallback;
-};
-
-const toPlanLimits = (limits: unknown): PlanLimits => {
-  if (!limits || typeof limits !== "object" || Array.isArray(limits)) {
-    return {
-      projects: 0,
-      widgets: 0,
-      testimonials: 0,
-    };
-  }
-
-  const source = limits as Record<string, unknown>;
-  const normalized: PlanLimits = {
-    projects: getNumberLimit(source, "projects", 0),
-    widgets: getNumberLimit(source, "widgets", 0),
-    testimonials: getNumberLimit(source, "testimonials", 0),
-  };
-
-  for (const [key, value] of Object.entries(source)) {
-    if (typeof value === "number" && Number.isFinite(value)) {
-      normalized[key] = value;
-    }
-  }
-
-  return normalized;
-};
 
 export const createSubscription = async (
   req: Request,
@@ -74,7 +20,7 @@ export const createSubscription = async (
   next: NextFunction,
 ) => {
   try {
-    const { planId } = parseCreateSubscriptionRequest(req.body);
+    const { planId } = req.body; // This is now the Razorpay Plan ID directly
     const userId = req.user?.id;
 
     if (!userId) {
@@ -99,11 +45,11 @@ export const createSubscription = async (
     let subscription: Subscriptions.RazorpaySubscription;
     try {
       subscription = await createRazorpaySubscription(planId);
-    } catch (err: unknown) {
+    } catch (err: any) {
       throw new InternalServerError(
         "Failed to create subscription with payment provider",
         {
-          providerError: getErrorMessage(err),
+          providerError: err.message,
           planId: planId,
         },
       );
@@ -120,8 +66,7 @@ export const createSubscription = async (
       create: {
         userId,
         planId: dbPlanId,
-        status: "INCOMPLETE", // Final state is reconciled through provider events/webhooks
-        providerStatus: subscription.status || "created",
+        status: "INCOMPLETE", // Will be ACTIVE after verification
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
         currentPeriodStart: subscription.current_start
@@ -134,7 +79,6 @@ export const createSubscription = async (
       update: {
         planId: dbPlanId,
         status: "INCOMPLETE",
-        providerStatus: subscription.status || "created",
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
         currentPeriodStart: subscription.current_start
@@ -150,18 +94,11 @@ export const createSubscription = async (
       message: "Subscription initiated",
       data: {
         subscriptionId: subscription.id,
-        key: process.env.RAZORPAY_KEY_ID || undefined,
+        key: process.env.RAZORPAY_KEY_ID,
         planName: plan?.name || "Pro Plan", // Fallback name
       },
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      return next(
-        new BadRequestError("Invalid subscription request payload", {
-          issues: error.issues,
-        }),
-      );
-    }
     next(handlePrismaError(error));
   }
 };
@@ -177,7 +114,7 @@ export const verifyPayment = async (
       razorpay_subscription_id,
       razorpay_signature,
       planId,
-    } = parseVerifyPaymentRequest(req.body);
+    } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -202,44 +139,37 @@ export const verifyPayment = async (
       throw new BadRequestError("Invalid payment signature");
     }
 
-    // Fetch latest details from Razorpay. Webhook remains source-of-truth.
+    // Update Subscription status to ACTIVE
+    // Fetch latest details from Razorpay to get updated start/end times
     const { getSubscription } = await import("../services/razorpay.service.js");
     let currentPeriodStart: Date | undefined;
     let currentPeriodEnd: Date | undefined;
-    let providerStatus: string | undefined;
-    let mappedStatus:
-      | "ACTIVE"
-      | "INCOMPLETE"
-      | "PAST_DUE"
-      | "PAUSED"
-      | "CANCELED" = "INCOMPLETE";
 
     try {
       const subDetails = await getSubscription(razorpay_subscription_id);
-      providerStatus = subDetails.status;
-      mappedStatus = mapProviderStatusToInternal(providerStatus);
       if (subDetails.current_start)
         currentPeriodStart = new Date(subDetails.current_start * 1000);
       if (subDetails.current_end)
         currentPeriodEnd = new Date(subDetails.current_end * 1000);
     } catch (e) {
       console.error(
-        "Failed to fetch Razorpay subscription details during verification",
+        `[WARNING] Failed to fetch Razorpay subscription details for ${razorpay_subscription_id} — billing period dates will not be set.`,
         e,
       );
-      // Non-blocking, we proceed with activation
     }
+
+    const periodData: Record<string, Date> = {};
+    if (currentPeriodStart) periodData.currentPeriodStart = currentPeriodStart;
+    if (currentPeriodEnd) periodData.currentPeriodEnd = currentPeriodEnd;
 
     const subscription = await prisma.subscription.update({
       where: { externalSubscriptionId: razorpay_subscription_id },
       data: {
-        status: mappedStatus,
-        providerStatus,
+        status: "ACTIVE",
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
         razorpayOrderId: razorpay_subscription_id,
-        currentPeriodStart,
-        currentPeriodEnd,
+        ...periodData,
       },
     });
 
@@ -251,27 +181,18 @@ export const verifyPayment = async (
     });
     const userPlanType = plan?.type || "PRO";
 
-    if (mappedStatus === "ACTIVE") {
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          plan: userPlanType,
-        },
-      });
-    }
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        plan: userPlanType,
+      },
+    });
 
     return ResponseHandler.success(res, {
-      message: "Payment verified. Subscription state updated from provider status.",
+      message: "Payment verified and subscription active",
       data: subscription,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      return next(
-        new BadRequestError("Invalid payment verification payload", {
-          issues: error.issues,
-        }),
-      );
-    }
     next(handlePrismaError(error));
   }
 };
@@ -303,78 +224,59 @@ export const getSubscriptionDetails = async (
     }
 
     const subscription = user.subscription;
+    let plan = subscription?.plan;
 
-    let planSummary: SubscriptionPlanSummary | null = null;
-
-    if (subscription?.plan) {
-      planSummary = {
-        id: subscription.plan.id,
-        name: subscription.plan.name,
-        interval: subscription.plan.interval,
-        price: subscription.plan.price,
-        limits: toPlanLimits(subscription.plan.limits),
-        type: subscription.plan.type,
-      };
-    }
-
-    // If no active DB plan linked, check subscription enum type to fallback to PRO structure
-    if (!planSummary && subscription?.userPlan === "PRO") {
-      planSummary = {
+    // If no active DB plan linked, check subscription enum type to fallback to a PRO structure
+    if (!plan && subscription?.userPlan === "PRO") {
+      plan = {
         id: "pro-legacy-or-static",
         name: "Pro Plan",
-        interval: subscription.interval || "month",
-        price: subscription.amount || 30000,
-        limits: { projects: -1, testimonials: -1, widgets: -1 },
+        description: "Unlimited access",
         type: "PRO",
-      };
+        price: subscription.amount || 30000,
+        currency: subscription.currency || "INR",
+        interval: subscription.interval || "month",
+        limits: { projects: -1, testimonials: -1, widgets: -1 },
+        isActive: true,
+        razorpayPlanId: subscription.externalSubscriptionId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any;
     }
 
     // If no active plan, fetch free details
-    if (!planSummary) {
-      const freePlan = await prisma.plan.findFirst({
+    if (!plan) {
+      plan = await prisma.plan.findFirst({
         where: { type: "FREE" },
       });
-
-      if (freePlan) {
-        planSummary = {
-          id: freePlan.id,
-          name: freePlan.name,
-          interval: freePlan.interval,
-          price: freePlan.price,
-          limits: toPlanLimits(freePlan.limits),
-          type: freePlan.type,
-        };
-      }
     }
 
     // Get usage stats
     const { getUsageStats } = await import("../services/usage.service.js");
     const usage = await getUsageStats(userId);
 
-    const payload: SubscriptionDetailsData = {
-      plan: planSummary,
-      subscription: subscription
-        ? {
-            id: subscription.id,
-            status: subscription.status,
-            providerStatus: subscription.providerStatus,
-            currentPeriodEnd: subscription.currentPeriodEnd
-              ? subscription.currentPeriodEnd.toISOString()
-              : null,
-            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-          }
-        : null,
-      usage: usage
-        ? {
-            projects: usage.projects,
-            widgets: usage.widgets,
-            testimonials: usage.testimonials,
-          }
-        : null,
-    };
-
     return ResponseHandler.success(res, {
-      data: payload,
+      data: {
+        plan: plan
+          ? {
+              id: plan.id,
+              name: plan.name,
+              interval: plan.interval,
+              price: plan.price,
+              limits: plan.limits,
+              type: plan.type,
+            }
+          : null,
+        subscription: subscription
+          ? {
+              id: subscription.id,
+              status: subscription.status,
+              currentPeriodEnd: subscription.currentPeriodEnd,
+              cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+            }
+          : null,
+        usage: usage,
+      },
     });
   } catch (error) {
     next(handlePrismaError(error));
@@ -431,39 +333,3 @@ export const cancelSubscription = async (
   }
 };
 
-export const resumeSubscription = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
-
-    const subscription = await prisma.subscription.findUnique({
-      where: { userId },
-      include: { plan: true },
-    });
-
-    if (!subscription || !subscription.externalSubscriptionId) {
-      throw new BadRequestError("No active subscription found to resume");
-    }
-
-    if (!subscription.cancelAtPeriodEnd) {
-      return ResponseHandler.success(res, {
-        message:
-          "Subscription is already active and not scheduled for cancellation.",
-      });
-    }
-
-    // Razorpay does not support "un-cancelling" a scheduled cancellation via API.
-    // We must ask the user to create a new subscription (Renew).
-    throw new BadRequestError(
-      "Resumption not supported. Please subscribe again to renew your plan.",
-    );
-  } catch (error) {
-    next(handlePrismaError(error));
-  }
-};

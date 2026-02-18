@@ -9,6 +9,7 @@
 import * as React from "react";
 import { Control, useController } from "react-hook-form";
 import { Sun, Moon, Monitor, Lock, Palette } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   Card,
@@ -148,7 +149,9 @@ export function BrandingWizardSection({
           isPro={isPro}
           featureName="remove_branding"
           checked={false}
-          onCheckedChange={() => {}}
+          onCheckedChange={() => {
+            toast.info("Coming soon! Branding removal is not yet available.");
+          }}
           label="Remove 'Powered by Tresta'"
           description="Hide the attribution from your widgets"
         />

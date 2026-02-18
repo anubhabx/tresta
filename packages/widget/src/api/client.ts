@@ -142,7 +142,7 @@ export class APIClient {
       if (this.logger) {
         this.logger.error('Invalid API response structure:', errorDetails);
       } else {
-        console.error('[TrestaWidget] Invalid API response structure:', errorDetails);
+        this.logger.error('Invalid API response structure:', errorDetails);
       }
       throw new WidgetError(
         WidgetErrorCode.PARSE_ERROR,

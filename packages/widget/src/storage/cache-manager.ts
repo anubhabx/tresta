@@ -6,6 +6,7 @@ import type { WidgetData } from '../types/index.js';
 import type { CacheEntry, StorageAdapter } from './types.js';
 import { IndexedDBAdapter } from './indexeddb.js';
 import { LocalStorageAdapter } from './localstorage.js';
+import { widgetLog } from '../utils/logger.js';
 
 const DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const LOCALSTORAGE_TTL = 60 * 60 * 1000; // 1 hour (reduced for localStorage)
@@ -50,7 +51,7 @@ export class StorageManager {
       }
 
       // No storage available
-      console.warn('[TrestaWidget] No storage available, caching disabled');
+      widgetLog.warn('No storage available, caching disabled');
       this.adapter = null;
     })();
 
@@ -103,7 +104,7 @@ export class StorageManager {
 
       return entry.data;
     } catch (error) {
-      console.error('[TrestaWidget] Cache get error:', error);
+      widgetLog.error('Cache get error:', error);
       return null;
     }
   }
@@ -131,7 +132,7 @@ export class StorageManager {
 
       await adapter.set(key, entry);
     } catch (error) {
-      console.error('[TrestaWidget] Cache set error:', error);
+      widgetLog.error('Cache set error:', error);
       // Don't throw - caching is best effort
     }
   }
@@ -149,7 +150,7 @@ export class StorageManager {
       const key = this.getCacheKey(widgetId);
       await adapter.delete(key);
     } catch (error) {
-      console.error('[TrestaWidget] Cache delete error:', error);
+      widgetLog.error('Cache delete error:', error);
       // Don't throw - deletion is best effort
     }
   }
@@ -166,7 +167,7 @@ export class StorageManager {
 
       await adapter.clear();
     } catch (error) {
-      console.error('[TrestaWidget] Cache clear error:', error);
+      widgetLog.error('Cache clear error:', error);
       // Don't throw - clearing is best effort
     }
   }
@@ -185,7 +186,7 @@ export class StorageManager {
         await adapter.clearExpired();
       }
     } catch (error) {
-      console.error('[TrestaWidget] Cache clearExpired error:', error);
+      widgetLog.error('Cache clearExpired error:', error);
       // Don't throw - cleanup is best effort
     }
   }

@@ -7,15 +7,14 @@ import { createErrorState, createEmptyState } from '../error-state.js';
 
 describe('Error State Components', () => {
   describe('createErrorState', () => {
-    it.skip('should create error state with default message', () => {
-      // TODO: Fix test - expects aria-live="polite" but code uses "assertive" (better for errors)
+    it('should create error state with default message', () => {
       const errorState = createErrorState({
         type: 'error',
       });
 
       expect(errorState.className).toBe('tresta-widget-error-state');
       expect(errorState.getAttribute('role')).toBe('alert');
-      expect(errorState.getAttribute('aria-live')).toBe('polite');
+      expect(errorState.getAttribute('aria-live')).toBe('assertive');
       expect(errorState.textContent).toContain('Unable to load testimonials');
     });
 
@@ -29,14 +28,13 @@ describe('Error State Components', () => {
       expect(errorState.textContent).toContain(customMessage);
     });
 
-    it.skip('should create empty state with default message', () => {
-      // TODO: Fix test - expects role="alert" but code uses "status" (more appropriate for empty state)
+    it('should create empty state with default message', () => {
       const emptyState = createErrorState({
         type: 'empty',
       });
 
       expect(emptyState.className).toBe('tresta-widget-empty-state');
-      expect(emptyState.getAttribute('role')).toBe('alert');
+      expect(emptyState.getAttribute('role')).toBe('status');
       expect(emptyState.getAttribute('aria-live')).toBe('polite');
       expect(emptyState.textContent).toContain('No testimonials yet');
     });
@@ -51,14 +49,13 @@ describe('Error State Components', () => {
       expect(emptyState.textContent).toContain(customMessage);
     });
 
-    it.skip('should have proper ARIA attributes', () => {
-      // TODO: Fix test - expects aria-live="polite" but code uses "assertive" (better for errors)
+    it('should have proper ARIA attributes', () => {
       const errorState = createErrorState({
         type: 'error',
       });
 
       expect(errorState.getAttribute('role')).toBe('alert');
-      expect(errorState.getAttribute('aria-live')).toBe('polite');
+      expect(errorState.getAttribute('aria-live')).toBe('assertive');
     });
 
     it('should contain message in paragraph element', () => {
@@ -87,11 +84,10 @@ describe('Error State Components', () => {
       expect(emptyState.textContent).toContain(customMessage);
     });
 
-    it.skip('should have proper ARIA attributes', () => {
-      // TODO: Fix test - expects role="alert" but code uses "status" (more appropriate for empty state)
+    it('should have proper ARIA attributes', () => {
       const emptyState = createEmptyState();
 
-      expect(emptyState.getAttribute('role')).toBe('alert');
+      expect(emptyState.getAttribute('role')).toBe('status');
       expect(emptyState.getAttribute('aria-live')).toBe('polite');
     });
   });

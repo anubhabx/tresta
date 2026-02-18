@@ -5,6 +5,7 @@
 import { Widget } from './widget.js';
 import { parseWidgetConfig, validateConfig } from './config.js';
 import type { WidgetConfig } from '../types/index.js';
+import { widgetLog } from '../utils/logger.js';
 
 /**
  * Parse configuration from data attributes on script tag or container
@@ -69,7 +70,7 @@ function initializeWidget(script: HTMLScriptElement): void {
     const widget = new Widget(config);
     widget.mount(container);
   } catch (error) {
-    console.error('[TrestaWidget] Failed to initialize widget:', error);
+    widgetLog.error('Failed to initialize widget:', error);
   }
 }
 
@@ -92,6 +93,6 @@ export function autoInitialize(): void {
       initializeWidget(script as HTMLScriptElement);
     });
   } catch (error) {
-    console.error('[TrestaWidget] Auto-initialization failed:', error);
+    widgetLog.error('Auto-initialization failed:', error);
   }
 }

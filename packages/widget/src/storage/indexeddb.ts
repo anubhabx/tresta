@@ -3,6 +3,7 @@
  */
 
 import type { CacheEntry, StorageAdapter } from './types.js';
+import { widgetLog } from '../utils/logger.js';
 
 const DB_NAME = 'tresta-widget-cache';
 const DB_VERSION = 1;
@@ -44,7 +45,7 @@ export class IndexedDBAdapter implements StorageAdapter {
       this.available = true;
       return true;
     } catch (error) {
-      console.warn('[TrestaWidget] IndexedDB unavailable, will use localStorage fallback:', error);
+      widgetLog.warn('IndexedDB unavailable, will use localStorage fallback:', error);
       this.available = false;
       return false;
     }
@@ -113,7 +114,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         };
       });
     } catch (error) {
-      console.error('[TrestaWidget] IndexedDB get error:', error);
+      widgetLog.error('IndexedDB get error:', error);
       return null;
     }
   }
@@ -134,7 +135,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('[TrestaWidget] IndexedDB set error:', error);
+      widgetLog.error('IndexedDB set error:', error);
       throw error;
     }
   }
@@ -155,7 +156,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('[TrestaWidget] IndexedDB delete error:', error);
+      widgetLog.error('IndexedDB delete error:', error);
       throw error;
     }
   }
@@ -176,7 +177,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         request.onsuccess = () => resolve();
       });
     } catch (error) {
-      console.error('[TrestaWidget] IndexedDB clear error:', error);
+      widgetLog.error('IndexedDB clear error:', error);
       throw error;
     }
   }
@@ -210,7 +211,7 @@ export class IndexedDBAdapter implements StorageAdapter {
         };
       });
     } catch (error) {
-      console.error('[TrestaWidget] IndexedDB clearExpired error:', error);
+      widgetLog.error('IndexedDB clearExpired error:', error);
       // Don't throw - cleanup is best effort
     }
   }

@@ -3,6 +3,7 @@
  */
 
 import type { CacheEntry, StorageAdapter } from './types.js';
+import { widgetLog } from '../utils/logger.js';
 
 const STORAGE_PREFIX = 'tresta-widget-';
 
@@ -24,7 +25,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       this.available = true;
       return true;
     } catch (error) {
-      console.warn('[TrestaWidget] localStorage unavailable:', error);
+      widgetLog.warn('localStorage unavailable:', error);
       this.available = false;
       return false;
     }
@@ -53,7 +54,7 @@ export class LocalStorageAdapter implements StorageAdapter {
 
       return entry;
     } catch (error) {
-      console.error('[TrestaWidget] localStorage get error:', error);
+      widgetLog.error('localStorage get error:', error);
       return null;
     }
   }
@@ -70,7 +71,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       // Handle quota exceeded error
       if (error instanceof DOMException &&
         (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-        console.warn('[TrestaWidget] localStorage quota exceeded, clearing old entries');
+        widgetLog.warn('localStorage quota exceeded, clearing old entries');
         await this.clearExpired();
 
         // Try again after cleanup
@@ -79,11 +80,11 @@ export class LocalStorageAdapter implements StorageAdapter {
           const serialized = JSON.stringify(value);
           localStorage.setItem(storageKey, serialized);
         } catch (retryError) {
-          console.error('[TrestaWidget] localStorage set error after cleanup:', retryError);
+          widgetLog.error('localStorage set error after cleanup:', retryError);
           throw retryError;
         }
       } else {
-        console.error('[TrestaWidget] localStorage set error:', error);
+        widgetLog.error('localStorage set error:', error);
         throw error;
       }
     }
@@ -97,7 +98,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       const storageKey = STORAGE_PREFIX + key;
       localStorage.removeItem(storageKey);
     } catch (error) {
-      console.error('[TrestaWidget] localStorage delete error:', error);
+      widgetLog.error('localStorage delete error:', error);
       throw error;
     }
   }
@@ -120,7 +121,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       // Remove all matching keys
       keysToRemove.forEach(key => localStorage.removeItem(key));
     } catch (error) {
-      console.error('[TrestaWidget] localStorage clear error:', error);
+      widgetLog.error('localStorage clear error:', error);
       throw error;
     }
   }
@@ -155,7 +156,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       // Remove expired keys
       keysToRemove.forEach(key => localStorage.removeItem(key));
     } catch (error) {
-      console.error('[TrestaWidget] localStorage clearExpired error:', error);
+      widgetLog.error('localStorage clearExpired error:', error);
       // Don't throw - cleanup is best effort
     }
   }

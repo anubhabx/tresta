@@ -166,8 +166,7 @@ describe('Widget Core', () => {
       expect(widget.getContentRoot()).not.toBeNull();
     });
 
-    it.skip('should create ARIA live region for announcements', async () => {
-      // TODO: Fix test - expects role="status" aria-live="polite" but code uses different ARIA attributes
+    it('should create ARIA live region for announcements', async () => {
       const config: WidgetConfig = {
         widgetId: 'test-123',
         apiKey: 'test-key',
@@ -175,20 +174,18 @@ describe('Widget Core', () => {
 
       const widget = new Widget(config);
 
-      // Mock API
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(new Error('No API'));
 
       await widget.mount(container);
 
       const contentRoot = widget.getContentRoot();
-      const liveRegion = contentRoot?.querySelector('[role="status"][aria-live="polite"]');
+      const liveRegion = contentRoot?.querySelector('[role="alert"][aria-live="assertive"]');
 
       expect(liveRegion).not.toBeNull();
     });
 
-    it.skip('should handle mount errors gracefully', async () => {
-      // TODO: Fix test - error state element not being found in DOM
+    it('should handle mount errors gracefully', async () => {
       const config: WidgetConfig = {
         widgetId: 'test-123',
         apiKey: 'test-key',
@@ -196,23 +193,19 @@ describe('Widget Core', () => {
 
       const widget = new Widget(config);
 
-      // Mock API to throw error
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(new Error('API Error'));
 
-      // Mock storage to return null (no cache)
       const storageManager = (widget as any).storageManager;
       vi.spyOn(storageManager, 'get').mockResolvedValue(null);
 
-      // Should not throw
       await expect(widget.mount(container)).resolves.not.toThrow();
 
-      // Should render error state
       expect(widget.getState().error).not.toBeNull();
       expect(widget.getState().mounted).toBe(true);
 
       const contentRoot = widget.getContentRoot();
-      const errorState = contentRoot?.querySelector('.tresta-widget-error');
+      const errorState = contentRoot?.querySelector('.tresta-error');
       expect(errorState).not.toBeNull();
     });
 
@@ -600,8 +593,7 @@ describe('Widget Core', () => {
       expect(state.data?.testimonials[0].content).toBe('Refreshed testimonial');
     });
 
-    it.skip('should not refresh when not mounted', async () => {
-      // TODO: Fix test - console.warn format expectation
+    it('should not refresh when not mounted', async () => {
       const config: WidgetConfig = {
         widgetId: 'test-123',
         apiKey: 'test-key',
@@ -614,7 +606,8 @@ describe('Widget Core', () => {
       await widget.refresh();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Cannot refresh: widget not mounted')
+        expect.stringContaining('[TrestaWidget'),
+        'Cannot refresh: widget not mounted'
       );
 
       consoleSpy.mockRestore();

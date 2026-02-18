@@ -152,7 +152,9 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
       setAblyClient(client);
     };
 
-    initAbly();
+    initAbly().catch((err) => {
+      console.error("Failed to initialize Ably:", err);
+    });
 
     return () => {
       if (channel) channel.unsubscribe();

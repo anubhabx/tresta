@@ -72,6 +72,13 @@ if (process.env.DISABLE_WORKERS !== 'true') {
   startSubscriptionReconciliationJob();
   scheduleWidgetAnalyticsJobs();
 
+  const { retryFailedAuditLogs } = await import('../middleware/audit-log.middleware.js');
+  setInterval(() => {
+    retryFailedAuditLogs().catch((err: unknown) => {
+      console.error('Audit log retry cycle failed:', err);
+    });
+  }, 60_000);
+
   const { createOutboxWorker } = await import('./outbox.worker.js');
   const { createNotificationWorker } = await import('./notification.worker.js');
   const { createEmailWorker } = await import('./email.worker.js');

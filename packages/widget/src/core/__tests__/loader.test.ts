@@ -115,8 +115,7 @@ describe('Loader - autoInitialize', () => {
   });
 
   describe('Configuration parsing', () => {
-    it.skip('should parse debug flag from data attribute', () => {
-      // TODO: Fix test - console.log format expectation doesn't match actual logging
+    it('should parse debug flag from data attribute', () => {
       const container = document.createElement('div');
       container.id = 'tresta-widget-debug-test';
       document.body.appendChild(container);
@@ -127,13 +126,13 @@ describe('Loader - autoInitialize', () => {
       script.setAttribute('data-debug', 'true');
       document.body.appendChild(script);
 
-      const consoleSpy = vi.spyOn(console, 'log');
+      const consoleSpy = vi.spyOn(console, 'debug');
 
       autoInitialize();
 
-      // Should log initialization in debug mode
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget v1.0.0] Initialized with config:'),
+        '[TrestaWidget v1.0.0]',
+        'Initialized with config:',
         expect.objectContaining({
           widgetId: 'debug-test',
           debug: true,
@@ -143,8 +142,7 @@ describe('Loader - autoInitialize', () => {
       consoleSpy.mockRestore();
     });
 
-    it.skip('should parse telemetry flag from data attribute', () => {
-      // TODO: Fix test - console.log format expectation doesn't match actual logging
+    it('should parse telemetry flag from data attribute', () => {
       const container = document.createElement('div');
       container.id = 'tresta-widget-telemetry-test';
       document.body.appendChild(container);
@@ -156,12 +154,13 @@ describe('Loader - autoInitialize', () => {
       script.setAttribute('data-debug', 'true');
       document.body.appendChild(script);
 
-      const consoleSpy = vi.spyOn(console, 'log');
+      const consoleSpy = vi.spyOn(console, 'debug');
 
       autoInitialize();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget v1.0.0] Initialized with config:'),
+        '[TrestaWidget v1.0.0]',
+        'Initialized with config:',
         expect.objectContaining({
           widgetId: 'telemetry-test',
           telemetry: false,

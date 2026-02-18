@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { ResponseHandler } from '../../lib/response.js';
 import { getRedisClient } from '../../lib/redis.js';
 import { getAllFeatureFlags } from '../../services/feature-flags.service.js';
+import { prisma } from '@workspace/database/prisma';
 
 /**
  * GET /admin/system
@@ -34,7 +35,9 @@ export const getSystemInfo = async (
           api: process.env.npm_package_version || '1.0.0',
           node: process.version,
           redis: redisVersion,
-          database: 'PostgreSQL (version check not implemented)',
+          database: await prisma.$queryRaw<[{version: string}]>`SELECT version()`.then(
+            (rows) => rows[0]?.version ?? 'unknown',
+          ).catch(() => 'PostgreSQL (version check failed)'),
         },
         featureFlags: featureFlagsMap,
         externalServices: {

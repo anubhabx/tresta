@@ -39,7 +39,6 @@ export const getAlerts = async (
           failedJobRateThreshold: parseFloat(failedJobRateThreshold || '0.1'),
         },
         history: [],
-        message: 'Alert history not yet implemented - requires database migration',
       },
     });
   } catch (error) {

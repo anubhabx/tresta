@@ -32,6 +32,7 @@ import {
   MessageSquare,
   LayoutGrid,
 } from "lucide-react";
+import { toast } from "sonner";
 import { EmbedDialog } from "./embed-dialog";
 import type { Project } from "@/types/api";
 
@@ -53,6 +54,7 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
       router.push("/projects");
     } catch (error) {
       console.error("Failed to delete project:", error);
+      toast.error("Failed to delete project. Please try again.");
       setIsDeleting(false);
     }
   };

@@ -97,34 +97,3 @@ export async function retry<T>(
   throw lastError;
 }
 
-/**
- * Retry helper class for more complex retry scenarios
- */
-export class RetryHelper {
-  private config: RetryConfig;
-
-  constructor(config: Partial<RetryConfig> = {}) {
-    this.config = { ...DEFAULT_RETRY_CONFIG, ...config };
-  }
-
-  /**
-   * Execute a function with retry logic
-   */
-  async execute<T>(fn: () => Promise<T>): Promise<T> {
-    return retry(fn, this.config);
-  }
-
-  /**
-   * Update retry configuration
-   */
-  updateConfig(config: Partial<RetryConfig>): void {
-    this.config = { ...this.config, ...config };
-  }
-
-  /**
-   * Get current configuration
-   */
-  getConfig(): RetryConfig {
-    return { ...this.config };
-  }
-}

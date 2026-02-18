@@ -29,10 +29,6 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
     (acc, project) => acc + (project._count?.testimonials || 0),
     0,
   );
-  // Note: We'd need isPublished data from API to calculate this accurately
-  // For now, we'll assume all approved testimonials are published
-  const publishedTestimonials = totalTestimonials; // Placeholder
-
   // Find top performing project
   const topProject =
     projects.length > 0
@@ -165,52 +161,22 @@ export function StatusOverviewCard({ projects }: StatusOverviewCardProps) {
               </div>
             </div>
 
-            {/* Published/Unpublished Testimonials */}
+            {/* Testimonials Total */}
             {totalTestimonials > 0 && (
               <div className="pt-4 border-t">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Testimonial Status
+                    Testimonials
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Published
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-24 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary/60"
-                          style={{
-                            width: `${totalTestimonials > 0 ? (publishedTestimonials / totalTestimonials) * 100 : 0}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium w-8 text-right">
-                        {publishedTestimonials}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Unpublished
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-24 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-muted-foreground/40"
-                          style={{
-                            width: `${totalTestimonials > 0 ? ((totalTestimonials - publishedTestimonials) / totalTestimonials) * 100 : 0}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium w-8 text-right">
-                        {totalTestimonials - publishedTestimonials}
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Total collected
+                  </span>
+                  <span className="text-sm font-medium">
+                    {totalTestimonials}
+                  </span>
                 </div>
               </div>
             )}

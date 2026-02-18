@@ -13,8 +13,6 @@ export {
 export {
   CSPValidator,
   defaultCSPValidator,
-  getRequiredCSPDirectives,
-  generateCSPFriendlyEmbedCode,
   type CSPConfig,
   type CSPViolation,
   type CSPValidationResult

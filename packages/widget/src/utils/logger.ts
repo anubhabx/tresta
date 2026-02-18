@@ -78,3 +78,21 @@ export class Logger {
     return this.version;
   }
 }
+
+const PREFIX = '[TrestaWidget]';
+
+/**
+ * Module-level logger for infrastructure code (storage, cache, telemetry)
+ * that doesn't have access to a widget-specific Logger instance.
+ *
+ * All methods are intentionally non-throwing so callers can use them
+ * inside catch blocks without risk.
+ */
+export const widgetLog = {
+  debug: (message: string, ...args: unknown[]) =>
+    console.debug(PREFIX, message, ...args),
+  warn: (message: string, ...args: unknown[]) =>
+    console.warn(PREFIX, message, ...args),
+  error: (message: string, ...args: unknown[]) =>
+    console.error(PREFIX, message, ...args),
+} as const;

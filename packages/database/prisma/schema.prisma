@@ -146,6 +146,7 @@ model Subscription {
   payments SubscriptionPayment[]
 
   @@index([userId])
+  @@index([userId, externalSubscriptionId])
   @@index([planId])
   @@index([status])
   @@index([providerStatus])
