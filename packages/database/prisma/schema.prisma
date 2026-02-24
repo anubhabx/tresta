@@ -250,6 +250,14 @@ model Testimonial {
   @@index([isPublished])
   @@index([createdAt])
   @@index([isOAuthVerified])
+
+  // Composite indexes for common query patterns
+  @@index([projectId, isPublished, isApproved, createdAt]) // Public widget embed + API-key listing
+  @@index([projectId, moderationStatus, createdAt])        // Moderation queue + admin filtering
+  @@index([projectId, createdAt])                          // Paginated list ordered by date
+  @@index([ipAddress, createdAt])                          // IP velocity check (moderation)
+  @@index([ipAddress, projectId, createdAt])               // IP+project velocity (moderation)
+  @@index([authorEmail, createdAt])                        // Email velocity + privacy queries
 }
 
 enum TestimonialType {
@@ -273,6 +281,8 @@ model Widget {
   updatedAt DateTime @updatedAt
 
   Project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId]) // Widget listing by project
 }
 
 model ApiKey {
@@ -598,6 +608,7 @@ model WidgetPerformanceAlert {
   @@index([widgetId, createdAt])
   @@index([projectId, createdAt])
   @@index([resolved])
+  @@index([widgetId, resolved, alertType, createdAt]) // Batch dedup check in perf service
 }
 
 enum WidgetAlertType {
