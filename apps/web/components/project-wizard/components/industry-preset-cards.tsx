@@ -73,7 +73,7 @@ export function IndustryPresetCards({
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Industry Type</label>
+        <p className="text-sm font-medium">Industry Type</p>
         <span className="text-xs text-muted-foreground">
           Helps us suggest settings
         </span>

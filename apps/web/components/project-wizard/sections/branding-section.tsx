@@ -80,7 +80,7 @@ export function BrandingWizardSection({
       <CardContent className="space-y-6">
         {/* Theme Selector */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Widget Theme</label>
+          <p className="text-sm font-medium">Widget Theme</p>
           <div className="grid grid-cols-3 gap-3">
             {THEMES.map((theme) => {
               const Icon = theme.icon;
@@ -123,7 +123,7 @@ export function BrandingWizardSection({
 
         {/* Logo Upload */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Project Logo</label>
+          <p className="text-sm font-medium">Project Logo</p>
           <AzureFileUpload
             control={control}
             name="logoUrl"

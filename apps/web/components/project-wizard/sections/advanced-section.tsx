@@ -157,8 +157,9 @@ export function AdvancedSection({
           </AccordionTrigger>
           <AccordionContent className="px-6 pb-6">
             <div className="space-y-2 pt-2">
-              <Label>Tags</Label>
+              <Label htmlFor="project-tags">Tags</Label>
               <Input
+                id="project-tags"
                 {...register("tagsInput")}
                 placeholder="saas, b2b, productivity (comma separated)"
               />
@@ -203,8 +204,9 @@ export function AdvancedSection({
 
               {/* Detailed Description */}
               <div className="space-y-2">
-                <Label>Detailed Description</Label>
+                <Label htmlFor="project-description">Detailed Description</Label>
                 <Textarea
+                  id="project-description"
                   {...register("description")}
                   placeholder="Provide a detailed description of your project..."
                   rows={4}

@@ -143,7 +143,7 @@ export function IdentitySection({
 
         {/* Accent Color Selector */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Accent Color</label>
+          <p className="text-sm font-medium">Accent Color</p>
           <p className="text-xs text-muted-foreground mb-2">
             Used when no logo is uploaded
           </p>
@@ -169,7 +169,9 @@ export function IdentitySection({
         {/* Slug with URL Preview */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Project URL</label>
+            <label htmlFor="project-slug" className="text-sm font-medium">
+              Project URL
+            </label>
             {userEditedSlug && (
               <Button
                 type="button"
@@ -190,6 +192,7 @@ export function IdentitySection({
               <span>tresta.co/p/</span>
             </div>
             <input
+              id="project-slug"
               type="text"
               value={currentSlug || ""}
               onChange={(e) => {
