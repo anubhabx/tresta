@@ -14,6 +14,7 @@
     "generate": "prisma generate"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1"
+    "@types/node": "^24.10.1",
+    "supabase": "^2.76.14"
   }
 }
