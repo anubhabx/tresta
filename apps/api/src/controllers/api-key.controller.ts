@@ -20,6 +20,7 @@ import {
   handlePrismaError 
 } from '../lib/errors.js';
 import { prisma } from '@workspace/database/prisma';
+import { requireUserId } from '../lib/auth.js';
 
 /**
  * Create a new API key for a project
@@ -58,9 +59,7 @@ export async function createApiKeyHandler(
       });
     }
     
-    if (!req.user?.id) {
-      throw new BadRequestError('User authentication required');
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new BadRequestError('Project slug is required', { field: 'slug' });
@@ -126,10 +125,10 @@ export async function createApiKeyHandler(
     }
     
     // Check if user owns the project
-    if (project.userId !== req.user.id) {
+    if (project.userId !== userId) {
       throw new ForbiddenError('You do not have permission to create API keys for this project', {
         projectId: project.id,
-        userId: req.user.id,
+        userId,
         ownerId: project.userId
       });
     }
@@ -158,7 +157,7 @@ export async function createApiKeyHandler(
     let apiKey;
     try {
       apiKey = await createApiKey(
-        req.user.id,
+        userId,
         project.id,
         name.trim(),
         environment as ApiKeyEnvironment,
@@ -205,9 +204,7 @@ export async function listApiKeysHandler(
   try {
     const { slug } = req.params;
     
-    if (!req.user?.id) {
-      throw new BadRequestError('User authentication required');
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new BadRequestError('Project slug is required', { field: 'slug' });
@@ -232,7 +229,7 @@ export async function listApiKeysHandler(
     }
     
     // Check if user owns the project
-    if (project.userId !== req.user.id) {
+    if (project.userId !== userId) {
       throw new ForbiddenError('You do not have permission to view API keys for this project', {
         projectId: project.id,
         projectName: project.name
@@ -303,9 +300,7 @@ export async function getApiKeyHandler(
       });
     }
     
-    if (!req.user?.id) {
-      throw new BadRequestError('User authentication required');
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new BadRequestError('Project slug is required', { field: 'slug' });
@@ -330,7 +325,7 @@ export async function getApiKeyHandler(
     }
     
     // Check if user owns the project
-    if (project.userId !== req.user.id) {
+    if (project.userId !== userId) {
       throw new ForbiddenError('You do not have permission to view API keys for this project', {
         projectId: project.id,
         projectName: project.name
@@ -418,9 +413,7 @@ export async function revokeApiKeyHandler(
       });
     }
     
-    if (!req.user?.id) {
-      throw new BadRequestError('User authentication required');
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new BadRequestError('Project slug is required', { field: 'slug' });
@@ -445,7 +438,7 @@ export async function revokeApiKeyHandler(
     }
     
     // Check if user owns the project
-    if (project.userId !== req.user.id) {
+    if (project.userId !== userId) {
       throw new ForbiddenError('You do not have permission to revoke API keys for this project', {
         projectId: project.id,
         projectName: project.name
@@ -523,11 +516,7 @@ export async function listAccountApiKeysHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new BadRequestError('User authentication required');
-    }
+    const userId = requireUserId(req);
 
     const apiKeys = await prisma.apiKey.findMany({
       where: { userId },
@@ -586,7 +575,7 @@ export async function createAccountApiKeyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = requireUserId(req);
     const {
       name,
       projectSlug,
@@ -596,10 +585,6 @@ export async function createAccountApiKeyHandler(
       rateLimit,
       expiresAt,
     } = req.body;
-
-    if (!userId) {
-      throw new BadRequestError('User authentication required');
-    }
 
     if (!name || typeof name !== 'string') {
       throw new ValidationError('API key name is required and must be a string', {
@@ -731,12 +716,8 @@ export async function revokeAccountApiKeyHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = requireUserId(req);
     const { keyId } = req.params;
-
-    if (!userId) {
-      throw new BadRequestError('User authentication required');
-    }
 
     if (!keyId || typeof keyId !== 'string') {
       throw new ValidationError('API key ID is required', {
@@ -789,3 +770,5 @@ export async function revokeAccountApiKeyHandler(
     next(error);
   }
 }
+
+

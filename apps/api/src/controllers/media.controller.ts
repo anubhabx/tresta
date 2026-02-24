@@ -11,6 +11,7 @@ import {
   blobStorageService,
   StorageDirectory,
 } from '../services/blob-storage.service.js';
+import { requireUserId } from '../lib/auth.js';
 
 // Validation schema for upload URL request
 const generateUploadUrlSchema = z.object({
@@ -66,7 +67,7 @@ const generateUploadUrl = async (
       validationResult.data;
 
     // Get user ID from authenticated user
-    const userId = req.user?.id;
+    const userId = requireUserId(req);
 
     // Generate upload URL with SAS token
     const uploadData = await blobStorageService.generateUploadUrl({
@@ -134,17 +135,13 @@ const generateReadUrl = async (
 const deleteBlob = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { blobName } = req.params;
-    const userId = req.user?.id;
+    const userId = requireUserId(req);
 
     if (!blobName || typeof blobName !== 'string') {
       throw new ValidationError("Blob name is required", {
         field: 'blobName',
         received: typeof blobName
       });
-    }
-
-    if (!userId) {
-      throw new BadRequestError("User not authenticated");
     }
 
     const decodedBlobName = decodeURIComponent(blobName);

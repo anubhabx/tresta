@@ -13,6 +13,7 @@ import {
   verifyRazorpaySignature,
 } from "../services/razorpay.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
+import { requireUserId } from "../lib/auth.js";
 
 export const createSubscription = async (
   req: Request,
@@ -21,11 +22,7 @@ export const createSubscription = async (
 ) => {
   try {
     const { planId } = req.body; // This is now the Razorpay Plan ID directly
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (!planId) {
       throw new BadRequestError("Plan ID is required");
@@ -115,11 +112,7 @@ export const verifyPayment = async (
       razorpay_signature,
       planId,
     } = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (
       !razorpay_payment_id ||
@@ -203,10 +196,7 @@ export const getSubscriptionDetails = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -289,10 +279,7 @@ export const cancelSubscription = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     const subscription = await prisma.subscription.findUnique({
       where: { userId },

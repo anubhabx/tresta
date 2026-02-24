@@ -29,6 +29,7 @@ import type {
   ProjectData,
 } from "../../types/api-responses.js";
 import { isFreeColor } from "@workspace/types";
+import { requireUserId } from "../lib/auth.js";
 
 /**
  * Helper to serialize Prisma Project to ProjectData
@@ -62,11 +63,7 @@ const createProject = async (
       tags,
       visibility,
     } = req.body as CreateProjectPayload;
-    const id = req.user?.id;
-
-    if (!id) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const id = requireUserId(req);
 
     // Required field validations
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -254,11 +251,7 @@ const listProjects = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     const { page, limit } = extractPaginationParams(req.query);
 
@@ -316,11 +309,7 @@ const getProjectBySlug = async (
 ) => {
   try {
     const { slug } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new ValidationError('Project slug is required', {
@@ -447,11 +436,7 @@ const updateProject = async (
   try {
     const { slug } = req.params;
     const payload = req.body as UpdateProjectPayload;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new ValidationError('Project slug is required', {
@@ -785,11 +770,7 @@ const deleteProject = async (
 ) => {
   try {
     const { slug } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (!slug || typeof slug !== 'string') {
       throw new ValidationError('Project slug is required', {

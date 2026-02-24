@@ -22,6 +22,7 @@ import {
   analyzeReviewerBehavior,
 } from '../services/moderation.service.js';
 import { hashIp, encrypt } from '../utils/encryption.js';
+import { requireUserId } from '../lib/auth.js';
 
 const FALLBACK_TESTIMONIAL_LIMIT = 10;
 
@@ -470,11 +471,7 @@ const listTestimonials = async (
 ) => {
   try {
     const { slug } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     const project = await prisma.project.findFirst({
       where: { slug, userId },
@@ -601,11 +598,7 @@ const getTestimonialById = async (
 ) => {
   try {
     const { slug, id } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -645,11 +638,7 @@ const updateTestimonial = async (
   try {
     const { slug, id } = req.params;
     const { isPublished, isApproved, moderationStatus } = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -713,11 +702,7 @@ const deleteTestimonial = async (
 ) => {
   try {
     const { slug, id } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -761,11 +746,7 @@ const getModerationQueue = async (
 ) => {
   try {
     const { slug } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -865,11 +846,7 @@ const bulkModerationAction = async (
   try {
     const { slug } = req.params;
     const { testimonialIds, action } = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     if (
       !testimonialIds ||
@@ -943,11 +920,7 @@ const updateModerationStatus = async (
   try {
     const { slug, id } = req.params;
     const { status, isApproved, isPublished } = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new UnauthorizedError("User not authenticated");
-    }
+    const userId = requireUserId(req);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -1002,3 +975,4 @@ export {
   bulkModerationAction,
   updateModerationStatus,
 };
+
