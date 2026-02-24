@@ -92,7 +92,7 @@ export function IndustryPresetCards({
               className={cn(
                 "relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
                 "hover:border-primary/50 hover:bg-muted/50",
-                "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 isSelected
                   ? "border-primary bg-primary/5 shadow-sm"
                   : "border-border",

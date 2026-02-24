@@ -200,7 +200,7 @@ export function IdentitySection({
                 handleSlugChange(e.target.value);
               }}
               placeholder="your-project-slug"
-              className="flex-1 px-3 py-2 text-sm bg-transparent outline-none"
+              className="flex-1 px-3 py-2 text-sm bg-transparent focus-visible:outline-none"
             />
             {currentSlug && (
               <div className="px-3 text-emerald-600 dark:text-emerald-400">

@@ -276,7 +276,7 @@ export function CustomFormField<TFieldValues extends FieldValues>(
                         onMouseEnter={() => setHoveredRating(rating)}
                         onMouseLeave={() => setHoveredRating(0)}
                         disabled={disabled}
-                        className="transition-transform hover:scale-110 focus:outline-none focus:ring-none rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="transition-transform hover:scale-110 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Star
                           className={`h-8 w-8 px-0.5 transition-colors ${
