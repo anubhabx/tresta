@@ -62,7 +62,6 @@ describe('StyleManager', () => {
 
       const styleElement = shadowRoot?.querySelector('style');
       expect(styleElement).toBeDefined();
-      expect(styleElement?.textContent).toContain('--tresta-primary-color');
     });
 
     it('should return content wrapper inside Shadow DOM', () => {

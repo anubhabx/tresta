@@ -464,28 +464,32 @@ describe('Storage Manager', () => {
 
       const consoleSpy = vi.spyOn(console, 'warn');
 
-      const manager = new StorageManager();
-      const data = createMockWidgetData('test-123');
+      try {
+        const manager = new StorageManager();
+        const data = createMockWidgetData('test-123');
 
-      // Should not throw
-      await expect(manager.set('test-123', data)).resolves.not.toThrow();
+        // Should not throw
+        await expect(manager.set('test-123', data)).resolves.not.toThrow();
 
-      // Should return null when getting
-      const retrieved = await manager.get('test-123');
-      expect(retrieved).toBeNull();
+        // Should return null when getting
+        const retrieved = await manager.get('test-123');
+        expect(retrieved).toBeNull();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('No storage available')
-      );
-
-      // Restore
-      (global as any).indexedDB = originalIndexedDB;
-      Object.defineProperty(global, 'localStorage', {
-        value: originalLocalStorage,
-        writable: true,
-        configurable: true,
-      });
-      consoleSpy.mockRestore();
+        expect(consoleSpy).toHaveBeenCalled();
+        expect(
+          consoleSpy.mock.calls.some((call) =>
+            call.some((arg) => String(arg).includes('No storage available'))
+          )
+        ).toBe(true);
+      } finally {
+        (global as any).indexedDB = originalIndexedDB;
+        Object.defineProperty(global, 'localStorage', {
+          value: originalLocalStorage,
+          writable: true,
+          configurable: true,
+        });
+        consoleSpy.mockRestore();
+      }
     });
   });
 });

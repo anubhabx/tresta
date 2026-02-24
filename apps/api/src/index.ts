@@ -84,7 +84,6 @@ app.get("/health", (req, res) => {
 // Resolve widget path relative to this file
 // src/index.ts -> src -> api -> apps -> root -> packages -> widget -> dist
 const widgetPath = path.resolve(__dirname, "../../../packages/widget/dist");
-console.log("Widget path:", widgetPath);
 app.use(
   "/widget",
   express.static(widgetPath, {
