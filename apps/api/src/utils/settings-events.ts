@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { getRedisClient } from '../lib/redis.js';
+import { SETTINGS_HMAC_SECRET } from '../config/secrets.js';
 
 const SETTINGS_CHANGE_CHANNEL = 'settings:changes';
-const SETTINGS_HMAC_SECRET = process.env.SETTINGS_HMAC_SECRET || 'default-secret-change-in-production';
 
 export interface SettingsChangeEvent {
   version: number;

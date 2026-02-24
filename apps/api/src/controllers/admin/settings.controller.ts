@@ -3,9 +3,9 @@ import { ResponseHandler } from '../../lib/response.js';
 import { getRedisClient } from '../../lib/redis.js';
 import { BadRequestError, ConflictError } from '../../lib/errors.js';
 import crypto from 'crypto';
+import { SETTINGS_HMAC_SECRET } from '../../config/secrets.js';
 
 const SETTINGS_CHANGE_CHANNEL = 'settings:changes';
-const SETTINGS_HMAC_SECRET = process.env.SETTINGS_HMAC_SECRET || 'default-secret-change-in-production';
 
 const SETTINGS_KEYS = {
   EMAIL_QUOTA_LIMIT: 'settings:email_quota_limit',
