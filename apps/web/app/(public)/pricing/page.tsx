@@ -3,12 +3,51 @@ import { PricingTable } from "@/components/billing/pricing-table";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Gift, Rocket, Shield, Sparkles } from "lucide-react";
+import { siteConfig } from "@/config/site";
 
 export const metadata = {
   title: "Pricing - Tresta",
   description:
     "Simple, transparent pricing for your testimonial collection needs. Start free, upgrade when ready.",
   alternates: { canonical: "/pricing" },
+};
+
+/* ── JSON-LD: SoftwareApplication + Offers ───────────────────── */
+
+const softwareAppJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description: siteConfig.description,
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Free",
+      price: "0",
+      priceCurrency: "INR",
+      description: "Perfect for trying out Tresta",
+      url: `${siteConfig.url}/pricing`,
+    },
+    {
+      "@type": "Offer",
+      name: "Pro",
+      price: "300",
+      priceCurrency: "INR",
+      description: "For growing businesses — billed monthly",
+      url: `${siteConfig.url}/pricing`,
+    },
+    {
+      "@type": "Offer",
+      name: "Pro Yearly",
+      price: "3000",
+      priceCurrency: "INR",
+      description: "Best value — 2 months free, billed yearly",
+      url: `${siteConfig.url}/pricing`,
+    },
+  ],
 };
 
 const planJustifications = [
@@ -45,6 +84,12 @@ const planJustifications = [
 export default function PricingPage() {
   return (
     <div className="container mx-auto py-12 px-4 pt-24">
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppJsonLd) }}
+      />
+
       {/* Header */}
       <div className="text-center mb-16 max-w-3xl mx-auto">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
