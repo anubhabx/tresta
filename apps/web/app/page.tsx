@@ -1,16 +1,32 @@
+import dynamic from "next/dynamic";
 import { LandingNavbar } from "@/components/landing/landing-navbar";
 import { Hero } from "@/components/landing/hero";
-import { PainSection } from "@/components/landing/pain-section";
-import { Features } from "@/components/landing/features";
-import { InteractiveDemo } from "@/components/landing/interactive-demo";
-import { Testimonials } from "@/components/landing/testimonials";
-import { IntegrationSection } from "@/components/landing/integration-section";
-import { FAQ } from "@/components/landing/faq";
-import { CTA } from "@/components/landing/cta";
-import { SiteFooter } from "@/components/site-footer";
 import { PageWrapper } from "@/components/landing/page-wrapper";
 import { siteConfig } from "@/config/site";
 import type { Metadata } from "next";
+
+/* ── Below-fold components: code-split & lazy-loaded ─────────── */
+const PainSection = dynamic(
+  () => import("@/components/landing/pain-section").then((m) => m.PainSection),
+);
+const Features = dynamic(
+  () => import("@/components/landing/features").then((m) => m.Features),
+);
+const InteractiveDemo = dynamic(
+  () => import("@/components/landing/interactive-demo").then((m) => m.InteractiveDemo),
+);
+const IntegrationSection = dynamic(
+  () => import("@/components/landing/integration-section").then((m) => m.IntegrationSection),
+);
+const FAQ = dynamic(
+  () => import("@/components/landing/faq").then((m) => m.FAQ),
+);
+const CTA = dynamic(
+  () => import("@/components/landing/cta").then((m) => m.CTA),
+);
+const SiteFooter = dynamic(
+  () => import("@/components/site-footer").then((m) => m.SiteFooter),
+);
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
