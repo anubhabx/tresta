@@ -47,7 +47,7 @@ export const BentoGridItem = ({
   return (
     <div
       className={cn(
-        "group/bento row-span-1 flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 p-4 transition duration-200 hover:border-zinc-700 hover:shadow-xl hover:shadow-primary/5",
+        "group/bento row-span-1 flex flex-col justify-between overflow-hidden rounded-xl border border-border bg-card p-4 transition duration-200 hover:border-border/80 hover:shadow-xl hover:shadow-primary/5",
         className,
       )}
     >
@@ -57,10 +57,10 @@ export const BentoGridItem = ({
       {/* Text content — slides right on hover */}
       <div className="transition duration-200 group-hover/bento:translate-x-2">
         {icon}
-        <div className="mt-2 mb-1 font-sans text-base font-bold text-zinc-100">
+        <div className="mt-2 mb-1 font-sans text-base font-bold text-foreground">
           {title}
         </div>
-        <div className="font-sans text-sm font-normal text-zinc-400 leading-relaxed">
+        <div className="font-sans text-sm font-normal text-muted-foreground leading-relaxed">
           {description}
         </div>
       </div>

@@ -95,7 +95,7 @@ export const SpotlightCard = ({
   return (
     <div
       className={cn(
-        "group/spotlight relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900",
+        "group/spotlight relative overflow-hidden rounded-xl border border-border bg-card",
         className
       )}
       onMouseMove={handleMouseMove}

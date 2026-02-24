@@ -40,16 +40,16 @@ export function PainSection() {
   );
 
   return (
-    <section className="bg-zinc-950 py-24 md:py-32">
+    <section className="bg-background py-24 md:py-32">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             You&apos;ve shipped the product.
             <br />
-            <span className="text-zinc-400">Now you need social proof.</span>
+            <span className="text-muted-foreground">Now you need social proof.</span>
           </h2>
-          <p className="mx-auto max-w-xl text-lg text-zinc-400">
+          <p className="mx-auto max-w-xl text-lg text-muted-foreground">
             Sweep your mouse across to see the difference.
           </p>
         </div>
@@ -68,12 +68,12 @@ export function PainSection() {
               className="absolute inset-0 p-6"
               style={{ filter: "blur(0.5px) saturate(0.3)" }}
             >
-              <div className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-600">
+              <div className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 The old way
               </div>
               <div className="space-y-4">
                 {/* Ugly HTML mockup */}
-                <pre className="rounded-lg bg-zinc-800/60 p-4 font-mono text-xs text-zinc-500 overflow-x-auto">
+                <pre className="rounded-lg bg-muted p-4 font-mono text-xs text-muted-foreground overflow-x-auto">
                   {`<!-- Your "testimonials" section -->
 <div class="testimonials">
   <img src="/screenshots/tweet1.png" />
@@ -99,7 +99,7 @@ export function PainSection() {
                   ].map((issue) => (
                     <span
                       key={issue}
-                      className="inline-flex items-center gap-1 rounded-full bg-zinc-800/50 px-3 py-1 text-xs text-zinc-500"
+                      className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
                     >
                       <X className="h-3 w-3 text-red-400/60" />
                       {issue}
@@ -111,7 +111,7 @@ export function PainSection() {
 
             {/* TRESTA WAY - Right side (clips based on slider) */}
             <div
-              className="absolute inset-0 bg-zinc-950"
+              className="absolute inset-0 bg-background"
               style={{
                 clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
                 transition: "clip-path 100ms ease-out"
@@ -131,31 +131,31 @@ export function PainSection() {
                 </div>
                 <div className="space-y-4">
                   {/* Clean script tag */}
-                  <pre className="rounded-lg bg-zinc-900/40 border border-cyan-900/30 p-4 font-mono text-xs overflow-x-auto">
+                  <pre className="rounded-lg bg-muted border border-cyan-900/30 p-4 font-mono text-xs overflow-x-auto">
                     <code>
-                      <span className="text-zinc-400">&lt;</span>
+                      <span className="text-muted-foreground">&lt;</span>
                       <span className="text-cyan-400">script</span>
                       {"\n  "}
                       <span className="text-violet-400">src</span>
-                      <span className="text-zinc-400">=</span>
+                      <span className="text-muted-foreground">=</span>
                       <span className="text-yellow-300">
                         &quot;https://tresta.app/widget.js&quot;
                       </span>
                       {"\n  "}
                       <span className="text-violet-400">data-project</span>
-                      <span className="text-zinc-400">=</span>
+                      <span className="text-muted-foreground">=</span>
                       <span className="text-yellow-300">
                         &quot;your-project&quot;
                       </span>
                       {"\n"}
-                      <span className="text-zinc-400">&gt;&lt;/</span>
+                      <span className="text-muted-foreground">&gt;&lt;/</span>
                       <span className="text-cyan-400">script</span>
-                      <span className="text-zinc-400">&gt;</span>
+                      <span className="text-muted-foreground">&gt;</span>
                     </code>
                   </pre>
 
                   {/* Clean testimonial card preview */}
-                  <div className="rounded-lg border border-cyan-800/30 bg-zinc-900/50 p-4">
+                  <div className="rounded-lg border border-cyan-800/30 bg-muted p-4">
                     <div className="mb-2 flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -164,7 +164,7 @@ export function PainSection() {
                         />
                       ))}
                     </div>
-                    <p className="mb-3 text-sm text-zinc-300">
+                    <p className="mb-3 text-sm text-foreground">
                       &ldquo;Set it up in 10 minutes. It just works.&rdquo;
                     </p>
                     <div className="flex items-center justify-between">
@@ -173,10 +173,10 @@ export function PainSection() {
                           JD
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-zinc-100">
+                          <p className="text-sm font-medium text-foreground">
                             @developer
                           </p>
-                          <p className="text-xs text-zinc-500">Indie Hacker</p>
+                          <p className="text-xs text-muted-foreground">Indie Hacker</p>
                         </div>
                       </div>
                       <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
@@ -221,7 +221,7 @@ export function PainSection() {
 
           {/* Labels below */}
           <div className="mt-6 flex justify-between text-sm">
-            <span className="text-zinc-600">← The old way</span>
+            <span className="text-muted-foreground">← The old way</span>
             <span className="text-cyan-400">The Tresta way →</span>
           </div>
         </div>

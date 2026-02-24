@@ -82,15 +82,15 @@ export function ApiKeyCard({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-md group hover:border-zinc-700 transition-colors">
+    <div className="flex items-center justify-between p-4 bg-card border border-border rounded-md group hover:border-border/80 transition-colors">
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-3 font-mono text-sm text-zinc-400">
-          <Key className="w-4 h-4 text-zinc-500" />
-          <span className="font-medium text-zinc-300">{apiKey.name}</span>
-          <span className="text-zinc-600">|</span>
+        <div className="flex items-center gap-3 font-mono text-sm text-muted-foreground">
+          <Key className="w-4 h-4 text-muted-foreground" />
+          <span className="font-medium text-foreground">{apiKey.name}</span>
+          <span className="text-muted-foreground">|</span>
           <span>{displayKey}</span>
         </div>
-        <div className="text-xs text-zinc-500 pl-7">
+        <div className="text-xs text-muted-foreground pl-7">
           {apiKey.lastUsedAt ? `Last used ${apiKey.lastUsedAt}` : "Never used"}
         </div>
       </div>
@@ -100,7 +100,7 @@ export function ApiKeyCard({
           variant="ghost"
           size="icon"
           onClick={copyToClipboard}
-          className="h-8 w-8 text-zinc-400 hover:text-white"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
         >
           <Copy className="h-4 w-4" />
           <span className="sr-only">Copy Key</span>
@@ -111,7 +111,7 @@ export function ApiKeyCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-zinc-400 hover:text-yellow-400"
+              className="h-8 w-8 text-muted-foreground hover:text-yellow-400"
             >
               <RefreshCw className="h-4 w-4" />
               <span className="sr-only">Regenerate Key</span>
@@ -146,7 +146,7 @@ export function ApiKeyCard({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-zinc-400 hover:text-red-400"
+              className="h-8 w-8 text-muted-foreground hover:text-red-400"
             >
               <EyeOff className="h-4 w-4" />{" "}
               {/* Using generic icon for delete/revoke */}

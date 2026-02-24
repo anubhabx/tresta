@@ -60,8 +60,8 @@ function TocNav({
                 "block rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
                 item.level === 3 && "pl-6",
                 activeId === item.id
-                  ? "bg-zinc-800/60 text-zinc-100 font-medium"
-                  : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30"
+                  ? "bg-accent text-accent-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
               )}
             >
               {item.title}
@@ -135,7 +135,7 @@ export function LegalLayout({
   return (
     <div className="min-h-screen">
       {/* ── Trust Header ─────────────────────────────────────────────── */}
-      <div className="border-b border-zinc-800/60">
+      <div className="border-b border-border/60">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
           {/* Breadcrumbs */}
           <nav
@@ -144,23 +144,23 @@ export function LegalLayout({
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-zinc-500 transition-colors hover:text-zinc-300"
+              className="inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
             >
               <Home className="h-3.5 w-3.5" />
               <span>Home</span>
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-zinc-600" />
-            <span className="text-zinc-400">{title}</span>
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-muted-foreground">{title}</span>
           </nav>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {title}
           </h1>
 
           {/* Last Updated Badge */}
           <div className="mt-4 flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-mono text-zinc-400">
+            <span className="inline-flex items-center gap-2 rounded-md border border-border bg-card/50 px-3 py-1 text-xs font-mono text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Last updated: {lastUpdated}
             </span>
@@ -169,23 +169,23 @@ export function LegalLayout({
       </div>
 
       {/* ── Mobile ToC Trigger ───────────────────────────────────────── */}
-      <div className="sticky top-0 z-30 border-b border-zinc-800/60 bg-background/80 backdrop-blur-md lg:hidden">
+      <div className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md lg:hidden">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="my-2 gap-2 text-zinc-400 hover:text-zinc-200"
+                className="my-2 gap-2 text-muted-foreground hover:text-foreground"
               >
                 <List className="h-4 w-4" />
                 On this page
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-zinc-950 border-zinc-800 p-0">
+            <SheetContent side="left" className="w-72 bg-background border-border p-0">
               <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-4">
-                  <SheetTitle className="text-sm font-semibold text-zinc-300">
+                <div className="flex items-center justify-between border-b border-border px-4 py-4">
+                  <SheetTitle className="text-sm font-semibold text-foreground">
                     On this page
                   </SheetTitle>
                 </div>
@@ -208,7 +208,7 @@ export function LegalLayout({
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block">
             <div className="sticky top-24 -ml-1 pt-10 pb-16">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 On this page
               </p>
               <TocNav items={toc} activeId={activeId} />
