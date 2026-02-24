@@ -149,7 +149,6 @@ export async function publicRateLimitMiddleware(
       'X-RateLimit-Reset',
       new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
     );
-    res.setHeader('X-RateLimit-Key', clientIp);
 
     next();
   } catch (error: any) {
@@ -161,7 +160,6 @@ export async function publicRateLimitMiddleware(
         new Date(Date.now() + error.msBeforeNext).toISOString()
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
-      res.setHeader('X-RateLimit-Key', clientIp);
 
       res.status(429).json({
         success: false,
