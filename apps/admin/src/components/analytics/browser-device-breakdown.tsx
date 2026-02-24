@@ -22,12 +22,12 @@ export function BrowserDeviceBreakdown({ title, data }: BrowserDeviceBreakdownPr
   }));
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="bg-card rounded-lg shadow p-6">
+      <h2 className="text-xl font-semibold text-foreground mb-4">
         {title}
       </h2>
       {data.length === 0 ? (
-        <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
           No data available
         </div>
       ) : (
@@ -74,15 +74,15 @@ export function BrowserDeviceBreakdown({ title, data }: BrowserDeviceBreakdownPr
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                   />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-muted-foreground">
                     {item.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className="text-muted-foreground">
                     {item.count.toLocaleString()}
                   </span>
-                  <span className="text-gray-500 dark:text-gray-500 w-12 text-right">
+                  <span className="text-muted-foreground w-12 text-right">
                     {item.percentage.toFixed(1)}%
                   </span>
                 </div>

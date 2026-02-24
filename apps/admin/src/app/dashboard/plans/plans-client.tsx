@@ -20,10 +20,10 @@ export function PlansClient() {
                 header: 'Name',
                 render: (plan: Plan) => (
                     <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <div className="text-sm font-medium text-foreground">
                             {plan.name}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-muted-foreground">
                             {plan.description}
                         </div>
                     </div>
@@ -33,7 +33,7 @@ export function PlansClient() {
                 key: 'price',
                 header: 'Price',
                 render: (plan: Plan) => (
-                    <span className="text-sm text-gray-900 dark:text-gray-100 font-mono">
+                    <span className="text-sm text-foreground font-mono">
                         {new Intl.NumberFormat('en-IN', { style: 'currency', currency: plan.currency }).format(plan.price / 100)} / {plan.interval}
                     </span>
                 ),
@@ -60,7 +60,7 @@ export function PlansClient() {
                 key: 'razorpayPlanId',
                 header: 'Razorpay ID',
                 render: (plan: Plan) => (
-                    <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">
+                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
                         {plan.razorpayPlanId || 'N/A'}
                     </code>
                 ),
@@ -69,7 +69,7 @@ export function PlansClient() {
                 key: 'createdAt',
                 header: 'Created At',
                 render: (plan: Plan) => (
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-muted-foreground">
                         {formatDate(plan.createdAt)}
                     </span>
                 ),
@@ -105,8 +105,8 @@ export function PlansClient() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Plans</h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2">
+                    <h1 className="text-3xl font-bold text-foreground">Plans</h1>
+                    <p className="text-muted-foreground mt-2">
                         Manage subscription plans and pricing
                     </p>
                 </div>

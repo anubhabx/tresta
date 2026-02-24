@@ -31,10 +31,10 @@ export function ProjectSettingsClient({ projectId }: ProjectSettingsClientProps)
           Back
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Project Settings
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             {project?.name || 'Project'}
           </p>
         </div>
@@ -43,7 +43,7 @@ export function ProjectSettingsClient({ projectId }: ProjectSettingsClientProps)
       {/* Settings Sections */}
       <div className="space-y-6">
         {/* Telemetry Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-card rounded-lg shadow p-6">
           <TelemetrySettings projectId={projectId} />
         </div>
 

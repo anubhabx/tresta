@@ -29,10 +29,10 @@ export function DLQClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Dead Letter Queue
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Manage failed background jobs and retry operations
           </p>
         </div>
@@ -43,18 +43,18 @@ export function DLQClient() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="flex items-center gap-4">
-          <Filter className="h-5 w-5 text-gray-400" />
+          <Filter className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Queue
               </label>
               <select
                 value={queue}
                 onChange={(e) => setQueue(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Queues</option>
                 <option value="notifications">Notifications</option>
@@ -62,13 +62,13 @@ export function DLQClient() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Error Type
               </label>
               <select
                 value={errorType}
                 onChange={(e) => setErrorType(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="transient">Transient</option>
@@ -116,21 +116,21 @@ export function DLQClient() {
       {/* Stats */}
       {data && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Failed Jobs</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Total Failed Jobs</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {data.total}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Showing</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Showing</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {data.jobs.length}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Limit</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Limit</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {data.limit}
             </p>
           </div>

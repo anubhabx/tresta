@@ -158,15 +158,15 @@ export function SettingsForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Email Quota Limit */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Email Settings
         </h3>
         <div className="space-y-4">
           <div>
             <label
               htmlFor="emailQuotaLimit"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-muted-foreground mb-2"
             >
               Email Quota Limit
             </label>
@@ -178,8 +178,8 @@ export function SettingsForm() {
               className={`block w-full rounded-md border ${
                 errors.emailQuotaLimit
                   ? 'border-red-300 dark:border-red-600'
-                  : 'border-gray-300 dark:border-gray-600'
-              } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  : 'border-border'
+              } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
               min="0"
               max="1000000"
             />
@@ -189,7 +189,7 @@ export function SettingsForm() {
                 {errors.emailQuotaLimit}
               </p>
             )}
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               Maximum number of emails that can be sent (0-1,000,000)
             </p>
           </div>
@@ -197,15 +197,15 @@ export function SettingsForm() {
       </div>
 
       {/* Ably Connection Limit */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Real-time Connection Settings
         </h3>
         <div className="space-y-4">
           <div>
             <label
               htmlFor="ablyConnectionLimit"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-muted-foreground mb-2"
             >
               Ably Connection Limit
             </label>
@@ -217,8 +217,8 @@ export function SettingsForm() {
               className={`block w-full rounded-md border ${
                 errors.ablyConnectionLimit
                   ? 'border-red-300 dark:border-red-600'
-                  : 'border-gray-300 dark:border-gray-600'
-              } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  : 'border-border'
+              } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
               min="0"
               max="10000"
             />
@@ -228,7 +228,7 @@ export function SettingsForm() {
                 {errors.ablyConnectionLimit}
               </p>
             )}
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               Maximum number of concurrent Ably connections (0-10,000)
             </p>
           </div>
@@ -236,8 +236,8 @@ export function SettingsForm() {
       </div>
 
       {/* Auto-Moderation Settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Auto-Moderation Settings
         </h3>
         <div className="space-y-4">
@@ -245,11 +245,11 @@ export function SettingsForm() {
             <div>
               <label
                 htmlFor="autoModerationEnabled"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-muted-foreground"
               >
                 Enable Auto-Moderation
               </label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Automatically moderate testimonials based on content analysis
               </p>
             </div>
@@ -259,7 +259,7 @@ export function SettingsForm() {
               aria-checked={formData.autoModerationEnabled}
               onClick={() => handleChange('autoModerationEnabled', !formData.autoModerationEnabled)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.autoModerationEnabled ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                formData.autoModerationEnabled ? 'bg-blue-600' : 'bg-muted'
               }`}
             >
               <span
@@ -278,8 +278,8 @@ export function SettingsForm() {
 
       {/* Metadata */}
       {settings && (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-500">
+        <div className="bg-muted rounded-lg p-4">
+          <p className="text-xs text-muted-foreground">
             Version: {settings.version}
           </p>
         </div>

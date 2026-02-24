@@ -72,7 +72,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center justify-center h-32">
           <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
         </div>
@@ -92,7 +92,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
   const hasActiveAlerts = activeAlerts.length > 0;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-card rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           {hasActiveAlerts ? (
@@ -100,7 +100,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
           ) : (
             <CheckCircle className="h-5 w-5 text-green-600" />
           )}
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-foreground">
             Performance Alerts
           </h2>
           {hasActiveAlerts && (
@@ -118,7 +118,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
       </div>
 
       {alerts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-32 text-gray-500 dark:text-gray-400">
+        <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
           <CheckCircle className="h-8 w-8 mb-2 text-green-600" />
           <p>No performance alerts</p>
         </div>
@@ -129,7 +129,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
               key={alert.id}
               className={`border rounded-lg p-4 ${
                 alert.resolved
-                  ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50'
+                  ? 'border-border bg-muted'
                   : alert.severity === 'CRITICAL'
                   ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
                   : alert.severity === 'WARNING'
@@ -147,7 +147,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
                     ) : (
                       <AlertTriangle className="h-4 w-4 text-yellow-600" />
                     )}
-                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="text-sm font-semibold text-foreground">
                       {alert.alertType.replace(/_/g, ' ')}
                     </span>
                     <span
@@ -162,10 +162,10 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
                       {alert.severity}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  <p className="text-sm text-muted-foreground mb-2">
                     {alert.message}
                   </p>
-                  <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>
                       Threshold: {alert.threshold}
                       {alert.alertType.includes('LOAD_TIME') ? 'ms' : '%'}
@@ -188,7 +188,7 @@ export function PerformanceAlerts({ widgetId }: PerformanceAlertsProps) {
                 {!alert.resolved && (
                   <button
                     onClick={() => resolveAlert(alert.id)}
-                    className="ml-4 px-3 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    className="ml-4 px-3 py-1 text-sm bg-background border border-border rounded hover:bg-muted transition-colors"
                   >
                     Resolve
                   </button>

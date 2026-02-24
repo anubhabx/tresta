@@ -24,20 +24,20 @@ export function MetricsCard({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-gray-800 rounded-lg shadow p-6',
+        'bg-card rounded-lg shadow p-6',
         className
       )}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+          <p className="text-sm font-medium text-muted-foreground">
             {title}
           </p>
-          <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="mt-2 text-3xl font-bold text-foreground">
             {value}
           </p>
           {subtitle && (
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {subtitle}
             </p>
           )}

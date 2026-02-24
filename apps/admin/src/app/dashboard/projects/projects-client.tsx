@@ -33,10 +33,10 @@ export function ProjectsClient() {
         header: 'Project',
         render: (project) => (
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="text-sm font-medium text-foreground">
               {project.name}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">/{project.slug}</div>
+            <div className="text-sm text-muted-foreground">/{project.slug}</div>
           </div>
         ),
       },
@@ -45,8 +45,8 @@ export function ProjectsClient() {
         header: 'Owner',
         render: (project) => (
           <div>
-            <div className="text-sm text-gray-900 dark:text-gray-100">{project.owner.name}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{project.owner.email}</div>
+            <div className="text-sm text-foreground">{project.owner.name}</div>
+            <div className="text-sm text-muted-foreground">{project.owner.email}</div>
           </div>
         ),
       },
@@ -71,10 +71,10 @@ export function ProjectsClient() {
         header: 'Testimonials',
         render: (project) => (
           <div className="text-sm">
-            <div className="text-gray-900 dark:text-gray-100">
+            <div className="text-foreground">
               Total: {formatNumber(project.testimonialCounts?.total ?? project.testimonialsCount)}
             </div>
-            <div className="text-gray-500 dark:text-gray-400">
+            <div className="text-muted-foreground">
               Pending: {formatNumber(project.testimonialCounts?.pending ?? project.pendingCount)} | Approved:{' '}
               {formatNumber(project.testimonialCounts?.approved ?? project.approvedCount)}
             </div>
@@ -85,7 +85,7 @@ export function ProjectsClient() {
         key: 'createdAt',
         header: 'Created',
         render: (project) => (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {formatDate(project.createdAt)}
           </span>
         ),
@@ -99,10 +99,10 @@ export function ProjectsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Projects
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Manage and monitor all projects
           </p>
         </div>
@@ -113,9 +113,9 @@ export function ProjectsClient() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="flex items-center gap-4">
-          <Filter className="h-5 w-5 text-gray-400" />
+          <Filter className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
             <TableSearch
               value={search}
@@ -125,7 +125,7 @@ export function ProjectsClient() {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Types</option>
               <option value="SAAS_APP">SaaS App</option>
@@ -138,7 +138,7 @@ export function ProjectsClient() {
             <select
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Visibility</option>
               <option value="PUBLIC">Public</option>
@@ -187,27 +187,27 @@ export function ProjectsClient() {
       {/* Stats */}
       {data && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Projects</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Total Projects</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.projects.length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">
               Public Projects
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(
                 data.projects.filter((p) => p.visibility === 'PUBLIC').length
               )}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">
               Total Testimonials
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(
                 data.projects.reduce((sum, p) => sum + p.testimonialsCount, 0)
               )}

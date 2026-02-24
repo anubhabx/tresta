@@ -153,14 +153,14 @@ export function AlertsClient() {
       key: 'message',
       header: 'Message',
       render: (alert) => (
-        <span className="text-sm text-gray-900 dark:text-gray-100">{alert.message}</span>
+        <span className="text-sm text-foreground">{alert.message}</span>
       ),
     },
     {
       key: 'triggeredAt',
       header: 'Triggered At',
       render: (alert) => (
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="text-sm text-muted-foreground">
           {formatDate(alert.triggeredAt)}
         </span>
       ),
@@ -215,10 +215,10 @@ export function AlertsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Alert Configuration
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Configure alert thresholds and notification settings
           </p>
         </div>
@@ -230,10 +230,10 @@ export function AlertsClient() {
 
       {/* Configuration Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-card rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-foreground">
               Alert Thresholds
             </h2>
           </div>
@@ -243,7 +243,7 @@ export function AlertsClient() {
             <div>
               <label
                 htmlFor="emailQuotaThreshold"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Email Quota Threshold (%)
               </label>
@@ -257,8 +257,8 @@ export function AlertsClient() {
                 className={`block w-full rounded-md border ${
                   errors.emailQuotaThreshold
                     ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-300 dark:border-gray-600'
-                } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    : 'border-border'
+                } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 min="0"
                 max="100"
               />
@@ -268,7 +268,7 @@ export function AlertsClient() {
                   {errors.emailQuotaThreshold}
                 </p>
               )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Alert when email quota usage exceeds this percentage (0-100)
               </p>
             </div>
@@ -277,7 +277,7 @@ export function AlertsClient() {
             <div>
               <label
                 htmlFor="dlqCountThreshold"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 DLQ Count Threshold
               </label>
@@ -289,8 +289,8 @@ export function AlertsClient() {
                 className={`block w-full rounded-md border ${
                   errors.dlqCountThreshold
                     ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-300 dark:border-gray-600'
-                } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    : 'border-border'
+                } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 min="0"
               />
               {errors.dlqCountThreshold && (
@@ -299,7 +299,7 @@ export function AlertsClient() {
                   {errors.dlqCountThreshold}
                 </p>
               )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Alert when dead letter queue count exceeds this number
               </p>
             </div>
@@ -308,7 +308,7 @@ export function AlertsClient() {
             <div>
               <label
                 htmlFor="failedJobRateThreshold"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Failed Job Rate Threshold
               </label>
@@ -323,8 +323,8 @@ export function AlertsClient() {
                 className={`block w-full rounded-md border ${
                   errors.failedJobRateThreshold
                     ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-300 dark:border-gray-600'
-                } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    : 'border-border'
+                } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 min="0"
                 max="1"
               />
@@ -334,7 +334,7 @@ export function AlertsClient() {
                   {errors.failedJobRateThreshold}
                 </p>
               )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Alert when failed job rate exceeds this ratio (0-1, e.g., 0.1 = 10%)
               </p>
             </div>
@@ -343,7 +343,7 @@ export function AlertsClient() {
             <div>
               <label
                 htmlFor="slackWebhookUrl"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Slack Webhook URL (Optional)
               </label>
@@ -356,8 +356,8 @@ export function AlertsClient() {
                 className={`block w-full rounded-md border ${
                   errors.slackWebhookUrl
                     ? 'border-red-300 dark:border-red-600'
-                    : 'border-gray-300 dark:border-gray-600'
-                } bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    : 'border-border'
+                } bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
               {errors.slackWebhookUrl && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -365,7 +365,7 @@ export function AlertsClient() {
                   {errors.slackWebhookUrl}
                 </p>
               )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Slack webhook URL for alert notifications
               </p>
             </div>
@@ -404,7 +404,7 @@ export function AlertsClient() {
       {/* Alert History */}
       {data && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
             Alert History (Last 7 Days)
           </h2>
           <DataTable

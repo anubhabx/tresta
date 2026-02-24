@@ -52,10 +52,10 @@ export function SessionsClient() {
       header: 'User',
       render: (session) => (
         <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          <div className="text-sm font-medium text-foreground">
             {session.userName}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">{session.userEmail}</div>
+          <div className="text-xs text-muted-foreground">{session.userEmail}</div>
         </div>
       ),
     },
@@ -63,7 +63,7 @@ export function SessionsClient() {
       key: 'ipAddress',
       header: 'IP Address',
       render: (session) => (
-        <span className="text-sm font-mono text-gray-900 dark:text-gray-100">
+        <span className="text-sm font-mono text-foreground">
           {session.ipAddress}
         </span>
       ),
@@ -73,7 +73,7 @@ export function SessionsClient() {
       header: 'Device',
       render: (session) => (
         <div className="max-w-xs">
-          <span className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+          <span className="text-sm text-foreground line-clamp-2">
             {session.userAgent}
           </span>
         </div>
@@ -84,10 +84,10 @@ export function SessionsClient() {
       header: 'Last Activity',
       render: (session) => (
         <div>
-          <div className="text-sm text-gray-900 dark:text-gray-100">
+          <div className="text-sm text-foreground">
             {formatRelativeTime(session.lastActivity)}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-muted-foreground">
             {formatDate(session.lastActivity)}
           </div>
         </div>
@@ -116,10 +116,10 @@ export function SessionsClient() {
       header: 'User',
       render: (signIn) => (
         <div>
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          <div className="text-sm font-medium text-foreground">
             {signIn.userName}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">{signIn.userEmail}</div>
+          <div className="text-xs text-muted-foreground">{signIn.userEmail}</div>
         </div>
       ),
     },
@@ -127,7 +127,7 @@ export function SessionsClient() {
       key: 'ipAddress',
       header: 'IP Address',
       render: (signIn) => (
-        <span className="text-sm font-mono text-gray-900 dark:text-gray-100">
+        <span className="text-sm font-mono text-foreground">
           {signIn.ipAddress}
         </span>
       ),
@@ -137,10 +137,10 @@ export function SessionsClient() {
       header: 'Timestamp',
       render: (signIn) => (
         <div>
-          <div className="text-sm text-gray-900 dark:text-gray-100">
+          <div className="text-sm text-foreground">
             {formatRelativeTime(signIn.timestamp)}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-muted-foreground">
             {formatDate(signIn.timestamp)}
           </div>
         </div>
@@ -153,10 +153,10 @@ export function SessionsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Admin Sessions
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Monitor and manage active admin sessions
           </p>
         </div>
@@ -194,11 +194,11 @@ export function SessionsClient() {
         <>
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Monitor className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <Monitor className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-xl font-semibold text-foreground">
                 Active Sessions
               </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-muted-foreground">
                 ({data.activeSessions.length})
               </span>
             </div>
@@ -212,11 +212,11 @@ export function SessionsClient() {
           {/* Recent Sign-ins */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-xl font-semibold text-foreground">
                 Recent Sign-ins (Last 30 Days)
               </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-muted-foreground">
                 ({data.recentSignIns.length})
               </span>
             </div>
@@ -244,27 +244,27 @@ export function SessionsClient() {
             <DialogBody>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">User</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium text-muted-foreground">User</p>
+                  <p className="text-sm text-foreground">
                     {selectedSession.userName}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {selectedSession.userEmail}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium text-muted-foreground">
                     IP Address
                   </p>
-                  <p className="text-sm font-mono text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-mono text-foreground">
                     {selectedSession.ipAddress}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Last Activity
                   </p>
-                  <p className="text-sm text-gray-900 dark:text-gray-100">
+                  <p className="text-sm text-foreground">
                     {formatDate(selectedSession.lastActivity)}
                   </p>
                 </div>

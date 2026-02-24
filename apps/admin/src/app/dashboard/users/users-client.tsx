@@ -31,10 +31,10 @@ export function UsersClient() {
         header: 'Name',
         render: (user) => (
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="text-sm font-medium text-foreground">
               {user.name}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+            <div className="text-sm text-muted-foreground">{user.email}</div>
           </div>
         ),
       },
@@ -51,7 +51,7 @@ export function UsersClient() {
         key: 'projects',
         header: 'Projects',
         render: (user) => (
-          <span className="text-sm text-gray-900 dark:text-gray-100">
+          <span className="text-sm text-foreground">
             {formatNumber(user.projectCount)}
           </span>
         ),
@@ -60,7 +60,7 @@ export function UsersClient() {
         key: 'testimonials',
         header: 'Testimonials',
         render: (user) => (
-          <span className="text-sm text-gray-900 dark:text-gray-100">
+          <span className="text-sm text-foreground">
             {formatNumber(user.testimonialCount)}
           </span>
         ),
@@ -69,7 +69,7 @@ export function UsersClient() {
         key: 'lastLogin',
         header: 'Last Login',
         render: (user) => (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
           </span>
         ),
@@ -78,7 +78,7 @@ export function UsersClient() {
         key: 'joinedAt',
         header: 'Joined',
         render: (user) => (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {formatDate(user.joinedAt)}
           </span>
         ),
@@ -92,8 +92,8 @@ export function UsersClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Users</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Users</h1>
+          <p className="text-muted-foreground mt-2">
             Manage and monitor user accounts
           </p>
         </div>
@@ -104,9 +104,9 @@ export function UsersClient() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="flex items-center gap-4">
-          <Filter className="h-5 w-5 text-gray-400" />
+          <Filter className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
             <TableSearch
               value={search}
@@ -116,7 +116,7 @@ export function UsersClient() {
             <select
               value={plan}
               onChange={(e) => setPlan(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Plans</option>
               <option value="FREE">Free</option>
@@ -163,21 +163,21 @@ export function UsersClient() {
       {/* Stats */}
       {data && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Total Users</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.users.length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Free Users</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Free Users</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.users.filter((u) => u.plan === 'FREE').length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Pro Users</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Pro Users</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.users.filter((u) => u.plan === 'PRO').length)}
             </p>
           </div>

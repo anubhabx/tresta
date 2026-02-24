@@ -84,7 +84,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
     <div className="space-y-4">
       {/* Embed Type Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-muted-foreground mb-2">
           Embed Type
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -93,7 +93,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
             className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
               embedType === 'standard'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                : 'bg-card text-muted-foreground border-border hover:border-blue-400'
             }`}
           >
             Standard
@@ -103,13 +103,13 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
             className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
               embedType === 'csp'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                : 'bg-card text-muted-foreground border-border hover:border-blue-400'
             }`}
           >
             CSP-Friendly (SRI)
           </button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-muted-foreground mt-2">
           {embedType === 'standard' 
             ? 'Standard embed code for most websites'
             : 'CSP-friendly embed with Subresource Integrity for enhanced security'}
@@ -118,7 +118,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
 
       {/* Version Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-muted-foreground mb-2">
           Version Pinning
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -127,7 +127,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
             className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
               versionType === 'exact'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                : 'bg-card text-muted-foreground border-border hover:border-blue-400'
             }`}
           >
             Exact ({version})
@@ -137,7 +137,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
             className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
               versionType === 'major'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                : 'bg-card text-muted-foreground border-border hover:border-blue-400'
             }`}
           >
             Major (v{version.split('.')[0]})
@@ -147,13 +147,13 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
             className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
               versionType === 'latest'
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                : 'bg-card text-muted-foreground border-border hover:border-blue-400'
             }`}
           >
             Latest
           </button>
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        <div className="text-xs text-muted-foreground mt-2">
           {versionType === 'exact' && '✓ Recommended: Exact version for production stability'}
           {versionType === 'major' && '⚠ Auto-updates to latest minor/patch versions'}
           {versionType === 'latest' && '⚠ Not recommended: Always uses latest version'}
@@ -163,7 +163,7 @@ style-src 'self' ${WIDGET_CDN_BASE_URL};`;
       {/* Embed Code Display */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-muted-foreground">
             Embed Code
           </label>
           <Button

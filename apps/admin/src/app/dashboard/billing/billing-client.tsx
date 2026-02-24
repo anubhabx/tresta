@@ -76,10 +76,10 @@ export function BillingClient() {
         header: 'User',
         render: (record) => (
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="text-sm font-medium text-foreground">
               {record.user.name}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{record.user.email}</div>
+            <div className="text-sm text-muted-foreground">{record.user.email}</div>
           </div>
         ),
       },
@@ -88,10 +88,10 @@ export function BillingClient() {
         header: 'Plan',
         render: (record) => (
           <div>
-            <div className="text-sm text-gray-900 dark:text-gray-100">
+            <div className="text-sm text-foreground">
               {record.plan?.name || record.user.currentPlan}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-muted-foreground">
               {record.plan ? `${record.plan.interval} • ${record.plan.type}` : 'No linked paid plan'}
             </div>
           </div>
@@ -101,7 +101,7 @@ export function BillingClient() {
         key: 'amount',
         header: 'Amount',
         render: (record) => (
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          <span className="text-sm font-medium text-foreground">
             {formatMoney(record.payment.amount, record.payment.currency)}
           </span>
         ),
@@ -128,8 +128,8 @@ export function BillingClient() {
         header: 'Event',
         render: (record) => (
           <div>
-            <div className="text-sm text-gray-900 dark:text-gray-100">{record.payment.eventType}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-foreground">{record.payment.eventType}</div>
+            <div className="text-xs text-muted-foreground">
               {record.payment.eventCreatedAt ? formatDate(record.payment.eventCreatedAt) : 'N/A'}
             </div>
           </div>
@@ -140,11 +140,11 @@ export function BillingClient() {
         header: 'Provider IDs',
         render: (record) => (
           <div className="space-y-1">
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Pay: <span className="text-gray-700 dark:text-gray-300">{record.payment.paymentId || '—'}</span>
+            <div className="text-xs text-muted-foreground">
+              Pay: <span className="text-muted-foreground">{record.payment.paymentId || '—'}</span>
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Inv: <span className="text-gray-700 dark:text-gray-300">{record.payment.invoiceId || '—'}</span>
+            <div className="text-xs text-muted-foreground">
+              Inv: <span className="text-muted-foreground">{record.payment.invoiceId || '—'}</span>
             </div>
           </div>
         ),
@@ -160,8 +160,8 @@ export function BillingClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Billing</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Billing</h1>
+          <p className="mt-2 text-muted-foreground">
             Compact view of subscriptions, plans, and payment activity
           </p>
         </div>
@@ -179,38 +179,38 @@ export function BillingClient() {
 
       {overview && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Active Subs</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Active Subs</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {formatNumber(overview.subscriptions.active)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Past Due</p>
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Past Due</p>
             <p className="mt-1 text-2xl font-bold text-amber-600 dark:text-amber-400">
               {formatNumber(overview.subscriptions.pastDue)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Paused</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Paused</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {formatNumber(overview.subscriptions.paused)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Canceled</p>
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Canceled</p>
             <p className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">
               {formatNumber(overview.subscriptions.canceled)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Success Payments</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Success Payments</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {formatNumber(overview.payments.successCount)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Failed Payments</p>
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Failed Payments</p>
             <p className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">
               {formatNumber(overview.payments.failedCount)}
             </p>
@@ -220,15 +220,15 @@ export function BillingClient() {
 
       {overview && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Gross Collected</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Gross Collected</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {formatMoney(overview.payments.grossCollected, overview.payments.currencyHint)}
             </p>
           </div>
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Collected Last 30 Days</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="rounded-lg bg-card p-4 shadow">
+            <p className="text-sm text-muted-foreground">Collected Last 30 Days</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {formatMoney(
                 overview.payments.grossCollectedLast30Days,
                 overview.payments.currencyHint,
@@ -238,9 +238,9 @@ export function BillingClient() {
         </div>
       )}
 
-      <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+      <div className="rounded-lg bg-card p-4 shadow">
         <div className="flex items-center gap-4">
-          <Filter className="h-5 w-5 text-gray-400" />
+          <Filter className="h-5 w-5 text-muted-foreground" />
           <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
             <TableSearch
               value={search}
@@ -250,7 +250,7 @@ export function BillingClient() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">All statuses</option>
               <option value="captured">Captured</option>
@@ -263,7 +263,7 @@ export function BillingClient() {
             <select
               value={planId}
               onChange={(e) => setPlanId(e.target.value)}
-              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">All plans</option>
               {plans.map((plan) => (
@@ -326,7 +326,7 @@ export function BillingClient() {
             columns={columns}
             emptyMessage="No billing records found"
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             Showing {formatNumber(recordsData.records.length)} records
             {recordsData.hasMore ? ' (more available; refine filters to narrow down)' : ''}.
           </p>

@@ -64,7 +64,7 @@ export function ErrorsClient() {
         header: 'Message',
         render: (errorLog) => (
           <div className="max-w-md">
-            <span className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+            <span className="text-sm text-foreground line-clamp-2">
               {errorLog.message}
             </span>
           </div>
@@ -75,18 +75,18 @@ export function ErrorsClient() {
         header: 'Affected User',
         render: (errorLog) =>
           errorLog.userId ? (
-            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+            <span className="text-xs font-mono text-muted-foreground">
               {errorLog.userId.substring(0, 8)}...
             </span>
           ) : (
-            <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+            <span className="text-xs text-muted-foreground">N/A</span>
           ),
       },
       {
         key: 'timestamp',
         header: 'Timestamp',
         render: (errorLog) => (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {formatDate(errorLog.createdAt)}
           </span>
         ),
@@ -110,10 +110,10 @@ export function ErrorsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Error Logs
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Monitor and investigate application errors
           </p>
         </div>
@@ -124,10 +124,10 @@ export function ErrorsClient() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <Filter className="h-5 w-5 text-gray-400" />
+            <Filter className="h-5 w-5 text-muted-foreground" />
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
               <TableSearch
                 value={search}
@@ -137,7 +137,7 @@ export function ErrorsClient() {
               <select
                 value={severity}
                 onChange={(e) => setSeverity(e.target.value)}
-                className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Severities</option>
                 <option value="LOW">Low</option>
@@ -148,7 +148,7 @@ export function ErrorsClient() {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="TypeError">TypeError</option>
@@ -164,25 +164,25 @@ export function ErrorsClient() {
           {/* Date Range */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 Start Date
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 End Date
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -232,26 +232,26 @@ export function ErrorsClient() {
       {/* Stats */}
       {data && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Errors</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Total Errors</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.errors.length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Critical</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Critical</p>
             <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
               {formatNumber(data.errors.filter((e) => e.severity === 'CRITICAL').length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">High</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">High</p>
             <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 mt-1">
               {formatNumber(data.errors.filter((e) => e.severity === 'HIGH').length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Medium/Low</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Medium/Low</p>
             <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
               {formatNumber(
                 data.errors.filter((e) => e.severity === 'MEDIUM' || e.severity === 'LOW').length

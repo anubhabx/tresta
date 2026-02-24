@@ -10,11 +10,11 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 dark:border-gray-800 dark:bg-gray-900">
+    <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-border bg-background px-6">
       {/* Mobile menu button */}
       <button
         onClick={onMenuClick}
-        className="lg:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="lg:hidden p-2 rounded-md hover:bg-accent"
         aria-label="Open menu"
       >
         <Menu className="h-6 w-6" />

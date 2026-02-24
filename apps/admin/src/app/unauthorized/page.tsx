@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function UnauthorizedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="max-w-md w-full text-center">
         <div className="flex justify-center mb-6">
           <div className="rounded-full bg-red-100 dark:bg-red-900/20 p-6">
@@ -12,11 +12,11 @@ export default function UnauthorizedPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <h1 className="text-3xl font-bold text-foreground mb-4">
           Access Denied
         </h1>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-8">
+        <p className="text-muted-foreground mb-8">
           You don&apos;t have permission to access the admin panel. This area is
           restricted to administrators only.
         </p>

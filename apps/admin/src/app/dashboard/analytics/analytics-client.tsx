@@ -95,10 +95,10 @@ export function AnalyticsClient() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Widget Analytics
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Monitor widget performance, load times, and user engagement
           </p>
         </div>
@@ -136,7 +136,7 @@ export function AnalyticsClient() {
 
   if (!analyticsData) {
     return (
-      <div className="text-center text-gray-600 dark:text-gray-400">
+      <div className="text-center text-muted-foreground">
         No analytics data available
       </div>
     );
@@ -149,10 +149,10 @@ export function AnalyticsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Widget Analytics
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             {analyticsData.widget.projectName} - Last {selectedDays} days
           </p>
         </div>
@@ -160,7 +160,7 @@ export function AnalyticsClient() {
           <select
             value={selectedDays}
             onChange={(e) => setSelectedDays(Number(e.target.value))}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md"
+            className="px-4 py-2 bg-card border border-border rounded-md"
           >
             <option value={7}>Last 7 days</option>
             <option value={30}>Last 30 days</option>
@@ -168,14 +168,14 @@ export function AnalyticsClient() {
           </select>
           <button
             onClick={() => setSelectedWidgetId(null)}
-            className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 bg-card border border-border rounded-md hover:bg-muted transition-colors"
           >
             Change Widget
           </button>
           <button
             onClick={fetchAnalytics}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-md hover:bg-muted transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh

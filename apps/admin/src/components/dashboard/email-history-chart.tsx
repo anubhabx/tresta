@@ -33,18 +33,18 @@ export function EmailHistoryChart({ data }: EmailHistoryChartProps) {
   }));
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="bg-card rounded-lg shadow p-6">
+      <h3 className="text-lg font-semibold text-foreground mb-4">
         7-Day Email History
       </h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={formattedData}>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis
             dataKey="date"
-            className="text-xs text-gray-600 dark:text-gray-400"
+            className="text-xs text-muted-foreground"
           />
-          <YAxis className="text-xs text-gray-600 dark:text-gray-400" />
+          <YAxis className="text-xs text-muted-foreground" />
           <Tooltip
             contentStyle={{
               backgroundColor: 'rgba(255, 255, 255, 0.95)',

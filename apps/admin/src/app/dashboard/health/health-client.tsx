@@ -16,17 +16,17 @@ export function HealthClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Health Checks
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Monitor system infrastructure and service health
           </p>
         </div>
         <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-md hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
@@ -57,7 +57,7 @@ export function HealthClient() {
 
       {/* Individual Health Checks */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2 className="text-xl font-semibold text-foreground">
           Infrastructure Components
         </h2>
 
@@ -109,7 +109,7 @@ export function HealthClient() {
 
       {/* Last Checked */}
       {health?.timestamp && (
-        <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+        <div className="text-sm text-muted-foreground text-center">
           Last checked: {new Date(health.timestamp).toLocaleString()}
         </div>
       )}

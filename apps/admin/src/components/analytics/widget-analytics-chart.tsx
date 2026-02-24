@@ -32,8 +32,8 @@ export function WidgetAnalyticsChart({ data }: WidgetAnalyticsChartProps) {
   }));
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="bg-card rounded-lg shadow p-6">
+      <h2 className="text-xl font-semibold text-foreground mb-4">
         Widget Load Trends
       </h2>
       <ResponsiveContainer width="100%" height={400}>

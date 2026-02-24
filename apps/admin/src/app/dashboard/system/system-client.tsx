@@ -67,10 +67,10 @@ export function SystemClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             System Information
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             View system configuration and service status
           </p>
         </div>
@@ -81,10 +81,10 @@ export function SystemClient() {
       </div>
 
       {/* Environment */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Server className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <Server className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-foreground">
             Environment
           </h2>
         </div>
@@ -96,35 +96,35 @@ export function SystemClient() {
       </div>
 
       {/* Versions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Database className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <Database className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-foreground">
             System Versions
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">API Version</p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-muted rounded-lg p-4">
+            <p className="text-sm text-muted-foreground mb-1">API Version</p>
+            <p className="text-lg font-semibold text-foreground">
               {systemInfo.versions.api}
             </p>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Database</p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-muted rounded-lg p-4">
+            <p className="text-sm text-muted-foreground mb-1">Database</p>
+            <p className="text-lg font-semibold text-foreground">
               {systemInfo.versions.database}
             </p>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Redis</p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-muted rounded-lg p-4">
+            <p className="text-sm text-muted-foreground mb-1">Redis</p>
+            <p className="text-lg font-semibold text-foreground">
               {systemInfo.versions.redis}
             </p>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Node.js</p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="bg-muted rounded-lg p-4">
+            <p className="text-sm text-muted-foreground mb-1">Node.js</p>
+            <p className="text-lg font-semibold text-foreground">
               {systemInfo.versions.node}
             </p>
           </div>
@@ -132,10 +132,10 @@ export function SystemClient() {
       </div>
 
       {/* Feature Flags */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Flag className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <Flag className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-foreground">
             Feature Flags
           </h2>
         </div>
@@ -143,10 +143,10 @@ export function SystemClient() {
           {Object.entries(systemInfo.featureFlags).map(([key, enabled]) => (
             <div
               key={key}
-              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+              className="flex items-center justify-between p-3 bg-muted rounded-lg"
             >
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-foreground">
                   {key}
                 </p>
               </div>
@@ -156,7 +156,7 @@ export function SystemClient() {
             </div>
           ))}
           {Object.keys(systemInfo.featureFlags).length === 0 && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               No feature flags configured
             </p>
           )}
@@ -164,10 +164,10 @@ export function SystemClient() {
       </div>
 
       {/* External Services */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-card rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <Globe className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-foreground">
             External Services
           </h2>
         </div>
@@ -175,16 +175,16 @@ export function SystemClient() {
           {Object.entries(systemInfo.externalServices).map(([name, service]) => (
             <div
               key={name}
-              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+              className="flex items-center justify-between p-3 bg-muted rounded-lg"
             >
               <div className="flex items-center gap-3 flex-1">
                 {serviceStatusIcons[service.status as keyof typeof serviceStatusIcons] || serviceStatusIcons.operational}
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium text-foreground">
                     {name.charAt(0).toUpperCase() + name.slice(1)}
                   </p>
                   {'provider' in service && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       Provider: {service.provider}
                     </p>
                   )}

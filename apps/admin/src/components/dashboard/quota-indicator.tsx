@@ -59,7 +59,7 @@ export function QuotaIndicator({
       )}
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-lg font-semibold text-foreground">
           {title}
         </h3>
         {locked && (
@@ -71,7 +71,7 @@ export function QuotaIndicator({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-700 dark:text-gray-300">
+          <span className="text-muted-foreground">
             {used} / {limit}
           </span>
           <span className={cn('font-bold', classes.text)}>
@@ -80,14 +80,14 @@ export function QuotaIndicator({
         </div>
 
         {/* Progress bar */}
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div className="w-full bg-muted rounded-full h-2.5">
           <div
             className={cn('h-2.5 rounded-full transition-all', classes.bar)}
             style={{ width: `${Math.min(percentage, 100)}%` }}
           />
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-muted-foreground">
           {remaining} remaining
         </p>
       </div>

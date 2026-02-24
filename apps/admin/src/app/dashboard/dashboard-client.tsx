@@ -39,7 +39,7 @@ export function DashboardClient() {
 
   if (!metrics) {
     return (
-      <div className="text-center text-gray-600 dark:text-gray-400">
+      <div className="text-center text-muted-foreground">
         No metrics data available
       </div>
     );
@@ -50,16 +50,16 @@ export function DashboardClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             System metrics and performance overview
           </p>
         </div>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-md hover:bg-muted transition-colors"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh
@@ -92,7 +92,7 @@ export function DashboardClient() {
       <EmailHistoryChart data={metrics.history} />
 
       {/* Last Updated */}
-      <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+      <div className="text-sm text-muted-foreground text-center">
         Last updated: {new Date(metrics.timestamp).toLocaleString()}
       </div>
     </div>

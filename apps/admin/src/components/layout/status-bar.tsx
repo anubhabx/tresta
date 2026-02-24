@@ -45,8 +45,8 @@ export function StatusBar() {
     loading: {
       icon: Loader2,
       text: 'Checking Status...',
-      className: 'text-gray-600 dark:text-gray-400',
-      bgClassName: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700',
+      className: 'text-muted-foreground',
+      bgClassName: 'bg-muted border-border',
     },
   };
 

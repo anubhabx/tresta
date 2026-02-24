@@ -58,7 +58,7 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
-        <div className="text-center text-gray-600 dark:text-gray-400">
+        <div className="text-center text-muted-foreground">
           User not found
         </div>
       </div>
@@ -75,10 +75,10 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-foreground">
               {[user.firstName, user.lastName].filter(Boolean).join(' ') || 'N/A'}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{user.email}</p>
+            <p className="text-muted-foreground mt-1">{user.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -97,19 +97,19 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
       </div>
 
       {/* User Info Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           User Information
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">User ID</p>
-            <p className="text-sm font-mono text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">User ID</p>
+            <p className="text-sm font-mono text-foreground mt-1">
               {user.id}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Plan</p>
+            <p className="text-sm text-muted-foreground">Plan</p>
             <div className="mt-1">
               <Badge variant={user.plan === 'PRO' ? 'default' : 'secondary'}>
                 {user.plan}
@@ -117,20 +117,20 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
             </div>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Projects</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Projects</p>
+            <p className="text-sm text-foreground mt-1">
               {formatNumber(user.stats.projectCount)} projects
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Testimonials</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Testimonials</p>
+            <p className="text-sm text-foreground mt-1">
               {formatNumber(user.stats.testimonialCount)} testimonials
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Last Login</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Last Login</p>
+            <p className="text-sm text-foreground mt-1">
               {user.lastLogin ? (
                 <span title={formatDate(user.lastLogin)}>
                   {formatRelativeTime(user.lastLogin)}
@@ -141,8 +141,8 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Joined</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Joined</p>
+            <p className="text-sm text-foreground mt-1">
               {formatDate(user.createdAt)}
             </p>
           </div>
@@ -150,12 +150,12 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
       </div>
 
       {/* Projects List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Projects ({user.projects.length})
         </h2>
         {user.projects.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No projects yet
           </p>
         ) : (
@@ -163,20 +163,20 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
             {user.projects.map((project) => (
               <div
                 key={project.id}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                className="border border-border rounded-lg p-4 hover:bg-muted cursor-pointer transition-colors"
                 onClick={() => router.push(`/dashboard/projects/${project.id}`)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                    <h3 className="text-lg font-medium text-foreground">
                       {project.name}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       /{project.slug}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Total: {formatNumber(project.testimonialCounts.total)}
                     </p>
                   </div>

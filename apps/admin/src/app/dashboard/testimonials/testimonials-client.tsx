@@ -93,10 +93,10 @@ export function TestimonialsClient() {
         header: 'Content',
         render: (testimonial) => (
           <div className="max-w-md">
-            <div className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+            <div className="text-sm text-foreground line-clamp-2">
               {testimonial.content}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               by {testimonial.authorName}
             </div>
           </div>
@@ -107,10 +107,10 @@ export function TestimonialsClient() {
         header: 'Project',
         render: (testimonial) => (
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <div className="text-sm font-medium text-foreground">
               {testimonial.project.name}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-muted-foreground">
               /{testimonial.project.slug}
             </div>
           </div>
@@ -122,7 +122,7 @@ export function TestimonialsClient() {
         render: (testimonial) => (
           <div className="flex items-center gap-1">
             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-medium text-foreground">
               {testimonial.rating}
             </span>
           </div>
@@ -139,7 +139,7 @@ export function TestimonialsClient() {
         key: 'createdAt',
         header: 'Created',
         render: (testimonial) => (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-muted-foreground">
             {formatDate(testimonial.createdAt)}
           </span>
         ),
@@ -165,10 +165,10 @@ export function TestimonialsClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-foreground">
             Testimonials
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Manage and moderate testimonials across all projects
           </p>
         </div>
@@ -201,9 +201,9 @@ export function TestimonialsClient() {
       )}
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="flex items-center gap-4">
-          <Filter className="h-5 w-5 text-gray-400" />
+          <Filter className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
             <TableSearch
               value={search}
@@ -213,7 +213,7 @@ export function TestimonialsClient() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
               <option value="PENDING">Pending</option>
@@ -224,7 +224,7 @@ export function TestimonialsClient() {
             <select
               value={rating}
               onChange={(e) => setRating(e.target.value)}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Ratings</option>
               <option value="5">5 Stars</option>
@@ -275,30 +275,30 @@ export function TestimonialsClient() {
       {/* Stats */}
       {data && !isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Total</p>
+            <p className="text-2xl font-bold text-foreground mt-1">
               {formatNumber(data.testimonials.length)}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Pending</p>
             <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
               {formatNumber(
                 data.testimonials.filter((t) => t.moderationStatus === 'PENDING').length
               )}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Approved</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Approved</p>
             <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
               {formatNumber(
                 data.testimonials.filter((t) => t.moderationStatus === 'APPROVED').length
               )}
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Flagged</p>
+          <div className="bg-card rounded-lg shadow p-4">
+            <p className="text-sm text-muted-foreground">Flagged</p>
             <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
               {formatNumber(
                 data.testimonials.filter((t) => t.moderationStatus === 'FLAGGED').length

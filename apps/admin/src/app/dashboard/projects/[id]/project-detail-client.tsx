@@ -53,7 +53,7 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
-        <div className="text-center text-gray-600 dark:text-gray-400">
+        <div className="text-center text-muted-foreground">
           Project not found
         </div>
       </div>
@@ -72,10 +72,10 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-foreground">
               {project.name}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">/{project.slug}</p>
+            <p className="text-muted-foreground mt-1">/{project.slug}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -93,25 +93,25 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
       </div>
 
       {/* Project Info Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Project Information
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Project ID</p>
-            <p className="text-sm font-mono text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Project ID</p>
+            <p className="text-sm font-mono text-foreground mt-1">
               {project.id}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
+            <p className="text-sm text-muted-foreground">Type</p>
             <div className="mt-1">
               <Badge variant="outline">{project.projectType}</Badge>
             </div>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Visibility</p>
+            <p className="text-sm text-muted-foreground">Visibility</p>
             <div className="mt-1">
               <Badge
                 variant={project.visibility === 'PUBLIC' ? 'default' : 'secondary'}
@@ -121,31 +121,31 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
             </div>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Owner</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Owner</p>
+            <p className="text-sm text-foreground mt-1">
               {project.owner.name}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {project.owner.email}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Created</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Created</p>
+            <p className="text-sm text-foreground mt-1">
               {formatDate(project.createdAt)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Last Updated</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Last Updated</p>
+            <p className="text-sm text-foreground mt-1">
               {formatDate(project.updatedAt)}
             </p>
           </div>
         </div>
         {project.description && (
           <div className="mt-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Description</p>
-            <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+            <p className="text-sm text-muted-foreground">Description</p>
+            <p className="text-sm text-foreground mt-1">
               {project.description}
             </p>
           </div>
@@ -154,9 +154,9 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
 
       {/* Testimonial Statistics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+        <div className="bg-card rounded-lg shadow p-4">
+          <p className="text-sm text-muted-foreground">Total</p>
+          <p className="text-2xl font-bold text-foreground mt-1">
             {formatNumber(project.stats.testimonialCounts.total)}
           </p>
         </div>
@@ -181,12 +181,12 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
       </div>
 
       {/* Testimonials List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <div className="bg-card rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Recent Testimonials ({project.recentTestimonials.length})
         </h2>
         {project.recentTestimonials.length === 0 ? (
-          <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No testimonials yet
           </p>
         ) : (
@@ -194,12 +194,12 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
             {project.recentTestimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                className="border border-border rounded-lg p-4"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                      <p className="font-medium text-foreground">
                         {testimonial.authorName}
                       </p>
                       <Badge
@@ -214,10 +214,10 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
                         {testimonial.moderationStatus}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                    <p className="text-sm text-muted-foreground mt-2">
                       {testimonial.content}
                     </p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                       <span>Rating: {testimonial.rating}/5</span>
                       <span>{formatDate(testimonial.createdAt)}</span>
                     </div>
@@ -226,7 +226,7 @@ export function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
               </div>
             ))}
             {project.stats.testimonialCounts.total > 10 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Showing {project.recentTestimonials.length} of {project.stats.testimonialCounts.total} testimonials
               </p>
             )}

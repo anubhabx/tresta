@@ -46,35 +46,35 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Severity</p>
+                <p className="text-sm font-medium text-muted-foreground">Severity</p>
                 <Badge variant={severityVariants[error.severity]}>{error.severity}</Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Type</p>
+                <p className="text-sm font-medium text-muted-foreground">Type</p>
                 <Badge variant="outline">{error.type}</Badge>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Timestamp</p>
-                <p className="text-sm text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-medium text-muted-foreground">Timestamp</p>
+                <p className="text-sm text-foreground">
                   {formatDate(error.createdAt)}
                 </p>
               </div>
               {error.userId && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Affected User
                   </p>
-                  <p className="text-sm font-mono text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-mono text-foreground">
                     {error.userId}
                   </p>
                 </div>
               )}
               {error.requestPath && (
                 <div className="col-span-2">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Request Path
                   </p>
-                  <p className="text-sm font-mono text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-mono text-foreground">
                     {error.requestPath}
                   </p>
                 </div>
@@ -83,16 +83,16 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
 
             {/* Request ID */}
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <p className="text-sm font-medium text-muted-foreground mb-2">
                 Request ID
               </p>
-              <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                <code className="text-sm font-mono text-gray-900 dark:text-gray-100 flex-1">
+              <div className="flex items-center gap-2 bg-muted rounded-lg p-3">
+                <code className="text-sm font-mono text-foreground flex-1">
                   {error.requestId}
                 </code>
                 <button
                   onClick={() => copyToClipboard(error.requestId, 'Request ID')}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -102,16 +102,16 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
             {/* Sentry Event ID */}
             {error.sentryId && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-sm font-medium text-muted-foreground mb-2">
                   Sentry Event ID
                 </p>
-                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                  <code className="text-sm font-mono text-gray-900 dark:text-gray-100 flex-1">
+                <div className="flex items-center gap-2 bg-muted rounded-lg p-3">
+                  <code className="text-sm font-mono text-foreground flex-1">
                     {error.sentryId}
                   </code>
                   <button
                     onClick={() => copyToClipboard(error.sentryId!, 'Sentry Event ID')}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <Copy className="h-4 w-4" />
                   </button>
@@ -129,7 +129,7 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
 
             {/* Error Message */}
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <p className="text-sm font-medium text-muted-foreground mb-2">
                 Error Message
               </p>
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -139,11 +139,11 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
 
             {/* Stacktrace */}
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <p className="text-sm font-medium text-muted-foreground mb-2">
                 Stacktrace
               </p>
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
-                <pre className="text-xs text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+              <div className="bg-muted rounded-lg p-4 overflow-x-auto max-h-96">
+                <pre className="text-xs text-foreground whitespace-pre-wrap">
                   {error.stacktrace}
                 </pre>
               </div>
@@ -152,11 +152,11 @@ export function ErrorDetailModal({ open, onOpenChange, error }: ErrorDetailModal
             {/* Metadata */}
             {error.metadata && Object.keys(error.metadata).length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p className="text-sm font-medium text-muted-foreground mb-2">
                   Additional Context
                 </p>
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                  <pre className="text-xs text-gray-900 dark:text-gray-100">
+                <div className="bg-muted rounded-lg p-4 overflow-x-auto">
+                  <pre className="text-xs text-foreground">
                     {JSON.stringify(error.metadata, null, 2)}
                   </pre>
                 </div>

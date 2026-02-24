@@ -72,10 +72,10 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-bold text-foreground">
               Widgets
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-muted-foreground mt-1">
               {project?.name || 'Project'}
             </p>
           </div>
@@ -88,15 +88,15 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
 
       {/* Widgets List */}
       {!widgets || widgets.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+        <div className="bg-card rounded-lg shadow p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Code className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               No widgets yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-muted-foreground mb-6">
               Create your first widget to start embedding testimonials on your website
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -110,14 +110,14 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
           {widgets.map((widget) => (
             <div
               key={widget.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+              className="bg-card rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {widget.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {widget.config.layout || 'grid'} layout
                   </p>
                 </div>
@@ -141,37 +141,37 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Theme:</span>
-                  <span className="text-gray-900 dark:text-gray-100">
+                  <span className="text-muted-foreground">Theme:</span>
+                  <span className="text-foreground">
                     {widget.config.theme || 'light'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Max Items:</span>
-                  <span className="text-gray-900 dark:text-gray-100">
+                  <span className="text-muted-foreground">Max Items:</span>
+                  <span className="text-foreground">
                     {widget.config.maxTestimonials || 10}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Created:</span>
-                  <span className="text-gray-900 dark:text-gray-100">
+                  <span className="text-muted-foreground">Created:</span>
+                  <span className="text-foreground">
                     {formatDate(widget.createdAt)}
                   </span>
                 </div>
               </div>
 
               {widget.stats && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-4 pt-4 border-t border-border">
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Impressions</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <p className="text-muted-foreground">Impressions</p>
+                      <p className="text-lg font-semibold text-foreground">
                         {widget.stats.impressions || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Clicks</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <p className="text-muted-foreground">Clicks</p>
+                      <p className="text-lg font-semibold text-foreground">
                         {widget.stats.clicks || 0}
                       </p>
                     </div>
@@ -195,9 +195,9 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
       {/* Create Widget Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="bg-card rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-2xl font-bold text-foreground">
                 Create New Widget
               </h2>
             </div>
@@ -207,7 +207,7 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                 {/* Configuration Panel */}
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">
                       Widget Name
                     </label>
                     <input
@@ -215,19 +215,19 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                       value={widgetName}
                       onChange={(e) => setWidgetName(e.target.value)}
                       placeholder="e.g., Homepage Widget"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      className="w-full px-4 py-2 border border-border rounded-lg bg-card text-foreground"
                     />
                   </div>
 
                   {/* Tabs */}
-                  <div className="border-b border-gray-200 dark:border-gray-700">
+                  <div className="border-b border-border">
                     <div className="flex gap-4">
                       <button
                         onClick={() => setActiveTab('configure')}
                         className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
                           activeTab === 'configure'
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         Configure
@@ -236,8 +236,8 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                         onClick={() => setActiveTab('preview')}
                         className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
                           activeTab === 'preview'
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         Preview
@@ -246,8 +246,8 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                         onClick={() => setActiveTab('embed')}
                         className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
                           activeTab === 'embed'
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         Embed Code
@@ -267,7 +267,7 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                 {/* Preview Panel */}
                 {(activeTab === 'configure' || activeTab === 'preview') && (
                   <div className="lg:sticky lg:top-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">
                       Live Preview
                     </h3>
                     <WidgetPreview widgetId="preview" config={widgetConfig} />
@@ -276,7 +276,7 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div className="p-6 border-t border-border flex justify-end gap-3">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -309,9 +309,9 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
       {selectedWidget && (
         <Dialog open={!!selectedWidget} onOpenChange={() => setSelectedWidget(null)}>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="bg-card rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="p-6 border-b border-border">
+                <h2 className="text-2xl font-bold text-foreground">
                   Widget Embed Code
                 </h2>
               </div>
@@ -320,7 +320,7 @@ export function WidgetsClient({ projectId }: WidgetsClientProps) {
                 <EmbedCodeGenerator widgetId={selectedWidget} />
               </div>
 
-              <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+              <div className="p-6 border-t border-border flex justify-end">
                 <Button onClick={() => setSelectedWidget(null)}>
                   Close
                 </Button>

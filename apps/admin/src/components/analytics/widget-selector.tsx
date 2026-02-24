@@ -102,8 +102,8 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
 
   if (projects.length === 0) {
     return (
-      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
-        <p className="text-gray-600 dark:text-gray-400">
+      <div className="bg-muted border border-border rounded-lg p-8 text-center">
+        <p className="text-muted-foreground">
           No widgets found. Create a widget to view analytics.
         </p>
       </div>
@@ -111,14 +111,14 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div className="bg-card rounded-lg shadow p-6">
+      <h2 className="text-xl font-semibold text-foreground mb-4">
         Select a Widget
       </h2>
       <div className="space-y-4">
         {projects.map((project) => (
-          <div key={project.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <div key={project.id} className="border-b border-border pb-4 last:border-0">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               {project.name}
             </h3>
             <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
@@ -126,12 +126,12 @@ export function WidgetSelector({ onSelect }: WidgetSelectorProps) {
                 <button
                   key={widget.id}
                   onClick={() => onSelect(widget.id)}
-                  className="text-left p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="text-left p-4 bg-muted rounded-lg hover:bg-accent transition-colors"
                 >
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium text-foreground">
                     Widget {widget.id.slice(0, 8)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Created {new Date(widget.createdAt).toLocaleDateString()}
                   </p>
                 </button>

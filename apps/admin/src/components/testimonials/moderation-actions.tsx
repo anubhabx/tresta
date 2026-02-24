@@ -130,16 +130,16 @@ export function ModerationActions({
           <DialogBody>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-muted-foreground">
                   Author
                 </p>
-                <p className="text-sm text-gray-900 dark:text-gray-100">{authorName}</p>
+                <p className="text-sm text-foreground">{authorName}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-medium text-muted-foreground">
                   Content
                 </p>
-                <p className="text-sm text-gray-900 dark:text-gray-100 line-clamp-3">
+                <p className="text-sm text-foreground line-clamp-3">
                   {testimonialContent}
                 </p>
               </div>

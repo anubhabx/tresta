@@ -32,8 +32,8 @@ export function DataTable<T extends { id: string }>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
-        <p className="text-gray-600 dark:text-gray-400">{emptyMessage}</p>
+      <div className="bg-card rounded-lg shadow p-12 text-center">
+        <p className="text-muted-foreground">{emptyMessage}</p>
       </div>
     );
   }
@@ -69,10 +69,10 @@ export function DataTable<T extends { id: string }>({
   const someSelected = data.some(item => selectedIds.has(item.id)) && !allSelected;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div className="bg-card rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-900">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
               {selectable && (
                 <th className="px-6 py-3 text-left">
@@ -83,21 +83,21 @@ export function DataTable<T extends { id: string }>({
                       if (input) input.indeterminate = someSelected;
                     }}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
                   />
                 </th>
               )}
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${column.className || ''}`}
+                  className={`px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider ${column.className || ''}`}
                 >
                   {column.header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-card divide-y divide-border">
             {data.map((item) => {
               const isSelected = selectedIds.has(item.id);
               const isDisabled = !!(maxSelection && !isSelected && selectedIds.size >= maxSelection);
@@ -106,7 +106,7 @@ export function DataTable<T extends { id: string }>({
                 <tr
                   key={item.id}
                   onClick={() => !selectable && onRowClick?.(item)}
-                  className={onRowClick && !selectable ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' : ''}
+                  className={onRowClick && !selectable ? 'hover:bg-muted cursor-pointer' : ''}
                 >
                   {selectable && (
                     <td className="px-6 py-4">
@@ -116,7 +116,7 @@ export function DataTable<T extends { id: string }>({
                         disabled={isDisabled}
                         onChange={(e) => handleSelectRow(item.id, e.target.checked)}
                         onClick={(e) => e.stopPropagation()}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                        className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500 disabled:opacity-50"
                       />
                     </td>
                   )}

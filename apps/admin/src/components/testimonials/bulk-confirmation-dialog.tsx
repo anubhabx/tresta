@@ -123,37 +123,37 @@ export function BulkConfirmationDialog({
                 </p>
               </div>
 
-              <div className="max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
+              <div className="max-h-96 overflow-y-auto border border-border rounded-lg">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted sticky top-0">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                         Author
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                         Project
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                         Content
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                         Current
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                      <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                         New
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-card divide-y divide-border">
                     {preview.preview?.map((item: BulkUpdatePreview) => (
                       <tr key={item.id}>
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-4 py-3 text-sm text-foreground">
                           {item.authorName}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-4 py-3 text-sm text-foreground">
                           {item.projectName}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">
+                        <td className="px-4 py-3 text-sm text-foreground max-w-xs truncate">
                           {item.content}
                         </td>
                         <td className="px-4 py-3">
@@ -169,7 +169,7 @@ export function BulkConfirmationDialog({
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               Failed to load preview
             </div>
           )}
