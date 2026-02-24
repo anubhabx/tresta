@@ -12,18 +12,12 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId } = await auth();
 
-  if (!userId) return NextResponse.next()
-
-  const publicMetadata = (await (await clerkClient()).users.getUser(userId)).publicMetadata
-
-  // console.log({ publicMetadata })
-
-  // Allow public routes
+  // Allow public routes (sign-in, sign-up, unauthorized) without authentication
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
 
-  // Require authentication for all other routes
+  // Redirect unauthenticated users to sign-in for all protected routes
   if (!userId) {
     const signInUrl = new URL('/sign-in', req.url);
     signInUrl.searchParams.set('redirect_url', req.url);
@@ -31,6 +25,7 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Check for admin role in publicMetadata
+  const publicMetadata = (await (await clerkClient()).users.getUser(userId)).publicMetadata;
   const role = publicMetadata.role as string | undefined;
 
   if (role !== 'admin') {
