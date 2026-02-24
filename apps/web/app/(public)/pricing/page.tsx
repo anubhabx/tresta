@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { PricingTable } from "@/components/billing/pricing-table";
+import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Gift, Rocket, Shield, Sparkles } from "lucide-react";
@@ -83,7 +84,7 @@ const planJustifications = [
 
 export default function PricingPage() {
   return (
-    <div className="container mx-auto py-12 px-4 pt-24">
+    <div className="mx-auto w-full max-w-6xl py-12 px-4 pt-24 md:px-8">
       {/* Structured Data */}
       <script
         type="application/ld+json"
@@ -91,15 +92,11 @@ export default function PricingPage() {
       />
 
       {/* Header */}
-      <div className="text-center mb-16 max-w-3xl mx-auto">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
-          Simple, Transparent Pricing
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Start collecting testimonials for free. Upgrade when you need more
-          power. No hidden fees. Cancel anytime.
-        </p>
-      </div>
+      <PageHeader
+        className="mx-auto mb-16 max-w-3xl text-center"
+        title="Simple, Transparent Pricing"
+        description="Start collecting testimonials for free. Upgrade when you need more power. No hidden fees. Cancel anytime."
+      />
 
       {/* Pricing Cards */}
       <Suspense>

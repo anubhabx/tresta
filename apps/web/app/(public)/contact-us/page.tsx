@@ -1,6 +1,5 @@
-"use client";
-
 import { PageWrapper } from "@/components/landing/page-wrapper";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@workspace/ui/components/button";
 import { Mail, MessageSquare, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
@@ -15,19 +14,15 @@ import {
 export default function ContactUsPage() {
   return (
     <PageWrapper className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 md:py-24">
-      <div className="container max-w-5xl px-4 md:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 md:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Left Column: Content */}
           <div className="flex flex-col items-start space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-foreground/50 via-foreground to-foreground/50">
-                Get in touch
-              </h1>
-              <p className="max-w-[600px] text-zinc-500 md:text-xl dark:text-zinc-400">
-                Have a question or feedback? We&apos;d love to hear from you.
-                Our team is ready to help you get the most out of Tresta.
-              </p>
-            </div>
+            <PageHeader
+              title="Get in touch"
+              description="Have a question or feedback? We&apos;d love to hear from you. Our team is ready to help you get the most out of Tresta."
+              className="max-w-[620px]"
+            />
 
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-primary" />
