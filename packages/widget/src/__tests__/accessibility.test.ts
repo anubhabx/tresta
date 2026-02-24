@@ -114,7 +114,7 @@ describe('Accessibility Features', () => {
     it('should add role="region" to widget root', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false, // Disable Shadow DOM for testing
       };
 
@@ -129,7 +129,7 @@ describe('Accessibility Features', () => {
     it('should add lang attribute when provided', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         lang: 'es',
         useShadowDOM: false,
       };
@@ -146,7 +146,7 @@ describe('Accessibility Features', () => {
       // This is tested manually and verified to work correctly
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -163,7 +163,7 @@ describe('Accessibility Features', () => {
     it('should add proper ARIA attributes to carousel', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -179,7 +179,7 @@ describe('Accessibility Features', () => {
     it('should add proper ARIA attributes to carousel slides', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -199,7 +199,7 @@ describe('Accessibility Features', () => {
     it('should add proper ARIA attributes to navigation buttons', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -218,7 +218,7 @@ describe('Accessibility Features', () => {
     it('should add proper ARIA attributes to dot indicators', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -239,7 +239,7 @@ describe('Accessibility Features', () => {
     it('should add role="img" to star ratings with aria-label', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -258,7 +258,7 @@ describe('Accessibility Features', () => {
     it('should add role="img" to verification badges', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -279,7 +279,7 @@ describe('Accessibility Features', () => {
     it('should use <article> for testimonial cards', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -293,7 +293,7 @@ describe('Accessibility Features', () => {
     it('should use <button> elements for interactive controls', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -312,7 +312,7 @@ describe('Accessibility Features', () => {
     it('should use <time> element for dates', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -332,7 +332,7 @@ describe('Accessibility Features', () => {
     it('should have visible focus indicators on interactive elements', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -352,7 +352,7 @@ describe('Accessibility Features', () => {
     it('should set tabindex correctly for roving tabindex pattern', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -377,7 +377,7 @@ describe('Accessibility Features', () => {
     it('should add aria-hidden="true" to decorative SVGs', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -395,7 +395,7 @@ describe('Accessibility Features', () => {
     it('should add focusable="false" to all SVGs', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -420,7 +420,7 @@ describe('Accessibility Features', () => {
 
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -460,7 +460,7 @@ describe('Accessibility Features', () => {
 
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -477,7 +477,7 @@ describe('Accessibility Features', () => {
     it('should have screen-reader-only instructions for carousel', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -492,7 +492,7 @@ describe('Accessibility Features', () => {
     it('should have screen-reader-only class with proper CSS', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -537,7 +537,7 @@ describe('Accessibility Features', () => {
 
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
@@ -581,7 +581,7 @@ describe('Accessibility Features', () => {
 
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
-        apiKey: 'tresta_live_iuY3-VSa9JUHscy36qITKofks3LxuTVG',
+        apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
         useShadowDOM: false,
       };
 
