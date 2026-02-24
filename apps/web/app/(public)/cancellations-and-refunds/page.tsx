@@ -3,6 +3,14 @@ import {
   LegalLayout,
   LegalSection,
 } from "@/components/legal-layout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cancellations & Refunds - Tresta",
+  description:
+    "Tresta cancellation and refund policy. Learn about subscription cancellations, refund eligibility, and processing timelines.",
+  alternates: { canonical: "/cancellations-and-refunds" },
+};
 
 const toc = [
   { id: "cancellation-policy", title: "Cancellation Policy", level: 2 as const },

@@ -8,6 +8,7 @@ export const metadata = {
   title: "Pricing - Tresta",
   description:
     "Simple, transparent pricing for your testimonial collection needs. Start free, upgrade when ready.",
+  alternates: { canonical: "/pricing" },
 };
 
 const planJustifications = [

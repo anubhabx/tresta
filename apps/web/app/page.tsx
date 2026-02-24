@@ -9,6 +9,11 @@ import { FAQ } from "@/components/landing/faq";
 import { CTA } from "@/components/landing/cta";
 import { SiteFooter } from "@/components/site-footer";
 import { PageWrapper } from "@/components/landing/page-wrapper";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Page() {
   return (

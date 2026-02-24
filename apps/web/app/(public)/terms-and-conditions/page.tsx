@@ -3,6 +3,14 @@ import {
   LegalLayout,
   LegalSection,
 } from "@/components/legal-layout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions - Tresta",
+  description:
+    "Read the terms and conditions governing your use of Tresta, including account registration, payments, and liability.",
+  alternates: { canonical: "/terms-and-conditions" },
+};
 
 const toc = [
   { id: "introduction", title: "Introduction", level: 2 as const },

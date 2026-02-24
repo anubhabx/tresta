@@ -1,5 +1,13 @@
 import Link from "next/link";
 import { LegalLayout, LegalSection } from "@/components/legal-layout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy - Tresta",
+  description:
+    "Learn how Tresta collects, uses, and protects your personal data. Your privacy matters to us.",
+  alternates: { canonical: "/privacy-policy" },
+};
 
 const toc = [
   { id: "introduction", title: "Introduction", level: 2 as const },
