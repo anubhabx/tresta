@@ -2,8 +2,16 @@
 
 import { useMotionValue, motion, useMotionTemplate } from "motion/react";
 import React, { MouseEvent as ReactMouseEvent, useState } from "react";
-import { CanvasRevealEffect } from "./canvas-reveal-effect";
+import dynamic from "next/dynamic";
 import { cn } from "@workspace/ui/lib/utils";
+
+const CanvasRevealEffect = dynamic(
+  () =>
+    import("./canvas-reveal-effect").then((mod) => ({
+      default: mod.CanvasRevealEffect,
+    })),
+  { ssr: false }
+);
 
 /**
  * Spotlight color presets — themed variants for different feature card moods.
