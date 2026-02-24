@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { ArrowRight, Star, Code2 } from "lucide-react";
 import { CodeBlock } from "@workspace/ui/components/code-block";
@@ -264,3 +264,4 @@ export function Hero() {
     </section>
   );
 }
+

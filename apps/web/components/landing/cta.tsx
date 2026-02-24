@@ -3,7 +3,7 @@
 import { Button } from "@workspace/ui/components/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 export function CTA() {
   return (
@@ -44,3 +44,4 @@ export function CTA() {
     </section>
   );
 }
+

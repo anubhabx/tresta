@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Star, Check, X } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -229,3 +229,4 @@ export function PainSection() {
     </section>
   );
 }
+

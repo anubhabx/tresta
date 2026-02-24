@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Code2, MessageSquareQuote, Shield, Zap } from "lucide-react";
 
 /**
@@ -58,3 +58,4 @@ export function SocialProof() {
     </section>
   );
 }
+

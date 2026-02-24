@@ -19,7 +19,7 @@ import {
   Check,
 } from "lucide-react";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import type {
   ApiResponse,
   CreateTestimonialPayload,
@@ -800,3 +800,4 @@ export default function TestimonialSubmissionPage({
     </GoogleOAuthProvider>
   );
 }
+

@@ -1,7 +1,7 @@
 "use client";
 
 import { SectionHeader } from "./section-header";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Link2, CheckCircle, Code } from "lucide-react";
 
 const steps = [
@@ -67,3 +67,4 @@ export function HowItWorks() {
     </section>
   );
 }
+

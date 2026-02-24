@@ -2,7 +2,7 @@
 
 import { SectionHeader } from "./section-header";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Star, Zap } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -137,3 +137,4 @@ export function Testimonials() {
     </section>
   );
 }
+

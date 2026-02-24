@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Button } from "@workspace/ui/components/button";
 import { CodeBlock } from "@workspace/ui/components/code-block";
 import { Copy, Check, ChevronDown } from "lucide-react";
@@ -216,3 +216,4 @@ export function IntegrationSection() {
     </section>
   );
 }
+
