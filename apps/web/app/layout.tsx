@@ -68,9 +68,17 @@ export default function RootLayout({
         <body
           className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
         >
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 rounded-md bg-background px-4 py-2 text-foreground ring-2 ring-primary"
+          >
+            Skip to content
+          </a>
           <Providers>
             <div className="flex min-h-svh flex-col">
-              <main className="flex-1">{children}</main>
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
             </div>
           </Providers>
         </body>

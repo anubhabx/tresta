@@ -27,7 +27,15 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${fontSans.variable} font-sans antialiased`}>
-          <Providers>{children}</Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 rounded-md bg-background px-4 py-2 text-foreground ring-2 ring-primary"
+          >
+            Skip to content
+          </a>
+          <Providers>
+            <main id="main-content">{children}</main>
+          </Providers>
         </body>
       </html>
     </ClerkProvider>
