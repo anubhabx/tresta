@@ -6,14 +6,14 @@ import {
     getSubscriptionDetails,
     cancelSubscription,
 } from "../controllers/payments.controller.js";
-import { attachUser } from "../middleware/auth.middleware.js";
+import { attachUser, requireAuth } from "../middleware/auth.middleware.js";
 
 const paymentsRouter: Router = Router();
 
 // Protected routes (require login)
-paymentsRouter.post("/subscription", attachUser, createSubscription);
-paymentsRouter.get("/subscription", attachUser, getSubscriptionDetails);
-paymentsRouter.post("/verify", attachUser, verifyPayment);
-paymentsRouter.post("/cancel", attachUser, cancelSubscription);
+paymentsRouter.post("/subscription", attachUser, requireAuth, createSubscription);
+paymentsRouter.get("/subscription", attachUser, requireAuth, getSubscriptionDetails);
+paymentsRouter.post("/verify", attachUser, requireAuth, verifyPayment);
+paymentsRouter.post("/cancel", attachUser, requireAuth, cancelSubscription);
 
 export { paymentsRouter };

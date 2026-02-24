@@ -1,5 +1,5 @@
 import { Router, type Router as RouterType } from 'express';
-import { attachUser } from '../middleware/auth.middleware.js';
+import { attachUser, requireAuth } from '../middleware/auth.middleware.js';
 import {
   listAccountApiKeysHandler,
   createAccountApiKeyHandler,
@@ -9,6 +9,7 @@ import {
 const router: RouterType = Router();
 
 router.use(attachUser);
+router.use(requireAuth);
 
 router.get('/api-keys', listAccountApiKeysHandler);
 router.post('/api-keys', createAccountApiKeyHandler);

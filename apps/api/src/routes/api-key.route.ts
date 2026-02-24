@@ -10,12 +10,13 @@ import {
   getApiKeyHandler,
   revokeApiKeyHandler 
 } from '../controllers/api-key.controller.js';
-import { attachUser } from '../middleware/auth.middleware.js';
+import { attachUser, requireAuth } from '../middleware/auth.middleware.js';
 
 const router: RouterType = Router();
 
 // All API key routes require authentication
 router.use(attachUser);
+router.use(requireAuth);
 
 /**
  * Create a new API key for a project

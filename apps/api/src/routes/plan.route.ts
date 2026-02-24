@@ -7,7 +7,7 @@ import {
     deletePlan,
 } from "../controllers/plan.controller.js";
 import { requireAdmin } from "../middleware/admin.middleware.js";
-import { attachUser } from "../middleware/auth.middleware.js";
+import { attachUser, requireAuth } from "../middleware/auth.middleware.js";
 
 
 const planRouter: Router = Router();
@@ -17,8 +17,8 @@ const planRouter: Router = Router();
 planRouter.get("/", listPlans);
 
 // Admin routes
-planRouter.post("/", attachUser, requireAdmin, createPlan);
-planRouter.patch("/:id", attachUser, requireAdmin, updatePlan);
-planRouter.delete("/:id", attachUser, requireAdmin, deletePlan);
+planRouter.post("/", attachUser, requireAuth, requireAdmin, createPlan);
+planRouter.patch("/:id", attachUser, requireAuth, requireAdmin, updatePlan);
+planRouter.delete("/:id", attachUser, requireAuth, requireAdmin, deletePlan);
 
 export { planRouter };

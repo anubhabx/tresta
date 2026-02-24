@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import { webhookRouter } from './routes/webhook.route.js';
 import { publicRouter } from './routes/public.route.js';
 import { clerkMiddleware } from "@clerk/express";
-import { attachUser } from './middleware/auth.middleware.js';
+import { attachUser, requireAuth } from './middleware/auth.middleware.js';
 import {
   errorHandler,
   notFoundHandler,
@@ -108,21 +108,21 @@ app.use("/api/webhook", webhookRouter);
 app.use("/api/public", publicRouter);
 
 // Protected routes (use global restrictive CORS)
-app.use("/api/projects", attachUser, projectRouter);
+app.use("/api/projects", attachUser, requireAuth, projectRouter);
 app.use("/api/projects", apiKeyRouter); // API key routes (has its own auth middleware)
 app.use("/api/account", accountApiKeyRouter);
-app.use("/api/media", attachUser, mediaRouter);
+app.use("/api/media", attachUser, requireAuth, mediaRouter);
 app.use("/api/widgets", widgetRouter);
 app.use("/api/widget-analytics", widgetAnalyticsRouter);
-app.use("/api/notifications", attachUser, notificationsRouter);
-app.use("/api/ably", attachUser, ablyRouter);
+app.use("/api/notifications", attachUser, requireAuth, notificationsRouter);
+app.use("/api/ably", attachUser, requireAuth, ablyRouter);
 app.use("/api/plans", planRouter);
 app.use("/api/payments", paymentsRouter);
 app.use("/api/privacy", privacyRouter);
 
 // Test routes (remove in production)
 if (process.env.NODE_ENV !== "production") {
-  app.use("/api/test", attachUser, testRouter);
+  app.use("/api/test", attachUser, requireAuth, testRouter);
 }
 
 // 404 handler for unmatched routes

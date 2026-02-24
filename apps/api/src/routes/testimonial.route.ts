@@ -9,7 +9,7 @@ import {
   updateModerationStatus,
 } from '../controllers/testimonial.controller.js';
 import { Router } from "express";
-import { attachUser } from '../middleware/auth.middleware.js';
+import { attachUser, requireAuth } from '../middleware/auth.middleware.js';
 
 const router: Router = Router({ mergeParams: true });
 
@@ -17,14 +17,14 @@ const router: Router = Router({ mergeParams: true });
 router.post("/", createTestimonial);
 
 // Protected routes - require authentication
-router.get("/", attachUser, listTestimonials);
-router.get("/:id", attachUser, getTestimonialById);
-router.put("/:id", attachUser, updateTestimonial);
-router.delete("/:id", attachUser, deleteTestimonial);
+router.get("/", attachUser, requireAuth, listTestimonials);
+router.get("/:id", attachUser, requireAuth, getTestimonialById);
+router.put("/:id", attachUser, requireAuth, updateTestimonial);
+router.delete("/:id", attachUser, requireAuth, deleteTestimonial);
 
 // Moderation routes
-router.get("/moderation/queue", attachUser, getModerationQueue);
-router.post("/moderation/bulk", attachUser, bulkModerationAction);
-router.put("/:id/moderation", attachUser, updateModerationStatus);
+router.get("/moderation/queue", attachUser, requireAuth, getModerationQueue);
+router.post("/moderation/bulk", attachUser, requireAuth, bulkModerationAction);
+router.put("/:id/moderation", attachUser, requireAuth, updateModerationStatus);
 
 export { router as testimonialRouter };

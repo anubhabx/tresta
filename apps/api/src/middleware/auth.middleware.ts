@@ -25,3 +25,19 @@ export const attachUser = async (
     return next(new UnauthorizedError("Unauthorized"));
   }
 };
+
+/**
+ * Middleware that rejects unauthenticated requests with 401.
+ * Use after `attachUser` on protected routes. Public/webhook routes
+ * should NOT use this middleware.
+ */
+export const requireAuth = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user) {
+    return next(new UnauthorizedError("Authentication required"));
+  }
+  return next();
+};

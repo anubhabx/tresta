@@ -6,7 +6,7 @@ import {
   getPerformanceAlerts,
   resolvePerformanceAlert,
 } from '../controllers/widget-analytics.controller.js';
-import { attachUser } from '../middleware/auth.middleware.js';
+import { attachUser, requireAuth } from '../middleware/auth.middleware.js';
 import { createRateLimiter } from '../middleware/rate-limiter.js';
 
 const router: Router = Router();
@@ -27,6 +27,7 @@ router.post(
 router.get(
   "/:widgetId",
   attachUser,
+  requireAuth,
   analyticsLimiter,
   getWidgetAnalytics
 );
@@ -34,6 +35,7 @@ router.get(
 router.get(
   "/:widgetId/realtime",
   attachUser,
+  requireAuth,
   analyticsLimiter,
   getRealtimeAnalytics
 );
@@ -41,6 +43,7 @@ router.get(
 router.get(
   "/:widgetId/alerts",
   attachUser,
+  requireAuth,
   analyticsLimiter,
   getPerformanceAlerts
 );
@@ -48,6 +51,7 @@ router.get(
 router.patch(
   "/alerts/:alertId/resolve",
   attachUser,
+  requireAuth,
   analyticsLimiter,
   resolvePerformanceAlert
 );

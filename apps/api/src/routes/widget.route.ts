@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { attachUser } from "../middleware/auth.middleware.js";
+import { attachUser, requireAuth } from "../middleware/auth.middleware.js";
 import {
   validateApiKeyMiddleware,
   requirePermission,
@@ -32,18 +32,19 @@ router.get(
 router.post(
   "/",
   attachUser,
+  requireAuth,
   checkUsageLimit("widgets"),
   auditLog,
   createWidget,
 );
 
 // GET /api/widgets/project/:slug - List all widgets for a project
-router.get("/project/:slug", attachUser, listWidgets);
+router.get("/project/:slug", attachUser, requireAuth, listWidgets);
 
 // PUT /api/widgets/:widgetId - Update widget configuration
-router.put("/:widgetId", attachUser, auditLog, updateWidget);
+router.put("/:widgetId", attachUser, requireAuth, auditLog, updateWidget);
 
 // DELETE /api/widgets/:widgetId - Delete a widget
-router.delete("/:widgetId", attachUser, auditLog, deleteWidget);
+router.delete("/:widgetId", attachUser, requireAuth, auditLog, deleteWidget);
 
 export { router as widgetRouter };
