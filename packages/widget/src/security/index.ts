@@ -17,3 +17,5 @@ export {
   type CSPViolation,
   type CSPValidationResult
 } from './csp-validator.js';
+
+export { sanitizeCss } from './css-sanitizer.js';

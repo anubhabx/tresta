@@ -14,6 +14,7 @@ import {
   WallOfLoveLayout,
   MarqueeLayout,
 } from "./layouts";
+import { sanitizeCss } from "@/security/css-sanitizer";
 
 interface WidgetRootProps {
   data: WidgetData;
@@ -63,9 +64,9 @@ export function WidgetRoot({ data }: WidgetRootProps) {
         </div>
       )}
 
-      {/* Custom CSS Injection */}
+      {/* Custom CSS Injection — sanitized to strip url(), @import, expression(), etc. */}
       {display.customCss && (
-        <style dangerouslySetInnerHTML={{ __html: display.customCss }} />
+        <style dangerouslySetInnerHTML={{ __html: sanitizeCss(display.customCss) }} />
       )}
     </div>
   );
