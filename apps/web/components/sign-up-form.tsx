@@ -82,8 +82,6 @@ const SignUpForm = () => {
   });
 
   const onSubmitSignUp = async (data: z.infer<typeof signUpFormSchema>) => {
-    console.log("Sign Up Data:", data);
-
     if (data.password.length < 8) {
       toast.error("Password must be at least 8 characters long.");
       return;
@@ -130,8 +128,6 @@ const SignUpForm = () => {
   };
 
   const onSubmitCode = async (data: z.infer<typeof codeFormSchema>) => {
-    console.log("Code Data:", data);
-
     if (codeForm.formState.errors.code) {
       toast.error(codeForm.formState.errors.code.message);
       return;
