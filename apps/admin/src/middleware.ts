@@ -2,6 +2,10 @@ import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// In-memory cache for Clerk user metadata (avoids API call on every request)
+const userRoleCache = new Map<string, { role: string | undefined; expiresAt: number }>();
+const CACHE_TTL_MS = 60_000; // 60 seconds
+
 // Define public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
@@ -24,9 +28,25 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return NextResponse.redirect(signInUrl);
   }
 
-  // Check for admin role in publicMetadata
-  const publicMetadata = (await (await clerkClient()).users.getUser(userId)).publicMetadata;
-  const role = publicMetadata.role as string | undefined;
+  // Check for admin role in publicMetadata (cached for 60s)
+  const now = Date.now();
+  let role: string | undefined;
+  const cached = userRoleCache.get(userId);
+
+  if (cached && cached.expiresAt > now) {
+    role = cached.role;
+  } else {
+    const publicMetadata = (await (await clerkClient()).users.getUser(userId)).publicMetadata;
+    role = publicMetadata.role as string | undefined;
+    userRoleCache.set(userId, { role, expiresAt: now + CACHE_TTL_MS });
+
+    // Prune expired entries
+    if (userRoleCache.size > 50) {
+      for (const [key, entry] of userRoleCache) {
+        if (entry.expiresAt <= now) userRoleCache.delete(key);
+      }
+    }
+  }
 
   if (role !== 'admin') {
     // Redirect non-admin users to unauthorized page

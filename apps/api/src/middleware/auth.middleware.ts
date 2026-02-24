@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { UnauthorizedError } from '../lib/errors.js';
-import { clerkClient, getAuth } from "@clerk/express";
+import { getAuth } from "@clerk/express";
+import { getCachedUser } from '../lib/clerk-cache.js';
 
 export const attachUser = async (
   req: Request,
@@ -11,7 +12,7 @@ export const attachUser = async (
     const { userId } = getAuth(req);
 
     if (userId) {
-      const user = await clerkClient.users.getUser(userId);
+      const user = await getCachedUser(userId);
 
       if (!user) {
         return next(new UnauthorizedError("Unauthorized"));

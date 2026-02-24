@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ResponseHandler } from '../../lib/response.js';
 import { clerkClient } from '@clerk/express';
+import { getCachedUser } from '../../lib/clerk-cache.js';
 import { InternalServerError } from '../../lib/errors.js';
 
 /**
@@ -23,7 +24,7 @@ export const getSessions = async (
     const sessionDetails = await Promise.all(
       sessions.data.map(async (session) => {
         try {
-          const user = await clerkClient.users.getUser(session.userId);
+          const user = await getCachedUser(session.userId);
 
           // Check if user has admin role
           const isAdmin = user.publicMetadata?.role === 'admin' ||

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { getAuth, clerkClient } from '@clerk/express';
+import { getAuth } from '@clerk/express';
 import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
+import { getCachedUser } from '../lib/clerk-cache.js';
 
 /**
  * Admin authentication middleware
@@ -30,8 +31,8 @@ export const requireAdmin = async (
       return next(new UnauthorizedError('Authentication required'));
     }
 
-    // Fetch user from Clerk to check metadata
-    const user = await clerkClient.users.getUser(userId);
+    // Fetch user from Clerk (cached for 60s to avoid redundant API calls)
+    const user = await getCachedUser(userId);
 
     // Check if user has admin role in publicMetadata
     const role = user.publicMetadata?.role as string | undefined;
@@ -75,7 +76,7 @@ export const requireRole = (allowedRoles: string[]) => {
         return next(new UnauthorizedError('Authentication required'));
       }
 
-      const user = await clerkClient.users.getUser(userId);
+      const user = await getCachedUser(userId);
       const role = user.publicMetadata?.role as string | undefined;
 
       if (!role || !allowedRoles.includes(role)) {
@@ -123,7 +124,7 @@ export const checkAdmin = async (
       return next();
     }
 
-    const user = await clerkClient.users.getUser(userId);
+    const user = await getCachedUser(userId);
     const role = user.publicMetadata?.role as string | undefined;
 
     (req as any).isAdmin = role === 'admin';
