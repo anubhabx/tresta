@@ -13,7 +13,7 @@ import { EmailService } from '../services/email.service.js';
 import { NotificationType } from '@workspace/database/prisma';
 import { decrypt } from '../utils/encryption.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
+const JWT_SECRET = process.env.JWT_SECRET ?? (() => { throw new Error('JWT_SECRET environment variable must be set'); })();
 
 /**
  * Request data access/deletion link
