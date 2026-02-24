@@ -5,6 +5,17 @@ const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toSt
 const IV_LENGTH = 16;
 
 /**
+ * Typed error for decryption failures — callers can catch this
+ * specifically to distinguish from other error types.
+ */
+export class DecryptionError extends Error {
+    constructor(message: string, public readonly cause?: unknown) {
+        super(message);
+        this.name = 'DecryptionError';
+    }
+}
+
+/**
  * Encrypts a string using AES-256-GCM
  */
 export function encrypt(text: string): string {
@@ -59,8 +70,10 @@ export function decrypt(text: string): string {
 
         return decrypted;
     } catch (error) {
-        console.error('Decryption failed:', error);
-        return text; // Return original on error to be safe, or handle differently
+        throw new DecryptionError(
+            'Decryption failed: data may be corrupted or the encryption key may have changed',
+            error,
+        );
     }
 }
 
