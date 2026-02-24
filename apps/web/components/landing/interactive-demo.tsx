@@ -168,29 +168,32 @@ export function InteractiveDemo() {
 
           {/* Preview Area */}
           <div
-            className={cn(
-              "min-h-[400px] p-6 transition-colors duration-300",
-              theme === "dark" ? "bg-[#0A0A0A]" : "bg-[#FAFAFA]",
-            )}
+            className="min-h-[400px] p-6 transition-colors duration-300"
+            style={{
+              backgroundColor: theme === "dark" ? "var(--color-background-dark, #0A0A0A)" : "var(--color-background-light, #FAFAFA)",
+              // Scoped preview theme variables
+              "--preview-bg": theme === "dark" ? "#141414" : "#ffffff",
+              "--preview-border": theme === "dark" ? "#2E2E2E" : "#E5E5E5",
+              "--preview-fg": theme === "dark" ? "#FAFAFA" : "#0A0A0A",
+              "--preview-muted": theme === "dark" ? "#A3A3A3" : "#737373",
+              "--preview-muted-alt": theme === "dark" ? "#737373" : "#A3A3A3",
+            } as React.CSSProperties}
           >
             <div className={cn("grid gap-4", getGridClasses())}>
               {sampleTestimonials.map((testimonial) => (
                 <Card
                   key={testimonial.id}
-                  className={cn(
-                    "transition-all duration-300",
-                    theme === "dark"
-                      ? "border-[#2E2E2E] bg-[#141414]"
-                      : "border-[#E5E5E5] bg-white",
-                  )}
+                  className="transition-all duration-300"
+                  style={{
+                    borderColor: "var(--preview-border)",
+                    backgroundColor: "var(--preview-bg)",
+                  }}
                 >
                   <CardContent className="p-5">
                     <StarRating rating={testimonial.rating} />
                     <p
-                      className={cn(
-                        "my-4 text-sm",
-                        theme === "dark" ? "text-[#A3A3A3]" : "text-[#737373]",
-                      )}
+                      className="my-4 text-sm"
+                      style={{ color: "var(--preview-muted)" }}
                     >
                       &ldquo;{testimonial.content}&rdquo;
                     </p>
@@ -205,22 +208,14 @@ export function InteractiveDemo() {
                       </div>
                       <div>
                         <p
-                          className={cn(
-                            "text-sm font-medium",
-                            theme === "dark"
-                              ? "text-[#FAFAFA]"
-                              : "text-[#0A0A0A]",
-                          )}
+                          className="text-sm font-medium"
+                          style={{ color: "var(--preview-fg)" }}
                         >
                           {testimonial.name}
                         </p>
                         <p
-                          className={cn(
-                            "text-xs",
-                            theme === "dark"
-                              ? "text-[#737373]"
-                              : "text-[#A3A3A3]",
-                          )}
+                          className="text-xs"
+                          style={{ color: "var(--preview-muted-alt)" }}
                         >
                           {testimonial.role}
                         </p>

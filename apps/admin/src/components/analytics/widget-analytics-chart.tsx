@@ -38,45 +38,45 @@ export function WidgetAnalyticsChart({ data }: WidgetAnalyticsChartProps) {
       </h2>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={formattedData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
           <XAxis
             dataKey="date"
-            stroke="#9CA3AF"
+            stroke="var(--muted-foreground)"
             style={{ fontSize: '12px' }}
           />
-          <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
+          <YAxis stroke="var(--muted-foreground)" style={{ fontSize: '12px' }} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1F2937',
-              border: '1px solid #374151',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
-              color: '#F3F4F6',
+              color: 'var(--popover-foreground)',
             }}
           />
           <Legend />
           <Line
             type="monotone"
             dataKey="total"
-            stroke="#3B82F6"
+            stroke="var(--chart-1)"
             strokeWidth={2}
             name="Total Loads"
-            dot={{ fill: '#3B82F6' }}
+            dot={{ fill: 'var(--chart-1)' }}
           />
           <Line
             type="monotone"
             dataKey="successful"
-            stroke="#10B981"
+            stroke="var(--chart-2)"
             strokeWidth={2}
             name="Successful"
-            dot={{ fill: '#10B981' }}
+            dot={{ fill: 'var(--chart-2)' }}
           />
           <Line
             type="monotone"
             dataKey="failed"
-            stroke="#EF4444"
+            stroke="var(--chart-5)"
             strokeWidth={2}
             name="Failed"
-            dot={{ fill: '#EF4444' }}
+            dot={{ fill: 'var(--chart-5)' }}
           />
         </LineChart>
       </ResponsiveContainer>

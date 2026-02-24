@@ -13,7 +13,16 @@ interface BrowserDeviceBreakdownProps {
   data: BreakdownData[];
 }
 
-const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
+const COLORS = [
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-6)',
+  'var(--chart-7)',
+  'var(--chart-8)',
+];
 
 export function BrowserDeviceBreakdown({ title, data }: BrowserDeviceBreakdownProps) {
   const chartData = data.map((item) => ({
@@ -43,7 +52,7 @@ export function BrowserDeviceBreakdown({ title, data }: BrowserDeviceBreakdownPr
                   `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 outerRadius={80}
-                fill="#8884d8"
+                fill="var(--chart-1)"
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
@@ -55,10 +64,10 @@ export function BrowserDeviceBreakdown({ title, data }: BrowserDeviceBreakdownPr
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: '1px solid #374151',
+                  backgroundColor: 'var(--popover)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
-                  color: '#F3F4F6',
+                  color: 'var(--popover-foreground)',
                 }}
               />
             </PieChart>

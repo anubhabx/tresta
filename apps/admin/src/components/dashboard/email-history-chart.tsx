@@ -47,8 +47,8 @@ export function EmailHistoryChart({ data }: EmailHistoryChartProps) {
           <YAxis className="text-xs text-muted-foreground" />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid #e5e7eb',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: '0.5rem',
             }}
           />
@@ -56,21 +56,21 @@ export function EmailHistoryChart({ data }: EmailHistoryChartProps) {
           <Line
             type="monotone"
             dataKey="sent"
-            stroke="#10b981"
+            stroke="var(--chart-2)"
             strokeWidth={2}
             name="Sent"
           />
           <Line
             type="monotone"
             dataKey="deferred"
-            stroke="#f59e0b"
+            stroke="var(--chart-3)"
             strokeWidth={2}
             name="Deferred"
           />
           <Line
             type="monotone"
             dataKey="failed"
-            stroke="#ef4444"
+            stroke="var(--chart-5)"
             strokeWidth={2}
             name="Failed"
           />
