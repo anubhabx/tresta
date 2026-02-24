@@ -37,7 +37,32 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(helmet.hidePoweredBy());
+app.use(helmet({
+  // CSP: restrictive defaults appropriate for an API server
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+      imgSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+    },
+  },
+  // Block framing (clickjacking protection)
+  frameguard: { action: 'deny' },
+  // Enforce HSTS (1 year, include subdomains, allow preload)
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+  // hidePoweredBy is enabled by default in helmet() — preserves existing behaviour
+}));
 // Apply dynamic CORS (checks path and applies appropriate policy)
 app.use(dynamicCors);
 app.use(morgan("dev"));
