@@ -49,6 +49,7 @@
     "@types/three": "^0.182.0",
     "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "@workspace/database": "workspace:*",
     "ably": "^2.14.0",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
