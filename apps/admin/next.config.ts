@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   /* config options here */
   transpilePackages: ["@workspace/ui"],
   async headers() {
-    const clerkDomain = "https://clerk.tresta.app";
     return [
       {
         source: '/(.*)',
@@ -13,12 +12,12 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkDomain} https://*.clerk.accounts.dev`,
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://checkout.razorpay.com",
               "style-src 'self' 'unsafe-inline'",
-              // `img-src 'self' ${clerkDomain} https://img.clerk.com data: blob:`,
+              "img-src 'self' https://*.tresta.app https://img.clerk.com data: blob:",
               "font-src 'self'",
-              // `connect-src 'self' ${clerkDomain} https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com`,
-              // `frame-src 'self' ${clerkDomain} https://challenges.cloudflare.com`,
+              "connect-src 'self' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com",
+              "frame-src 'self' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

@@ -22,7 +22,6 @@ const nextConfig = {
     return config
   },
   async headers() {
-    const clerkDomain = "https://clerk.tresta.app";
     return [
       {
         source: "/((?!api/).*)",
@@ -31,12 +30,12 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkDomain} https://checkout.razorpay.com https://*.clerk.accounts.dev`,
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://checkout.razorpay.com",
               "style-src 'self' 'unsafe-inline'",
-              // `img-src 'self' ${clerkDomain} https://img.clerk.com https://tresta.blob.core.windows.net data: blob:`,
+              "img-src 'self' https://*.tresta.app https://img.clerk.com https://tresta.blob.core.windows.net data: blob:",
               "font-src 'self'",
-              // `connect-src 'self' ${clerkDomain} https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com https://*.ably.io wss://*.ably-realtime.com https://*.ably-realtime.com https://tresta.blob.core.windows.net https://api.razorpay.com https://lumberjack.razorpay.com`,
-              // `frame-src 'self' ${clerkDomain} https://challenges.cloudflare.com https://api.razorpay.com`,
+              "connect-src 'self' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://*.ably.io wss://*.ably-realtime.com https://*.ably-realtime.com https://tresta.blob.core.windows.net https://api.razorpay.com https://lumberjack.razorpay.com",
+              "frame-src 'self' https://*.tresta.app https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com https://api.razorpay.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
