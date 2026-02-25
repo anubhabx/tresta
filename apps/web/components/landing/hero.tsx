@@ -64,7 +64,7 @@ function LiveTestimonialCard() {
   const testimonial = testimonials[currentIndex]!;
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full overflow-x-hidden">
       {/* Notification-style incoming indicator */}
       <motion.div
         key={testimonial.id}
@@ -152,7 +152,7 @@ export function Hero() {
       <div className="container relative z-10 mx-auto max-w-6xl">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
-          <div className="flex flex-col items-start text-left">
+          <div className="flex flex-col items-start text-left min-w-0">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -168,24 +168,24 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-8 flex items-center gap-4 text-lg text-muted-foreground"
+              className="mb-8 flex flex-col gap-2 text-lg text-muted-foreground sm:flex-row sm:items-center sm:gap-4"
             >
               <span className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                   1
                 </span>
                 Collect feedback
               </span>
-              <span className="text-border">→</span>
+              <span className="hidden text-border sm:inline">→</span>
               <span className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                   2
                 </span>
                 One line of code
               </span>
-              <span className="text-border">→</span>
+              <span className="hidden text-border sm:inline">→</span>
               <span className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                   3
                 </span>
                 Done
@@ -232,7 +232,7 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
-            className="relative"
+            className="relative min-w-0"
           >
             <LiveTestimonialCard />
 
@@ -241,7 +241,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mt-6"
+              className="mt-6 overflow-hidden rounded-md"
             >
               <CodeBlock
                 code={`<script src="https://tresta.app/widget.js"
@@ -264,4 +264,3 @@ export function Hero() {
     </section>
   );
 }
-

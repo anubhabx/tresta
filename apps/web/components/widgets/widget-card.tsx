@@ -34,7 +34,6 @@ import {
   Code2Icon,
   EditIcon,
   TrashIcon,
-  EyeIcon,
   CopyIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -93,7 +92,7 @@ export function WidgetCard({
   };
 
   return (
-    <Card className="border border-border/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200">
+    <Card className="border border-border/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200 overflow-hidden min-w-0">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">

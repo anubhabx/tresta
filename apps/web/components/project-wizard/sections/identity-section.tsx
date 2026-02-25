@@ -147,7 +147,7 @@ export function IdentitySection({
           <p className="text-xs text-muted-foreground mb-2">
             Used when no logo is uploaded
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {COLOR_PRESETS.map((color) => (
               <button
                 key={color.id}

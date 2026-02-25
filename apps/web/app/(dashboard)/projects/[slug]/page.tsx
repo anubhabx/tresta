@@ -97,7 +97,7 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
       </section>
 
       <Tabs defaultValue={initialTab} className="w-full">
-        <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 no-scrollbar tabs-scroll-fade sm:[mask-image:none] sm:[-webkit-mask-image:none]">
           <TabsList className="w-max sm:w-auto inline-flex">
             <TabsTrigger
               value="overview"

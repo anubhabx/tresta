@@ -106,7 +106,7 @@ export function ConditionalColorPicker({
       )}
 
       {/* Preset Swatches — always shown */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {FREE_COLOR_PALETTE.map((preset) => {
           const isActive = activePresetId === preset.id;
           return (
@@ -137,7 +137,7 @@ export function ConditionalColorPicker({
         })}
 
         {/* Divider */}
-        <div className="h-6 w-px bg-border mx-1" />
+        <div className="hidden sm:block h-6 w-px bg-border mx-1" />
 
         {/* Pro: Full color picker | Free: Locked trigger */}
         {isPro ? (
@@ -146,7 +146,7 @@ export function ConditionalColorPicker({
             defaultValue={value || "#3B82F6"}
             onChange={onChange}
             disabled={disabled}
-            className="flex-1"
+            className="w-full sm:w-auto sm:flex-1"
           />
         ) : (
           <button
@@ -154,7 +154,7 @@ export function ConditionalColorPicker({
             disabled={disabled}
             onClick={handleProFeatureClick}
             className={cn(
-              "flex h-9 flex-1 items-center gap-2 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-all duration-150",
+              "flex h-9 w-full sm:w-auto sm:flex-1 items-center gap-2 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-all duration-150",
               "hover:border-amber-300 hover:bg-amber-50/50 dark:hover:border-amber-700 dark:hover:bg-amber-900/10",
               "cursor-pointer",
               disabled && "pointer-events-none opacity-50",

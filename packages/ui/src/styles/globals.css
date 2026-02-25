@@ -702,6 +702,24 @@ body {
   .legal-prose section + section {
     @apply mt-10;
   }
+
+  /* Tab scroll fade — gradient masks for horizontal scroll affordance */
+  .tabs-scroll-fade {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 1rem,
+      black calc(100% - 1.5rem),
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 1rem,
+      black calc(100% - 1.5rem),
+      transparent
+    );
+  }
 }
 /*
  Admin-specific utility classes */

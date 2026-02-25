@@ -15,6 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarMenuSkeleton,
+  useSidebar,
 } from "@workspace/ui/components/sidebar";
 import {
   ChevronUp,
@@ -49,6 +50,12 @@ const UISidebar = () => {
     isLoading: isLoadingSubscription,
   } = useSubscription();
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  /** Close the mobile sidebar sheet when a navigation link is clicked */
+  const closeMobileSidebar = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   // Fetch projects list - will automatically update when new project is created
   const { data: projectsData, isLoading: isLoadingProjects } =
@@ -85,7 +92,11 @@ const UISidebar = () => {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton isActive={pathname === "/dashboard"} asChild>
-              <Link href="/dashboard" className="px-3">
+              <Link
+                href="/dashboard"
+                className="px-3"
+                onClick={closeMobileSidebar}
+              >
                 <Button
                   className="justify-start w-full has-[>svg]:px-0"
                   variant="ghost"
@@ -98,7 +109,11 @@ const UISidebar = () => {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton isActive={pathname === "/projects"} asChild>
-              <Link href="/projects" className="px-3">
+              <Link
+                href="/projects"
+                className="px-3"
+                onClick={closeMobileSidebar}
+              >
                 <Button
                   className="justify-start w-full has-[>svg]:px-0"
                   variant="ghost"
@@ -110,7 +125,11 @@ const UISidebar = () => {
             </SidebarMenuButton>
 
             <SidebarMenuAction asChild>
-              <Link href="/projects/new" title="Create New Project">
+              <Link
+                href="/projects/new"
+                title="Create New Project"
+                onClick={closeMobileSidebar}
+              >
                 <PlusIcon className="h-6 w-6 cursor-pointer transition-colors rounded-[2px]" />
               </Link>
             </SidebarMenuAction>
@@ -127,7 +146,11 @@ const UISidebar = () => {
               <SidebarMenuSub>
                 {userProjects.slice(0, 3).map((project) => (
                   <SidebarMenuSubItem key={project.id}>
-                    <Link href={`/projects/${project.slug}`} className="w-full">
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="w-full"
+                      onClick={closeMobileSidebar}
+                    >
                       <SidebarMenuSubButton
                         isActive={pathname === `/projects/${project.slug}`}
                         asChild
@@ -145,7 +168,11 @@ const UISidebar = () => {
                 ))}
                 {userProjects.length > 3 && (
                   <SidebarMenuSubItem>
-                    <Link href="/projects" className="w-full">
+                    <Link
+                      href="/projects"
+                      className="w-full"
+                      onClick={closeMobileSidebar}
+                    >
                       <SidebarMenuSubButton asChild>
                         <Button
                           className="justify-start w-full text-muted-foreground"
@@ -260,7 +287,7 @@ const UISidebar = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="border-border">
-                <Link href="/account">
+                <Link href="/account" onClick={closeMobileSidebar}>
                   <Button
                     className="justify-start w-full"
                     variant="ghost"

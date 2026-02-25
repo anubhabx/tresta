@@ -11,13 +11,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PipetteIcon } from "lucide-react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
@@ -40,11 +34,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 /** HSL (h: 0-360, s: 0-100, l: 0-100) → RGB (0-255 each) */
-function hslToRgb(
-  h: number,
-  s: number,
-  l: number,
-): [number, number, number] {
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   const sn = s / 100;
   const ln = l / 100;
   const c = (1 - Math.abs(2 * ln - 1)) * sn;
@@ -67,11 +57,7 @@ function hslToRgb(
 }
 
 /** RGB (0-255 each) → HSL (h: 0-360, s: 0-100, l: 0-100) */
-function rgbToHsl(
-  r: number,
-  g: number,
-  b: number,
-): [number, number, number] {
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   const rn = r / 255;
   const gn = g / 255;
   const bn = b / 255;
@@ -257,7 +243,7 @@ export function ColorPicker({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-64 p-3 space-y-3"
+        className="w-64 max-w-[calc(100vw-2rem)] p-3 space-y-3"
         align="start"
         sideOffset={6}
       >
@@ -331,7 +317,8 @@ function SaturationPanel({
   }, [saturation, lightness]);
 
   const positionY = useMemo(() => {
-    const topLightness = saturation < 1 ? 100 : 50 + 50 * (1 - saturation / 100);
+    const topLightness =
+      saturation < 1 ? 100 : 50 + 50 * (1 - saturation / 100);
     const y = topLightness === 0 ? 1 : 1 - lightness / topLightness;
     return clamp(y, 0, 1);
   }, [saturation, lightness]);
@@ -395,7 +382,8 @@ function SaturationPanel({
         style={{
           left: `${positionX * 100}%`,
           top: `${positionY * 100}%`,
-          boxShadow: "0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.1)",
+          boxShadow:
+            "0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.1)",
         }}
       />
     </div>

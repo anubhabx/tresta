@@ -30,7 +30,7 @@ const shortcuts: ShortcutItem[] = [
  */
 export function KeyboardShortcutsCard() {
   return (
-    <Card className="border-border">
+    <Card className="border-border hidden lg:block">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           <Keyboard className="h-4 w-4 text-primary" />
