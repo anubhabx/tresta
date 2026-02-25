@@ -22,50 +22,51 @@ const nextConfig = {
     return config
   },
   async headers() {
+    const clerkDomain = "https://clerk.tresta.app";
     return [
       {
-        source: '/(.*)',
+        source: "/((?!api/).*)",
         headers: [
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://*.clerk.accounts.dev",
+              `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkDomain} https://checkout.razorpay.com https://*.clerk.accounts.dev`,
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https://img.clerk.com https://tresta.blob.core.windows.net data: blob:",
+              `img-src 'self' ${clerkDomain} https://img.clerk.com https://tresta.blob.core.windows.net data: blob:`,
               "font-src 'self'",
-              "connect-src 'self' https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com https://*.ably.io wss://*.ably-realtime.com https://*.ably-realtime.com https://tresta.blob.core.windows.net https://api.razorpay.com https://lumberjack.razorpay.com",
-              "frame-src 'self' https://challenges.cloudflare.com https://api.razorpay.com",
+              `connect-src 'self' ${clerkDomain} https://*.clerk.accounts.dev https://clerk-telemetry.com https://*.clerk-telemetry.com https://*.ably.io wss://*.ably-realtime.com https://*.ably-realtime.com https://tresta.blob.core.windows.net https://api.razorpay.com https://lumberjack.razorpay.com`,
+              `frame-src 'self' ${clerkDomain} https://challenges.cloudflare.com https://api.razorpay.com`,
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
-              "worker-src 'self' blob:",
-            ].join('; '),
+              "worker-src 'self' blob:"
+            ].join("; ")
           },
           {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload',
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload"
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY"
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff"
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin"
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-        ],
-      },
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()"
+          }
+        ]
+      }
     ];
-  },
+  }
 };
 
 export default nextConfig;
