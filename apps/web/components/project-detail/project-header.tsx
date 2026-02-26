@@ -62,7 +62,7 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
   const handleCopyCollectionLink = async () => {
     const collectionUrl =
       typeof window !== "undefined"
-        ? `${window.location.origin}/collect/${slug}`
+        ? `${window.location.origin}/testimonials/${slug}`
         : "";
     await navigator.clipboard.writeText(collectionUrl);
     setLinkCopied(true);

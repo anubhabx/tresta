@@ -97,35 +97,35 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
       </section>
 
       <Tabs defaultValue={initialTab} className="w-full">
-        <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 no-scrollbar tabs-scroll-fade sm:[mask-image:none] sm:[-webkit-mask-image:none]">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 pr-6 sm:pr-0 sm:mx-0 sm:px-0 scroll-smooth no-scrollbar tabs-scroll-fade sm:[mask-image:none] sm:[-webkit-mask-image:none]">
           <TabsList className="w-max sm:w-auto inline-flex">
             <TabsTrigger
               value="overview"
-              className="text-xs sm:text-sm whitespace-nowrap"
+              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="testimonials"
-              className="text-xs sm:text-sm whitespace-nowrap"
+              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
             >
               Testimonials
             </TabsTrigger>
             <TabsTrigger
               value="moderation"
-              className="text-xs sm:text-sm whitespace-nowrap"
+              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
             >
               Moderation
             </TabsTrigger>
             <TabsTrigger
               value="widgets"
-              className="text-xs sm:text-sm whitespace-nowrap"
+              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
             >
               Widgets
             </TabsTrigger>
             <TabsTrigger
               value="settings"
-              className="text-xs sm:text-sm whitespace-nowrap"
+              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
             >
               Settings
             </TabsTrigger>

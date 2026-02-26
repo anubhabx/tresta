@@ -28,7 +28,7 @@ export function PainSection() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => calcPosition(e.clientX),
-    [calcPosition]
+    [calcPosition],
   );
 
   const handleTouchMove = useCallback(
@@ -36,7 +36,7 @@ export function PainSection() {
       const touch = e.touches[0];
       if (touch) calcPosition(touch.clientX);
     },
-    [calcPosition]
+    [calcPosition],
   );
 
   return (
@@ -47,7 +47,9 @@ export function PainSection() {
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             You&apos;ve shipped the product.
             <br />
-            <span className="text-muted-foreground">Now you need social proof.</span>
+            <span className="text-muted-foreground">
+              Now you need social proof.
+            </span>
           </h2>
           <p className="mx-auto max-w-xl text-lg text-muted-foreground">
             Sweep your mouse across to see the difference.
@@ -95,7 +97,7 @@ export function PainSection() {
                     "Manual updates",
                     "No verification",
                     "Looks dated",
-                    "Breaks on mobile"
+                    "Breaks on mobile",
                   ].map((issue) => (
                     <span
                       key={issue}
@@ -114,7 +116,7 @@ export function PainSection() {
               className="absolute inset-0 bg-background"
               style={{
                 clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
-                transition: "clip-path 100ms ease-out"
+                transition: "clip-path 100ms ease-out",
               }}
             >
               {/* Subtle radial glow overlay */}
@@ -122,7 +124,7 @@ export function PainSection() {
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(ellipse at 60% 50%, rgba(20,184,166,0.06) 0%, rgba(6,182,212,0.03) 40%, transparent 70%)"
+                    "radial-gradient(ellipse at 60% 50%, rgba(20,184,166,0.06) 0%, rgba(6,182,212,0.03) 40%, transparent 70%)",
                 }}
               />
               <div className="relative p-6">
@@ -139,13 +141,15 @@ export function PainSection() {
                       <span className="text-violet-400">src</span>
                       <span className="text-muted-foreground">=</span>
                       <span className="text-yellow-300">
-                        &quot;https://tresta.app/widget.js&quot;
+                        &quot;https://api.tresta.app/widget/tresta-widget.js&quot;
                       </span>
                       {"\n  "}
-                      <span className="text-violet-400">data-project</span>
+                      <span className="text-violet-400">
+                        data-tresta-widget
+                      </span>
                       <span className="text-muted-foreground">=</span>
                       <span className="text-yellow-300">
-                        &quot;your-project&quot;
+                        &quot;your-widget-id&quot;
                       </span>
                       {"\n"}
                       <span className="text-muted-foreground">&gt;&lt;/</span>
@@ -176,7 +180,9 @@ export function PainSection() {
                           <p className="text-sm font-medium text-foreground">
                             @developer
                           </p>
-                          <p className="text-xs text-muted-foreground">Indie Hacker</p>
+                          <p className="text-xs text-muted-foreground">
+                            Indie Hacker
+                          </p>
                         </div>
                       </div>
                       <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
@@ -191,7 +197,7 @@ export function PainSection() {
                       "Auto-updating",
                       "OAuth verified",
                       "5 layouts",
-                      "Dark mode"
+                      "Dark mode",
                     ].map((feature) => (
                       <span
                         key={feature}
@@ -211,7 +217,7 @@ export function PainSection() {
               className="pointer-events-none absolute top-0 bottom-0 z-20"
               style={{
                 left: `${sliderPosition}%`,
-                transition: "left 100ms ease-out"
+                transition: "left 100ms ease-out",
               }}
             >
               {/* Thin vertical line */}
@@ -229,4 +235,3 @@ export function PainSection() {
     </section>
   );
 }
-

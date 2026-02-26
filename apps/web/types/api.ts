@@ -55,6 +55,26 @@ export interface SocialLinks {
   [key: string]: string | undefined;
 }
 
+export interface FormConfig {
+  headerTitle?: string;
+  headerDescription?: string;
+  thankYouMessage?: string;
+  enableRating?: boolean;
+  enableJobTitle?: boolean;
+  enableCompany?: boolean;
+  enableAvatar?: boolean;
+  enableVideoUrl?: boolean;
+  enableGoogleVerification?: boolean;
+  requireRating?: boolean;
+  requireJobTitle?: boolean;
+  requireCompany?: boolean;
+  requireAvatar?: boolean;
+  requireVideoUrl?: boolean;
+  requireGoogleVerification?: boolean;
+  allowAnonymousSubmissions?: boolean;
+  notifyOnSubmission?: boolean;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -83,6 +103,7 @@ export interface Project {
     customProfanityList?: string[];
     brandKeywords?: string[];
   } | null;
+  formConfig?: FormConfig | null;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -195,6 +216,7 @@ export interface CreateProjectPayload {
   socialLinks?: SocialLinks;
   tags?: string[];
   visibility?: ProjectVisibility;
+  formConfig?: FormConfig | null;
 }
 
 export interface UpdateProjectPayload {
@@ -224,6 +246,7 @@ export interface UpdateProjectPayload {
     customProfanityList?: string[];
     brandKeywords?: string[];
   };
+  formConfig?: FormConfig | null;
 }
 
 export interface CreateTestimonialPayload {

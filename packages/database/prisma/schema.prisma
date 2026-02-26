@@ -23,11 +23,11 @@ model User {
   lastName  String?
   avatar    String? @db.VarChar(1000) // Avatar URL from Azure Blob Storage
 
-  plan         UserPlan      @default(FREE)
-  projects     Project[]
-  testimonials Testimonial[]
-  apiKeys      ApiKey[]
-  subscription Subscription? // null for free tier users
+  plan                 UserPlan              @default(FREE)
+  projects             Project[]
+  testimonials         Testimonial[]
+  apiKeys              ApiKey[]
+  subscription         Subscription? // null for free tier users
   subscriptionPayments SubscriptionPayment[]
 
   // Notification system relations
@@ -65,6 +65,28 @@ model Project {
   profanityFilterLevel String? @default("MODERATE") // STRICT, MODERATE, LENIENT
   moderationSettings   Json? // Custom moderation rules
 
+  // Collection Form Configuration
+  // {
+  //   headerTitle,
+  //   headerDescription,
+  //   thankYouMessage,
+  //   enableRating,
+  //   enableJobTitle,
+  //   enableCompany,
+  //   enableAvatar,
+  //   enableVideoUrl,
+  //   enableGoogleVerification,
+  //   requireRating,
+  //   requireJobTitle,
+  //   requireCompany,
+  //   requireAvatar,
+  //   requireVideoUrl,
+  //   requireGoogleVerification,
+  //   allowAnonymousSubmissions,
+  //   notifyOnSubmission
+  // }
+  formConfig Json?
+
   testimonials Testimonial[]
   widgets      Widget[]
   apiKeys      ApiKey[]
@@ -92,7 +114,7 @@ model Plan {
   razorpayPlanId String?  @unique // ID from Razorpay
   type           UserPlan @default(FREE) // Mapping to enum for code compatibility
 
-  subscriptions Subscription[]
+  subscriptions        Subscription[]
   subscriptionPayments SubscriptionPayment[]
 
   createdAt DateTime @default(now())
@@ -124,11 +146,11 @@ model Subscription {
   externalCustomerId     String? // Razorpay Customer ID (optional)
 
   // Razorpay Specifics
-  razorpayOrderId   String?
-  razorpayPaymentId String?
-  razorpaySignature String?
-  lastPaymentStatus String? @db.VarChar(32)
-  lastInvoiceStatus String? @db.VarChar(32)
+  razorpayOrderId      String?
+  razorpayPaymentId    String?
+  razorpaySignature    String?
+  lastPaymentStatus    String?   @db.VarChar(32)
+  lastInvoiceStatus    String?   @db.VarChar(32)
   lastWebhookEventId   String?   @db.VarChar(255)
   lastWebhookEventType String?   @db.VarChar(128)
   lastWebhookAt        DateTime?
@@ -142,7 +164,7 @@ model Subscription {
   currency String? @default("INR")
   interval String? // "month", "year"
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments SubscriptionPayment[]
 
   @@index([userId])
@@ -250,14 +272,13 @@ model Testimonial {
   @@index([isPublished])
   @@index([createdAt])
   @@index([isOAuthVerified])
-
   // Composite indexes for common query patterns
   @@index([projectId, isPublished, isApproved, createdAt]) // Public widget embed + API-key listing
-  @@index([projectId, moderationStatus, createdAt])        // Moderation queue + admin filtering
-  @@index([projectId, createdAt])                          // Paginated list ordered by date
-  @@index([ipAddress, createdAt])                          // IP velocity check (moderation)
-  @@index([ipAddress, projectId, createdAt])               // IP+project velocity (moderation)
-  @@index([authorEmail, createdAt])                        // Email velocity + privacy queries
+  @@index([projectId, moderationStatus, createdAt]) // Moderation queue + admin filtering
+  @@index([projectId, createdAt]) // Paginated list ordered by date
+  @@index([ipAddress, createdAt]) // IP velocity check (moderation)
+  @@index([ipAddress, projectId, createdAt]) // IP+project velocity (moderation)
+  @@index([authorEmail, createdAt]) // Email velocity + privacy queries
 }
 
 enum TestimonialType {

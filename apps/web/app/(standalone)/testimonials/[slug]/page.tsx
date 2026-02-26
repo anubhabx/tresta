@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState, useEffect } from "react";
+import { CSSProperties, use, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,17 +9,15 @@ import { toast } from "sonner";
 import {
   Ban,
   CheckCircle2,
+  ChevronDown,
+  Info,
+  Linkedin,
   MessageSquare,
   ShieldCheck,
-  Star,
-  Share2,
   Twitter,
-  Linkedin,
-  Copy,
-  Check,
 } from "lucide-react";
 import axios from "axios";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import type {
   ApiResponse,
   CreateTestimonialPayload,
@@ -42,6 +40,11 @@ import { Separator } from "@workspace/ui/components/separator";
 import { CustomFormField } from "@/components/custom-form-field";
 import { Badge } from "@workspace/ui/components/badge";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@workspace/ui/components/collapsible";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -54,7 +57,8 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@workspace/ui/components/avatar";
-import { Info } from "lucide-react";
+import { cn } from "@workspace/ui/lib/utils";
+import { CollectionPageShell } from "@/components/testimonials/collection-page-shell";
 
 // Public API client (no credentials/cookie, no auth header)
 const publicApi = axios.create({
@@ -63,6 +67,27 @@ const publicApi = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+const normalizeHexColor = (value?: string | null): string | null => {
+  if (!value) return null;
+
+  const trimmed = value.trim();
+  const shortHexMatch = /^#([0-9a-fA-F]{3})$/.exec(trimmed);
+
+  if (shortHexMatch?.[1]) {
+    const [r, g, b] = shortHexMatch[1].split("");
+    return `#${r}${r}${g}${g}${b}${b}`;
+  }
+
+  if (/^#[0-9a-fA-F]{6}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return null;
+};
+
+const withHexAlpha = (hexColor: string, alphaHex: string) =>
+  `${hexColor}${alphaHex}`;
 
 const testimonialFormSchema = z.object({
   authorName: z
@@ -135,6 +160,7 @@ export default function TestimonialSubmissionPage({
     useState<string | undefined>(undefined);
   const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
   const [isGoogleVerified, setIsGoogleVerified] = useState(false);
+  const [isVideoSectionOpen, setIsVideoSectionOpen] = useState(false);
 
   // Privacy Consent State
   const [isPrivacyDialogOpen, setIsPrivacyDialogOpen] = useState(false);
@@ -223,18 +249,120 @@ export default function TestimonialSubmissionPage({
     }
   }, [slug]);
 
+  const isRatingEnabled = project?.formConfig?.enableRating !== false;
+  const isJobTitleEnabled = project?.formConfig?.enableJobTitle !== false;
+  const isCompanyEnabled = project?.formConfig?.enableCompany !== false;
+  const isAvatarEnabled = project?.formConfig?.enableAvatar !== false;
+  const isVideoEnabled = project?.formConfig?.enableVideoUrl !== false;
+  const isGoogleVerificationEnabled =
+    project?.formConfig?.enableGoogleVerification !== false;
+
+  const requireRating = isRatingEnabled && project?.formConfig?.requireRating === true;
+  const requireJobTitle =
+    isJobTitleEnabled && project?.formConfig?.requireJobTitle === true;
+  const requireCompany = isCompanyEnabled && project?.formConfig?.requireCompany === true;
+  const requireAvatar = isAvatarEnabled && project?.formConfig?.requireAvatar === true;
+  const requireVideoUrl = isVideoEnabled && project?.formConfig?.requireVideoUrl === true;
+  const requireGoogleVerification =
+    isGoogleVerificationEnabled &&
+    project?.formConfig?.requireGoogleVerification === true;
+  const allowAnonymousSubmissions =
+    project?.formConfig?.allowAnonymousSubmissions !== false;
+
+  useEffect(() => {
+    if (!isVideoEnabled) {
+      setIsVideoSectionOpen(false);
+      return;
+    }
+
+    if (requireVideoUrl) {
+      setIsVideoSectionOpen(true);
+    }
+  }, [isVideoEnabled, requireVideoUrl]);
+
   // Handle Google Sign-In error
   const handleGoogleError = () => {
     toast.error("Google Sign-In was unsuccessful. Please try again.");
   };
 
+  const validateConfigRequirements = (data: FormData) => {
+    let hasValidationError = false;
+    form.clearErrors([
+      "rating",
+      "authorRole",
+      "authorCompany",
+      "authorAvatar",
+      "videoUrl",
+    ]);
+
+    if (requireRating && (!data.rating || data.rating < 1)) {
+      form.setError("rating", {
+        type: "manual",
+        message: "Rating is required for this form.",
+      });
+      hasValidationError = true;
+    }
+
+    if (requireJobTitle && !data.authorRole?.trim()) {
+      form.setError("authorRole", {
+        type: "manual",
+        message: "Role is required for this form.",
+      });
+      hasValidationError = true;
+    }
+
+    if (requireCompany && !data.authorCompany?.trim()) {
+      form.setError("authorCompany", {
+        type: "manual",
+        message: "Company is required for this form.",
+      });
+      hasValidationError = true;
+    }
+
+    if (requireAvatar && !data.authorAvatar?.trim()) {
+      form.setError("authorAvatar", {
+        type: "manual",
+        message: "Profile picture is required for this form.",
+      });
+      hasValidationError = true;
+    }
+
+    if (requireVideoUrl && !data.videoUrl?.trim()) {
+      form.setError("videoUrl", {
+        type: "manual",
+        message: "Video URL is required for this form.",
+      });
+      hasValidationError = true;
+    }
+
+    if (requireGoogleVerification && !isGoogleVerified) {
+      toast.error("Google verification is required before submitting.");
+      hasValidationError = true;
+    }
+
+    if (hasValidationError) {
+      toast.error("Please complete all required fields before submitting.");
+    }
+
+    return !hasValidationError;
+  };
+
   const onSubmit = async (data: FormData) => {
+    if (!validateConfigRequirements(data)) {
+      return;
+    }
+
     // Open privacy dialog instead of submitting directly
     setPendingFormData(data);
     setIsPrivacyDialogOpen(true);
   };
 
   const handlePrivacyChoice = async (consented: boolean) => {
+    if (!allowAnonymousSubmissions && !consented) {
+      toast.error("Anonymous submissions are disabled for this form.");
+      return;
+    }
+
     setIsPrivacyDialogOpen(false);
     if (!pendingFormData) return;
 
@@ -281,7 +409,7 @@ export default function TestimonialSubmissionPage({
       }
 
       const headers: Record<string, string> = {};
-      if (!consented) {
+      if (!consented && allowAnonymousSubmissions) {
         headers["x-anonymous-submission"] = "true";
       }
 
@@ -296,7 +424,7 @@ export default function TestimonialSubmissionPage({
       setGoogleIdToken(null);
       setIsGoogleVerified(false);
 
-      if (!consented) {
+      if (!consented && allowAnonymousSubmissions) {
         toast.success(
           "Thank you! Your testimonial has been submitted anonymously (no IP/Device data stored).",
         );
@@ -344,23 +472,35 @@ export default function TestimonialSubmissionPage({
       }).format(new Date(existingSubmissionCreatedAt))
     : null;
 
+  const brandPrimaryHex = normalizeHexColor(project?.brandColorPrimary);
+  const brandAccentStyles = brandPrimaryHex
+    ? ({
+        "--collection-brand-primary": brandPrimaryHex,
+        "--collection-brand-soft": withHexAlpha(brandPrimaryHex, "1A"),
+        "--collection-brand-hover": withHexAlpha(brandPrimaryHex, "E6"),
+      } as CSSProperties)
+    : undefined;
+
   if (hasExistingSubmission) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+      <CollectionPageShell centered>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
+          className="w-full"
         >
-          <Card className="max-w-lg w-full">
-            <CardContent className="pt-12 pb-12 text-center space-y-6">
+          <Card className="w-full border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <CardContent className="card-spacious text-center stack-loose">
               <div className="flex justify-center">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                   <Ban className="h-8 w-8 text-primary" />
                 </div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold mb-3">Already Submitted</h1>
+                <h1 className="text-2xl font-semibold tracking-tight mb-3">
+                  Already Submitted
+                </h1>
                 <p className="text-muted-foreground">
                   Thanks for your enthusiasm! We already have your testimonial
                   on file.
@@ -384,20 +524,21 @@ export default function TestimonialSubmissionPage({
             </CardContent>
           </Card>
         </motion.div>
-      </div>
+      </CollectionPageShell>
     );
   }
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+      <CollectionPageShell centered>
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
+          className="w-full"
         >
-          <Card className="max-w-lg w-full">
-            <CardContent className="pt-12 pb-12 text-center">
+          <Card className="w-full border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <CardContent className="card-spacious text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -419,10 +560,14 @@ export default function TestimonialSubmissionPage({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <h1 className="text-3xl font-bold mb-3">Thank You!</h1>
+                <h1 className="text-3xl font-semibold tracking-tight mb-3">
+                  {project?.formConfig?.thankYouMessage
+                    ? "Thank You!"
+                    : "Thank You!"}
+                </h1>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Your testimonial has been submitted and is pending review. We
-                  truly appreciate your feedback!
+                  {project?.formConfig?.thankYouMessage ||
+                    "Your testimonial has been submitted and is pending review. We truly appreciate your feedback!"}
                 </p>
               </motion.div>
 
@@ -486,14 +631,17 @@ export default function TestimonialSubmissionPage({
             </CardContent>
           </Card>
         </motion.div>
-      </div>
+      </CollectionPageShell>
     );
   }
 
   return (
     <GoogleOAuthProvider>
-      <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
-        <Card className="max-w-lg w-full">
+      <CollectionPageShell>
+        <Card
+          className="w-full border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+          style={brandAccentStyles}
+        >
           <CardHeader className="text-center pb-2">
             {isLoading ? (
               <div className="flex flex-col items-center gap-4">
@@ -511,33 +659,42 @@ export default function TestimonialSubmissionPage({
                       src={project.logoUrl}
                       alt={`${project.name} Logo`}
                     />
-                    <AvatarFallback className="bg-primary/10">
-                      <MessageSquare className="h-6 w-6 text-primary" />
+                    <AvatarFallback
+                      className={cn(
+                        "bg-primary/10",
+                        brandPrimaryHex && "bg-[var(--collection-brand-soft)]",
+                      )}
+                    >
+                      <MessageSquare
+                        className={cn(
+                          "h-6 w-6 text-primary",
+                          brandPrimaryHex &&
+                            "text-[var(--collection-brand-primary)]",
+                        )}
+                      />
                     </AvatarFallback>
                   </Avatar>
                 ) : (
                   <div
-                    className="h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                    style={{
-                      backgroundColor: project?.brandColorPrimary
-                        ? `${project.brandColorPrimary}15`
-                        : "hsl(var(--primary) / 0.1)",
-                    }}
+                    className={cn(
+                      "h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-primary/10",
+                      brandPrimaryHex && "bg-[var(--collection-brand-soft)]",
+                    )}
                   >
                     <MessageSquare
-                      className="h-6 w-6"
-                      style={{
-                        color:
-                          project?.brandColorPrimary || "hsl(var(--primary))",
-                      }}
+                      className={cn(
+                        "h-6 w-6 text-primary",
+                        brandPrimaryHex && "text-[var(--collection-brand-primary)]",
+                      )}
                     />
                   </div>
                 )}
                 <CardTitle className="text-2xl">
-                  Share your experience
+                  {project?.formConfig?.headerTitle || "Share your experience"}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Tell us about your experience with {project?.name || "us"}
+                  {project?.formConfig?.headerDescription ||
+                    `Tell us about your experience with ${project?.name || "us"}`}
                 </CardDescription>
               </>
             )}
@@ -547,17 +704,19 @@ export default function TestimonialSubmissionPage({
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="stack-loose"
               >
                 {/* Google Sign-In Section */}
-                {!isGoogleVerified && (
-                  <div className="rounded-lg border border-dashed p-4 text-center space-y-3">
+                {isGoogleVerificationEnabled && !isGoogleVerified && (
+                  <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-center space-y-3">
                     <div className="flex items-center justify-center gap-2 text-sm font-medium">
                       <ShieldCheck className="h-4 w-4 text-primary" />
-                      Verify with Google (Recommended)
+                      Verify with Google
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Auto-fill your info and get a verified badge
+                      {requireGoogleVerification
+                        ? "Required to submit this testimonial"
+                        : "Auto-fill your info and get a verified badge"}
                     </p>
                     <div className="flex justify-center">
                       <GoogleLogin
@@ -593,16 +752,19 @@ export default function TestimonialSubmissionPage({
                 <Separator />
 
                 {/* Rating - Centered and prominent */}
-                <div className="text-center space-y-2">
-                  <CustomFormField
-                    type="rating"
-                    control={form.control}
-                    name="rating"
-                    label="How would you rate us?"
-                    max={5}
-                    optional
-                  />
-                </div>
+                {isRatingEnabled && (
+                  <div className="text-center space-y-2">
+                    <CustomFormField
+                      type="rating"
+                      control={form.control}
+                      name="rating"
+                      label="How would you rate us?"
+                      max={5}
+                      required={requireRating}
+                      optional={!requireRating}
+                    />
+                  </div>
+                )}
 
                 {/* Testimonial Content */}
                 <CustomFormField
@@ -637,55 +799,92 @@ export default function TestimonialSubmissionPage({
                 </div>
 
                 {/* Role & Company side by side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <CustomFormField
-                    type="text"
-                    control={form.control}
-                    name="authorRole"
-                    label="Role"
-                    placeholder="CEO, Developer, etc."
-                    optional
-                  />
-                  <CustomFormField
-                    type="text"
-                    control={form.control}
-                    name="authorCompany"
-                    label="Company"
-                    placeholder="Acme Inc."
-                    optional
-                  />
-                </div>
+                {(isJobTitleEnabled || isCompanyEnabled) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {isJobTitleEnabled && (
+                      <CustomFormField
+                        type="text"
+                        control={form.control}
+                        name="authorRole"
+                        label="Role"
+                        placeholder="CEO, Developer, etc."
+                        required={requireJobTitle}
+                        optional={!requireJobTitle}
+                      />
+                    )}
+                    {isCompanyEnabled && (
+                      <CustomFormField
+                        type="text"
+                        control={form.control}
+                        name="authorCompany"
+                        label="Company"
+                        placeholder="Acme Inc."
+                        required={requireCompany}
+                        optional={!requireCompany}
+                      />
+                    )}
+                  </div>
+                )}
 
-                {/* Avatar Upload - only show if not using Google */}
-                {!isGoogleVerified && (
+                {/* Avatar Upload - only show if enabled and not using Google */}
+                {isAvatarEnabled && !isGoogleVerified && (
                   <AzureFileUpload
                     control={form.control}
                     name="authorAvatar"
-                    label="Profile Picture"
+                    label={
+                      requireAvatar ? "Profile Picture (Required)" : "Profile Picture"
+                    }
                     directory="avatars"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
                     maxSizeMB={2}
-                    description="Optional · JPG, PNG, or WebP (max 2MB)"
+                    description={
+                      requireAvatar
+                        ? "Required · JPG, PNG, or WebP (max 2MB)"
+                        : "Optional · JPG, PNG, or WebP (max 2MB)"
+                    }
                   />
                 )}
 
                 {/* Video URL - collapsed by default */}
-                <details className="group">
-                  <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-                    + Add video testimonial
-                  </summary>
-                  <div className="mt-3">
-                    <CustomFormField
-                      type="url"
-                      control={form.control}
-                      name="videoUrl"
-                      label="Video URL"
-                      placeholder="https://youtube.com/watch?v=..."
-                      description="YouTube, Vimeo, or Loom link"
-                      optional
-                    />
-                  </div>
-                </details>
+                {isVideoEnabled && (
+                  <Collapsible
+                    open={isVideoSectionOpen}
+                    onOpenChange={setIsVideoSectionOpen}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto w-full justify-between px-0 text-sm font-medium text-muted-foreground hover:text-foreground"
+                      >
+                        <span>
+                          {requireVideoUrl
+                            ? "Video testimonial required"
+                            : "Add video testimonial"}
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            "h-4 w-4 transition-transform",
+                            isVideoSectionOpen && "rotate-180",
+                          )}
+                        />
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-3">
+                      <CustomFormField
+                        type="url"
+                        control={form.control}
+                        name="videoUrl"
+                        label="Video URL"
+                        placeholder="https://youtube.com/watch?v=..."
+                        description="YouTube, Vimeo, or Loom link"
+                        required={requireVideoUrl}
+                        optional={!requireVideoUrl}
+                      />
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
 
                 <Separator />
 
@@ -693,12 +892,13 @@ export default function TestimonialSubmissionPage({
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full"
-                  disabled={isSubmitting}
-                  style={
-                    project?.brandColorPrimary
-                      ? { backgroundColor: project.brandColorPrimary }
-                      : undefined
+                  className={cn(
+                    "w-full",
+                    brandPrimaryHex &&
+                      "border-[var(--collection-brand-primary)] bg-[var(--collection-brand-primary)] text-white hover:bg-[var(--collection-brand-hover)] focus-visible:ring-[var(--collection-brand-primary)]",
+                  )}
+                  disabled={
+                    isSubmitting || (requireGoogleVerification && !isGoogleVerified)
                   }
                 >
                   {isSubmitting ? "Submitting..." : "Submit Testimonial"}
@@ -708,13 +908,15 @@ export default function TestimonialSubmissionPage({
                 <div className="flex items-center justify-center">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <button
+                      <Button
                         type="button"
-                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto gap-1 px-1 text-xs text-muted-foreground hover:text-foreground"
                       >
                         <Info className="h-3 w-3" />
                         How we use your data
-                      </button>
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -759,7 +961,9 @@ export default function TestimonialSubmissionPage({
                     <DialogHeader>
                       <DialogTitle>Data Privacy</DialogTitle>
                       <DialogDescription>
-                        Choose how you'd like to submit your testimonial.
+                        {allowAnonymousSubmissions
+                          ? "Choose how you'd like to submit your testimonial."
+                          : "This form requires consented submission for spam protection."}
                       </DialogDescription>
                     </DialogHeader>
 
@@ -781,13 +985,15 @@ export default function TestimonialSubmissionPage({
                           <ShieldCheck className="h-4 w-4" />I Consent & Submit
                         </Button>
 
-                        <Button
-                          variant="outline"
-                          onClick={() => handlePrivacyChoice(false)}
-                          className="w-full text-muted-foreground"
-                        >
-                          Submit Anonymously
-                        </Button>
+                        {allowAnonymousSubmissions && (
+                          <Button
+                            variant="outline"
+                            onClick={() => handlePrivacyChoice(false)}
+                            className="w-full text-muted-foreground"
+                          >
+                            Submit Anonymously
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </DialogContent>
@@ -796,8 +1002,7 @@ export default function TestimonialSubmissionPage({
             </Form>
           </CardContent>
         </Card>
-      </div>
+      </CollectionPageShell>
     </GoogleOAuthProvider>
   );
 }
-

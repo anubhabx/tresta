@@ -109,7 +109,7 @@ export interface WidgetConfig {
 export const DEFAULT_WIDGET_CONFIG: Required<WidgetConfig> = {
   layout: "grid",
   theme: "dark",
-  primaryColor: "#0066FF",
+  primaryColor: "#3B82F6",
   secondaryColor: "#1a1a2e",
   showRating: true,
   showDate: true,

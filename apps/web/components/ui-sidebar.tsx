@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Sidebar,
@@ -57,6 +57,11 @@ const UISidebar = () => {
     if (isMobile) setOpenMobile(false);
   };
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    if (isMobile) setOpenMobile(false);
+  }, [pathname]);
+
   // Fetch projects list - will automatically update when new project is created
   const { data: projectsData, isLoading: isLoadingProjects } =
     projects.queries.useList(1, 10);
@@ -73,6 +78,7 @@ const UISidebar = () => {
         <Link
           href="/dashboard"
           className="flex items-center gap-2 text-foreground w-8! h-8!"
+          onClick={closeMobileSidebar}
         >
           <Image
             src="/branding/tresta.svg"

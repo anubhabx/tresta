@@ -1,7 +1,7 @@
 "use client";
 
-import { ProjectWizard } from "@/components/project-wizard";
+import { ProjectConfigEditor } from "@/components/project-config-editor";
 
 export default function NewProjectPage() {
-  return <ProjectWizard mode="create" />;
+  return <ProjectConfigEditor mode="create" />;
 }

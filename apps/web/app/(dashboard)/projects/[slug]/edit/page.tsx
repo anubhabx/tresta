@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { ProjectWizard } from "@/components/project-wizard";
+import { ProjectConfigEditor } from "@/components/project-config-editor";
 
 interface ProjectEditPageProps {
   params: Promise<{
@@ -11,5 +11,5 @@ interface ProjectEditPageProps {
 
 export default function ProjectEditPage({ params }: ProjectEditPageProps) {
   const { slug } = use(params);
-  return <ProjectWizard mode="edit" slug={slug} />;
+  return <ProjectConfigEditor mode="edit" slug={slug} />;
 }

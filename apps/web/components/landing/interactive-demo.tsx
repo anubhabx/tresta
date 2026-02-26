@@ -169,15 +169,20 @@ export function InteractiveDemo() {
           {/* Preview Area */}
           <div
             className="min-h-[400px] p-6 transition-colors duration-300"
-            style={{
-              backgroundColor: theme === "dark" ? "var(--color-background-dark, #0A0A0A)" : "var(--color-background-light, #FAFAFA)",
-              // Scoped preview theme variables
-              "--preview-bg": theme === "dark" ? "#141414" : "#ffffff",
-              "--preview-border": theme === "dark" ? "#2E2E2E" : "#E5E5E5",
-              "--preview-fg": theme === "dark" ? "#FAFAFA" : "#0A0A0A",
-              "--preview-muted": theme === "dark" ? "#A3A3A3" : "#737373",
-              "--preview-muted-alt": theme === "dark" ? "#737373" : "#A3A3A3",
-            } as React.CSSProperties}
+            style={
+              {
+                backgroundColor:
+                  theme === "dark"
+                    ? "var(--color-background-dark, #0A0A0A)"
+                    : "var(--color-background-light, #FAFAFA)",
+                // Scoped preview theme variables
+                "--preview-bg": theme === "dark" ? "#141414" : "#ffffff",
+                "--preview-border": theme === "dark" ? "#2E2E2E" : "#E5E5E5",
+                "--preview-fg": theme === "dark" ? "#FAFAFA" : "#0A0A0A",
+                "--preview-muted": theme === "dark" ? "#A3A3A3" : "#737373",
+                "--preview-muted-alt": theme === "dark" ? "#737373" : "#A3A3A3",
+              } as React.CSSProperties
+            }
           >
             <div className={cn("grid gap-4", getGridClasses())}>
               {sampleTestimonials.map((testimonial) => (

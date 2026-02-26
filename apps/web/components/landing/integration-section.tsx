@@ -20,10 +20,9 @@ type Framework = (typeof frameworks)[number]["id"];
 const codeExamples: Record<Framework, string> = {
   html: `<!-- Add this anywhere in your HTML -->
 <script
-  src="https://tresta.app/widget.js"
-  data-project="your-project-slug"
-  data-theme="dark"
-  data-layout="carousel"
+  src="https://api.tresta.app/widget/tresta-widget.js"
+  data-tresta-widget="your-widget-id"
+  data-api-key="your-api-key"
 ></script>`,
   nextjs: `// components/Testimonials.tsx
 import Script from 'next/script'
@@ -31,10 +30,9 @@ import Script from 'next/script'
 export function Testimonials() {
   return (
     <Script
-      src="https://tresta.app/widget.js"
-      data-project="your-project-slug"
-      data-theme="dark"
-      data-layout="carousel"
+      src="https://api.tresta.app/widget/tresta-widget.js"
+      data-tresta-widget="your-widget-id"
+      data-api-key="your-api-key"
       strategy="lazyOnload"
     />
   )
@@ -45,10 +43,9 @@ import { useEffect } from 'react'
 function Testimonials() {
   useEffect(() => {
     const script = document.createElement('script')
-    script.src = 'https://tresta.app/widget.js'
-    script.dataset.project = 'your-project-slug'
-    script.dataset.theme = 'dark'
-    script.dataset.layout = 'carousel'
+    script.src = 'https://api.tresta.app/widget/tresta-widget.js'
+    script.setAttribute('data-tresta-widget', 'your-widget-id')
+    script.setAttribute('data-api-key', 'your-api-key')
     document.body.appendChild(script)
   }, [])
   
@@ -60,10 +57,9 @@ import { onMounted } from 'vue'
 
 onMounted(() => {
   const script = document.createElement('script')
-  script.src = 'https://tresta.app/widget.js'
-  script.dataset.project = 'your-project-slug'
-  script.dataset.theme = 'dark'
-  script.dataset.layout = 'carousel'
+  script.src = 'https://api.tresta.app/widget/tresta-widget.js'
+  script.setAttribute('data-tresta-widget', 'your-widget-id')
+  script.setAttribute('data-api-key', 'your-api-key')
   document.body.appendChild(script)
 })
 </script>
@@ -78,29 +74,32 @@ onMounted(() => {
 
 <script
   is:inline
-  src="https://tresta.app/widget.js"
-  data-project="your-project-slug"
-  data-theme="dark"
-  data-layout="carousel"
+  src="https://api.tresta.app/widget/tresta-widget.js"
+  data-tresta-widget="your-widget-id"
+  data-api-key="your-api-key"
 ></script>`,
 };
 
 const configOptions = [
   {
+    prop: "data-tresta-widget",
+    values: "string",
+    desc: "Your widget ID",
+  },
+  {
+    prop: "data-api-key",
+    values: "string",
+    desc: "Your API key",
+  },
+  {
+    prop: "data-api-url",
+    values: "string",
+    desc: "API base URL (optional)",
+  },
+  {
     prop: "data-theme",
     values: '"light" | "dark" | "system"',
     desc: "Theme mode",
-  },
-  {
-    prop: "data-layout",
-    values: '"carousel" | "grid" | "wall" | "masonry" | "list"',
-    desc: "Display layout",
-  },
-  { prop: "data-limit", values: "number", desc: "Max testimonials to show" },
-  {
-    prop: "data-filter-rating",
-    values: "number",
-    desc: "Minimum rating filter",
   },
 ];
 
@@ -216,4 +215,3 @@ export function IntegrationSection() {
     </section>
   );
 }
-

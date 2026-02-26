@@ -232,8 +232,8 @@ export function LandingNavbar() {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px]">
-              <SheetHeader>
+            <SheetContent side="right" className="w-[300px] sm:w-[350px] px-4">
+              <SheetHeader className="px-0 mt-4">
                 <SheetTitle className="flex items-center gap-2">
                   <Image
                     src="/branding/tresta.svg"
@@ -245,7 +245,7 @@ export function LandingNavbar() {
                 </SheetTitle>
               </SheetHeader>
 
-              <nav className="mt-8 flex flex-col gap-6">
+              <nav className="mt-4 flex flex-col gap-6">
                 {/* Product Section */}
                 <div>
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

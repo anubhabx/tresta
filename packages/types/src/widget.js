@@ -13,7 +13,7 @@ export const MVP_WIDGET_THEMES = ["light", "dark", "auto"];
 export const DEFAULT_WIDGET_CONFIG = {
     layout: "grid",
     theme: "light",
-    primaryColor: "#0066FF",
+    primaryColor: "#3B82F6",
     secondaryColor: "#00CC99",
     showRating: true,
     showDate: true,

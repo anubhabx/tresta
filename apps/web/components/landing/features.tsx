@@ -50,7 +50,9 @@ function CodeWindowHeader() {
       <div className="relative px-4 py-3">
         <pre className="text-xs font-mono leading-relaxed">
           <code>
-            <span className="text-muted-foreground">{"<!-- Tresta Widget -->"}</span>
+            <span className="text-muted-foreground">
+              {"<!-- Tresta Widget -->"}
+            </span>
             {"\n"}
             <span className="text-muted-foreground">&lt;</span>
             <span className="text-pink-400">script</span>
@@ -58,20 +60,16 @@ function CodeWindowHeader() {
             <span className="text-sky-400">src</span>
             <span className="text-muted-foreground">=</span>
             <span className="text-amber-300">
-              &quot;tresta.app/widget.js&quot;
+              &quot;api.tresta.app/widget/tresta-widget.js&quot;
             </span>
             {"\n  "}
-            <span className="text-sky-400">data-project</span>
+            <span className="text-sky-400">data-tresta-widget</span>
             <span className="text-muted-foreground">=</span>
-            <span className="text-amber-300">&quot;my-saas&quot;</span>
+            <span className="text-amber-300">&quot;my-widget-id&quot;</span>
             {"\n  "}
-            <span className="text-sky-400">data-layout</span>
+            <span className="text-sky-400">data-api-key</span>
             <span className="text-muted-foreground">=</span>
-            <span className="text-emerald-400">&quot;carousel&quot;</span>
-            {"\n  "}
-            <span className="text-sky-400">data-theme</span>
-            <span className="text-muted-foreground">=</span>
-            <span className="text-violet-400">&quot;dark&quot;</span>
+            <span className="text-emerald-400">&quot;my-api-key&quot;</span>
             {"\n"}
             <span className="text-muted-foreground">/&gt;</span>
           </code>
@@ -257,7 +255,9 @@ function RealtimeFeedHeader() {
           </span>
           Notifications
         </div>
-        <span className="text-[10px] text-muted-foreground font-mono">3 new</span>
+        <span className="text-[10px] text-muted-foreground font-mono">
+          3 new
+        </span>
       </div>
 
       {/* Feed items */}

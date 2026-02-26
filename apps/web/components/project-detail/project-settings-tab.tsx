@@ -24,6 +24,7 @@ import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { Project } from "@/types/api";
 import { ModerationSettingsForm } from "./moderation-settings-form";
+import { FormConfigSettings } from "./form-config-settings";
 
 interface ProjectSettingsTabProps {
   project: Project;
@@ -51,7 +52,7 @@ export function ProjectSettingsTab({
     <div className="space-y-6">
       <Accordion
         type="multiple"
-        defaultValue={["general", "moderation"]}
+        defaultValue={["general", "moderation", "form-config"]}
         className="w-full space-y-4"
       >
         {/* General Settings */}
@@ -141,6 +142,21 @@ export function ProjectSettingsTab({
           <AccordionContent>
             <div className="pt-4">
               <ModerationSettingsForm project={project} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Collection Form Settings */}
+        <AccordionItem
+          value="form-config"
+          className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)] rounded-lg px-4"
+        >
+          <AccordionTrigger className="text-base sm:text-lg font-semibold hover:no-underline">
+            Collection Form Settings
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="pt-4">
+              <FormConfigSettings project={project} />
             </div>
           </AccordionContent>
         </AccordionItem>

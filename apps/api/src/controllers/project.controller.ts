@@ -8,12 +8,12 @@ import {
   ForbiddenError,
   ValidationError,
   handlePrismaError,
-} from '../lib/errors.js';
+} from "../lib/errors.js";
 import {
   ResponseHandler,
   extractPaginationParams,
   calculateSkip,
-} from '../lib/response.js';
+} from "../lib/response.js";
 import {
   isValidHexColor,
   isValidUrl,
@@ -22,7 +22,7 @@ import {
   isValidVisibility,
   validateSocialLinks,
   validateTags,
-} from '../lib/validators.js';
+} from "../lib/validators.js";
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,
@@ -62,51 +62,58 @@ const createProject = async (
       socialLinks,
       tags,
       visibility,
+      formConfig,
     } = req.body as CreateProjectPayload;
     const id = requireUserId(req);
 
     // Required field validations
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      throw new ValidationError("Project name is required and must be a non-empty string", {
-        field: 'name',
-        received: typeof name
-      });
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      throw new ValidationError(
+        "Project name is required and must be a non-empty string",
+        {
+          field: "name",
+          received: typeof name,
+        },
+      );
     }
 
     if (name.length > 255) {
       throw new ValidationError(
         "Project name must be less than 255 characters",
         {
-          field: 'name',
+          field: "name",
           maxLength: 255,
-          received: name.length
-        }
+          received: name.length,
+        },
       );
     }
 
-    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
-      throw new ValidationError("Project slug is required and must be a non-empty string", {
-        field: 'slug',
-        received: typeof slug
-      });
+    if (!slug || typeof slug !== "string" || slug.trim().length === 0) {
+      throw new ValidationError(
+        "Project slug is required and must be a non-empty string",
+        {
+          field: "slug",
+          received: typeof slug,
+        },
+      );
     }
 
     if (!isValidSlug(slug)) {
       throw new ValidationError(
         "Slug can only contain lowercase letters, numbers, and hyphens",
         {
-          field: 'slug',
-          pattern: '^[a-z0-9-]+$',
-          received: slug
-        }
+          field: "slug",
+          pattern: "^[a-z0-9-]+$",
+          received: slug,
+        },
       );
     }
 
     if (slug.length > 255) {
       throw new ValidationError("Slug must be less than 255 characters", {
-        field: 'slug',
+        field: "slug",
         maxLength: 255,
-        received: slug.length
+        received: slug.length,
       });
     }
 
@@ -157,7 +164,7 @@ const createProject = async (
       select: { plan: true },
     });
 
-    if (user?.plan === 'FREE') {
+    if (user?.plan === "FREE") {
       if (brandColorPrimary && !isFreeColor(brandColorPrimary)) {
         throw new ForbiddenError(
           "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
@@ -200,9 +207,9 @@ const createProject = async (
 
     if (existingProject) {
       throw new ConflictError("Project with this slug already exists", {
-        field: 'slug',
+        field: "slug",
         value: slug,
-        suggestion: 'Please choose a different slug'
+        suggestion: "Please choose a different slug",
       });
     }
 
@@ -230,6 +237,8 @@ const createProject = async (
           socialLinks: socialLinks || undefined,
           tags: tags || [],
           visibility: visibility || "PRIVATE",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          formConfig: formConfig ? (formConfig as any) : undefined,
         },
       });
     } catch (error) {
@@ -311,10 +320,10 @@ const getProjectBySlug = async (
     const { slug } = req.params;
     const userId = requireUserId(req);
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
-        received: typeof slug
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
       });
     }
 
@@ -339,7 +348,8 @@ const getProjectBySlug = async (
       throw new NotFoundError(`Project with slug "${slug}" not found`, {
         slug,
         userId,
-        suggestion: 'Please check the project slug or ensure you have access to this project'
+        suggestion:
+          "Please check the project slug or ensure you have access to this project",
       });
     }
 
@@ -364,10 +374,10 @@ const getPublicProjectBySlug = async (
   try {
     const { slug } = req.params;
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
-        received: typeof slug
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
       });
     }
 
@@ -387,6 +397,7 @@ const getPublicProjectBySlug = async (
           projectType: true,
           brandColorPrimary: true,
           brandColorSecondary: true,
+          formConfig: true,
           user: {
             select: {
               plan: true,
@@ -401,7 +412,8 @@ const getPublicProjectBySlug = async (
     if (!project) {
       throw new NotFoundError("Project not found", {
         slug,
-        suggestion: 'This project may be inactive. Please contact the project owner.'
+        suggestion:
+          "This project may be inactive. Please contact the project owner.",
       });
     }
 
@@ -438,31 +450,38 @@ const updateProject = async (
     const payload = req.body as UpdateProjectPayload;
     const userId = requireUserId(req);
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
-        received: typeof slug
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
       });
     }
 
     // Check user plan implementation
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { plan: true } // Assuming 'plan' field stores 'FREE' or 'PRO' or we check subscription
+      select: { plan: true }, // Assuming 'plan' field stores 'FREE' or 'PRO' or we check subscription
     });
     // In our schema User.plan is an Enum "FREE" | "PRO"
 
     // Check if trying to update brand colors — free users can only use palette colors
     if (
-      (payload.brandColorPrimary !== undefined || payload.brandColorSecondary !== undefined) &&
-      user?.plan === 'FREE'
+      (payload.brandColorPrimary !== undefined ||
+        payload.brandColorSecondary !== undefined) &&
+      user?.plan === "FREE"
     ) {
-      if (payload.brandColorPrimary && !isFreeColor(payload.brandColorPrimary)) {
+      if (
+        payload.brandColorPrimary &&
+        !isFreeColor(payload.brandColorPrimary)
+      ) {
         throw new ForbiddenError(
           "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
         );
       }
-      if (payload.brandColorSecondary && !isFreeColor(payload.brandColorSecondary)) {
+      if (
+        payload.brandColorSecondary &&
+        !isFreeColor(payload.brandColorSecondary)
+      ) {
         throw new ForbiddenError(
           "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
         );
@@ -483,7 +502,8 @@ const updateProject = async (
       throw new NotFoundError(`Project with slug "${slug}" not found`, {
         slug,
         userId,
-        suggestion: 'Please check the project slug or ensure you have access to this project'
+        suggestion:
+          "Please check the project slug or ensure you have access to this project",
       });
     }
 
@@ -527,9 +547,9 @@ const updateProject = async (
 
       if (slugExists) {
         throw new ConflictError("Project with this slug already exists", {
-          field: 'slug',
+          field: "slug",
           value: payload.slug,
-          suggestion: 'Please choose a different slug'
+          suggestion: "Please choose a different slug",
         });
       }
     }
@@ -735,6 +755,104 @@ const updateProject = async (
     if (payload.moderationSettings !== undefined)
       updateData.moderationSettings = payload.moderationSettings;
 
+    // Add form config
+    if (payload.formConfig !== undefined) {
+      if (payload.formConfig !== null) {
+        const fc = payload.formConfig;
+        // Validate string fields
+        if (
+          fc.headerTitle !== undefined &&
+          typeof fc.headerTitle !== "string"
+        ) {
+          throw new BadRequestError("Header title must be a string");
+        }
+        if (fc.headerTitle && fc.headerTitle.length > 200) {
+          throw new BadRequestError(
+            "Header title must be less than 200 characters",
+          );
+        }
+        if (
+          fc.headerDescription !== undefined &&
+          typeof fc.headerDescription !== "string"
+        ) {
+          throw new BadRequestError("Header description must be a string");
+        }
+        if (fc.headerDescription && fc.headerDescription.length > 500) {
+          throw new BadRequestError(
+            "Header description must be less than 500 characters",
+          );
+        }
+        if (
+          fc.thankYouMessage !== undefined &&
+          typeof fc.thankYouMessage !== "string"
+        ) {
+          throw new BadRequestError("Thank you message must be a string");
+        }
+        if (fc.thankYouMessage && fc.thankYouMessage.length > 500) {
+          throw new BadRequestError(
+            "Thank you message must be less than 500 characters",
+          );
+        }
+        // Validate boolean fields
+        const boolFields = [
+          "enableRating",
+          "enableJobTitle",
+          "enableCompany",
+          "enableAvatar",
+          "enableVideoUrl",
+          "enableGoogleVerification",
+          "requireRating",
+          "requireJobTitle",
+          "requireCompany",
+          "requireAvatar",
+          "requireVideoUrl",
+          "requireGoogleVerification",
+          "allowAnonymousSubmissions",
+          "notifyOnSubmission",
+        ] as const;
+        for (const field of boolFields) {
+          if (fc[field] !== undefined && typeof fc[field] !== "boolean") {
+            throw new BadRequestError(`${field} must be a boolean`);
+          }
+        }
+
+        if (fc.enableRating === false && fc.requireRating === true) {
+          throw new BadRequestError(
+            "Rating cannot be required when rating is disabled",
+          );
+        }
+        if (fc.enableJobTitle === false && fc.requireJobTitle === true) {
+          throw new BadRequestError(
+            "Job title cannot be required when the field is disabled",
+          );
+        }
+        if (fc.enableCompany === false && fc.requireCompany === true) {
+          throw new BadRequestError(
+            "Company cannot be required when the field is disabled",
+          );
+        }
+        if (fc.enableAvatar === false && fc.requireAvatar === true) {
+          throw new BadRequestError(
+            "Avatar cannot be required when uploads are disabled",
+          );
+        }
+        if (fc.enableVideoUrl === false && fc.requireVideoUrl === true) {
+          throw new BadRequestError(
+            "Video URL cannot be required when the field is disabled",
+          );
+        }
+        if (
+          fc.enableGoogleVerification === false &&
+          fc.requireGoogleVerification === true
+        ) {
+          throw new BadRequestError(
+            "Google verification cannot be required when it is disabled",
+          );
+        }
+      }
+      updateData.formConfig = payload.formConfig;
+    }
+
     // Update project
     let updatedProject;
     try {
@@ -772,10 +890,10 @@ const deleteProject = async (
     const { slug } = req.params;
     const userId = requireUserId(req);
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
-        received: typeof slug
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
       });
     }
 
@@ -793,7 +911,8 @@ const deleteProject = async (
       throw new NotFoundError(`Project with slug "${slug}" not found`, {
         slug,
         userId,
-        suggestion: 'Please check the project slug or ensure you have access to this project'
+        suggestion:
+          "Please check the project slug or ensure you have access to this project",
       });
     }
 
@@ -806,7 +925,10 @@ const deleteProject = async (
       throw handlePrismaError(error);
     }
 
-    return ResponseHandler.deleted(res, `Project "${existingProject.name}" deleted successfully`);
+    return ResponseHandler.deleted(
+      res,
+      `Project "${existingProject.name}" deleted successfully`,
+    );
   } catch (error) {
     next(error);
   }

@@ -23,6 +23,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { generateEmbedCodes, API_KEY_PLACEHOLDER } from "@/lib/embed-code";
 
 interface EmbedCodeDialogProps {
   widgetId: string;
@@ -103,58 +104,10 @@ export function EmbedCodeDialog({
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const widgetScriptUrl = `${apiUrl}/widget/tresta-widget.js`;
-  const apiKeyPlaceholder = "YOUR_API_KEY_HERE";
-  const displayApiKey = apiKey || apiKeyPlaceholder;
-  const iframeUrl = `${apiUrl}/api/public/embed/${widgetId}?apiKey=${displayApiKey}`;
+  const displayApiKey = apiKey || API_KEY_PLACEHOLDER;
   const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 
-  const embedCodes = {
-    script: `<!-- Tresta Widget -->
-<script 
-  src="${widgetScriptUrl}" 
-  data-tresta-widget="${widgetId}" 
-  data-api-url="${apiUrl}"
-  data-api-key="${displayApiKey}">
-</script>`,
-
-    iframe: `<!-- Tresta Widget (iframe) -->
-<iframe
-  src="${iframeUrl}"
-  width="100%"
-  height="600"
-  frameborder="0"
-  style="border: none; border-radius: 8px;"
-  title="Testimonials"
-></iframe>`,
-
-    react: `import { useEffect } from 'react';
-
-function TestimonialWidget() {
-  useEffect(() => {
-    // Load widget script
-    const script = document.createElement('script');
-    script.src = '${widgetScriptUrl}';
-    script.setAttribute('data-widget-id', '${widgetId}');
-    script.setAttribute('data-tresta-widget', '${widgetId}');
-    script.setAttribute('data-api-key', '${displayApiKey}');
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup widget on unmount
-      if (window.TrestaWidget) {
-        window.TrestaWidget.destroy('${widgetId}');
-      }
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  return <div id="tresta-widget-container" />;
-}`,
-
-    api: `curl -X GET "${apiEndpointUrl}" \\
-  -H "Authorization: Bearer ${displayApiKey}"`,
-  };
+  const embedCodes = generateEmbedCodes({ widgetId, apiKey });
 
   const tabConfigs = [
     {
@@ -256,8 +209,9 @@ function TestimonialWidget() {
               <div className="flex-1 text-sm text-info-text">
                 <p className="font-medium">API Key Required</p>
                 <p className="text-xs mt-1">
-                  Create an API key from <strong>Account Settings → API &amp; Tokens</strong>{" "}
-                  to enable widget embedding. Replace{" "}
+                  Create an API key from{" "}
+                  <strong>Account Settings → API &amp; Tokens</strong> to enable
+                  widget embedding. Replace{" "}
                   <code className="px-1 py-0.5 bg-info-highlight-bg rounded">
                     YOUR_API_KEY_HERE
                   </code>{" "}

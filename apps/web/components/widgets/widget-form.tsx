@@ -20,7 +20,7 @@ import {
 
 const MIN_MAX_TESTIMONIALS = 20;
 
-const widgetFormSchema = z.object({
+export const widgetFormSchema = z.object({
   layout: z.enum(["carousel", "grid", "masonry", "wall", "list", "marquee"]),
   theme: z.enum(["light", "dark", "auto"]),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),

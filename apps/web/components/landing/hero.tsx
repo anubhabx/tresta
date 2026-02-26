@@ -64,7 +64,7 @@ function LiveTestimonialCard() {
   const testimonial = testimonials[currentIndex]!;
 
   return (
-    <div className="relative w-full overflow-x-hidden">
+    <div className="relative w-full">
       {/* Notification-style incoming indicator */}
       <motion.div
         key={testimonial.id}
@@ -95,14 +95,14 @@ function LiveTestimonialCard() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.98 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="rounded-xl border border-border bg-card p-6 shadow-lg h-[200px]"
+          className="rounded-xl border border-border bg-card p-6 shadow-lg"
         >
           <div className="flex gap-1 mb-3">
             {[...Array(testimonial.rating)].map((_, i) => (
               <Star key={i} className="h-4 w-4 fill-warning text-warning" />
             ))}
           </div>
-          <p className="text-foreground text-lg leading-relaxed mb-4">
+          <p className="text-foreground text-lg leading-relaxed mb-4 min-h-[100px]">
             &ldquo;{testimonial.content}&rdquo;
           </p>
           <div className="flex items-center justify-between">
@@ -244,9 +244,9 @@ export function Hero() {
               className="mt-6 overflow-hidden rounded-md"
             >
               <CodeBlock
-                code={`<script src="https://tresta.app/widget.js"
-  data-project="your-project"
-  data-layout="carousel">
+                code={`<script src="https://api.tresta.app/widget/tresta-widget.js"
+  data-tresta-widget="your-widget-id"
+  data-api-key="your-api-key">
 </script>`}
                 language="html"
                 copyable

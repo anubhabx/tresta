@@ -60,6 +60,10 @@ Built as a **Turborepo monorepo** with modern TypeScript tooling, Tresta provide
 - ✅ **Embeddable Widgets** - Standalone JavaScript widgets (carousel, grid, masonry, wall, list, marquee)
 - ✅ **Project Management** - Create and manage multiple testimonial projects
 - ✅ **Testimonial Forms** - Public-facing forms with customizable branding
+  - Field visibility toggles (rating, role, company, avatar, video, Google verification)
+  - Field requirement controls (require rating/role/company/avatar/video)
+  - Submission behavior controls (require Google verification, anonymous submission toggle)
+  - Notification preference per project (notify owner on new submission)
 - ✅ **Admin Dashboard** - Full-featured management interface with bulk moderation
 - ✅ **Source Tracking** - IP address, user agent, and source metadata capture
 - ✅ **Custom Account Settings** - Profile management with privacy transparency page

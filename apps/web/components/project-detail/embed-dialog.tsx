@@ -16,31 +16,15 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
 import { CodeBlock } from "@workspace/ui/components/code-block";
-import { Code, Copy, Check } from "lucide-react";
+import { Code } from "lucide-react";
 import type { Project } from "@/types/api";
+import { generateEmbedCodes, API_KEY_PLACEHOLDER } from "@/lib/embed-code";
 
 interface EmbedDialogProps {
   project: Project;
   trigger?: React.ReactNode;
 }
-
-type LayoutType = "carousel" | "grid" | "masonry" | "wall" | "list";
-
-const layouts: { id: LayoutType; label: string }[] = [
-  { id: "carousel", label: "Carousel" },
-  { id: "grid", label: "Grid" },
-  { id: "masonry", label: "Masonry" },
-  { id: "wall", label: "Wall of Love" },
-  { id: "list", label: "List" },
-];
 
 /**
  * Embed Dialog Component
@@ -51,42 +35,17 @@ const layouts: { id: LayoutType; label: string }[] = [
  * - React component
  *
  * Design principle: Developer-first, copy-paste focused
+ *
+ * Note: This dialog works at the project level and uses a placeholder
+ * widget ID. For production embed codes with the correct widget ID,
+ * users should use the Embed button in the project's Widgets tab.
  */
 export function EmbedDialog({ project, trigger }: EmbedDialogProps) {
-  const [selectedLayout, setSelectedLayout] = useState<LayoutType>("carousel");
   const [open, setOpen] = useState(false);
 
-  const baseUrl =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "https://tresta.app";
-
-  const scriptCode = `<!-- Tresta Testimonial Widget -->
-<div id="tresta-widget"></div>
-<script 
-  src="${baseUrl}/widget.js" 
-  data-project="${project.slug}"
-  data-layout="${selectedLayout}"
-></script>`;
-
-  const iframeCode = `<iframe 
-  src="${baseUrl}/embed/${project.slug}?layout=${selectedLayout}"
-  width="100%" 
-  height="400"
-  frameborder="0"
-  loading="lazy"
-></iframe>`;
-
-  const reactCode = `import { TrestaWidget } from '@tresta/react';
-
-function App() {
-  return (
-    <TrestaWidget 
-      project="${project.slug}"
-      layout="${selectedLayout}"
-    />
-  );
-}`;
+  const embedCodes = generateEmbedCodes({
+    widgetId: "YOUR_WIDGET_ID",
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -107,24 +66,20 @@ function App() {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Layout Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Layout:</span>
-          <Select
-            value={selectedLayout}
-            onValueChange={(v) => setSelectedLayout(v as LayoutType)}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {layouts.map((layout) => (
-                <SelectItem key={layout.id} value={layout.id}>
-                  {layout.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Placeholder notice */}
+        <div className="p-3 bg-info-bg border border-border rounded-md">
+          <p className="text-xs text-info-text">
+            Replace{" "}
+            <code className="bg-info-highlight-bg px-1 py-0.5 rounded">
+              {API_KEY_PLACEHOLDER}
+            </code>{" "}
+            and{" "}
+            <code className="bg-info-highlight-bg px-1 py-0.5 rounded">
+              YOUR_WIDGET_ID
+            </code>{" "}
+            with your actual values from the <strong>Widgets</strong> tab in
+            your project settings.
+          </p>
         </div>
 
         {/* Code Tabs */}
@@ -139,7 +94,7 @@ function App() {
             <p className="text-sm text-muted-foreground">
               Add this script to your HTML. Works with any website.
             </p>
-            <CodeBlock code={scriptCode} language="html" copyable />
+            <CodeBlock code={embedCodes.script} language="html" copyable />
           </TabsContent>
 
           <TabsContent value="iframe" className="mt-4 space-y-3">
@@ -147,17 +102,15 @@ function App() {
               Use an iframe for sandboxed embedding. Simple but less
               customizable.
             </p>
-            <CodeBlock code={iframeCode} language="html" copyable />
+            <CodeBlock code={embedCodes.iframe} language="html" copyable />
           </TabsContent>
 
           <TabsContent value="react" className="mt-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Install the package first:{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                npm install @tresta/react
-              </code>
+              For React/Next.js projects. The widget script handles all
+              rendering automatically with your configured settings.
             </p>
-            <CodeBlock code={reactCode} language="tsx" copyable />
+            <CodeBlock code={embedCodes.react} language="tsx" copyable />
           </TabsContent>
         </Tabs>
 

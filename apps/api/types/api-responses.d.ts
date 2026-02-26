@@ -122,6 +122,28 @@ export interface SocialLinks {
     [key: string]: string | undefined;
 }
 /**
+ * Collection Form Configuration
+ */
+export interface FormConfig {
+    headerTitle?: string;
+    headerDescription?: string;
+    thankYouMessage?: string;
+    enableRating?: boolean;
+    enableJobTitle?: boolean;
+    enableCompany?: boolean;
+    enableAvatar?: boolean;
+    enableVideoUrl?: boolean;
+    enableGoogleVerification?: boolean;
+    requireRating?: boolean;
+    requireJobTitle?: boolean;
+    requireCompany?: boolean;
+    requireAvatar?: boolean;
+    requireVideoUrl?: boolean;
+    requireGoogleVerification?: boolean;
+    allowAnonymousSubmissions?: boolean;
+    notifyOnSubmission?: boolean;
+}
+/**
  * Project entity response types
  */
 export interface ProjectData {
@@ -206,6 +228,7 @@ export interface CreateProjectPayload {
     socialLinks?: SocialLinks;
     tags?: string[];
     visibility?: ProjectVisibility;
+    formConfig?: FormConfig | null;
 }
 export interface UpdateProjectPayload {
     name?: string;
@@ -233,6 +256,7 @@ export interface UpdateProjectPayload {
         customProfanityList?: string[];
         brandKeywords?: string[];
     };
+    formConfig?: FormConfig | null;
 }
 /**
  * Widget types and enums

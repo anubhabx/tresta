@@ -18,6 +18,7 @@ import { CodeBlock } from "@workspace/ui/components/code-block";
 import { Code2, Link2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import type { Project } from "@/types/api";
+import { generateScriptEmbed, API_KEY_PLACEHOLDER } from "@/lib/embed-code";
 
 interface QuickEmbedCardProps {
   projects: Project[];
@@ -28,6 +29,11 @@ interface QuickEmbedCardProps {
  * Allows quick copying of embed code and collection links
  *
  * Design principle: Developer-first, copy-paste focused
+ *
+ * Note: This card requires a widget ID for correct embed code.
+ * Since we only have project-level data here, we show a placeholder
+ * widget ID that the user should replace with their actual widget ID
+ * from the project's Widgets tab.
  */
 export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
   const [selectedProjectSlug, setSelectedProjectSlug] = useState<string>(
@@ -38,7 +44,7 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
 
   const handleCopyCollectionLink = async () => {
     if (!selectedProject) return;
-    const link = `${window.location.origin}/collect/${selectedProject.slug}`;
+    const link = `${window.location.origin}/testimonials/${selectedProject.slug}`;
     await navigator.clipboard.writeText(link);
   };
 
@@ -47,10 +53,9 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
   }
 
   const embedCode = selectedProjectSlug
-    ? `<script src="https://tresta.app/widget.js" 
-  data-project="${selectedProjectSlug}"
-  data-layout="carousel">
-</script>`
+    ? generateScriptEmbed({
+        widgetId: "YOUR_WIDGET_ID",
+      })
     : "";
 
   return (
@@ -83,6 +88,18 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
         {selectedProjectSlug && (
           <>
             <CodeBlock code={embedCode} language="html" copyable />
+
+            <p className="text-xs text-muted-foreground">
+              Replace{" "}
+              <code className="bg-muted px-1 py-0.5 rounded text-xs">
+                {API_KEY_PLACEHOLDER}
+              </code>{" "}
+              and{" "}
+              <code className="bg-muted px-1 py-0.5 rounded text-xs">
+                YOUR_WIDGET_ID
+              </code>{" "}
+              with values from the project&apos;s Widgets tab.
+            </p>
 
             {/* Collection Link Button */}
             <Button

@@ -26,6 +26,31 @@ import { requireUserId } from '../lib/auth.js';
 
 const FALLBACK_TESTIMONIAL_LIMIT = 10;
 
+type SubmissionFormConfig = {
+  enableRating?: boolean;
+  enableJobTitle?: boolean;
+  enableCompany?: boolean;
+  enableAvatar?: boolean;
+  enableVideoUrl?: boolean;
+  enableGoogleVerification?: boolean;
+  requireRating?: boolean;
+  requireJobTitle?: boolean;
+  requireCompany?: boolean;
+  requireAvatar?: boolean;
+  requireVideoUrl?: boolean;
+  requireGoogleVerification?: boolean;
+  allowAnonymousSubmissions?: boolean;
+  notifyOnSubmission?: boolean;
+};
+
+const normalizeFormConfig = (formConfig: unknown): SubmissionFormConfig => {
+  if (!formConfig || typeof formConfig !== 'object' || Array.isArray(formConfig)) {
+    return {};
+  }
+
+  return formConfig as SubmissionFormConfig;
+};
+
 const resolvePlanLimit = (plan: { limits?: unknown } | null): number | null => {
   if (!plan || !plan.limits || typeof plan.limits !== 'object') {
     return null;
@@ -119,6 +144,7 @@ const createTestimonial = async (
       videoUrl,
       googleIdToken, // Google OAuth ID token
     } = req.body;
+    const isAnonymousSubmission = req.headers['x-anonymous-submission'] === 'true';
 
     // Validate required fields
     if (!authorName || typeof authorName !== 'string') {
@@ -169,17 +195,54 @@ const createTestimonial = async (
       );
     }
 
-    // Validate rating if provided
-    if (rating !== undefined) {
-      const ratingNum = Number(rating);
-      if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
-        throw new ValidationError("Rating must be a number between 1 and 5", {
-          field: 'rating',
-          min: 1,
-          max: 5,
-          received: rating
-        });
-      }
+    // Validate optional field types
+    if (authorRole !== undefined && authorRole !== null && typeof authorRole !== 'string') {
+      throw new ValidationError('Author role must be a string', {
+        field: 'authorRole',
+        received: typeof authorRole,
+      });
+    }
+
+    if (
+      authorCompany !== undefined &&
+      authorCompany !== null &&
+      typeof authorCompany !== 'string'
+    ) {
+      throw new ValidationError('Author company must be a string', {
+        field: 'authorCompany',
+        received: typeof authorCompany,
+      });
+    }
+
+    if (authorAvatar !== undefined && authorAvatar !== null && typeof authorAvatar !== 'string') {
+      throw new ValidationError('Author avatar must be a string', {
+        field: 'authorAvatar',
+        received: typeof authorAvatar,
+      });
+    }
+
+    if (videoUrl !== undefined && videoUrl !== null && typeof videoUrl !== 'string') {
+      throw new ValidationError('Video URL must be a string', {
+        field: 'videoUrl',
+        received: typeof videoUrl,
+      });
+    }
+
+    const normalizedRating =
+      rating !== undefined && rating !== null && rating !== ''
+        ? Number(rating)
+        : undefined;
+
+    if (
+      normalizedRating !== undefined &&
+      (Number.isNaN(normalizedRating) || normalizedRating < 1 || normalizedRating > 5)
+    ) {
+      throw new ValidationError("Rating must be a number between 1 and 5", {
+        field: 'rating',
+        min: 1,
+        max: 5,
+        received: rating,
+      });
     }
 
     // Validate optional fields length
@@ -193,32 +256,15 @@ const createTestimonial = async (
       );
     }
 
-    // Verify Google OAuth token if provided
-    let googleProfile: any = null;
+    // Google OAuth verification state (evaluated after project config)
+    let googleProfile: {
+      email?: string;
+      name?: string;
+      email_verified?: boolean;
+      sub?: string;
+    } | null = null;
     let isOAuthVerified = false;
-    let oauthSubject = null;
-
-    if (googleIdToken) {
-      googleProfile = await verifyGoogleIdToken(googleIdToken);
-
-      if (!googleProfile) {
-        throw new BadRequestError("Invalid Google authentication token");
-      }
-
-      // Email verification check
-      if (!googleProfile.email_verified) {
-        throw new BadRequestError("Google email must be verified");
-      }
-
-      isOAuthVerified = true;
-      oauthSubject = googleProfile.sub;
-
-      console.log("✅ Google OAuth verified:", {
-        email: googleProfile.email,
-        name: googleProfile.name,
-        verified: googleProfile.email_verified,
-      });
-    }
+    let oauthSubject: string | null = null;
 
     if (!slug || typeof slug !== 'string') {
       throw new ValidationError('Project slug is required', {
@@ -256,8 +302,138 @@ const createTestimonial = async (
     // Enforce owner plan testimonial quota for both authenticated and public submissions
     await enforceTestimonialLimit(project.userId);
 
+    const formConfig = normalizeFormConfig(project.formConfig);
+    const isRatingEnabled = formConfig.enableRating !== false;
+    const isJobTitleEnabled = formConfig.enableJobTitle !== false;
+    const isCompanyEnabled = formConfig.enableCompany !== false;
+    const isAvatarEnabled = formConfig.enableAvatar !== false;
+    const isVideoEnabled = formConfig.enableVideoUrl !== false;
+    const isGoogleVerificationEnabled =
+      formConfig.enableGoogleVerification !== false;
+
+    const requireRating = isRatingEnabled && formConfig.requireRating === true;
+    const requireJobTitle =
+      isJobTitleEnabled && formConfig.requireJobTitle === true;
+    const requireCompany = isCompanyEnabled && formConfig.requireCompany === true;
+    const requireAvatar = isAvatarEnabled && formConfig.requireAvatar === true;
+    const requireVideoUrl = isVideoEnabled && formConfig.requireVideoUrl === true;
+    const requireGoogleVerification =
+      isGoogleVerificationEnabled && formConfig.requireGoogleVerification === true;
+    const allowAnonymousSubmissions =
+      formConfig.allowAnonymousSubmissions !== false;
+    const notifyOnSubmission = formConfig.notifyOnSubmission !== false;
+
+    const hasRole = typeof authorRole === 'string' && authorRole.trim().length > 0;
+    const hasCompany =
+      typeof authorCompany === 'string' && authorCompany.trim().length > 0;
+    const hasAvatar =
+      typeof authorAvatar === 'string' && authorAvatar.trim().length > 0;
+    const hasVideoUrl = typeof videoUrl === 'string' && videoUrl.trim().length > 0;
+    const normalizedEmail = authorEmail.trim().toLowerCase();
+
+    if (isAnonymousSubmission && !allowAnonymousSubmissions) {
+      throw new ForbiddenError(
+        'Anonymous submissions are disabled for this project',
+      );
+    }
+
+    if (!isRatingEnabled && normalizedRating !== undefined) {
+      throw new BadRequestError('Rating is disabled for this collection form');
+    }
+
+    if (requireRating && normalizedRating === undefined) {
+      throw new ValidationError('Rating is required for this collection form', {
+        field: 'rating',
+      });
+    }
+
+    if (!isJobTitleEnabled && hasRole) {
+      throw new BadRequestError('Job title is disabled for this collection form');
+    }
+
+    if (requireJobTitle && !hasRole) {
+      throw new ValidationError('Job title is required for this collection form', {
+        field: 'authorRole',
+      });
+    }
+
+    if (!isCompanyEnabled && hasCompany) {
+      throw new BadRequestError('Company is disabled for this collection form');
+    }
+
+    if (requireCompany && !hasCompany) {
+      throw new ValidationError('Company is required for this collection form', {
+        field: 'authorCompany',
+      });
+    }
+
+    if (!isAvatarEnabled && hasAvatar) {
+      throw new BadRequestError(
+        'Avatar uploads are disabled for this collection form',
+      );
+    }
+
+    if (requireAvatar && !hasAvatar) {
+      throw new ValidationError(
+        'Profile picture is required for this collection form',
+        {
+          field: 'authorAvatar',
+        },
+      );
+    }
+
+    if (!isVideoEnabled && hasVideoUrl) {
+      throw new BadRequestError(
+        'Video testimonials are disabled for this collection form',
+      );
+    }
+
+    if (requireVideoUrl && !hasVideoUrl) {
+      throw new ValidationError('Video URL is required for this collection form', {
+        field: 'videoUrl',
+      });
+    }
+
+    if (googleIdToken && !isGoogleVerificationEnabled) {
+      throw new BadRequestError(
+        'Google verification is disabled for this collection form',
+      );
+    }
+
+    if (googleIdToken) {
+      googleProfile = await verifyGoogleIdToken(googleIdToken);
+
+      if (!googleProfile) {
+        throw new BadRequestError('Invalid Google authentication token');
+      }
+
+      if (!googleProfile.email_verified) {
+        throw new BadRequestError('Google email must be verified');
+      }
+
+      if (
+        googleProfile.email &&
+        googleProfile.email.toLowerCase() !== normalizedEmail
+      ) {
+        throw new BadRequestError(
+          'Email must match the verified Google account email',
+        );
+      }
+
+      isOAuthVerified = true;
+      oauthSubject = googleProfile.sub ?? null;
+    }
+
+    if (requireGoogleVerification && !isOAuthVerified) {
+      throw new ValidationError(
+        'Google verification is required for this collection form',
+        {
+          field: 'googleIdToken',
+        },
+      );
+    }
+
     // Prevent duplicate testimonials from the same reviewer (account/IP/device)
-    const normalizedEmail = authorEmail?.trim().toLowerCase();
     const reviewerIdentityFilters = [] as any[];
 
     if (normalizedEmail) {
@@ -334,13 +510,13 @@ const createTestimonial = async (
 
     const reviewerBehavior = await analyzeReviewerBehavior(project.id, {
       ipAddress: req.ip,
-      email: authorEmail,
+      email: normalizedEmail,
     });
 
     const moderationResult = await moderateTestimonial(
       content,
-      authorEmail,
-      rating,
+      normalizedEmail,
+      normalizedRating,
       isOAuthVerified,
       moderationConfig,
       reviewerBehavior,
@@ -358,8 +534,6 @@ const createTestimonial = async (
     };
 
     // Handle Privacy & Consent
-    const isAnonymousSubmission = req.headers['x-anonymous-submission'] === 'true';
-
     if (isAnonymousSubmission) {
       // User declined consent for technical data
       testimonialData.ipAddress = null;
@@ -373,28 +547,26 @@ const createTestimonial = async (
     }
 
     // Add optional fields if provided
-    if (authorEmail) {
-      testimonialData.authorEmail = authorEmail;
+    testimonialData.authorEmail = normalizedEmail;
+
+    if (hasRole) {
+      testimonialData.authorRole = authorRole.trim();
     }
 
-    if (authorRole) {
-      testimonialData.authorRole = authorRole;
+    if (hasCompany) {
+      testimonialData.authorCompany = authorCompany.trim();
     }
 
-    if (authorCompany) {
-      testimonialData.authorCompany = authorCompany;
+    if (hasAvatar) {
+      testimonialData.authorAvatar = authorAvatar.trim();
     }
 
-    if (authorAvatar) {
-      testimonialData.authorAvatar = authorAvatar;
+    if (normalizedRating !== undefined) {
+      testimonialData.rating = normalizedRating;
     }
 
-    if (rating) {
-      testimonialData.rating = rating;
-    }
-
-    if (videoUrl) {
-      testimonialData.videoUrl = videoUrl;
+    if (hasVideoUrl) {
+      testimonialData.videoUrl = videoUrl.trim();
       testimonialData.type = "VIDEO";
     }
 
@@ -408,38 +580,40 @@ const createTestimonial = async (
       throw handlePrismaError(error);
     }
 
-    // Send notification to project owner
-    try {
-      const notificationType = moderationResult.status === 'FLAGGED'
-        ? NotificationType.TESTIMONIAL_FLAGGED
-        : NotificationType.NEW_TESTIMONIAL;
+    // Send notification to project owner if enabled
+    if (notifyOnSubmission) {
+      try {
+        const notificationType = moderationResult.status === 'FLAGGED'
+          ? NotificationType.TESTIMONIAL_FLAGGED
+          : NotificationType.NEW_TESTIMONIAL;
 
-      const title = moderationResult.status === 'FLAGGED'
-        ? 'Testimonial Flagged for Review'
-        : 'New Testimonial Received';
+        const title = moderationResult.status === 'FLAGGED'
+          ? 'Testimonial Flagged for Review'
+          : 'New Testimonial Received';
 
-      const message = moderationResult.status === 'FLAGGED'
-        ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
-        : `You received a new testimonial from ${authorName}.`;
+        const message = moderationResult.status === 'FLAGGED'
+          ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
+          : `You received a new testimonial from ${authorName}.`;
 
-      await NotificationService.create({
-        userId: project.userId,
-        type: notificationType,
-        title,
-        message,
-        link: `/dashboard/projects/${project.slug}?tab=testimonials`,
-        metadata: {
-          testimonialId: newTestimonial.id,
-          projectId: project.id,
-          projectSlug: project.slug,
-          authorName,
-          authorEmail,
-          moderationStatus: moderationResult.status,
-        },
-      });
-    } catch (error) {
-      // Non-blocking error - don't fail the request if notification fails
-      console.error('Failed to create notification:', error);
+        await NotificationService.create({
+          userId: project.userId,
+          type: notificationType,
+          title,
+          message,
+          link: `/dashboard/projects/${project.slug}?tab=testimonials`,
+          metadata: {
+            testimonialId: newTestimonial.id,
+            projectId: project.id,
+            projectSlug: project.slug,
+            authorName,
+            authorEmail: normalizedEmail,
+            moderationStatus: moderationResult.status,
+          },
+        });
+      } catch (error) {
+        // Non-blocking error - don't fail the request if notification fails
+        console.error('Failed to create notification:', error);
+      }
     }
 
     return ResponseHandler.created(res, {

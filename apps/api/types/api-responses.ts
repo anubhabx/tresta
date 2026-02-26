@@ -140,6 +140,29 @@ export interface SocialLinks {
 }
 
 /**
+ * Collection Form Configuration
+ */
+export interface FormConfig {
+  headerTitle?: string;
+  headerDescription?: string;
+  thankYouMessage?: string;
+  enableRating?: boolean;
+  enableJobTitle?: boolean;
+  enableCompany?: boolean;
+  enableAvatar?: boolean;
+  enableVideoUrl?: boolean;
+  enableGoogleVerification?: boolean;
+  requireRating?: boolean;
+  requireJobTitle?: boolean;
+  requireCompany?: boolean;
+  requireAvatar?: boolean;
+  requireVideoUrl?: boolean;
+  requireGoogleVerification?: boolean;
+  allowAnonymousSubmissions?: boolean;
+  notifyOnSubmission?: boolean;
+}
+
+/**
  * Project entity response types
  */
 export interface ProjectData {
@@ -159,6 +182,7 @@ export interface ProjectData {
   tags: string[];
   visibility: ProjectVisibility;
   isActive: boolean;
+  formConfig: FormConfig | null;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -248,6 +272,7 @@ export interface CreateProjectPayload {
   socialLinks?: SocialLinks;
   tags?: string[];
   visibility?: ProjectVisibility;
+  formConfig?: FormConfig | null;
 }
 
 export interface UpdateProjectPayload {
@@ -277,6 +302,7 @@ export interface UpdateProjectPayload {
     customProfanityList?: string[];
     brandKeywords?: string[];
   };
+  formConfig?: FormConfig | null;
 }
 
 /**
