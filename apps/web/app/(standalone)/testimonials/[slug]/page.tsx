@@ -1,64 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { CSSProperties, use, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
-import {
-  Ban,
-  CheckCircle2,
-  ChevronDown,
-  Info,
-  Linkedin,
-  MessageSquare,
-  ShieldCheck,
-  Twitter,
-} from "lucide-react";
+import { Ban, CheckCircle2, Linkedin, Twitter } from "lucide-react";
 import axios from "axios";
 import { motion } from "motion/react";
-import type {
-  ApiResponse,
-  CreateTestimonialPayload,
-  Project,
-} from "@/types/api";
-import { AzureFileUpload } from "@/components/azure-file-upload";
+import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
 import { GoogleOAuthProvider } from "@/components/google-oauth-provider";
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
-
-import { Form } from "@workspace/ui/components/form";
+import type { CredentialResponse } from "@react-oauth/google";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { Separator } from "@workspace/ui/components/separator";
-import { CustomFormField } from "@/components/custom-form-field";
-import { Badge } from "@workspace/ui/components/badge";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@workspace/ui/components/dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
-import { cn } from "@workspace/ui/lib/utils";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import { CollectionPageShell } from "@/components/testimonials/collection-page-shell";
+import {
+  CollectionFormBody,
+  testimonialFormSchema,
+  type TestimonialFormData,
+} from "@/components/collection-form";
 
 // Public API client (no credentials/cookie, no auth header)
 const publicApi = axios.create({
@@ -67,64 +27,6 @@ const publicApi = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-const normalizeHexColor = (value?: string | null): string | null => {
-  if (!value) return null;
-
-  const trimmed = value.trim();
-  const shortHexMatch = /^#([0-9a-fA-F]{3})$/.exec(trimmed);
-
-  if (shortHexMatch?.[1]) {
-    const [r, g, b] = shortHexMatch[1].split("");
-    return `#${r}${r}${g}${g}${b}${b}`;
-  }
-
-  if (/^#[0-9a-fA-F]{6}$/.test(trimmed)) {
-    return trimmed;
-  }
-
-  return null;
-};
-
-const withHexAlpha = (hexColor: string, alphaHex: string) =>
-  `${hexColor}${alphaHex}`;
-
-const testimonialFormSchema = z.object({
-  authorName: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters" })
-    .max(255, { message: "Name must be less than 255 characters" }),
-  authorEmail: z
-    .string({ required_error: "Email is required for verification" })
-    .email({ message: "Please enter a valid email address" }),
-  authorRole: z
-    .string()
-    .max(255, { message: "Role must be less than 255 characters" })
-    .optional()
-    .or(z.literal("")),
-  authorCompany: z
-    .string()
-    .max(255, { message: "Company must be less than 255 characters" })
-    .optional()
-    .or(z.literal("")),
-  authorAvatar: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-  content: z
-    .string()
-    .min(10, { message: "Please write at least 10 characters" })
-    .max(2000, { message: "Testimonial must be less than 2000 characters" }),
-  rating: z.number().min(1).max(5).optional(),
-  videoUrl: z
-    .string()
-    .url({ message: "Please enter a valid URL" })
-    .optional()
-    .or(z.literal("")),
-});
-
-type FormData = z.infer<typeof testimonialFormSchema>;
 
 type CreateTestimonialPayloadWithGoogle = CreateTestimonialPayload & {
   googleIdToken?: string;
@@ -161,12 +63,9 @@ export default function TestimonialSubmissionPage({
   const [googleIdToken, setGoogleIdToken] = useState<string | null>(null);
   const [isGoogleVerified, setIsGoogleVerified] = useState(false);
   const [isVideoSectionOpen, setIsVideoSectionOpen] = useState(false);
+  const [fingerprintOptOut, setFingerprintOptOut] = useState(false);
 
-  // Privacy Consent State
-  const [isPrivacyDialogOpen, setIsPrivacyDialogOpen] = useState(false);
-  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
-
-  const form = useForm<FormData>({
+  const form = useForm<TestimonialFormData>({
     resolver: zodResolver(testimonialFormSchema),
     defaultValues: {
       authorName: "",
@@ -180,7 +79,6 @@ export default function TestimonialSubmissionPage({
     },
   });
 
-  // Handle Google Sign-In success
   const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
     try {
       if (!credentialResponse.credential) {
@@ -249,25 +147,10 @@ export default function TestimonialSubmissionPage({
     }
   }, [slug]);
 
-  const isRatingEnabled = project?.formConfig?.enableRating !== false;
-  const isJobTitleEnabled = project?.formConfig?.enableJobTitle !== false;
-  const isCompanyEnabled = project?.formConfig?.enableCompany !== false;
-  const isAvatarEnabled = project?.formConfig?.enableAvatar !== false;
   const isVideoEnabled = project?.formConfig?.enableVideoUrl !== false;
-  const isGoogleVerificationEnabled =
-    project?.formConfig?.enableGoogleVerification !== false;
-
-  const requireRating = isRatingEnabled && project?.formConfig?.requireRating === true;
-  const requireJobTitle =
-    isJobTitleEnabled && project?.formConfig?.requireJobTitle === true;
-  const requireCompany = isCompanyEnabled && project?.formConfig?.requireCompany === true;
-  const requireAvatar = isAvatarEnabled && project?.formConfig?.requireAvatar === true;
   const requireVideoUrl = isVideoEnabled && project?.formConfig?.requireVideoUrl === true;
-  const requireGoogleVerification =
-    isGoogleVerificationEnabled &&
-    project?.formConfig?.requireGoogleVerification === true;
-  const allowAnonymousSubmissions =
-    project?.formConfig?.allowAnonymousSubmissions !== false;
+  const allowFingerprintOptOut =
+    project?.formConfig?.allowFingerprintOptOut === true;
 
   useEffect(() => {
     if (!isVideoEnabled) {
@@ -280,96 +163,68 @@ export default function TestimonialSubmissionPage({
     }
   }, [isVideoEnabled, requireVideoUrl]);
 
-  // Handle Google Sign-In error
+  useEffect(() => {
+    if (!allowFingerprintOptOut) {
+      setFingerprintOptOut(false);
+    }
+  }, [allowFingerprintOptOut]);
+
   const handleGoogleError = () => {
     toast.error("Google Sign-In was unsuccessful. Please try again.");
   };
 
-  const validateConfigRequirements = (data: FormData) => {
+  const validateConfigRequirements = (data: TestimonialFormData) => {
+    const fc = project?.formConfig;
+    const chkRating = fc?.enableRating !== false && fc?.requireRating === true;
+    const chkJobTitle = fc?.enableJobTitle !== false && fc?.requireJobTitle === true;
+    const chkCompany = fc?.enableCompany !== false && fc?.requireCompany === true;
+    const chkAvatar = fc?.enableAvatar !== false && fc?.requireAvatar === true;
+    const chkVideo = fc?.enableVideoUrl !== false && fc?.requireVideoUrl === true;
+    const chkGoogle =
+      fc?.enableGoogleVerification !== false &&
+      fc?.requireGoogleVerification === true;
+
     let hasValidationError = false;
-    form.clearErrors([
-      "rating",
-      "authorRole",
-      "authorCompany",
-      "authorAvatar",
-      "videoUrl",
-    ]);
+    form.clearErrors(["rating", "authorRole", "authorCompany", "authorAvatar", "videoUrl"]);
 
-    if (requireRating && (!data.rating || data.rating < 1)) {
-      form.setError("rating", {
-        type: "manual",
-        message: "Rating is required for this form.",
-      });
+    if (chkRating && (!data.rating || data.rating < 1)) {
+      form.setError("rating", { type: "manual", message: "Rating is required for this form." });
       hasValidationError = true;
     }
-
-    if (requireJobTitle && !data.authorRole?.trim()) {
-      form.setError("authorRole", {
-        type: "manual",
-        message: "Role is required for this form.",
-      });
+    if (chkJobTitle && !data.authorRole?.trim()) {
+      form.setError("authorRole", { type: "manual", message: "Role is required for this form." });
       hasValidationError = true;
     }
-
-    if (requireCompany && !data.authorCompany?.trim()) {
-      form.setError("authorCompany", {
-        type: "manual",
-        message: "Company is required for this form.",
-      });
+    if (chkCompany && !data.authorCompany?.trim()) {
+      form.setError("authorCompany", { type: "manual", message: "Company is required for this form." });
       hasValidationError = true;
     }
-
-    if (requireAvatar && !data.authorAvatar?.trim()) {
-      form.setError("authorAvatar", {
-        type: "manual",
-        message: "Profile picture is required for this form.",
-      });
+    if (chkAvatar && !data.authorAvatar?.trim()) {
+      form.setError("authorAvatar", { type: "manual", message: "Profile picture is required for this form." });
       hasValidationError = true;
     }
-
-    if (requireVideoUrl && !data.videoUrl?.trim()) {
-      form.setError("videoUrl", {
-        type: "manual",
-        message: "Video URL is required for this form.",
-      });
+    if (chkVideo && !data.videoUrl?.trim()) {
+      form.setError("videoUrl", { type: "manual", message: "Video URL is required for this form." });
       hasValidationError = true;
     }
-
-    if (requireGoogleVerification && !isGoogleVerified) {
+    if (chkGoogle && !isGoogleVerified) {
       toast.error("Google verification is required before submitting.");
       hasValidationError = true;
     }
-
     if (hasValidationError) {
       toast.error("Please complete all required fields before submitting.");
     }
-
     return !hasValidationError;
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: TestimonialFormData) => {
     if (!validateConfigRequirements(data)) {
       return;
     }
-
-    // Open privacy dialog instead of submitting directly
-    setPendingFormData(data);
-    setIsPrivacyDialogOpen(true);
+    await executeSubmission(data);
   };
 
-  const handlePrivacyChoice = async (consented: boolean) => {
-    if (!allowAnonymousSubmissions && !consented) {
-      toast.error("Anonymous submissions are disabled for this form.");
-      return;
-    }
-
-    setIsPrivacyDialogOpen(false);
-    if (!pendingFormData) return;
-
-    await executeSubmission(pendingFormData, consented);
-  };
-
-  const executeSubmission = async (data: FormData, consented: boolean) => {
+  const executeSubmission = async (data: TestimonialFormData) => {
     setIsSubmitting(true);
     try {
       const payload: CreateTestimonialPayloadWithGoogle = {
@@ -409,7 +264,7 @@ export default function TestimonialSubmissionPage({
       }
 
       const headers: Record<string, string> = {};
-      if (!consented && allowAnonymousSubmissions) {
+      if (fingerprintOptOut && allowFingerprintOptOut) {
         headers["x-anonymous-submission"] = "true";
       }
 
@@ -424,9 +279,9 @@ export default function TestimonialSubmissionPage({
       setGoogleIdToken(null);
       setIsGoogleVerified(false);
 
-      if (!consented && allowAnonymousSubmissions) {
+      if (fingerprintOptOut) {
         toast.success(
-          "Thank you! Your testimonial has been submitted anonymously (no IP/Device data stored).",
+          "Thank you! Your testimonial has been submitted anonymously.",
         );
       } else {
         toast.success("Thank you! Your testimonial has been submitted.");
@@ -461,7 +316,6 @@ export default function TestimonialSubmissionPage({
       }
     } finally {
       setIsSubmitting(false);
-      setPendingFormData(null);
     }
   };
 
@@ -471,15 +325,6 @@ export default function TestimonialSubmissionPage({
         timeStyle: "short",
       }).format(new Date(existingSubmissionCreatedAt))
     : null;
-
-  const brandPrimaryHex = normalizeHexColor(project?.brandColorPrimary);
-  const brandAccentStyles = brandPrimaryHex
-    ? ({
-        "--collection-brand-primary": brandPrimaryHex,
-        "--collection-brand-soft": withHexAlpha(brandPrimaryHex, "1A"),
-        "--collection-brand-hover": withHexAlpha(brandPrimaryHex, "E6"),
-      } as CSSProperties)
-    : undefined;
 
   if (hasExistingSubmission) {
     return (
@@ -635,373 +480,53 @@ export default function TestimonialSubmissionPage({
     );
   }
 
+  if (isLoading) {
+    return (
+      <CollectionPageShell>
+        <Card className="w-full border-border/60 bg-card shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="text-center pt-8 pb-5 px-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
+              <div className="space-y-2.5 w-full max-w-xs mx-auto">
+                <div className="h-7 bg-muted animate-pulse rounded mx-auto w-3/4" />
+                <div className="h-4 bg-muted animate-pulse rounded mx-auto w-full" />
+              </div>
+            </div>
+          </CardHeader>
+          <div className="px-6 pb-8 space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-10 bg-muted animate-pulse rounded-md" />
+            ))}
+            <div className="h-24 bg-muted animate-pulse rounded-md" />
+            <div className="h-12 bg-muted animate-pulse rounded-xl" />
+          </div>
+        </Card>
+      </CollectionPageShell>
+    );
+  }
+
   return (
     <GoogleOAuthProvider>
       <CollectionPageShell>
-        <Card
-          className="w-full border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-          style={brandAccentStyles}
-        >
-          <CardHeader className="text-center pb-2">
-            {isLoading ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
-                <div className="space-y-2">
-                  <div className="h-6 w-48 bg-muted animate-pulse rounded mx-auto" />
-                  <div className="h-4 w-64 bg-muted animate-pulse rounded mx-auto" />
-                </div>
-              </div>
-            ) : (
-              <>
-                {project?.logoUrl ? (
-                  <Avatar className="h-16 w-16 mx-auto mb-4">
-                    <AvatarImage
-                      src={project.logoUrl}
-                      alt={`${project.name} Logo`}
-                    />
-                    <AvatarFallback
-                      className={cn(
-                        "bg-primary/10",
-                        brandPrimaryHex && "bg-[var(--collection-brand-soft)]",
-                      )}
-                    >
-                      <MessageSquare
-                        className={cn(
-                          "h-6 w-6 text-primary",
-                          brandPrimaryHex &&
-                            "text-[var(--collection-brand-primary)]",
-                        )}
-                      />
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <div
-                    className={cn(
-                      "h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-primary/10",
-                      brandPrimaryHex && "bg-[var(--collection-brand-soft)]",
-                    )}
-                  >
-                    <MessageSquare
-                      className={cn(
-                        "h-6 w-6 text-primary",
-                        brandPrimaryHex && "text-[var(--collection-brand-primary)]",
-                      )}
-                    />
-                  </div>
-                )}
-                <CardTitle className="text-2xl">
-                  {project?.formConfig?.headerTitle || "Share your experience"}
-                </CardTitle>
-                <CardDescription className="text-base">
-                  {project?.formConfig?.headerDescription ||
-                    `Tell us about your experience with ${project?.name || "us"}`}
-                </CardDescription>
-              </>
-            )}
-          </CardHeader>
-
-          <CardContent className="pt-4">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="stack-loose"
-              >
-                {/* Google Sign-In Section */}
-                {isGoogleVerificationEnabled && !isGoogleVerified && (
-                  <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-center space-y-3">
-                    <div className="flex items-center justify-center gap-2 text-sm font-medium">
-                      <ShieldCheck className="h-4 w-4 text-primary" />
-                      Verify with Google
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {requireGoogleVerification
-                        ? "Required to submit this testimonial"
-                        : "Auto-fill your info and get a verified badge"}
-                    </p>
-                    <div className="flex justify-center">
-                      <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={handleGoogleError}
-                        useOneTap
-                        size="medium"
-                        text="continue_with"
-                        shape="rectangular"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Verified Badge */}
-                {isGoogleVerified && (
-                  <div className="bg-success/5 border border-success/20 rounded-lg p-3 flex items-center gap-3">
-                    <ShieldCheck className="h-5 w-5 text-success" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        Verified with Google
-                      </p>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="bg-success/10 text-success border-0"
-                    >
-                      Verified
-                    </Badge>
-                  </div>
-                )}
-
-                <Separator />
-
-                {/* Rating - Centered and prominent */}
-                {isRatingEnabled && (
-                  <div className="text-center space-y-2">
-                    <CustomFormField
-                      type="rating"
-                      control={form.control}
-                      name="rating"
-                      label="How would you rate us?"
-                      max={5}
-                      required={requireRating}
-                      optional={!requireRating}
-                    />
-                  </div>
-                )}
-
-                {/* Testimonial Content */}
-                <CustomFormField
-                  type="textarea"
-                  control={form.control}
-                  name="content"
-                  label="Your testimonial"
-                  placeholder="What did you like? How did it help you?"
-                  maxLength={2000}
-                  showCharacterCount
-                  required
-                />
-
-                {/* Name & Email side by side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <CustomFormField
-                    type="text"
-                    control={form.control}
-                    name="authorName"
-                    label="Your Name"
-                    placeholder="John Doe"
-                    required
-                  />
-                  <CustomFormField
-                    type="email"
-                    control={form.control}
-                    name="authorEmail"
-                    label="Email"
-                    placeholder="john@example.com"
-                    required
-                  />
-                </div>
-
-                {/* Role & Company side by side */}
-                {(isJobTitleEnabled || isCompanyEnabled) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {isJobTitleEnabled && (
-                      <CustomFormField
-                        type="text"
-                        control={form.control}
-                        name="authorRole"
-                        label="Role"
-                        placeholder="CEO, Developer, etc."
-                        required={requireJobTitle}
-                        optional={!requireJobTitle}
-                      />
-                    )}
-                    {isCompanyEnabled && (
-                      <CustomFormField
-                        type="text"
-                        control={form.control}
-                        name="authorCompany"
-                        label="Company"
-                        placeholder="Acme Inc."
-                        required={requireCompany}
-                        optional={!requireCompany}
-                      />
-                    )}
-                  </div>
-                )}
-
-                {/* Avatar Upload - only show if enabled and not using Google */}
-                {isAvatarEnabled && !isGoogleVerified && (
-                  <AzureFileUpload
-                    control={form.control}
-                    name="authorAvatar"
-                    label={
-                      requireAvatar ? "Profile Picture (Required)" : "Profile Picture"
-                    }
-                    directory="avatars"
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    maxSizeMB={2}
-                    description={
-                      requireAvatar
-                        ? "Required · JPG, PNG, or WebP (max 2MB)"
-                        : "Optional · JPG, PNG, or WebP (max 2MB)"
-                    }
-                  />
-                )}
-
-                {/* Video URL - collapsed by default */}
-                {isVideoEnabled && (
-                  <Collapsible
-                    open={isVideoSectionOpen}
-                    onOpenChange={setIsVideoSectionOpen}
-                  >
-                    <CollapsibleTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto w-full justify-between px-0 text-sm font-medium text-muted-foreground hover:text-foreground"
-                      >
-                        <span>
-                          {requireVideoUrl
-                            ? "Video testimonial required"
-                            : "Add video testimonial"}
-                        </span>
-                        <ChevronDown
-                          className={cn(
-                            "h-4 w-4 transition-transform",
-                            isVideoSectionOpen && "rotate-180",
-                          )}
-                        />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-3">
-                      <CustomFormField
-                        type="url"
-                        control={form.control}
-                        name="videoUrl"
-                        label="Video URL"
-                        placeholder="https://youtube.com/watch?v=..."
-                        description="YouTube, Vimeo, or Loom link"
-                        required={requireVideoUrl}
-                        optional={!requireVideoUrl}
-                      />
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-
-                <Separator />
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  size="lg"
-                  className={cn(
-                    "w-full",
-                    brandPrimaryHex &&
-                      "border-[var(--collection-brand-primary)] bg-[var(--collection-brand-primary)] text-white hover:bg-[var(--collection-brand-hover)] focus-visible:ring-[var(--collection-brand-primary)]",
-                  )}
-                  disabled={
-                    isSubmitting || (requireGoogleVerification && !isGoogleVerified)
-                  }
-                >
-                  {isSubmitting ? "Submitting..." : "Submit Testimonial"}
-                </Button>
-
-                {/* Privacy info link */}
-                <div className="flex items-center justify-center">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto gap-1 px-1 text-xs text-muted-foreground hover:text-foreground"
-                      >
-                        <Info className="h-3 w-3" />
-                        How we use your data
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>How we use your data</DialogTitle>
-                        <DialogDescription>
-                          We value your privacy and transparency.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4 pt-2">
-                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                          <h4 className="font-semibold text-foreground flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-success" />
-                            Publicly Visible
-                          </h4>
-                          <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                            <li>Name, Role & Company</li>
-                            <li>Profile Picture</li>
-                            <li>Testimonial Content & Video</li>
-                          </ul>
-                        </div>
-                        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                          <h4 className="font-semibold text-foreground flex items-center gap-2">
-                            <span className="h-2 w-2 rounded-full bg-warning" />
-                            Kept Private
-                          </h4>
-                          <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                            <li>Email Address (verification only)</li>
-                            <li>IP & Device Info (spam prevention)</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                {/* Privacy Consent Dialog */}
-                <Dialog
-                  open={isPrivacyDialogOpen}
-                  onOpenChange={setIsPrivacyDialogOpen}
-                >
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Data Privacy</DialogTitle>
-                      <DialogDescription>
-                        {allowAnonymousSubmissions
-                          ? "Choose how you'd like to submit your testimonial."
-                          : "This form requires consented submission for spam protection."}
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-2">
-                      <div className="bg-muted/30 p-4 rounded-lg text-sm">
-                        <p>
-                          We collect <strong>IP Address</strong> and{" "}
-                          <strong>Device Info</strong> to prevent spam. This
-                          data is encrypted and never shared.
-                        </p>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <Button
-                          onClick={() => handlePrivacyChoice(true)}
-                          className="w-full gap-2"
-                          size="lg"
-                        >
-                          <ShieldCheck className="h-4 w-4" />I Consent & Submit
-                        </Button>
-
-                        {allowAnonymousSubmissions && (
-                          <Button
-                            variant="outline"
-                            onClick={() => handlePrivacyChoice(false)}
-                            className="w-full text-muted-foreground"
-                          >
-                            Submit Anonymously
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+        <CollectionFormBody
+          mode="hosted"
+          formConfig={project?.formConfig}
+          projectName={project?.name}
+          projectTagline={project?.shortDescription}
+          projectDescription={project?.description}
+          logoUrl={project?.logoUrl}
+          brandColorPrimary={project?.brandColorPrimary}
+          form={form}
+          isSubmitting={isSubmitting}
+          isGoogleVerified={isGoogleVerified}
+          onGoogleSuccess={handleGoogleSuccess}
+          onGoogleError={handleGoogleError}
+          isVideoOpen={isVideoSectionOpen}
+          onVideoOpenChange={setIsVideoSectionOpen}
+          fingerprintOptOut={fingerprintOptOut}
+          onFingerprintOptOutChange={setFingerprintOptOut}
+          onFormSubmit={form.handleSubmit(onSubmit)}
+        />
       </CollectionPageShell>
     </GoogleOAuthProvider>
   );

@@ -141,6 +141,7 @@ export interface FormConfig {
     requireVideoUrl?: boolean;
     requireGoogleVerification?: boolean;
     allowAnonymousSubmissions?: boolean;
+    allowFingerprintOptOut?: boolean;
     notifyOnSubmission?: boolean;
 }
 /**

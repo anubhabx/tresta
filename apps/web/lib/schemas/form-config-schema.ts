@@ -41,6 +41,7 @@ export const formConfigSchema = z
 
     // Submission behavior and notifications
     allowAnonymousSubmissions: z.boolean(),
+    allowFingerprintOptOut: z.boolean(),
     notifyOnSubmission: z.boolean(),
   })
   .superRefine((data, ctx) => {
@@ -116,6 +117,7 @@ export const defaultFormConfig: FormConfigFormData = {
   requireVideoUrl: false,
   requireGoogleVerification: false,
   allowAnonymousSubmissions: true,
+  allowFingerprintOptOut: false,
   notifyOnSubmission: true,
 };
 
@@ -142,6 +144,7 @@ export function convertFormConfigToPayload(
     requireVideoUrl: data.requireVideoUrl,
     requireGoogleVerification: data.requireGoogleVerification,
     allowAnonymousSubmissions: data.allowAnonymousSubmissions,
+    allowFingerprintOptOut: data.allowFingerprintOptOut,
     notifyOnSubmission: data.notifyOnSubmission,
   };
 }
@@ -171,6 +174,7 @@ export function convertFormConfigToForm(
     requireVideoUrl: formConfig.requireVideoUrl ?? false,
     requireGoogleVerification: formConfig.requireGoogleVerification ?? false,
     allowAnonymousSubmissions: formConfig.allowAnonymousSubmissions ?? true,
+    allowFingerprintOptOut: formConfig.allowFingerprintOptOut ?? false,
     notifyOnSubmission: formConfig.notifyOnSubmission ?? true,
   };
 }

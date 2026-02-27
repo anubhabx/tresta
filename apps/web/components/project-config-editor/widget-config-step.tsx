@@ -158,7 +158,7 @@ export const WidgetConfigStep = forwardRef<
       </div>
 
       {/* Right: Live preview */}
-      <div className="lg:col-span-3 lg:sticky lg:top-6 lg:h-fit">
+      <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-fit lg:self-start">
         <div className="rounded-lg border bg-card overflow-hidden">
           <div className="border-b p-3 bg-muted/30">
             <div className="flex items-center justify-between">

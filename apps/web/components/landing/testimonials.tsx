@@ -14,7 +14,7 @@ const testimonials = [
   {
     name: "@shipfast_dev",
     role: "Indie Hacker",
-    verified: "GitHub",
+    verified: "Google",
     rating: 5,
     content:
       "Set it up in 10 minutes. Haven't touched it since. It just works.",
@@ -29,7 +29,7 @@ const testimonials = [
   {
     name: "@frontend_dev",
     role: "Developer",
-    verified: "GitHub",
+    verified: "Google",
     rating: 5,
     content:
       "One script tag. Zero CSS headaches. This is how tools should work.",
@@ -44,7 +44,7 @@ const testimonials = [
   {
     name: "@product_lead",
     role: "Product Lead",
-    verified: "LinkedIn",
+    verified: "Google",
     rating: 5,
     content: "The OAuth verification is a game changer. No more fake reviews.",
   },

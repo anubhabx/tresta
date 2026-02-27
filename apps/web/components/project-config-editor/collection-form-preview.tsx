@@ -1,338 +1,264 @@
 "use client";
 
-import { CSSProperties, memo } from "react";
-import {
-  MessageSquare,
-  ShieldCheck,
-  Star,
-  ChevronDown,
-  Upload,
-  Eye,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@workspace/ui/components/card";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@workspace/ui/components/avatar";
-import { Separator } from "@workspace/ui/components/separator";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, Monitor, Smartphone, Tablet } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import type { FormConfig } from "@/types/api";
+import { CollectionFormBody } from "@/components/collection-form";
 
-const normalizeHex = (v?: string | null): string | null => {
-  if (!v) return null;
-  const t = v.trim();
-  if (/^#[0-9a-fA-F]{6}$/.test(t)) return t;
-  const m = /^#([0-9a-fA-F]{3})$/.exec(t);
-  if (m?.[1]) {
-    const [r, g, b] = m[1].split("");
-    return `#${r}${r}${g}${g}${b}${b}`;
-  }
-  return null;
+type PreviewDevice = "desktop" | "tablet" | "mobile";
+
+const DEVICE_VIEWPORT_WIDTH: Record<PreviewDevice, number> = {
+  desktop: 1200,
+  tablet: 768,
+  mobile: 375,
 };
 
-interface PreviewFieldProps {
-  label: string;
-  placeholder: string;
-  required?: boolean;
-  optional?: boolean;
-  type?: "text" | "textarea" | "url" | "email";
-}
+const DEVICE_FRAME_WIDTH: Record<PreviewDevice, number> = {
+  desktop: 1264,
+  tablet: 824,
+  mobile: 425,
+};
 
-function PreviewField({
-  label,
-  placeholder,
-  required,
-  optional,
-  type = "text",
-}: PreviewFieldProps) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1">
-        <span className="text-xs font-medium text-foreground">{label}</span>
-        {required && <span className="text-destructive text-xs">*</span>}
-        {optional && (
-          <span className="text-muted-foreground text-xs">(optional)</span>
-        )}
-      </div>
-      {type === "textarea" ? (
-        <div className="min-h-[64px] w-full rounded-md border border-input bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground/70 leading-relaxed">
-          {placeholder}
-        </div>
-      ) : (
-        <div className="h-7 w-full rounded-md border border-input bg-muted/30 px-2.5 flex items-center text-xs text-muted-foreground/70">
-          {placeholder}
-        </div>
-      )}
-    </div>
-  );
-}
+const DEVICE_FRAME_HEIGHT: Record<PreviewDevice, number> = {
+  desktop: 860,
+  tablet: 980,
+  mobile: 900,
+};
 
-function PreviewStarRating({ required }: { required?: boolean }) {
-  return (
-    <div className="space-y-1 text-center">
-      <div className="flex items-center justify-center gap-1">
-        <span className="text-xs font-medium">How would you rate us?</span>
-        {required && <span className="text-destructive text-xs">*</span>}
-      </div>
-      <div className="flex justify-center gap-0.5">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Star
-            key={i}
-            className={cn(
-              "h-5 w-5",
-              i <= 4
-                ? "fill-amber-400 text-amber-400"
-                : "text-muted-foreground/30",
-            )}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+const getSlugFromProjectName = (name: string) => {
+  const slug = name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "your-project";
+};
 
 export interface CollectionFormPreviewProps {
   formConfig?: FormConfig | null;
   projectName?: string;
+  projectTagline?: string | null;
+  projectDescription?: string | null;
   logoUrl?: string | null;
   brandColorPrimary?: string | null;
   className?: string;
 }
 
-export const CollectionFormPreview = memo(function CollectionFormPreview({
+export function CollectionFormPreview({
   formConfig,
   projectName = "Your Project",
+  projectTagline,
+  projectDescription,
   logoUrl,
   brandColorPrimary,
   className,
 }: CollectionFormPreviewProps) {
-  const brandHex = normalizeHex(brandColorPrimary);
-  const brandStyles = brandHex
-    ? ({
-        "--collection-brand-primary": brandHex,
-        "--collection-brand-soft": `${brandHex}1A`,
-        "--collection-brand-hover": `${brandHex}E6`,
-      } as CSSProperties)
-    : undefined;
+  const [device, setDevice] = useState<PreviewDevice>("desktop");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [scaledHeight, setScaledHeight] = useState<number | undefined>(
+    undefined,
+  );
 
-  const isRatingEnabled = formConfig?.enableRating !== false;
-  const isJobTitleEnabled = formConfig?.enableJobTitle !== false;
-  const isCompanyEnabled = formConfig?.enableCompany !== false;
-  const isAvatarEnabled = formConfig?.enableAvatar !== false;
-  const isVideoEnabled = formConfig?.enableVideoUrl !== false;
-  const isGoogleEnabled = formConfig?.enableGoogleVerification !== false;
+  const frameWidth = DEVICE_FRAME_WIDTH[device];
+  const frameHeight = DEVICE_FRAME_HEIGHT[device];
+  const projectSlug = useMemo(
+    () => getSlugFromProjectName(projectName),
+    [projectName],
+  );
 
-  const requireRating = isRatingEnabled && formConfig?.requireRating === true;
-  const requireJobTitle =
-    isJobTitleEnabled && formConfig?.requireJobTitle === true;
-  const requireCompany =
-    isCompanyEnabled && formConfig?.requireCompany === true;
-  const requireAvatar = isAvatarEnabled && formConfig?.requireAvatar === true;
+  useEffect(() => {
+    const container = containerRef.current;
+    const inner = innerRef.current;
+    if (!container || !inner) return;
 
-  const headerTitle =
-    formConfig?.headerTitle ||
-    (projectName ? `Share your experience` : "Share your experience");
-  const headerDescription =
-    formConfig?.headerDescription ||
-    `Tell us about your experience with ${projectName || "us"}`;
+    const update = () => {
+      const containerWidth = container.offsetWidth;
+      const newScale = Math.min(1, containerWidth / frameWidth);
+      const naturalHeight = inner.offsetHeight;
+      setScale(newScale);
+      setScaledHeight(naturalHeight * newScale);
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(container);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [frameHeight, frameWidth]);
+
+  const previewForm = (
+    <CollectionFormBody
+      mode="preview"
+      previewViewport={device}
+      formConfig={formConfig}
+      projectName={projectName}
+      projectTagline={projectTagline}
+      projectDescription={projectDescription}
+      logoUrl={logoUrl}
+      brandColorPrimary={brandColorPrimary}
+    />
+  );
+
+  const framedPreview =
+    device === "desktop" ? (
+      <div
+        style={{
+          width: DEVICE_FRAME_WIDTH.desktop,
+          height: DEVICE_FRAME_HEIGHT.desktop,
+        }}
+        className="overflow-hidden rounded-2xl border border-border/70 bg-background/95 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.55)] transition-all duration-300 ease-out"
+      >
+        <div className="flex h-11 items-center gap-3 border-b border-border/70 bg-muted/35 px-4">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-400/85" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/85" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/85" />
+          </div>
+          <div className="flex h-7 flex-1 items-center justify-center rounded-md border border-border/70 bg-background px-3 text-[11px] text-muted-foreground">
+            yourapp.com/collect/{projectSlug}
+          </div>
+        </div>
+        <div
+          className="overflow-y-auto"
+          style={{ height: DEVICE_FRAME_HEIGHT.desktop - 44 }}
+        >
+          <div
+            className="min-h-full px-8 py-8"
+            style={{
+              background:
+                "radial-gradient(120% 120% at 50% -10%, rgba(59,130,246,0.12) 0%, rgba(15,23,42,0) 45%), hsl(var(--muted) / 0.22)",
+            }}
+          >
+            <div
+              className="mx-auto"
+              style={{ width: DEVICE_VIEWPORT_WIDTH.desktop, maxWidth: "100%" }}
+            >
+              {previewForm}
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : device === "tablet" ? (
+      <div
+        style={{
+          width: DEVICE_FRAME_WIDTH.tablet,
+          height: DEVICE_FRAME_HEIGHT.tablet,
+        }}
+        className="mx-auto rounded-[34px] border border-border/70 bg-zinc-900 p-3 shadow-[0_26px_70px_-45px_rgba(15,23,42,0.65)] transition-all duration-300 ease-out"
+      >
+        <div
+          className="relative flex h-full flex-col overflow-hidden rounded-[26px] border border-white/10"
+          style={{
+            background:
+              "radial-gradient(120% 120% at 50% -10%, rgba(59,130,246,0.16) 0%, rgba(15,23,42,0) 48%), rgb(12, 14, 19)",
+          }}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.14)_0%,transparent_36%)] opacity-40" />
+          <div
+            className="relative h-full overflow-y-auto px-5 py-6"
+          >
+            <div
+              className="relative mx-auto"
+              style={{ width: DEVICE_VIEWPORT_WIDTH.tablet, maxWidth: "100%" }}
+            >
+              {previewForm}
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto mt-3 h-1.5 w-20 rounded-full bg-white/20" />
+      </div>
+    ) : (
+      <div
+        style={{
+          width: DEVICE_FRAME_WIDTH.mobile,
+          height: DEVICE_FRAME_HEIGHT.mobile,
+        }}
+        className="mx-auto rounded-[42px] border border-border/70 bg-zinc-900 p-[10px] shadow-[0_28px_65px_-48px_rgba(15,23,42,0.7)] transition-all duration-300 ease-out"
+      >
+        <div
+          className="relative flex h-full flex-col overflow-hidden rounded-[32px] border border-white/10"
+          style={{
+            background:
+              "radial-gradient(120% 120% at 50% -10%, rgba(59,130,246,0.2) 0%, rgba(15,23,42,0) 52%), rgb(10, 12, 16)",
+          }}
+        >
+          <div className="mx-auto mb-3 mt-2 h-6 w-28 rounded-full bg-black/65" />
+          <div
+            className="relative flex-1 overflow-y-auto px-3 pb-5"
+          >
+            <div
+              className="mx-auto"
+              style={{ width: DEVICE_VIEWPORT_WIDTH.mobile, maxWidth: "100%" }}
+            >
+              {previewForm}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
-    <div
-      className={cn("pointer-events-none select-none w-full", className)}
-      aria-hidden="true"
-    >
-      {/* Preview Label */}
-      <div className="flex items-center gap-1.5 mb-2 text-xs text-muted-foreground">
-        <Eye className="h-3.5 w-3.5" />
-        <span>Live Preview</span>
+    <div className={cn("w-full", className)}>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Eye className="h-3.5 w-3.5" />
+          <span>Live Preview</span>
+        </div>
+
+        <div className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background/70 p-1 shadow-sm">
+          {(
+            [
+              { value: "desktop", icon: Monitor, label: "Desktop" },
+              { value: "tablet", icon: Tablet, label: "Tablet" },
+              { value: "mobile", icon: Smartphone, label: "Mobile" },
+            ] as const
+          ).map(({ value, icon: Icon, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setDevice(value)}
+              className={cn(
+                "inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-all duration-200",
+                device === value
+                  ? "bg-muted text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              aria-label={`Preview ${label.toLowerCase()} frame`}
+              title={`${label} preview`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <Card
-        className="w-full border-border/70 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-        style={brandStyles}
+      <div
+        ref={containerRef}
+        style={{ height: scaledHeight ?? "auto" }}
+        className="w-full overflow-hidden transition-[height] duration-300 ease-out"
       >
-        <CardHeader className="text-center pb-2 pt-5 px-5">
-          {logoUrl ? (
-            <Avatar className="h-12 w-12 mx-auto mb-3">
-              <AvatarImage src={logoUrl} alt={`${projectName} Logo`} />
-              <AvatarFallback
-                className={cn(
-                  "bg-primary/10",
-                  brandHex && "bg-[var(--collection-brand-soft)]",
-                )}
-              >
-                <MessageSquare
-                  className={cn(
-                    "h-5 w-5 text-primary",
-                    brandHex && "text-[var(--collection-brand-primary)]",
-                  )}
-                />
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <div
-              className={cn(
-                "h-12 w-12 rounded-full mx-auto mb-3 flex items-center justify-center bg-primary/10",
-                brandHex && "bg-[var(--collection-brand-soft)]",
-              )}
-            >
-              <MessageSquare
-                className={cn(
-                  "h-5 w-5 text-primary",
-                  brandHex && "text-[var(--collection-brand-primary)]",
-                )}
-              />
-            </div>
-          )}
-          <CardTitle className="text-base leading-tight">{headerTitle}</CardTitle>
-          <CardDescription className="text-xs mt-1 line-clamp-2">
-            {headerDescription}
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="pt-3 px-5 pb-5 space-y-3">
-          {/* Google verification */}
-          {isGoogleEnabled && (
-            <div className="rounded-lg border border-dashed bg-muted/30 p-2.5 text-center space-y-1.5">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-medium">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                Verify with Google
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {formConfig?.requireGoogleVerification
-                  ? "Required to submit"
-                  : "Auto-fill your info"}
-              </p>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 border rounded text-xs bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
-                <svg className="h-3 w-3" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                Continue with Google
-              </div>
-            </div>
-          )}
-
-          <Separator />
-
-          {/* Star Rating */}
-          {isRatingEnabled && <PreviewStarRating required={requireRating} />}
-
-          {/* Testimonial content */}
-          <PreviewField
-            label="Your testimonial"
-            placeholder="What did you like? How did it help you?"
-            type="textarea"
-            required
-          />
-
-          {/* Name & Email */}
-          <div className="grid grid-cols-2 gap-2">
-            <PreviewField label="Your Name" placeholder="John Doe" required />
-            <PreviewField
-              label="Email"
-              placeholder="john@example.com"
-              type="email"
-              required
-            />
-          </div>
-
-          {/* Role & Company */}
-          {(isJobTitleEnabled || isCompanyEnabled) && (
-            <div className="grid grid-cols-2 gap-2">
-              {isJobTitleEnabled && (
-                <PreviewField
-                  label="Role"
-                  placeholder="CEO, Developer..."
-                  required={requireJobTitle}
-                  optional={!requireJobTitle}
-                />
-              )}
-              {isCompanyEnabled && (
-                <PreviewField
-                  label="Company"
-                  placeholder="Acme Inc."
-                  required={requireCompany}
-                  optional={!requireCompany}
-                />
-              )}
-            </div>
-          )}
-
-          {/* Avatar upload */}
-          {isAvatarEnabled && (
-            <div className="space-y-1">
-              <div className="flex items-center gap-1">
-                <span className="text-xs font-medium">Profile Picture</span>
-                {requireAvatar ? (
-                  <span className="text-destructive text-xs">*</span>
-                ) : (
-                  <span className="text-muted-foreground text-xs">
-                    (optional)
-                  </span>
-                )}
-              </div>
-              <div className="border-2 border-dashed rounded-lg p-3 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-                <Upload className="h-3.5 w-3.5" />
-                Click to upload photo
-              </div>
-            </div>
-          )}
-
-          {/* Video URL */}
-          {isVideoEnabled && (
-            <div className="flex items-center justify-between text-xs font-medium text-muted-foreground py-0.5">
-              <span>
-                {formConfig?.requireVideoUrl
-                  ? "Video testimonial required"
-                  : "Add video testimonial"}
-              </span>
-              <ChevronDown className="h-3.5 w-3.5" />
-            </div>
-          )}
-
-          <Separator />
-
-          {/* Submit */}
+        <div className="flex justify-center">
           <div
-            className={cn(
-              "w-full h-8 rounded-md text-xs font-medium flex items-center justify-center",
-              !brandHex && "bg-primary text-primary-foreground",
-            )}
-            style={
-              brandHex
-                ? {
-                    backgroundColor: brandHex,
-                    color: "white",
-                  }
-                : undefined
-            }
+            ref={innerRef}
+            style={{
+              width: frameWidth,
+              transform: `scale(${scale})`,
+              transformOrigin: "top center",
+              pointerEvents: "auto",
+              userSelect: "none",
+            }}
+            className="transition-transform duration-300 ease-out"
+            aria-hidden="true"
           >
-            Submit Testimonial
+            {framedPreview}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
-});
+}

@@ -8,9 +8,6 @@ import {
   ArrowRight,
   Check,
   Loader2,
-  Monitor,
-  Smartphone,
-  Tablet,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
@@ -31,19 +28,12 @@ import { WidgetConfigStep, type WidgetConfigStepRef } from "./widget-config-step
 // ============================================================================
 
 type EditorStep = 1 | 2;
-type DeviceMode = "desktop" | "tablet" | "mobile";
 type MobileView = "settings" | "preview";
 
 interface ProjectConfigEditorProps {
   mode: "create" | "edit";
   slug?: string;
 }
-
-const DEVICE_MAX_WIDTHS: Record<DeviceMode, string> = {
-  desktop: "100%",
-  tablet: "768px",
-  mobile: "390px",
-};
 
 // ============================================================================
 // COMPONENT
@@ -55,7 +45,6 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
 
   const [step, setStep] = useState<EditorStep>(1);
   const [isSaving, setIsSaving] = useState(false);
-  const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const [mobileView, setMobileView] = useState<MobileView>("settings");
 
   // Track saved project identity for step 2
@@ -143,6 +132,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
         requireVideoUrl: data.requireVideoUrl,
         requireGoogleVerification: data.requireGoogleVerification,
         allowAnonymousSubmissions: data.allowAnonymousSubmissions,
+        allowFingerprintOptOut: data.allowFingerprintOptOut,
         notifyOnSubmission: data.notifyOnSubmission,
       };
 
@@ -352,7 +342,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
       <div className="container mx-auto px-4 py-6">
         {step === 1 ? (
           // ── STEP 1 ────────────────────────────────────────────────────────
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
             {/* Mobile view toggle */}
             <div className="lg:hidden col-span-full flex gap-1 bg-muted rounded-lg p-1 w-fit">
               <MobileViewButton
@@ -405,74 +395,49 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
             {/* Preview panel */}
             <div
               className={cn(
-                "lg:col-span-7 lg:block",
+                "lg:col-span-7 lg:block lg:sticky lg:top-24 lg:self-start",
                 mobileView === "preview" ? "block" : "hidden",
               )}
             >
-              <div className="lg:sticky lg:top-20">
-                {/* Device toggles (desktop only) */}
-                <div className="hidden lg:flex items-center justify-end gap-1 mb-3">
-                  {(["desktop", "tablet", "mobile"] as DeviceMode[]).map(
-                    (d) => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => setDeviceMode(d)}
-                        title={d.charAt(0).toUpperCase() + d.slice(1)}
-                        className={cn(
-                          "p-1.5 rounded-md transition-colors",
-                          deviceMode === d
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground hover:text-foreground",
-                        )}
-                      >
-                        {d === "desktop" && <Monitor className="h-4 w-4" />}
-                        {d === "tablet" && <Tablet className="h-4 w-4" />}
-                        {d === "mobile" && <Smartphone className="h-4 w-4" />}
-                      </button>
-                    ),
-                  )}
-                </div>
-
-                <div
-                  className="transition-all duration-300 mx-auto"
-                  style={{ maxWidth: DEVICE_MAX_WIDTHS[deviceMode] }}
-                >
-                  <CollectionFormPreview
-                    formConfig={
-                      previewData
-                        ? {
-                            headerTitle: previewData.headerTitle,
-                            headerDescription: previewData.headerDescription,
-                            thankYouMessage: previewData.thankYouMessage,
-                            enableRating: previewData.enableRating,
-                            enableJobTitle: previewData.enableJobTitle,
-                            enableCompany: previewData.enableCompany,
-                            enableAvatar: previewData.enableAvatar,
-                            enableVideoUrl: previewData.enableVideoUrl,
-                            enableGoogleVerification:
-                              previewData.enableGoogleVerification,
-                            requireRating: previewData.requireRating,
-                            requireJobTitle: previewData.requireJobTitle,
-                            requireCompany: previewData.requireCompany,
-                            requireAvatar: previewData.requireAvatar,
-                            requireVideoUrl: previewData.requireVideoUrl,
-                            requireGoogleVerification:
-                              previewData.requireGoogleVerification,
-                            allowAnonymousSubmissions:
-                              previewData.allowAnonymousSubmissions,
-                            notifyOnSubmission: previewData.notifyOnSubmission,
-                          }
-                        : project?.formConfig
-                    }
-                    projectName={previewData?.name || project?.name}
-                    logoUrl={previewData?.logoUrl || project?.logoUrl}
-                    brandColorPrimary={
-                      previewData?.brandColorPrimary ||
-                      project?.brandColorPrimary
-                    }
-                  />
-                </div>
+              <div className="mx-auto">
+                <CollectionFormPreview
+                  formConfig={
+                    previewData
+                      ? {
+                          headerTitle: previewData.headerTitle,
+                          headerDescription: previewData.headerDescription,
+                          thankYouMessage: previewData.thankYouMessage,
+                          enableRating: previewData.enableRating,
+                          enableJobTitle: previewData.enableJobTitle,
+                          enableCompany: previewData.enableCompany,
+                          enableAvatar: previewData.enableAvatar,
+                          enableVideoUrl: previewData.enableVideoUrl,
+                          enableGoogleVerification:
+                            previewData.enableGoogleVerification,
+                          requireRating: previewData.requireRating,
+                          requireJobTitle: previewData.requireJobTitle,
+                          requireCompany: previewData.requireCompany,
+                          requireAvatar: previewData.requireAvatar,
+                          requireVideoUrl: previewData.requireVideoUrl,
+                          requireGoogleVerification:
+                            previewData.requireGoogleVerification,
+                          allowAnonymousSubmissions:
+                            previewData.allowAnonymousSubmissions,
+                          allowFingerprintOptOut:
+                            previewData.allowFingerprintOptOut,
+                          notifyOnSubmission: previewData.notifyOnSubmission,
+                        }
+                      : project?.formConfig
+                  }
+                  projectName={previewData?.name || project?.name}
+                  projectTagline={project?.shortDescription}
+                  projectDescription={project?.description}
+                  logoUrl={previewData?.logoUrl || project?.logoUrl}
+                  brandColorPrimary={
+                    previewData?.brandColorPrimary ||
+                    project?.brandColorPrimary
+                  }
+                />
               </div>
             </div>
           </div>

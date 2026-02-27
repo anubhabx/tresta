@@ -97,6 +97,7 @@ export const step1Schema = z.object({
   requireVideoUrl: z.boolean(),
   requireGoogleVerification: z.boolean(),
   allowAnonymousSubmissions: z.boolean(),
+  allowFingerprintOptOut: z.boolean(),
   notifyOnSubmission: z.boolean(),
 });
 
@@ -139,6 +140,8 @@ function getDefaultValues(project?: Project | null): Step1FormData {
       project?.formConfig?.requireGoogleVerification ?? false,
     allowAnonymousSubmissions:
       project?.formConfig?.allowAnonymousSubmissions ?? true,
+    allowFingerprintOptOut:
+      project?.formConfig?.allowFingerprintOptOut ?? false,
     notifyOnSubmission: project?.formConfig?.notifyOnSubmission ?? false,
   };
 }
@@ -595,6 +598,29 @@ export const CollectionFormStep = forwardRef<
                       </FormLabel>
                       <FormDescription className="text-xs">
                         Let users submit without sharing their IP/device data
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="allowFingerprintOptOut"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-3 space-y-0">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        Allow Fingerprint Opt-Out
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        Show reviewers a checkbox to skip IP/device logging
                       </FormDescription>
                     </div>
                     <FormControl>

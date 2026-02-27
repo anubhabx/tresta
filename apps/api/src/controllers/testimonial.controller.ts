@@ -40,6 +40,7 @@ type SubmissionFormConfig = {
   requireVideoUrl?: boolean;
   requireGoogleVerification?: boolean;
   allowAnonymousSubmissions?: boolean;
+  allowFingerprintOptOut?: boolean;
   notifyOnSubmission?: boolean;
 };
 
@@ -321,6 +322,8 @@ const createTestimonial = async (
       isGoogleVerificationEnabled && formConfig.requireGoogleVerification === true;
     const allowAnonymousSubmissions =
       formConfig.allowAnonymousSubmissions !== false;
+    const allowFingerprintOptOut =
+      formConfig.allowFingerprintOptOut === true;
     const notifyOnSubmission = formConfig.notifyOnSubmission !== false;
 
     const hasRole = typeof authorRole === 'string' && authorRole.trim().length > 0;
@@ -331,9 +334,13 @@ const createTestimonial = async (
     const hasVideoUrl = typeof videoUrl === 'string' && videoUrl.trim().length > 0;
     const normalizedEmail = authorEmail.trim().toLowerCase();
 
-    if (isAnonymousSubmission && !allowAnonymousSubmissions) {
+    if (
+      isAnonymousSubmission &&
+      !allowAnonymousSubmissions &&
+      !allowFingerprintOptOut
+    ) {
       throw new ForbiddenError(
-        'Anonymous submissions are disabled for this project',
+        'IP/device data opt-out is disabled for this project',
       );
     }
 

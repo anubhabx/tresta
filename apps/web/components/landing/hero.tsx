@@ -19,7 +19,7 @@ const testimonials = [
     content:
       "Set it up in 10 minutes. Haven't touched it since. It just works.",
     author: "@shipfast_dev",
-    badge: "GitHub",
+    badge: "Google",
     rating: 5,
     time: "2 seconds ago",
   },
@@ -37,7 +37,7 @@ const testimonials = [
     content:
       "One script tag. Zero CSS headaches. This is how tools should work.",
     author: "@frontend_dev",
-    badge: "GitHub",
+    badge: "Google",
     rating: 5,
     time: "5 seconds ago",
   },

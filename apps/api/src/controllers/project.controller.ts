@@ -808,6 +808,7 @@ const updateProject = async (
           "requireVideoUrl",
           "requireGoogleVerification",
           "allowAnonymousSubmissions",
+          "allowFingerprintOptOut",
           "notifyOnSubmission",
         ] as const;
         for (const field of boolFields) {

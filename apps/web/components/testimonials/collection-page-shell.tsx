@@ -16,7 +16,7 @@ export function CollectionPageShell({
     <div className="min-h-screen bg-muted/20 py-8 sm:py-10">
       <div
         className={cn(
-          "py-6 px-4 md:px-8",
+          "py-6 px-4 md:px-8 relative",
           centered && "flex min-h-[calc(100svh-4rem)] items-center",
           className,
         )}

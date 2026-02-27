@@ -513,6 +513,29 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="allowFingerprintOptOut"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Allow Fingerprint Opt-Out
+                      </FormLabel>
+                      <FormDescription>
+                        Show reviewers a checkbox to opt out of IP/device logging
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 
