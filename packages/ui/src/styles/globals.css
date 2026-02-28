@@ -11,6 +11,9 @@
 @theme inline {
   --animate-aurora: aurora 60s linear infinite;
   --animate-shimmer: shimmer 3s ease-in-out infinite;
+  --animate-scanline: scanline 6s ease-in-out infinite;
+  --animate-breathe: breathe 8s ease-in-out infinite;
+  --animate-border-beam: border-beam 4s linear infinite;
 
   @keyframes aurora {
     from {
@@ -31,6 +34,45 @@
     }
     100% {
       transform: translateX(200%);
+    }
+  }
+
+  @keyframes scanline {
+    0%,
+    100% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    95% {
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.04;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 0.08;
+    }
+  }
+
+  @keyframes border-beam {
+    0% {
+      offset-distance: 0%;
+    }
+    100% {
+      offset-distance: 100%;
     }
   }
 }
@@ -404,6 +446,11 @@
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --font-display: var(--font-display, "Instrument Serif", Georgia, serif);
+  --font-editorial: var(--font-editorial, "Cormorant Garamond", Georgia, serif);
+
+  --color-signal: var(--signal, #e11d48);
+  --color-signal-foreground: var(--signal-foreground, #ffffff);
 
   /* Border Radius - Using fixed values for consistency */
   --radius-sm: var(--radius-sm);

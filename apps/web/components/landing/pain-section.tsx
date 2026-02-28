@@ -1,236 +1,219 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { motion } from "motion/react";
-import { Star, Check, X } from "lucide-react";
-import { cn } from "@workspace/ui/lib/utils";
+import { useRef } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
+import { Star, Check } from "lucide-react";
 
 /**
- * Problem/Solution Section - Before / After Comparison
+ * Pain Section — "Screenshot Scatter → Collapse"
  *
- * A borderless, immersive before/after reveal. The cursor drives a subtle
- * divider that splits "The Old Way" (blurred, desaturated) from
- * "The Tresta Way" (vibrant, solid background). The divider is sticky —
- * it stays wherever the user leaves it.
+ * Shows 4 mock screenshot thumbnails (slightly rotated, overlapping, low opacity)
+ * representing "the old way." When the section scrolls 30% into view, they
+ * collapse to center (translate + scale(0) + opacity(0)), staggered 60ms.
+ * A clean Tresta widget card then fades in from scale(0.9).
+ *
+ * Tech: Motion whileInView (not GSAP). Duration-based, 800ms.
  */
-export function PainSection() {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const calcPosition = useCallback((clientX: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const pct = Math.min(100, Math.max(0, (x / rect.width) * 100));
-    setSliderPosition(pct);
-  }, []);
+const screenshots = [
+  {
+    id: 1,
+    rotate: -12,
+    x: -120,
+    y: -30,
+    label: "screenshot_tweet_01.png",
+  },
+  {
+    id: 2,
+    rotate: 6,
+    x: 80,
+    y: -50,
+    label: "review_slack_dm.png",
+  },
+  {
+    id: 3,
+    rotate: -4,
+    x: -60,
+    y: 40,
+    label: "email_feedback_03.png",
+  },
+  {
+    id: 4,
+    rotate: 10,
+    x: 100,
+    y: 30,
+    label: "twitter_mention.png",
+  },
+];
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => calcPosition(e.clientX),
-    [calcPosition],
-  );
+function ScreenshotThumbnail({
+  rotate,
+  x,
+  y,
+  label,
+  index,
+  collapsed,
+  reduced,
+}: {
+  rotate: number;
+  x: number;
+  y: number;
+  label: string;
+  index: number;
+  collapsed: boolean;
+  reduced: boolean;
+}) {
+  const scatteredState = {
+    x,
+    y,
+    rotate,
+    scale: 1,
+    opacity: 0.6,
+  };
 
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      const touch = e.touches[0];
-      if (touch) calcPosition(touch.clientX);
-    },
-    [calcPosition],
-  );
+  const collapsedState = {
+    x: 0,
+    y: 0,
+    rotate: 0,
+    scale: 0,
+    opacity: 0,
+  };
 
   return (
-    <section className="bg-background py-24 md:py-32">
+    <motion.div
+      className="absolute left-1/2 top-1/2 -ml-[80px] -mt-[60px] sm:-ml-[100px] sm:-mt-[75px] w-[160px] sm:w-[200px] aspect-[4/3] rounded-lg border border-[#2a2e38] bg-[#1a1d25] overflow-hidden"
+      animate={collapsed && !reduced ? collapsedState : scatteredState}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : {
+              duration: 0.8,
+              delay: collapsed ? index * 0.06 : 0,
+              ease: [0.32, 0.72, 0, 1],
+            }
+      }
+    >
+      {/* Simulated screenshot content */}
+      <div className="flex items-center gap-1.5 border-b border-[#2a2e38] px-3 py-1.5">
+        <div className="h-1.5 w-1.5 rounded-full bg-red-500/50" />
+        <div className="h-1.5 w-1.5 rounded-full bg-yellow-500/50" />
+        <div className="h-1.5 w-1.5 rounded-full bg-green-500/50" />
+      </div>
+      <div className="p-3 space-y-2">
+        <div className="h-2 w-3/4 rounded bg-[#2a2e38]" />
+        <div className="h-2 w-1/2 rounded bg-[#2a2e38]" />
+        <div className="h-2 w-2/3 rounded bg-[#2a2e38]" />
+      </div>
+      <div className="absolute bottom-2 left-3 text-[9px] font-mono text-[#8b8f99]/50">
+        {label}
+      </div>
+    </motion.div>
+  );
+}
+
+export function PainSection() {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const reducedMotion = useReducedMotion();
+  const reduced = !!reducedMotion;
+
+  return (
+    <section className="bg-[#08090d] py-24 md:py-32">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[#e8eaed] sm:text-4xl">
             You&apos;ve shipped the product.
             <br />
-            <span className="text-muted-foreground">
-              Now you need social proof.
-            </span>
+            <span className="text-[#8b8f99]">Now you need social proof.</span>
           </h2>
-          <p className="mx-auto max-w-xl text-lg text-muted-foreground">
-            Sweep your mouse across to see the difference.
+          <p className="mx-auto max-w-xl text-lg text-[#8b8f99]">
+            Stop hoarding screenshots. Let Tresta handle it.
           </p>
         </div>
 
-        {/* Slider Comparison */}
-        <div className="mx-auto max-w-4xl">
-          <div
-            ref={containerRef}
-            onMouseMove={handleMouseMove}
-            onTouchMove={handleTouchMove}
-            className="relative cursor-ew-resize overflow-hidden"
-            style={{ height: "400px" }}
+        {/* Scatter → Collapse Area */}
+        <div
+          ref={ref}
+          className="relative mx-auto max-w-2xl"
+          style={{ height: "360px" }}
+        >
+          {/* Scattered screenshots */}
+          {screenshots.map((s, i) => (
+            <ScreenshotThumbnail
+              key={s.id}
+              rotate={s.rotate}
+              x={s.x}
+              y={s.y}
+              label={s.label}
+              index={i}
+              collapsed={isInView}
+              reduced={reduced}
+            />
+          ))}
+
+          {/* Clean Tresta widget card — fades in after collapse */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            animate={
+              isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }
+            }
+            transition={
+              reduced
+                ? { duration: 0 }
+                : {
+                    duration: 0.6,
+                    delay: isInView ? 0.5 : 0,
+                    ease: [0.32, 0.72, 0, 1],
+                  }
+            }
           >
-            {/* OLD WAY - Left side (always visible underneath) */}
-            <div
-              className="absolute inset-0 p-6"
-              style={{ filter: "blur(0.5px) saturate(0.3)" }}
-            >
-              <div className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                The old way
+            <div className="w-full max-w-sm rounded-xl border border-[#2a2e38] bg-[#111318] p-5 shadow-2xl shadow-black/30">
+              <div className="mb-3 flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-4 w-4 fill-amber-400 text-amber-400"
+                  />
+                ))}
               </div>
-              <div className="space-y-4">
-                {/* Ugly HTML mockup */}
-                <pre className="rounded-lg bg-muted p-4 font-mono text-xs text-muted-foreground overflow-x-auto">
-                  {`<!-- Your "testimonials" section -->
-<div class="testimonials">
-  <img src="/screenshots/tweet1.png" />
-  <img src="/screenshots/tweet2.png" />
-  <img src="/screenshots/tweet3.png" />
-  <!-- TODO: remember to update these -->
-</div>
-
-<!-- CSS you'll never finish -->
-<style>
-  .testimonials img {
-    /* it's fine for now... */
-    margin: 10px;
-  }
-</style>`}
-                </pre>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Manual updates",
-                    "No verification",
-                    "Looks dated",
-                    "Breaks on mobile",
-                  ].map((issue) => (
-                    <span
-                      key={issue}
-                      className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
-                    >
-                      <X className="h-3 w-3 text-red-400/60" />
-                      {issue}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* TRESTA WAY - Right side (clips based on slider) */}
-            <div
-              className="absolute inset-0 bg-background"
-              style={{
-                clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
-                transition: "clip-path 100ms ease-out",
-              }}
-            >
-              {/* Subtle radial glow overlay */}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 60% 50%, rgba(20,184,166,0.06) 0%, rgba(6,182,212,0.03) 40%, transparent 70%)",
-                }}
-              />
-              <div className="relative p-6">
-                <div className="mb-4 text-sm font-semibold uppercase tracking-wider text-cyan-400">
-                  The Tresta way
-                </div>
-                <div className="space-y-4">
-                  {/* Clean script tag */}
-                  <pre className="rounded-lg bg-muted border border-cyan-900/30 p-4 font-mono text-xs overflow-x-auto">
-                    <code>
-                      <span className="text-muted-foreground">&lt;</span>
-                      <span className="text-cyan-400">script</span>
-                      {"\n  "}
-                      <span className="text-violet-400">src</span>
-                      <span className="text-muted-foreground">=</span>
-                      <span className="text-yellow-300">
-                        &quot;https://api.tresta.app/widget/tresta-widget.js&quot;
-                      </span>
-                      {"\n  "}
-                      <span className="text-violet-400">
-                        data-tresta-widget
-                      </span>
-                      <span className="text-muted-foreground">=</span>
-                      <span className="text-yellow-300">
-                        &quot;your-widget-id&quot;
-                      </span>
-                      {"\n"}
-                      <span className="text-muted-foreground">&gt;&lt;/</span>
-                      <span className="text-cyan-400">script</span>
-                      <span className="text-muted-foreground">&gt;</span>
-                    </code>
-                  </pre>
-
-                  {/* Clean testimonial card preview */}
-                  <div className="rounded-lg border border-cyan-800/30 bg-muted p-4">
-                    <div className="mb-2 flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="h-4 w-4 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                    </div>
-                    <p className="mb-3 text-sm text-foreground">
-                      &ldquo;Set it up in 10 minutes. It just works.&rdquo;
+              <p className="mb-4 text-sm text-[#e8eaed] leading-relaxed">
+                &ldquo;Set it up in 10 minutes. Haven&apos;t touched it since.
+                It just works.&rdquo;
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-[#60a5fa]/10 flex items-center justify-center text-xs font-medium text-[#60a5fa]">
+                    JD
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#e8eaed]">
+                      @shipfast_dev
                     </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">
-                          JD
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            @developer
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Indie Hacker
-                          </p>
-                        </div>
-                      </div>
-                      <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
-                        <Check className="h-3 w-3" />
-                        Verified
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Auto-updating",
-                      "OAuth verified",
-                      "5 layouts",
-                      "Dark mode",
-                    ].map((feature) => (
-                      <span
-                        key={feature}
-                        className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400"
-                      >
-                        <Check className="h-3 w-3" />
-                        {feature}
-                      </span>
-                    ))}
+                    <p className="text-xs text-[#8b8f99]">Indie Hacker</p>
                   </div>
                 </div>
+                <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
+                  <Check className="h-3 w-3" />
+                  Verified
+                </span>
               </div>
             </div>
-
-            {/* Slider Line */}
-            <div
-              className="pointer-events-none absolute top-0 bottom-0 z-20"
-              style={{
-                left: `${sliderPosition}%`,
-                transition: "left 100ms ease-out",
-              }}
-            >
-              {/* Thin vertical line */}
-              <div className="absolute inset-y-0 w-[1px] -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
-            </div>
-          </div>
-
-          {/* Labels below */}
-          <div className="mt-6 flex justify-between text-sm">
-            <span className="text-muted-foreground">← The old way</span>
-            <span className="text-cyan-400">The Tresta way →</span>
-          </div>
+          </motion.div>
         </div>
+
+        {/* Caption below */}
+        <motion.p
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={
+            reduced
+              ? { duration: 0 }
+              : { duration: 0.4, delay: isInView ? 1.0 : 0 }
+          }
+          className="mt-8 text-center text-sm text-[#8b8f99]"
+        >
+          From scattered chaos to polished social proof — in one line of code.
+        </motion.p>
       </div>
     </section>
   );

@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import {
+  Inter,
+  JetBrains_Mono,
+  Instrument_Serif,
+  Cormorant_Garamond,
+} from "next/font/google";
 
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
@@ -14,6 +19,19 @@ const fontSans = Inter({
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+});
+
+const fontDisplay = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+});
+
+const fontEditorial = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-editorial",
 });
 
 export const metadata: Metadata = {
@@ -63,10 +81,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#60a5fa",
+          colorBackground: "#111318",
+          colorInputBackground: "#0c0e12",
+          colorInputText: "#e8eaed",
+          colorText: "#e8eaed",
+          colorTextSecondary: "#8b8f99",
+          borderRadius: "0.75rem",
+        },
+      }}
+    >
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+          className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontEditorial.variable} font-sans antialiased`}
         >
           <a
             href="#main-content"

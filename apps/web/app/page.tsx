@@ -6,26 +6,33 @@ import { siteConfig } from "@/config/site";
 import type { Metadata } from "next";
 
 /* ── Below-fold components: code-split & lazy-loaded ─────────── */
-const PainSection = dynamic(
-  () => import("@/components/landing/pain-section").then((m) => m.PainSection),
+const PainSection = dynamic(() =>
+  import("@/components/landing/pain-section").then((m) => m.PainSection),
 );
-const Features = dynamic(
-  () => import("@/components/landing/features").then((m) => m.Features),
+const Features = dynamic(() =>
+  import("@/components/landing/features").then((m) => m.Features),
 );
-const InteractiveDemo = dynamic(
-  () => import("@/components/landing/interactive-demo").then((m) => m.InteractiveDemo),
+const InteractiveDemo = dynamic(() =>
+  import("@/components/landing/interactive-demo").then(
+    (m) => m.InteractiveDemo,
+  ),
 );
-const IntegrationSection = dynamic(
-  () => import("@/components/landing/integration-section").then((m) => m.IntegrationSection),
+const IntegrationSection = dynamic(() =>
+  import("@/components/landing/integration-section").then(
+    (m) => m.IntegrationSection,
+  ),
 );
-const FAQ = dynamic(
-  () => import("@/components/landing/faq").then((m) => m.FAQ),
+const FAQ = dynamic(() =>
+  import("@/components/landing/faq").then((m) => m.FAQ),
 );
-const CTA = dynamic(
-  () => import("@/components/landing/cta").then((m) => m.CTA),
+const SocialProof = dynamic(() =>
+  import("@/components/landing/social-proof").then((m) => m.SocialProof),
 );
-const SiteFooter = dynamic(
-  () => import("@/components/site-footer").then((m) => m.SiteFooter),
+const CTA = dynamic(() =>
+  import("@/components/landing/cta").then((m) => m.CTA),
+);
+const SiteFooter = dynamic(() =>
+  import("@/components/site-footer").then((m) => m.SiteFooter),
 );
 
 export const metadata: Metadata = {
@@ -85,7 +92,7 @@ const faqJsonLd = {
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="dark landing-observatory flex min-h-screen flex-col">
       {/* Structured Data */}
       <script
         type="application/ld+json"
@@ -98,7 +105,7 @@ export default function Page() {
 
       <LandingNavbar />
       <main className="flex-1">
-        <PageWrapper gridVariant="grid-small">
+        <PageWrapper>
           <Hero />
 
           <PainSection />
@@ -107,7 +114,7 @@ export default function Page() {
 
           <InteractiveDemo />
 
-          {/* <Testimonials /> */}
+          <SocialProof />
 
           <IntegrationSection />
 

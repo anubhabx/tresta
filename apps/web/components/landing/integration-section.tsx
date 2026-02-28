@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
-import { Button } from "@workspace/ui/components/button";
+import { motion, useReducedMotion } from "motion/react";
 import { CodeBlock } from "@workspace/ui/components/code-block";
-import { Copy, Check, ChevronDown } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
 const frameworks = [
@@ -105,37 +103,39 @@ const configOptions = [
 
 export function IntegrationSection() {
   const [selectedFramework, setSelectedFramework] = useState<Framework>("html");
+  const reducedMotion = useReducedMotion();
+  const reduced = !!reducedMotion;
 
   return (
     <section
       id="integration"
-      className="container mx-auto px-4 py-24 md:px-8 md:py-32"
+      className="bg-[#08090d] px-4 py-24 md:px-8 md:py-32"
     >
-      <div className="mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduced ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={reduced ? { duration: 0 } : { duration: 0.5 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[#e8eaed] sm:text-4xl">
             One line. That&apos;s it.
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-[#8b8f99]">
             Works with any framework. No dependencies. No build step.
           </p>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduced ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={reduced ? { duration: 0 } : { duration: 0.5, delay: 0.1 }}
           viewport={{ once: true }}
-          className="rounded-xl border border-border bg-card overflow-hidden"
+          className="rounded-xl border border-[#2a2e38] bg-[#111318] overflow-hidden"
         >
           {/* Framework Tabs */}
-          <div className="flex items-center gap-1 border-b border-border bg-muted/50 p-2">
+          <div className="flex items-center gap-1 border-b border-[#2a2e38] bg-[#0c0e12] p-2">
             {frameworks.map((fw) => (
               <button
                 key={fw.id}
@@ -143,8 +143,8 @@ export function IntegrationSection() {
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   selectedFramework === fw.id
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-[#60a5fa]/10 text-[#60a5fa]"
+                    : "text-[#8b8f99] hover:text-[#e8eaed]",
                 )}
               >
                 {fw.label}
@@ -165,44 +165,44 @@ export function IntegrationSection() {
 
         {/* Config Reference */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reduced ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={reduced ? { duration: 0 } : { duration: 0.5, delay: 0.2 }}
           viewport={{ once: true }}
           className="mt-8"
         >
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#8b8f99]">
             Configuration Options
           </h3>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="rounded-lg border border-[#2a2e38] bg-[#111318] overflow-hidden">
             <table className="w-full">
-              <thead className="border-b border-border bg-muted/50">
+              <thead className="border-b border-[#2a2e38] bg-[#0c0e12]">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-[#8b8f99]">
                     Property
                   </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-[#8b8f99]">
                     Values
                   </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden sm:table-cell">
+                  <th className="px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-[#8b8f99] hidden sm:table-cell">
                     Description
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-[#2a2e38]">
                 {configOptions.map((opt) => (
                   <tr key={opt.prop}>
                     <td className="px-4 py-3">
-                      <code className="rounded bg-primary/10 px-1.5 py-0.5 text-sm text-primary font-mono">
+                      <code className="rounded bg-[#60a5fa]/10 px-1.5 py-0.5 text-sm text-[#60a5fa] font-mono">
                         {opt.prop}
                       </code>
                     </td>
                     <td className="px-4 py-3">
-                      <code className="text-sm text-muted-foreground font-mono">
+                      <code className="text-sm text-[#8b8f99] font-mono">
                         {opt.values}
                       </code>
                     </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground hidden sm:table-cell">
+                    <td className="px-4 py-3 text-sm text-[#8b8f99] hidden sm:table-cell">
                       {opt.desc}
                     </td>
                   </tr>

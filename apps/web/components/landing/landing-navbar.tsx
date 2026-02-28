@@ -86,16 +86,16 @@ function NavLink({
     <NavigationMenuLink asChild>
       <Link
         href={href}
-        className="flex items-start gap-3 rounded-md p-3 hover:bg-accent transition-colors group"
+        className="flex items-start gap-3 rounded-md p-3 hover:bg-[#1a1d25] transition-colors group"
       >
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-background group-hover:border-primary/20 group-hover:bg-primary/5 transition-colors">
-          <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[#2a2e38] bg-[#111318] group-hover:border-[#60a5fa]/20 group-hover:bg-[#60a5fa]/5 transition-colors">
+          <Icon className="h-4 w-4 text-[#8b8f99] group-hover:text-[#60a5fa] transition-colors" />
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-medium leading-none">{title}</p>
-          <p className="text-xs text-muted-foreground line-clamp-1">
-            {description}
+          <p className="text-sm font-medium leading-none text-[#e8eaed]">
+            {title}
           </p>
+          <p className="text-xs text-[#8b8f99] line-clamp-1">{description}</p>
         </div>
       </Link>
     </NavigationMenuLink>
@@ -126,23 +126,26 @@ export function LandingNavbar() {
   return (
     <header
       className={cn(
-        "fixed left-0 right-0 top-0 z-50",
-        "bg-background/80 backdrop-blur-xl",
-        "transition-all duration-300",
-        isScrolled && "bg-background/95 border-b border-border shadow-sm",
+        "fixed left-1/2 -translate-x-1/2 top-4 z-50",
+        "rounded-full border border-[#2a2e38]/60",
+        "bg-[#111318]/80 backdrop-blur-xl",
+        "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+        isScrolled
+          ? "w-[min(90%,600px)] shadow-2xl shadow-black/30"
+          : "w-[min(95%,800px)]",
       )}
     >
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
+      <div className="flex h-12 items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Image
             src="/branding/tresta.svg"
-            width={28}
-            height={28}
+            width={24}
+            height={24}
             alt="Tresta Logo"
             priority
           />
-          <span className="text-lg font-semibold tracking-tight text-foreground">
+          <span className="text-sm font-semibold tracking-tight text-[#e8eaed]">
             Tresta
           </span>
         </Link>
@@ -152,11 +155,11 @@ export function LandingNavbar() {
           <NavigationMenuList>
             {/* Product Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent">
+              <NavigationMenuTrigger className="bg-transparent text-[#8b8f99] hover:text-[#e8eaed] data-[state=open]:text-[#e8eaed] h-8 text-sm">
                 Product
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[320px] gap-1 p-2">
+                <ul className="grid w-[320px] gap-1 p-2 bg-[#111318] border border-[#2a2e38] rounded-xl">
                   {productLinks.map((link) => (
                     <li key={link.href}>
                       <NavLink {...link} />
@@ -168,11 +171,11 @@ export function LandingNavbar() {
 
             {/* Resources Dropdown */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent">
+              <NavigationMenuTrigger className="bg-transparent text-[#8b8f99] hover:text-[#e8eaed] data-[state=open]:text-[#e8eaed] h-8 text-sm">
                 Resources
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[320px] gap-1 p-2">
+                <ul className="grid w-[320px] gap-1 p-2 bg-[#111318] border border-[#2a2e38] rounded-xl">
                   {resourceLinks.map((link) => (
                     <li key={link.href}>
                       <NavLink {...link} />
@@ -187,11 +190,10 @@ export function LandingNavbar() {
               <Link href="/pricing" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={cn(
-                    "inline-flex h-9 items-center justify-center rounded-md px-4 py-2",
+                    "inline-flex h-8 items-center justify-center rounded-md px-3 py-1.5",
                     "text-sm font-medium transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    pathname === "/pricing" &&
-                      "bg-accent text-accent-foreground",
+                    "text-[#8b8f99] hover:text-[#e8eaed]",
+                    pathname === "/pricing" && "text-[#e8eaed]",
                   )}
                 >
                   Pricing
@@ -206,15 +208,28 @@ export function LandingNavbar() {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-2">
             {isSignedIn ? (
-              <Button size="sm" asChild>
+              <Button
+                size="sm"
+                className="h-8 rounded-full bg-[#60a5fa] hover:bg-[#60a5fa]/90 text-white text-xs px-4"
+                asChild
+              >
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs text-[#8b8f99] hover:text-[#e8eaed] hover:bg-transparent"
+                  asChild
+                >
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button
+                  size="sm"
+                  className="h-8 rounded-full bg-[#60a5fa] hover:bg-[#60a5fa]/90 text-white text-xs px-4"
+                  asChild
+                >
                   <Link href="/sign-up">Get Started</Link>
                 </Button>
               </>
@@ -224,17 +239,25 @@ export function LandingNavbar() {
           {/* Mobile Menu Button */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" aria-label="Open menu">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open menu"
+                className="text-[#8b8f99] hover:text-[#e8eaed] hover:bg-transparent h-8 w-8"
+              >
                 {mobileMenuOpen ? (
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 ) : (
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-4 w-4" />
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px] px-4">
+            <SheetContent
+              side="right"
+              className="w-[300px] sm:w-[350px] px-4 bg-[#111318] border-[#2a2e38]"
+            >
               <SheetHeader className="px-0 mt-4">
-                <SheetTitle className="flex items-center gap-2">
+                <SheetTitle className="flex items-center gap-2 text-[#e8eaed]">
                   <Image
                     src="/branding/tresta.svg"
                     width={24}
@@ -248,7 +271,7 @@ export function LandingNavbar() {
               <nav className="mt-4 flex flex-col gap-6">
                 {/* Product Section */}
                 <div>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#8b8f99]">
                     Product
                   </h3>
                   <div className="flex flex-col gap-1">
@@ -256,11 +279,11 @@ export function LandingNavbar() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="flex items-center gap-3 rounded-md p-2 hover:bg-accent transition-colors"
+                        className="flex items-center gap-3 rounded-md p-2 hover:bg-[#1a1d25] transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <link.icon className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">
+                        <link.icon className="h-4 w-4 text-[#8b8f99]" />
+                        <span className="text-sm font-medium text-[#e8eaed]">
                           {link.title}
                         </span>
                       </Link>
@@ -270,7 +293,7 @@ export function LandingNavbar() {
 
                 {/* Resources Section */}
                 <div>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#8b8f99]">
                     Resources
                   </h3>
                   <div className="flex flex-col gap-1">
@@ -278,11 +301,11 @@ export function LandingNavbar() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="flex items-center gap-3 rounded-md p-2 hover:bg-accent transition-colors"
+                        className="flex items-center gap-3 rounded-md p-2 hover:bg-[#1a1d25] transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <link.icon className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">
+                        <link.icon className="h-4 w-4 text-[#8b8f99]" />
+                        <span className="text-sm font-medium text-[#e8eaed]">
                           {link.title}
                         </span>
                       </Link>
@@ -293,24 +316,36 @@ export function LandingNavbar() {
                 {/* Pricing */}
                 <Link
                   href="/pricing"
-                  className="flex items-center gap-3 rounded-md p-2 hover:bg-accent transition-colors"
+                  className="flex items-center gap-3 rounded-md p-2 hover:bg-[#1a1d25] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span className="text-sm font-medium">Pricing</span>
+                  <span className="text-sm font-medium text-[#e8eaed]">
+                    Pricing
+                  </span>
                 </Link>
 
                 {/* Auth Buttons */}
-                <div className="mt-4 pt-4 border-t flex flex-col gap-2">
+                <div className="mt-4 pt-4 border-t border-[#2a2e38] flex flex-col gap-2">
                   {isSignedIn ? (
-                    <Button asChild className="w-full">
+                    <Button
+                      asChild
+                      className="w-full bg-[#60a5fa] hover:bg-[#60a5fa]/90 text-white"
+                    >
                       <Link href="/dashboard">Dashboard</Link>
                     </Button>
                   ) : (
                     <>
-                      <Button variant="outline" asChild className="w-full">
+                      <Button
+                        variant="outline"
+                        asChild
+                        className="w-full border-[#2a2e38] text-[#e8eaed] hover:bg-[#1a1d25]"
+                      >
                         <Link href="/sign-in">Sign In</Link>
                       </Button>
-                      <Button asChild className="w-full">
+                      <Button
+                        asChild
+                        className="w-full bg-[#60a5fa] hover:bg-[#60a5fa]/90 text-white"
+                      >
                         <Link href="/sign-up">Get Started</Link>
                       </Button>
                     </>

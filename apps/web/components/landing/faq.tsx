@@ -33,22 +33,30 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section className="container max-w-3xl mx-auto py-24 px-4 md:px-24 md:py-32">
-      <SectionHeader
-        title="Frequently asked questions"
-        description="Have a question? We're here to help."
-      />
+    <section id="faq" className="bg-[#08090d] py-24 px-4 md:px-24 md:py-32">
+      <div className="container max-w-3xl mx-auto">
+        <SectionHeader
+          title="Frequently asked questions"
+          description="Have a question? We're here to help."
+        />
 
-      <Accordion type="single" collapsible className="w-full">
-        {faqs.map((faq, index) => (
-          <AccordionItem key={index} value={`item-${index}`}>
-            <AccordionTrigger className="text-left">
-              {faq.question}
-            </AccordionTrigger>
-            <AccordionContent>{faq.answer}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+        <Accordion type="single" collapsible className="w-full">
+          {faqs.map((faq, index) => (
+            <AccordionItem
+              key={index}
+              value={`item-${index}`}
+              className="border-[#2a2e38]"
+            >
+              <AccordionTrigger className="text-left text-[#e8eaed] hover:text-[#e8eaed]/80">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-[#8b8f99]">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
     </section>
   );
 }
