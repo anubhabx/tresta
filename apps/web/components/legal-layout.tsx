@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { ChevronRight, Home, List, X } from "lucide-react";
+import { ChevronRight, Home, List } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-  SheetClose,
   SheetTitle,
 } from "@workspace/ui/components/sheet";
 import { Button } from "@workspace/ui/components/button";
@@ -41,7 +40,7 @@ function TocNav({
 }) {
   return (
     <nav aria-label="Table of contents">
-      <ul className="space-y-1">
+      <ul className="space-y-0.5">
         {items.map((item) => (
           <li key={item.id}>
             <a
@@ -60,8 +59,8 @@ function TocNav({
                 "block rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
                 item.level === 3 && "pl-6",
                 activeId === item.id
-                  ? "bg-accent text-accent-foreground font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  ? "bg-white/10 text-white font-medium"
+                  : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5",
               )}
             >
               {item.title}
@@ -82,17 +81,12 @@ function useActiveSection(ids: string[]): string {
   useEffect(() => {
     if (ids.length === 0) return;
 
-    // Clean up previous observer
     observerRef.current?.disconnect();
 
     const callback: IntersectionObserverCallback = (entries) => {
-      // Find the first entry that is intersecting (top-most visible section)
       const visibleEntries = entries
         .filter((entry) => entry.isIntersecting)
-        .sort(
-          (a, b) =>
-            a.boundingClientRect.top - b.boundingClientRect.top
-        );
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
       if (visibleEntries.length > 0) {
         setActiveId(visibleEntries[0]!.target.id);
@@ -109,7 +103,6 @@ function useActiveSection(ids: string[]): string {
       if (el) observerRef.current!.observe(el);
     });
 
-    // Set initial active section
     if (!activeId && ids[0]) {
       setActiveId(ids[0]);
     }
@@ -133,9 +126,14 @@ export function LegalLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* ── Ambient glow ─────────────────────────────────────────────── */}
+      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.04] z-0">
+        <div className="absolute inset-0 bg-primary rounded-full blur-[150px]" />
+      </div>
+
       {/* ── Trust Header ─────────────────────────────────────────────── */}
-      <div className="border-b border-border/60">
+      <div className="relative z-10 border-b border-white/8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
           {/* Breadcrumbs */}
           <nav
@@ -144,23 +142,23 @@ export function LegalLayout({
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1 text-zinc-500 transition-colors hover:text-zinc-200"
             >
               <Home className="h-3.5 w-3.5" />
               <span>Home</span>
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-muted-foreground">{title}</span>
+            <ChevronRight className="h-3.5 w-3.5 text-zinc-700" />
+            <span className="text-zinc-500">{title}</span>
           </nav>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="text-3xl font-display font-medium tracking-tight text-white sm:text-4xl md:text-5xl">
             {title}
           </h1>
 
           {/* Last Updated Badge */}
-          <div className="mt-4 flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-md border border-border bg-card/50 px-3 py-1 text-xs font-mono text-muted-foreground">
+          <div className="mt-5 flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-zinc-400 backdrop-blur-sm">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Last updated: {lastUpdated}
             </span>
@@ -169,23 +167,26 @@ export function LegalLayout({
       </div>
 
       {/* ── Mobile ToC Trigger ───────────────────────────────────────── */}
-      <div className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md lg:hidden">
+      <div className="sticky top-0 z-30 border-b border-white/8 bg-background/80 backdrop-blur-md lg:hidden">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="my-2 gap-2 text-muted-foreground hover:text-foreground"
+                className="my-2 gap-2 text-zinc-400 hover:text-white hover:bg-white/5"
               >
                 <List className="h-4 w-4" />
                 On this page
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-background border-border p-0">
+            <SheetContent
+              side="left"
+              className="w-72 bg-zinc-950 border-white/10 p-0"
+            >
               <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between border-b border-border px-4 py-4">
-                  <SheetTitle className="text-sm font-semibold text-foreground">
+                <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
+                  <SheetTitle className="text-sm font-semibold text-white">
                     On this page
                   </SheetTitle>
                 </div>
@@ -203,12 +204,12 @@ export function LegalLayout({
       </div>
 
       {/* ── Two-Column Layout ────────────────────────────────────────── */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="relative lg:grid lg:grid-cols-[220px_1fr] lg:gap-12 xl:grid-cols-[240px_1fr] xl:gap-16">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block">
             <div className="sticky top-24 -ml-1 pt-10 pb-16">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-600">
                 On this page
               </p>
               <TocNav items={toc} activeId={activeId} />
@@ -217,7 +218,9 @@ export function LegalLayout({
 
           {/* Main Content */}
           <main className="min-w-0 max-w-3xl py-10 pb-20">
-            <article className="legal-prose">{children}</article>
+            <article className="legal-prose dark-legal-prose">
+              {children}
+            </article>
           </main>
         </div>
       </div>

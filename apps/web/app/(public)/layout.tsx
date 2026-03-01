@@ -1,16 +1,16 @@
-import { LandingNavbar } from "@/components/landing/landing-navbar";
-import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/landing/site-header";
+import { Footer } from "@/components/landing/pricing-footer";
 
 export default function PublicLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <LandingNavbar />
-      <main className="mx-auto w-full px-4 md:px-8">{children}</main>
-      <SiteFooter />
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <SiteHeader />
+      <main className="w-full">{children}</main>
+      <Footer />
     </div>
   );
 }
