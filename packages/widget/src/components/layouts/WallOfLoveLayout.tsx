@@ -28,14 +28,7 @@ export function WallOfLoveLayout({
   const cols = Math.min(layout.columns ?? 3, 4);
 
   return (
-    <div
-      className="tresta-wall"
-      data-cols={cols}
-      style={{
-        columnCount: 1,
-        columnGap: "12px",
-      }}
-    >
+    <div className="tresta-wall" data-cols={cols}>
       {testimonials.map((testimonial, idx) => (
         <div
           key={testimonial.id}

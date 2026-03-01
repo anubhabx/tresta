@@ -1,6 +1,6 @@
 "use client";
-import { cn } from "@workspace/ui/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { cn } from "@workspace/ui/lib/utils";
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -24,7 +24,7 @@ export const CanvasRevealEffect = ({
   showGradient?: boolean;
 }) => {
   return (
-    <div className={cn("h-full relative bg-background w-full", containerClassName)}>
+    <div className={cn("h-full relative bg-white w-full", containerClassName)}>
       <div className="h-full w-full">
         <DotMatrix
           colors={colors ?? [[0, 255, 255]]}
@@ -208,35 +208,35 @@ const ShaderMaterial = ({
     timeLocation.value = timestamp;
   });
 
-  const preparedUniforms = useMemo(() => {
-    const nextUniforms: any = {};
+  const getUniforms = () => {
+    const preparedUniforms: any = {};
 
     for (const uniformName in uniforms) {
       const uniform: any = uniforms[uniformName];
 
       switch (uniform.type) {
         case "uniform1f":
-          nextUniforms[uniformName] = { value: uniform.value, type: "1f" };
+          preparedUniforms[uniformName] = { value: uniform.value, type: "1f" };
           break;
         case "uniform3f":
-          nextUniforms[uniformName] = {
+          preparedUniforms[uniformName] = {
             value: new THREE.Vector3().fromArray(uniform.value),
             type: "3f",
           };
           break;
         case "uniform1fv":
-          nextUniforms[uniformName] = { value: uniform.value, type: "1fv" };
+          preparedUniforms[uniformName] = { value: uniform.value, type: "1fv" };
           break;
         case "uniform3fv":
-          nextUniforms[uniformName] = {
+          preparedUniforms[uniformName] = {
             value: uniform.value.map((v: number[]) =>
-              new THREE.Vector3().fromArray(v),
+              new THREE.Vector3().fromArray(v)
             ),
             type: "3fv",
           };
           break;
         case "uniform2f":
-          nextUniforms[uniformName] = {
+          preparedUniforms[uniformName] = {
             value: new THREE.Vector2().fromArray(uniform.value),
             type: "2f",
           };
@@ -247,13 +247,12 @@ const ShaderMaterial = ({
       }
     }
 
-    nextUniforms["u_time"] = { value: 0, type: "1f" };
-    nextUniforms["u_resolution"] = {
+    preparedUniforms["u_time"] = { value: 0, type: "1f" };
+    preparedUniforms["u_resolution"] = {
       value: new THREE.Vector2(size.width * 2, size.height * 2),
-    };
-
-    return nextUniforms;
-  }, [uniforms, size.width, size.height]);
+    }; // Initialize u_resolution
+    return preparedUniforms;
+  };
 
   // Shader material
   const material = useMemo(() => {
@@ -272,7 +271,7 @@ const ShaderMaterial = ({
       }
       `,
       fragmentShader: source,
-      uniforms: preparedUniforms,
+      uniforms: getUniforms(),
       glslVersion: THREE.GLSL3,
       blending: THREE.CustomBlending,
       blendSrc: THREE.SrcAlphaFactor,
@@ -280,7 +279,7 @@ const ShaderMaterial = ({
     });
 
     return materialObject;
-  }, [source, preparedUniforms]);
+  }, [size.width, size.height, source]);
 
   return (
     <mesh ref={ref as any}>

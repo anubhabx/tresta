@@ -14,10 +14,7 @@ export function ListLayout({
   theme,
 }: LayoutProps) {
   return (
-    <div
-      className="tresta-list"
-      style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-    >
+    <div className="tresta-list">
       {testimonials.map((testimonial) => (
         <TestimonialCard
           key={testimonial.id}

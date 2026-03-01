@@ -17,15 +17,7 @@ export function GridLayout({
   const cols = Math.min(layout.columns ?? 3, 4);
 
   return (
-    <div
-      className="tresta-grid"
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(1, 1fr)`,
-        gap: "16px",
-      }}
-      data-cols={cols}
-    >
+    <div className="tresta-grid" data-cols={cols}>
       {testimonials.map((testimonial) => (
         <TestimonialCard
           key={testimonial.id}

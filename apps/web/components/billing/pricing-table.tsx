@@ -5,14 +5,6 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useRef } from "react";
 import { PLANS, formatPrice, type PlanConfig } from "@/config/pricing";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   Check,
@@ -29,19 +21,19 @@ import { CheckoutButton } from "./checkout-button";
 import { useSubscription } from "@/hooks/use-subscription";
 
 const featureIcons: Record<string, React.ReactNode> = {
-  Unlimited: <Zap className="h-4 w-4" />,
-  Video: <Video className="h-4 w-4" />,
-  Custom: <Palette className="h-4 w-4" />,
-  API: <Code className="h-4 w-4" />,
-  Priority: <HeadphonesIcon className="h-4 w-4" />,
-  Early: <Shield className="h-4 w-4" />,
+  Unlimited: <Zap className="h-3.5 w-3.5" />,
+  Video: <Video className="h-3.5 w-3.5" />,
+  Custom: <Palette className="h-3.5 w-3.5" />,
+  API: <Code className="h-3.5 w-3.5" />,
+  Priority: <HeadphonesIcon className="h-3.5 w-3.5" />,
+  Early: <Shield className="h-3.5 w-3.5" />,
 };
 
 function getFeatureIcon(feature: string): React.ReactNode {
   for (const [key, icon] of Object.entries(featureIcons)) {
     if (feature.includes(key)) return icon;
   }
-  return <Check className="h-4 w-4" />;
+  return <Check className="h-3.5 w-3.5" />;
 }
 
 interface PricingCardProps {
@@ -70,12 +62,13 @@ function PricingCard({
   const visibleFeatures = compact
     ? plan.features.slice(0, keyFeatureCount)
     : plan.features;
-  const hiddenFeaturesCount = Math.max(plan.features.length - visibleFeatures.length, 0);
+  const hiddenFeaturesCount = Math.max(
+    plan.features.length - visibleFeatures.length,
+    0,
+  );
 
-  // Auto-trigger checkout if returning from sign-in with checkout param
   useEffect(() => {
     if (autoTriggerCheckout && isAuthenticated && !isFree && !isCurrentPlan) {
-      // Small delay to ensure component is fully mounted
       const timer = setTimeout(() => {
         checkoutButtonRef.current?.click();
       }, 500);
@@ -84,113 +77,144 @@ function PricingCard({
   }, [autoTriggerCheckout, isAuthenticated, isFree, isCurrentPlan]);
 
   return (
-    <Card
+    <div
       className={cn(
-        "relative flex flex-col transition-all duration-200 hover:shadow-lg",
-        isPopular && !compact && "border-primary shadow-md scale-[1.02]",
-        isPopular && compact && "border-primary shadow-md",
+        "relative flex flex-col rounded-lg border transition-all duration-300",
+        isPopular
+          ? "border-primary/60 bg-primary/[0.04] shadow-[0_0_60px_-15px_rgba(37,99,235,0.35)]"
+          : "border-white/10 bg-white/[0.02] hover:border-white/20",
+        compact && "gap-0",
       )}
     >
-      {plan.badge && (
-        <Badge
-          className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1"
-          variant={isPopular ? "default" : "secondary"}
-        >
-          {plan.badge}
-        </Badge>
+      {/* Popular top accent line */}
+      {isPopular && (
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent rounded-t-lg" />
       )}
 
-      <CardHeader className={cn("text-center pb-2", compact && "pb-1")}> 
-        <CardTitle className={cn("text-2xl", compact && "text-xl")}>
-          {plan.name}
-        </CardTitle>
-        <CardDescription className="text-sm">
-          {plan.description}
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className={cn("flex-1 space-y-6", compact && "space-y-4")}>
-        {/* Price */}
-        <div className="text-center">
-          <div className="flex items-baseline justify-center gap-1">
-            <span className={cn("text-4xl font-bold tracking-tight", compact && "text-3xl")}>
-              {isFree ? "Free" : formatPrice(plan.price, plan.currency)}
-            </span>
-            {!isFree && (
-              <span className="text-muted-foreground">/{plan.interval}</span>
+      {plan.badge && (
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+          <Badge
+            className={cn(
+              "px-3 py-1 text-xs font-medium",
+              isPopular
+                ? "bg-primary text-white border-0 shadow-[0_0_20px_-5px_rgba(37,99,235,0.6)]"
+                : "bg-zinc-800 text-zinc-300 border border-zinc-700",
             )}
-          </div>
-          {plan.interval === "year" && plan.price > 0 && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {formatPrice(Math.round(plan.price / 12), plan.currency)}/month
-              billed annually
-            </p>
+          >
+            {plan.badge}
+          </Badge>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className={cn("text-center p-6 pb-4", compact && "p-4 pb-3")}>
+        <h3
+          className={cn(
+            "font-semibold text-white mb-1",
+            compact ? "text-lg" : "text-2xl",
+          )}
+        >
+          {plan.name}
+        </h3>
+        <p className="text-sm text-zinc-500">{plan.description}</p>
+      </div>
+
+      {/* Price */}
+      <div className={cn("text-center px-6 pb-6", compact && "px-4 pb-4")}>
+        <div className="flex items-baseline justify-center gap-1">
+          <span
+            className={cn(
+              "font-bold tracking-tight text-white",
+              compact ? "text-3xl" : "text-5xl",
+            )}
+          >
+            {isFree ? "Free" : formatPrice(plan.price, plan.currency)}
+          </span>
+          {!isFree && (
+            <span className="text-zinc-500 text-sm">/{plan.interval}</span>
           )}
         </div>
+        {plan.interval === "year" && plan.price > 0 && (
+          <p className="text-xs text-zinc-500 mt-1.5">
+            {formatPrice(Math.round(plan.price / 12), plan.currency)}/month,
+            billed annually
+          </p>
+        )}
+      </div>
 
-        {/* Features */}
+      {/* Divider */}
+      <div className="mx-6 h-px bg-white/5" />
+
+      {/* Features */}
+      <div className={cn("flex-1 p-6", compact && "p-4")}>
         <ul className="space-y-3">
           {visibleFeatures.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-3 text-sm">
-              <span className="mt-0.5 text-primary shrink-0">
+              <span
+                className={cn(
+                  "mt-0.5 shrink-0",
+                  isPopular ? "text-primary" : "text-zinc-400",
+                )}
+              >
                 {getFeatureIcon(feature)}
               </span>
-              <span>{feature}</span>
+              <span className="text-zinc-300">{feature}</span>
             </li>
           ))}
         </ul>
 
         {compact && hiddenFeaturesCount > 0 && (
-          <p className="text-xs text-muted-foreground">
-            +{hiddenFeaturesCount} more feature{hiddenFeaturesCount > 1 ? "s" : ""}
+          <p className="text-xs text-zinc-600 mt-3">
+            +{hiddenFeaturesCount} more feature
+            {hiddenFeaturesCount > 1 ? "s" : ""}
           </p>
         )}
 
         {/* Quota Details */}
         {!compact && (
-          <div className="pt-4 border-t border-border/50">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+          <div className="mt-6 pt-5 border-t border-white/5">
+            <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-3 font-medium">
               Limits
             </p>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="font-medium">
-                  {plan.quota.projects === -1 ? "∞" : plan.quota.projects}
-                </span>{" "}
-                <span className="text-muted-foreground">Projects</span>
-              </div>
-              <div>
-                <span className="font-medium">
-                  {plan.quota.testimonials === -1 ? "∞" : plan.quota.testimonials}
-                </span>{" "}
-                <span className="text-muted-foreground">Testimonials</span>
-              </div>
-              <div>
-                <span className="font-medium">
-                  {plan.quota.widgets === -1 ? "∞" : plan.quota.widgets}
-                </span>{" "}
-                <span className="text-muted-foreground">Widgets</span>
-              </div>
-              <div>
-                <span className="font-medium">
-                  {plan.quota.video_minutes === -1
-                    ? "∞"
-                    : plan.quota.video_minutes === 0
-                      ? "—"
-                      : `${plan.quota.video_minutes}min`}
-                </span>{" "}
-                <span className="text-muted-foreground">Video</span>
-              </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              {[
+                {
+                  value: plan.quota.projects,
+                  label: "Projects",
+                },
+                {
+                  value: plan.quota.testimonials,
+                  label: "Testimonials",
+                },
+                {
+                  value: plan.quota.widgets,
+                  label: "Widgets",
+                },
+                {
+                  value: plan.quota.video_minutes,
+                  label: "Video",
+                  format: (v: number) =>
+                    v === 0 ? "—" : v === -1 ? "∞" : `${v}min`,
+                },
+              ].map(({ value, label, format }) => (
+                <div key={label} className="flex items-baseline gap-1.5">
+                  <span className="font-semibold text-white">
+                    {format ? format(value) : value === -1 ? "∞" : value}
+                  </span>
+                  <span className="text-zinc-500 text-xs">{label}</span>
+                </div>
+              ))}
             </div>
           </div>
         )}
-      </CardContent>
+      </div>
 
-      <CardFooter>
+      {/* CTA */}
+      <div className={cn("p-6 pt-0", compact && "p-4 pt-0")}>
         {isAuthenticated ? (
           isFree ? (
             <Button
-              className="w-full"
+              className="w-full rounded-md"
               variant="outline"
               disabled={isCurrentPlan}
             >
@@ -198,7 +222,7 @@ function PricingCard({
             </Button>
           ) : isCurrentPlan ? (
             <Button
-              className="w-full"
+              className="w-full rounded-md"
               variant={isPopular ? "default" : "outline"}
               disabled
             >
@@ -214,7 +238,11 @@ function PricingCard({
           )
         ) : (
           <Button
-            className="w-full"
+            className={cn(
+              "w-full rounded-md",
+              isPopular &&
+                "shadow-[0_0_30px_-8px_rgba(37,99,235,0.5)] hover:shadow-[0_0_40px_-8px_rgba(37,99,235,0.7)]",
+            )}
             variant={isPopular ? "default" : "outline"}
             size="lg"
             onClick={() => onUnauthenticatedClick(plan.id)}
@@ -222,8 +250,8 @@ function PricingCard({
             {plan.cta.public}
           </Button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -262,7 +290,7 @@ export function PricingTableView({
         "grid max-w-6xl mx-auto",
         compact
           ? "grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5"
-          : "grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8",
+          : "grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch",
       )}
     >
       {PLANS.map((plan) => (

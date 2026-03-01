@@ -39,10 +39,11 @@ export function CarouselLayout({
     if (!track) return;
     const slide = track.children[current] as HTMLElement | undefined;
     if (slide) {
-      slide.scrollIntoView({
+      // Use track.scrollTo instead of slide.scrollIntoView to prevent the
+      // entire parent document from jumping down exactly when the widget loads.
+      track.scrollTo({
+        left: slide.offsetLeft,
         behavior: "smooth",
-        block: "nearest",
-        inline: "start",
       });
     }
   }, [current]);
@@ -173,7 +174,11 @@ export function CarouselLayout({
 
       {/* Dot Indicators */}
       {total > 1 && (
-        <div className="tresta-carousel-dots" role="tablist" aria-label="Testimonial slides">
+        <div
+          className="tresta-carousel-dots"
+          role="tablist"
+          aria-label="Testimonial slides"
+        >
           {testimonials.map((_, idx) => (
             <button
               key={idx}

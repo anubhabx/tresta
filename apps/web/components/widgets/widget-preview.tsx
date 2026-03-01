@@ -96,6 +96,8 @@ interface WidgetPreviewProps {
   config: WidgetFormData;
   widgetId?: string;
   testimonials?: PreviewTestimonial[];
+  hideHeader?: boolean;
+  transparentBackground?: boolean;
 }
 
 type NormalizedPreviewConfig = {
@@ -114,6 +116,7 @@ type PreviewDocumentPayload = {
   config: NormalizedPreviewConfig;
   mockResponse: ReturnType<typeof buildMockApiResponse>;
   nonce?: string;
+  transparentBackground?: boolean;
   displayDefaults: {
     secondaryColor: string;
     showDate: boolean;
@@ -131,6 +134,8 @@ export function WidgetPreview({
   config,
   widgetId,
   testimonials,
+  hideHeader = false,
+  transparentBackground = false,
 }: WidgetPreviewProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
@@ -174,6 +179,7 @@ export function WidgetPreview({
       config: normalizedConfig,
       mockResponse,
       nonce: documentNonce,
+      transparentBackground,
       displayDefaults: {
         secondaryColor: DEFAULT_WIDGET_CONFIG.secondaryColor,
         showDate: DEFAULT_WIDGET_CONFIG.showDate,
@@ -181,7 +187,14 @@ export function WidgetPreview({
         showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
       },
     };
-  }, [config, widgetId, resolvedTestimonials, isMounted, documentNonce]);
+  }, [
+    config,
+    widgetId,
+    resolvedTestimonials,
+    isMounted,
+    documentNonce,
+    transparentBackground,
+  ]);
 
   const iframeDocument = useMemo(() => {
     if (!previewPayload) {
@@ -229,15 +242,17 @@ export function WidgetPreview({
 
   return (
     <div className="w-full">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Live Preview</h3>
-        {isLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Rendering preview...
-          </div>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Live Preview</h3>
+          {isLoading && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Rendering preview...
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="rounded-xl border overflow-hidden shadow-sm bg-card">
         {error || !iframeDocument ? (
@@ -264,6 +279,7 @@ export function WidgetPreview({
             key={iframeKey}
             srcDoc={iframeDocument}
             sandbox="allow-scripts allow-same-origin"
+            loading="lazy"
             className="min-h-[520px] w-full border-0"
             title="Widget preview"
           />
@@ -294,7 +310,7 @@ function buildMockApiResponse({
     showDate: DEFAULT_WIDGET_CONFIG.showDate,
     showAuthorRole: DEFAULT_WIDGET_CONFIG.showAuthorRole,
     showAuthorCompany: DEFAULT_WIDGET_CONFIG.showAuthorCompany,
-    columns: config.layout === "grid" ? 3 : 1,
+    columns: ["grid", "masonry", "wall"].includes(config.layout) ? 3 : 1,
     showNavigation: false,
   } as WidgetConfig;
 
@@ -400,7 +416,7 @@ function buildPreviewDocument(payload: PreviewDocumentPayload): string {
   const nonceAttr = payload.nonce ? ` nonce="${payload.nonce}"` : "";
 
   return `<!DOCTYPE html>
-  <html lang="en">
+  <html lang="en" style="${payload.transparentBackground ? "background: transparent;" : ""} color-scheme: ${payload.config.theme === "dark" ? "dark" : "light"};">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -412,7 +428,7 @@ function buildPreviewDocument(payload: PreviewDocumentPayload): string {
           margin: 0;
           padding: 24px;
           min-height: 100vh;
-          background-color: lab(7.24807% 0 0);
+          background-color: ${payload.transparentBackground ? "transparent" : "lab(7.24807% 0 0)"};
         }
         body::-webkit-scrollbar {
           width: 12px;
@@ -509,7 +525,7 @@ function buildPreviewDocument(payload: PreviewDocumentPayload): string {
               },
               layout: {
                 type: previewData.config.layout,
-                columns: previewData.config.layout === 'grid' ? 3 : 1,
+                columns: ['grid', 'masonry', 'wall'].includes(previewData.config.layout) ? 3 : 1,
                 autoRotate: false,
                 rotateInterval: 0,
                 showNavigation: false,

@@ -1,70 +1,61 @@
-"use client";
-
-import { SectionHeader } from "./section-header";
-import { motion } from "motion/react";
-import { Link2, CheckCircle, Code } from "lucide-react";
+import { Link as LinkIcon, ShieldCheck, Code2 } from "lucide-react";
 
 const steps = [
   {
-    step: "1",
-    title: "Collect",
-    description: "Share your unique collection link with customers.",
-    icon: Link2,
+    icon: LinkIcon,
+    title: "1. Share",
+    description: "Generate a branded collection link in one click.",
   },
   {
-    step: "2",
-    title: "Moderate",
-    description: "Review and approve testimonials with one click.",
-    icon: CheckCircle,
+    icon: ShieldCheck,
+    title: "2. Moderate",
+    description:
+      "AI-powered risk scoring and spam detection handles the noise.",
   },
   {
-    step: "3",
-    title: "Embed",
-    description: "Copy one line of code and paste on your site.",
-    icon: Code,
+    icon: Code2,
+    title: "3. Embed",
+    description:
+      "Drop a lightweight script anywhere and let the widgets do the work.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="container mx-auto px-4 py-24 md:px-8 md:py-32">
-      <SectionHeader
-        title="Three steps to social proof"
-        description="From signup to embedded testimonials in under 2 minutes."
-      />
+    <section className="py-24 relative overflow-hidden bg-background border-y border-white/5">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-display font-medium text-white mb-4">
+            How it works
+          </h2>
+          <p className="text-zinc-500 font-sans max-w-2xl mx-auto">
+            Three simple steps to automate your social proof workflow entirely
+            from scratch.
+          </p>
+        </div>
 
-      <div className="relative mx-auto max-w-6xl">
-        {/* Connecting Line (Desktop) */}
-        <div className="absolute left-0 top-8 hidden h-0.5 w-full bg-border md:block" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative max-w-5xl mx-auto">
+          {/* Connecting line for desktop */}
+          <div className="hidden md:block absolute top-[28px] left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
 
-        <div className="relative grid gap-8 md:grid-cols-3 md:gap-12">
           {steps.map((step, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              viewport={{ once: true }}
-              className="relative flex flex-col items-center text-center"
+              className="relative flex flex-col items-center text-center group"
             >
-              {/* Step number with icon */}
-              <div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary bg-background">
-                <step.icon className="h-7 w-7 text-primary" />
-                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                  {step.step}
-                </span>
+              <div className="w-14 h-14 rounded-full bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-6 relative z-10 group-hover:border-primary/50 group-hover:bg-primary/5 transition-all duration-500">
+                <step.icon className="w-6 h-6 text-zinc-400 group-hover:text-primary transition-colors duration-500" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold text-foreground">
+              <h3 className="text-xl font-medium text-zinc-200 mb-3">
                 {step.title}
               </h3>
-              <p className="max-w-[250px] text-sm text-muted-foreground">
+              <p className="text-zinc-500 leading-relaxed text-sm max-w-xs">
                 {step.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
 }
-

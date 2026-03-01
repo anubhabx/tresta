@@ -17,14 +17,7 @@ export function MasonryLayout({
   const cols = Math.min(layout.columns ?? 3, 4);
 
   return (
-    <div
-      className="tresta-masonry"
-      data-cols={cols}
-      style={{
-        columnCount: 1,
-        columnGap: "16px",
-      }}
-    >
+    <div className="tresta-masonry" data-cols={cols}>
       {testimonials.map((testimonial) => (
         <div
           key={testimonial.id}
