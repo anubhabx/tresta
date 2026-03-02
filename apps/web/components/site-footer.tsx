@@ -83,8 +83,6 @@ export function SiteFooter() {
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-import { MountainSnow } from "lucide-react";
-
               <span className="text-lg font-semibold tracking-tight text-[#e8eaed]">
                 Tresta
               </span>
