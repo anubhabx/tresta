@@ -83,14 +83,8 @@ export function SiteFooter() {
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <Image
-                src="/branding/tresta.svg"
-                alt="Tresta logo"
-                width={32}
-                height={32}
-                className="h-8 w-8"
-                priority
-              />
+import { MountainSnow } from "lucide-react";
+
               <span className="text-lg font-semibold tracking-tight text-[#e8eaed]">
                 Tresta
               </span>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
-import { MountainSnow } from "lucide-react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import Image from "next/image";
 
 export function SiteHeader() {
   return (
@@ -9,7 +9,14 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 sm:px-6 py-2 flex h-14 items-center justify-between">
         <div className="flex flex-1 items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <MountainSnow className="h-6 w-6 text-primary" />
+            <Image
+              src="/branding/tresta.svg"
+              alt="Tresta logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+              priority
+            />            
             <span className="font-bold sm:inline-block">Tresta</span>
           </Link>
         </div>
