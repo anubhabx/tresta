@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { PricingTable } from "@/components/billing/pricing-table";
-import { Spotlight } from "@/components/ui/spotlight-new";
+import { Spotlight } from "@/components/landing/ui/spotlight";
 import { Gift, Rocket, Shield, Sparkles } from "lucide-react";
 import { siteConfig } from "@/config/site";
 

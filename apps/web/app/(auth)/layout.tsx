@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import React from "react";
 
-const Dither = dynamic(() => import("@/components/ui/dither"), {
+const Dither = dynamic(() => import("@/components/auth/ui/dither"), {
   loading: () => <div className="absolute inset-0 -z-10 bg-background" />,
 });
 
