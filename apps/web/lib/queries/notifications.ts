@@ -76,8 +76,7 @@ export function useUnreadCount(isAblyConnected: boolean) {
       const response = await api.get("/api/notifications/unread-count");
       return response.data as UnreadCountResponse;
     },
-    // Poll every 30 seconds when Ably is disconnected
-    refetchInterval: false,
+    refetchInterval: isAblyConnected ? false : 30_000,
   });
 }
 
