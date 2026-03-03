@@ -1,13 +1,14 @@
 import axios from "axios";
 import { useAuth } from "@clerk/nextjs";
 import { useMemo } from "react";
+import { getApiBaseUrl } from "@/config/env";
 
 export const useApi = () => {
   const { getToken } = useAuth();
 
   const api = useMemo(() => {
     const instance = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+      baseURL: getApiBaseUrl(),
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",

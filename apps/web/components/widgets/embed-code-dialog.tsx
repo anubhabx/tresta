@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { generateEmbedCodes, API_KEY_PLACEHOLDER } from "@/lib/embed-code";
+import { getPublicApiBaseUrl } from "@/config/env";
 
 interface EmbedCodeDialogProps {
   widgetId: string;
@@ -103,7 +104,7 @@ export function EmbedCodeDialog({
 }: EmbedCodeDialogProps) {
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const apiUrl = getPublicApiBaseUrl();
   const displayApiKey = apiKey || API_KEY_PLACEHOLDER;
   const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 

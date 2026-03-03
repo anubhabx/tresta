@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { getApiUrl } from "@/config/env";
 
 // Cache for SAS URLs to avoid redundant API calls
 const sasUrlCache = new Map<string, { url: string; expiresAt: number }>();
@@ -148,7 +149,7 @@ export function useSasUrl(blobUrl: string | undefined | null): UseSasUrlResult {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-read-url`,
+          getApiUrl("/api/media/generate-read-url"),
           {
             method: "POST",
             headers: {
@@ -236,7 +237,7 @@ export async function getSasUrl(
   }
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-read-url`,
+    getApiUrl("/api/media/generate-read-url"),
     {
       method: "POST",
       headers: {

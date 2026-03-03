@@ -6,12 +6,13 @@
  * (see packages/widget/src/core/config.ts).
  */
 
+import { getPublicApiBaseUrl } from "@/config/env";
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const getApiUrl = (): string =>
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const getApiUrl = (): string => getPublicApiBaseUrl();
 
 const getWidgetScriptUrl = (): string =>
   `${getApiUrl()}/widget/tresta-widget.js`;

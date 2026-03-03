@@ -9,6 +9,7 @@ import { Ban, CheckCircle2, Linkedin, Twitter } from "lucide-react";
 import axios from "axios";
 import { motion } from "motion/react";
 import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
+import { getPublicApiBaseUrl } from "@/config/env";
 import { GoogleOAuthProvider } from "@/components/auth/google-oauth-provider";
 import type { CredentialResponse } from "@react-oauth/google";
 import { Button } from "@workspace/ui/components/button";
@@ -22,7 +23,7 @@ import {
 
 // Public API client (no credentials/cookie, no auth header)
 const publicApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+  baseURL: getPublicApiBaseUrl(),
   headers: {
     "Content-Type": "application/json",
   },

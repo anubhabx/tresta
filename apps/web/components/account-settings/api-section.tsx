@@ -12,6 +12,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Plus, Trash2, Copy, Key } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { getApiBaseUrl } from "@/config/env";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -87,7 +88,7 @@ export function ApiSection() {
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [keyToRevoke, setKeyToRevoke] = useState<string | null>(null);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL;
+  const apiBase = getApiBaseUrl();
 
   const revokeTarget = useMemo(
     () => keys.find((key) => key.id === keyToRevoke) || null,

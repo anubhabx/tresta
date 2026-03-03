@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { getApiUrl } from "@/config/env";
 
 export const UploadDirectory = {
   LOGOS: "logos",
@@ -132,7 +133,7 @@ export function useAzureSAS() {
 
         // Step 1: Request upload URL from backend
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-upload-url`,
+          getApiUrl("/api/media/generate-upload-url"),
           {
             method: "POST",
             headers: {
@@ -235,7 +236,7 @@ export async function uploadFileToAzure(
 
     // Step 1: Request upload URL from backend
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/media/generate-upload-url`,
+      getApiUrl("/api/media/generate-upload-url"),
       {
         method: "POST",
         headers: {

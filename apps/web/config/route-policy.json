@@ -1,0 +1,11 @@
+{
+  "publicRoutes": ["/", "/testimonials(.*)"],
+  "protectedRoutes": [
+    "/dashboard(.*)",
+    "/settings(.*)",
+    "/products(.*)",
+    "/projects(.*)",
+    "/account(.*)"
+  ],
+  "authRoutes": ["/sign-in(.*)", "/sign-up(.*)", "/sso-callback(.*)"]
+}
