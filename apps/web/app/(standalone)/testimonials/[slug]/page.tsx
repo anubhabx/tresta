@@ -10,6 +10,7 @@ import axios from "axios";
 import { motion } from "motion/react";
 import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
 import { getPublicApiBaseUrl } from "@/config/env";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import { GoogleOAuthProvider } from "@/components/auth/google-oauth-provider";
 import type { CredentialResponse } from "@react-oauth/google";
 import { Button } from "@workspace/ui/components/button";
@@ -312,11 +313,7 @@ export default function TestimonialSubmissionPage({
         setHasExistingSubmission(true);
         toast.info(responseMessage);
       } else {
-        toast.error(
-          axiosError?.response?.data?.error?.message ||
-          axiosError?.response?.data?.message ||
-            "Failed to submit testimonial. Please try again.",
-        );
+        toast.error(getHttpErrorMessage(error, "Failed to submit testimonial. Please try again."));
       }
     } finally {
       setIsSubmitting(false);

@@ -8,6 +8,7 @@ import type {
   WidgetTheme,
   CardStyle,
   AnimationType,
+  PublicWidgetData,
   CreateWidgetPayload,
   UpdateWidgetPayload,
 } from "@workspace/types";
@@ -22,36 +23,10 @@ export type {
   WidgetTheme,
   CardStyle,
   AnimationType,
+  PublicWidgetData,
   CreateWidgetPayload,
   UpdateWidgetPayload,
 };
-
-export interface PublicWidgetData {
-  widget: {
-    id: string;
-    config: WidgetConfig;
-  };
-  project: {
-    name: string;
-    slug: string;
-    logoUrl: string | null;
-    brandColorPrimary: string | null;
-    brandColorSecondary: string | null;
-  };
-  testimonials: Array<{
-    id: string;
-    authorName: string;
-    content: string;
-    rating: number | null;
-    videoUrl: string | null;
-    type: string;
-    createdAt: string;
-  }>;
-  meta: {
-    total: number;
-    fetchedAt: string;
-  };
-}
 
 // Query Keys Factory
 export const widgetKeys = {

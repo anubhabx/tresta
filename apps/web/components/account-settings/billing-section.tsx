@@ -19,6 +19,7 @@ import { Loader2, RefreshCcw } from "lucide-react";
 import { Progress } from "@workspace/ui/components/progress";
 import { Separator } from "@workspace/ui/components/separator";
 import { useSubscription } from "@/hooks/use-subscription";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 // We can fetch the subscription details to show current plan
 // For now, we rely on what we know or fetch it.
@@ -47,10 +48,7 @@ export function BillingSection() {
     },
     onError: (error: any) => {
       toast.error("Cancellation Failed", {
-        description:
-          error.response?.data?.error?.message ||
-          error.response?.data?.message ||
-          "Something went wrong.",
+        description: getHttpErrorMessage(error, "Something went wrong."),
       });
     },
   });
