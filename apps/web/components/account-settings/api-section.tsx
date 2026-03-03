@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,9 +10,7 @@ import {
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Plus, Trash2, Copy, Key } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
-import { getApiBaseUrl } from "@/config/env";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -51,136 +49,36 @@ import {
   TableRow,
 } from "@workspace/ui/components/table";
 import { Badge } from "@workspace/ui/components/badge";
-
-interface ProjectOption {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface AccountApiKey {
-  id: string;
-  name: string;
-  keyPrefix: string;
-  usageCount: number;
-  usageLimit: number | null;
-  rateLimit: number;
-  isActive: boolean;
-  lastUsedAt: string | null;
-  createdAt: string;
-  project: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-}
-
-interface ProjectLike {
-  id: string;
-  slug: string;
-  name: string;
-}
-
-const isProjectLike = (value: unknown): value is ProjectLike => {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.id === "string" &&
-    typeof candidate.slug === "string" &&
-    typeof candidate.name === "string"
-  );
-};
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import { useAccountApiKeys } from "@/hooks/use-account-api-keys";
 
 export function ApiSection() {
-  const { getToken } = useAuth();
-  const [keys, setKeys] = useState<AccountApiKey[]>([]);
-  const [projects, setProjects] = useState<ProjectOption[]>([]);
-  const [isLoadingKeys, setIsLoadingKeys] = useState(false);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const {
+    keys,
+    projects,
+    isLoadingKeys,
+    isLoadingProjects,
+    isCreating,
+    isRevoking,
+    createKey,
+    revokeKey,
+  } = useAccountApiKeys();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [selectedProjectSlug, setSelectedProjectSlug] = useState("");
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [keyToRevoke, setKeyToRevoke] = useState<string | null>(null);
-
-  const apiBase = getApiBaseUrl();
 
   const revokeTarget = useMemo(
     () => keys.find((key) => key.id === keyToRevoke) || null,
     [keys, keyToRevoke],
   );
 
-  const fetchKeys = useCallback(async () => {
-    setIsLoadingKeys(true);
-    try {
-      const token = await getToken();
-      const response = await fetch(`${apiBase}/api/account/api-keys`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch API keys");
-      }
-
-      const payload = await response.json();
-      setKeys(Array.isArray(payload?.data?.keys) ? payload.data.keys : []);
-    } catch (error) {
-      toast.error("Failed to load API keys");
-      console.error(error);
-    } finally {
-      setIsLoadingKeys(false);
-    }
-  }, [apiBase, getToken]);
-
-  const fetchProjects = useCallback(async () => {
-    setIsLoadingProjects(true);
-    try {
-      const token = await getToken();
-      const response = await fetch(`${apiBase}/api/projects?page=1&limit=100`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch projects");
-      }
-
-      const payload = await response.json();
-      const projectList: unknown[] = Array.isArray(payload?.data)
-        ? payload.data
-        : [];
-
-      const normalized: ProjectOption[] = projectList
-        .filter(isProjectLike)
-        .map((project) => ({
-          id: project.id,
-          slug: project.slug,
-          name: project.name,
-        }));
-
-      setProjects(normalized);
-      if (!selectedProjectSlug && normalized.length > 0) {
-        setSelectedProjectSlug(normalized[0]!.slug);
-      }
-    } catch (error) {
-      toast.error("Failed to load projects for API key creation");
-      console.error(error);
-    } finally {
-      setIsLoadingProjects(false);
-    }
-  }, [apiBase, getToken, selectedProjectSlug]);
-
   useEffect(() => {
-    fetchProjects();
-    fetchKeys();
-  }, [fetchProjects, fetchKeys]);
+    if (!selectedProjectSlug && projects.length > 0) {
+      setSelectedProjectSlug(projects[0]!.slug);
+    }
+  }, [projects, selectedProjectSlug]);
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) {
@@ -193,60 +91,33 @@ export function ApiSection() {
       return;
     }
 
-    setIsCreating(true);
     try {
-      const token = await getToken();
-      const response = await fetch(`${apiBase}/api/account/api-keys`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      const key = await createKey({
           name: newKeyName.trim(),
           projectSlug: selectedProjectSlug,
           environment: "live",
           permissions: { widgets: true, testimonials: true },
-        }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create API key");
-      }
-
-      const payload = await response.json();
-      setCreatedKey(payload?.data?.key || null);
+      setCreatedKey(key);
       setNewKeyName("");
-      await fetchKeys();
       toast.success("API key created successfully");
     } catch (error) {
-      toast.error("Failed to create API key");
-      console.error(error);
-    } finally {
-      setIsCreating(false);
+      toast.error(
+        getHttpErrorMessage(error, "Failed to create API key"),
+      );
     }
   };
 
   const handleRevoke = async (keyId: string) => {
     try {
-      const token = await getToken();
-      const response = await fetch(`${apiBase}/api/account/api-keys/${keyId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to revoke API key");
-      }
-
-      await fetchKeys();
+      await revokeKey(keyId);
       setKeyToRevoke(null);
       toast.success("API key revoked successfully");
     } catch (error) {
-      toast.error("Failed to revoke API key");
-      console.error(error);
+      toast.error(
+        getHttpErrorMessage(error, "Failed to revoke API key"),
+      );
     }
   };
 
@@ -481,9 +352,10 @@ export function ApiSection() {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => keyToRevoke && handleRevoke(keyToRevoke)}
+                disabled={isRevoking}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                Revoke key
+                {isRevoking ? "Revoking..." : "Revoke key"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
