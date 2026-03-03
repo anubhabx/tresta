@@ -25,17 +25,50 @@ export const createRazorpaySubscription = async (
     return subscription;
 };
 
-export const verifyRazorpaySignature = (
+function secureCompareHex(actual: string, expected: string): boolean {
+    try {
+        const actualBuffer = Buffer.from(actual, "hex");
+        const expectedBuffer = Buffer.from(expected, "hex");
+
+        if (actualBuffer.length !== expectedBuffer.length) {
+            return false;
+        }
+
+        return crypto.timingSafeEqual(actualBuffer, expectedBuffer);
+    } catch {
+        return false;
+    }
+}
+
+export const verifyPaymentSignature = (
     razorpaySubscriptionId: string,
     razorpayPaymentId: string,
     razorpaySignature: string,
 ) => {
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+        return false;
+    }
+
     const generatedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "")
-        .update(razorpayPaymentId + "|" + razorpaySubscriptionId)
+        .createHmac("sha256", secret)
+        .update(`${razorpayPaymentId}|${razorpaySubscriptionId}`)
         .digest("hex");
 
-    return generatedSignature === razorpaySignature;
+    return secureCompareHex(generatedSignature, razorpaySignature);
+};
+
+export const verifyWebhookSignature = (
+    rawBody: string,
+    signature: string,
+    webhookSecret: string,
+) => {
+    const generatedSignature = crypto
+        .createHmac("sha256", webhookSecret)
+        .update(rawBody)
+        .digest("hex");
+
+    return secureCompareHex(generatedSignature, signature);
 };
 
 export const cancelRazorpaySubscription = async (

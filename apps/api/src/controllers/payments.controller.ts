@@ -10,7 +10,7 @@ import {
 import { ResponseHandler } from "../lib/response.js";
 import {
   createRazorpaySubscription,
-  verifyRazorpaySignature,
+  verifyPaymentSignature,
 } from "../services/razorpay.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
 import { requireUserId } from "../lib/auth.js";
@@ -122,7 +122,7 @@ export const verifyPayment = async (
       throw new BadRequestError("Missing payment verification details");
     }
 
-    const isValid = verifyRazorpaySignature(
+    const isValid = verifyPaymentSignature(
       razorpay_subscription_id,
       razorpay_payment_id,
       razorpay_signature,
