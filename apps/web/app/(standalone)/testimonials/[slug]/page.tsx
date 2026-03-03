@@ -35,6 +35,7 @@ type CreateTestimonialPayloadWithGoogle = CreateTestimonialPayload & {
 type TestimonialErrorResponse = {
   message?: string;
   error?: {
+    message?: string;
     details?: {
       createdAt?: string;
     };
@@ -294,6 +295,7 @@ export default function TestimonialSubmissionPage({
       const status = axiosError?.response?.status;
       if (status === 409) {
         const responseMessage =
+          axiosError?.response?.data?.error?.message ||
           axiosError?.response?.data?.message ||
           "It looks like you've already shared your experience.";
         const details =
@@ -310,6 +312,7 @@ export default function TestimonialSubmissionPage({
         toast.info(responseMessage);
       } else {
         toast.error(
+          axiosError?.response?.data?.error?.message ||
           axiosError?.response?.data?.message ||
             "Failed to submit testimonial. Please try again.",
         );

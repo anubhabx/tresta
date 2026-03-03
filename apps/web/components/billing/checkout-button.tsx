@@ -51,8 +51,13 @@ type RazorpayInstance = {
 type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
-  if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message || error.message || fallback;
+  if (axios.isAxiosError<{ message?: string; error?: { message?: string } }>(error)) {
+    return (
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      fallback
+    );
   }
 
   if (error instanceof Error) {

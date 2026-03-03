@@ -59,7 +59,7 @@ export function DataPrivacySection({
       // Fetch user's widgets (from all projects)
       const widgetsPromises = projects.map((project: any) =>
         api
-          .get(`/api/projects/${project.slug}/widgets`)
+          .get(`/api/widgets/project/${project.slug}`)
           .catch(() => ({ data: { data: [] } }))
       );
       const widgetsResponses = await Promise.all(widgetsPromises);

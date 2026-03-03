@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import { useUpgradeModal } from "@/components/billing/upgrade-modal";
+import { useUpgradeModal } from "@/store/upgrade-modal-store";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
@@ -47,7 +47,10 @@ export function BillingSection() {
     },
     onError: (error: any) => {
       toast.error("Cancellation Failed", {
-        description: error.response?.data?.message || "Something went wrong.",
+        description:
+          error.response?.data?.error?.message ||
+          error.response?.data?.message ||
+          "Something went wrong.",
       });
     },
   });
