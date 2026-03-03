@@ -7,57 +7,31 @@ import type { Request, Response, NextFunction } from 'express';
 import { validateApiKey, incrementUsage } from '../services/api-key.service.js';
 import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
 import type { ApiKey } from '@workspace/database/prisma';
-
-/**
- * Rate limiter storage (in-memory)
- * In production, consider using Redis for distributed rate limiting
- */
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
-const rateLimitStore = new Map<string, RateLimitEntry>();
-
-/**
- * Clean up expired rate limit entries every 5 minutes
- */
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (entry.resetAt < now) {
-      rateLimitStore.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+import { getRedisClient } from '../lib/redis.js';
 
 /**
  * Check rate limit for an API key
  */
-function checkRateLimit(apiKey: ApiKey): { allowed: boolean; resetAt?: number } {
-  const now = Date.now();
-  const hourInMs = 60 * 60 * 1000;
-  const resetAt = now + hourInMs;
-  
-  const entry = rateLimitStore.get(apiKey.id);
-  
-  if (!entry || entry.resetAt < now) {
-    // Create new entry or reset expired one
-    rateLimitStore.set(apiKey.id, {
-      count: 1,
-      resetAt,
-    });
-    return { allowed: true };
+async function checkRateLimit(apiKey: ApiKey): Promise<{ allowed: boolean; resetAt?: number; remaining?: number }> {
+  const redis = getRedisClient();
+  const windowSeconds = 60 * 60;
+  const bucket = Math.floor(Date.now() / 1000 / windowSeconds);
+  const key = `tresta:ratelimit:apikey:${apiKey.id}:${bucket}`;
+
+  const usageCount = await redis.incr(key);
+  if (usageCount === 1) {
+    await redis.expire(key, windowSeconds);
   }
-  
-  // Check if limit exceeded
-  if (entry.count >= apiKey.rateLimit) {
-    return { allowed: false, resetAt: entry.resetAt };
+
+  const ttl = await redis.ttl(key);
+  const resetAt = Date.now() + (Math.max(ttl, 1) * 1000);
+  const remaining = Math.max(0, apiKey.rateLimit - usageCount);
+
+  if (usageCount > apiKey.rateLimit) {
+    return { allowed: false, resetAt, remaining: 0 };
   }
-  
-  // Increment count
-  entry.count++;
-  return { allowed: true };
+
+  return { allowed: true, resetAt, remaining };
 }
 
 /**
@@ -106,7 +80,7 @@ export async function validateApiKeyMiddleware(
     }
     
     // Check rate limit
-    const rateLimit = checkRateLimit(validation.apiKey);
+    const rateLimit = await checkRateLimit(validation.apiKey);
     
     if (!rateLimit.allowed) {
       const resetInSeconds = rateLimit.resetAt 
@@ -124,12 +98,9 @@ export async function validateApiKeyMiddleware(
     }
     
     // Set rate limit headers
-    const entry = rateLimitStore.get(validation.apiKey.id);
-    if (entry) {
-      res.setHeader('X-RateLimit-Limit', validation.apiKey.rateLimit.toString());
-      res.setHeader('X-RateLimit-Remaining', Math.max(0, validation.apiKey.rateLimit - entry.count).toString());
-      res.setHeader('X-RateLimit-Reset', entry.resetAt.toString());
-    }
+    res.setHeader('X-RateLimit-Limit', validation.apiKey.rateLimit.toString());
+    res.setHeader('X-RateLimit-Remaining', (rateLimit.remaining ?? 0).toString());
+    res.setHeader('X-RateLimit-Reset', (rateLimit.resetAt ?? Date.now()).toString());
     
     // Increment usage count asynchronously (don't wait for it)
     incrementUsage(validation.apiKey.id).catch(err => {

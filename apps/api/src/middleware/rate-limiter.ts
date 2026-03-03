@@ -295,6 +295,62 @@ export function createRateLimiter(
 }
 
 /**
+ * Create an IP-based custom rate limiter.
+ * Intended for public/unauthenticated endpoints.
+ */
+export function createIpRateLimiter(
+  points: number,
+  duration: number,
+  keyPrefix: string
+) {
+  const limiter = new RateLimiterRedis({
+    storeClient: getRedisClient(),
+    keyPrefix: `tresta:ratelimit:${keyPrefix}`,
+    points,
+    duration,
+  });
+
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const clientIp = getClientIp(req);
+    if (!clientIp) {
+      return next();
+    }
+
+    try {
+      const rateLimitRes = await limiter.consume(clientIp);
+
+      res.setHeader('X-RateLimit-Limit', points.toString());
+      res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+      );
+
+      next();
+    } catch (error: any) {
+      if (error.remainingPoints !== undefined) {
+        res.setHeader('X-RateLimit-Limit', points.toString());
+        res.setHeader('X-RateLimit-Remaining', '0');
+        res.setHeader(
+          'X-RateLimit-Reset',
+          new Date(Date.now() + error.msBeforeNext).toISOString()
+        );
+        res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+
+        res.status(429).json({
+          success: false,
+          error: 'Too many requests',
+          retryAfter: Math.ceil(error.msBeforeNext / 1000),
+        });
+      } else {
+        console.error('IP rate limiter error:', error);
+        next();
+      }
+    }
+  };
+}
+
+/**
  * Admin read operations rate limiting middleware
  * 
  * Limits admin users to 100 read requests per minute
