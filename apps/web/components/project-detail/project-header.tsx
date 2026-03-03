@@ -33,6 +33,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import { EmbedDialog } from "./embed-dialog";
 import type { Project } from "@/types/api";
 
@@ -52,9 +53,11 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
     try {
       await onDelete();
       router.push("/projects");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to delete project:", error);
-      toast.error("Failed to delete project. Please try again.");
+      toast.error(
+        getHttpErrorMessage(error, "Failed to delete project. Please try again."),
+      );
       setIsDeleting(false);
     }
   };

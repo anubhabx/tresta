@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { useApi } from "./use-api";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 interface ExportProject {
   id: string;
@@ -217,7 +218,9 @@ export function useAccountDataExport() {
       toast.success("Your data has been downloaded successfully.");
     } catch (error) {
       console.error("Export error:", error);
-      toast.error("Failed to export your data. Please try again.");
+      toast.error(
+        getHttpErrorMessage(error, "Failed to export your data. Please try again."),
+      );
     } finally {
       setIsExporting(false);
     }
