@@ -17,6 +17,7 @@ import {
   analyticsCleanupJob,
 } from '../jobs/widget-analytics.job.js';
 import { validateEnv } from '../config/env.js';
+import { logger } from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,7 +43,7 @@ let auditRetryInterval: NodeJS.Timeout | undefined;
 
 async function startWorkersAndJobs(): Promise<void> {
   if (process.env.DISABLE_WORKERS === 'true') {
-    console.log('⚠️ Workers and Cron Jobs are DISABLED via DISABLE_WORKERS env var.');
+    logger.warn('Workers and Cron Jobs are disabled via DISABLE_WORKERS env var');
     return;
   }
 
@@ -54,7 +55,7 @@ async function startWorkersAndJobs(): Promise<void> {
   const { retryFailedAuditLogs } = await import('../middleware/audit-log.middleware.js');
   auditRetryInterval = setInterval(() => {
     retryFailedAuditLogs().catch((error: unknown) => {
-      console.error('Audit log retry cycle failed:', error);
+      logger.error({ error }, 'Audit log retry cycle failed');
     });
   }, 60_000);
 
@@ -75,7 +76,7 @@ async function stopWorkersAndJobs(): Promise<void> {
     performanceCheckJob.stop();
     analyticsCleanupJob.stop();
   } catch (error) {
-    console.error('Failed to stop one or more cron jobs:', error);
+    logger.error({ error }, 'Failed to stop one or more cron jobs');
   }
 
   if (auditRetryInterval) {
@@ -101,14 +102,14 @@ async function stopWorkersAndJobs(): Promise<void> {
 }
 
 async function gracefulShutdown(signal: string): Promise<void> {
-  console.log(`\n${signal} received, shutting down workers...`);
+  logger.info({ signal }, 'Shutting down workers');
 
   try {
     await stopWorkersAndJobs();
-    console.log('Graceful shutdown completed');
+    logger.info('Worker graceful shutdown completed');
     process.exit(0);
   } catch (error) {
-    console.error('Error during graceful shutdown:', error);
+    logger.error({ error }, 'Error during worker graceful shutdown');
     process.exit(1);
   }
 }
@@ -122,16 +123,16 @@ process.on('SIGINT', () => {
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  logger.fatal({ error }, 'Worker uncaught exception');
   void gracefulShutdown('uncaughtException');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error({ promise, reason }, 'Worker unhandled rejection');
   void gracefulShutdown('unhandledRejection');
 });
 
-console.log('Starting workers and cron jobs...');
+logger.info('Starting workers and cron jobs');
 await startWorkersAndJobs();
-console.log('Workers started successfully');
-console.log('Press Ctrl+C to stop');
+logger.info('Workers started successfully');
+logger.info('Press Ctrl+C to stop');

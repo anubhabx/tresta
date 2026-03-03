@@ -30,6 +30,7 @@ import { paymentsRouter } from './routes/payments.route.js';
 import { privacyRouter } from './routes/privacy.routes.js';
 import { blobStorageService } from './services/blob-storage.service.js';
 import { validateEnv } from './config/env.js';
+import { logger, requestContextMiddleware } from './lib/logger.js';
 
 dotenv.config();
 validateEnv('api');
@@ -67,6 +68,7 @@ app.use(helmet({
 }));
 // Apply dynamic CORS (checks path and applies appropriate policy)
 app.use(dynamicCors);
+app.use(requestContextMiddleware);
 app.use(morgan("dev"));
 app.use(
   express.json({
@@ -143,20 +145,20 @@ blobStorageService
     await blobStorageService.configureCORS();
   })
   .catch((error) => {
-    console.error("✗ Failed to initialize Azure Blob Storage:", error);
+    logger.error({ error }, 'Failed to initialize Azure Blob Storage');
   });
 
 const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info({ port: PORT }, 'Server is running');
 });
 
 // Graceful shutdown handlers
 async function gracefulShutdown(signal: string) {
-  console.log(`\n${signal} received, starting graceful shutdown...`);
+  logger.info({ signal }, 'Starting graceful shutdown');
 
   // Stop accepting new connections
   server.close(async () => {
-    console.log('HTTP server closed');
+    logger.info('HTTP server closed');
 
     try {
       // Import disconnect functions (dynamic import to avoid circular dependencies)
@@ -167,17 +169,17 @@ async function gracefulShutdown(signal: string) {
       await disconnectPrisma();
       await disconnectRedis();
 
-      console.log('Graceful shutdown completed');
+      logger.info('Graceful shutdown completed');
       process.exit(0);
     } catch (error) {
-      console.error('Error during graceful shutdown:', error);
+      logger.error({ error }, 'Error during graceful shutdown');
       process.exit(1);
     }
   });
 
   // Force shutdown after 30 seconds
   setTimeout(() => {
-    console.error('Forced shutdown after timeout');
+    logger.error('Forced shutdown after timeout');
     process.exit(1);
   }, 30000);
 }
@@ -188,11 +190,11 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  logger.fatal({ error }, 'Uncaught Exception');
   gracefulShutdown('uncaughtException');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error({ promise, reason }, 'Unhandled Rejection');
   gracefulShutdown('unhandledRejection');
 });
