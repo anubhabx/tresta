@@ -5,6 +5,7 @@ import { AblyService } from './ably.service.js';
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS, getTTLToMidnightUTC, getCurrentDateUTC } from '../lib/redis-keys.js';
 import { sanitizeNotificationContent, sanitizeMetadata } from '../utils/sanitize.js';
+import { EMAIL_LIMITS } from '../config/constants.js';
 
 interface CreateNotificationParams {
   userId: string;
@@ -96,7 +97,7 @@ export class NotificationService {
       luaScript,
       1,
       key,
-      '200', // limit
+      EMAIL_LIMITS.dailyQuota.toString(),
       priority,
       ttl.toString()
     ) as [number, number];
@@ -104,7 +105,7 @@ export class NotificationService {
     const [success, count] = result;
 
     // Snapshot to DB every 10 emails (async, non-blocking)
-    if (success && count % 10 === 0) {
+    if (success && count % EMAIL_LIMITS.snapshotInterval === 0) {
       this.snapshotEmailUsage(today, count).catch(err => {
         console.error('Failed to snapshot email usage:', err);
       });

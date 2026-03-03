@@ -4,6 +4,7 @@ import { ForbiddenError, handlePrismaError, UnauthorizedError } from "../lib/err
 import { ResponseHandler } from "../lib/response.js";
 
 import { getUsageCount } from "../services/usage.service.js";
+import { FALLBACK_PLAN_LIMITS } from "../config/constants.js";
 
 // Helper to get limit from Plan JSON
 const getLimit = (plan: any, resource: string): number => {
@@ -48,13 +49,7 @@ export const checkUsageLimit = (resource: "projects" | "widgets" | "testimonials
 
             if (!plan) {
                 // Fallback hardcoded limits for safety if DB is empty
-                const fallbackLimits: Record<typeof resource, number> = {
-                    projects: 1,
-                    widgets: 1,
-                    testimonials: 10,
-                    teamMembers: 1
-                };
-                const limit = fallbackLimits[resource];
+                const limit = FALLBACK_PLAN_LIMITS[resource];
                 console.warn("No plan found for user, using fallback limits.");
 
                 // Check usage using service

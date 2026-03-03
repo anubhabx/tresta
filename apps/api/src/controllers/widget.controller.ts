@@ -21,6 +21,7 @@ import {
 import { validateWidgetConfig } from "../validators/widget.validator.js";
 import type { WidgetData } from "../../types/api-responses.js";
 import { validateApiKey } from "../services/api-key.service.js";
+import { WIDGET_LIMITS } from "../config/constants.js";
 
 const escapeHtmlAttribute = (value: string): string =>
   value
@@ -530,10 +531,6 @@ export {
   renderWidgetPage,
 };
 
-const MAX_MVP_TESTIMONIALS = 20;
-const MIN_ROTATE_INTERVAL = 2000;
-const MAX_ROTATE_INTERVAL = 10000;
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -547,13 +544,13 @@ function mergeWithWidgetDefaults(config?: WidgetConfig | null): WidgetConfig {
   merged.maxTestimonials = clamp(
     merged.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
     1,
-    MAX_MVP_TESTIMONIALS,
+    WIDGET_LIMITS.maxMvpTestimonials,
   );
 
   merged.rotateInterval = clamp(
     merged.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
-    MIN_ROTATE_INTERVAL,
-    MAX_ROTATE_INTERVAL,
+    WIDGET_LIMITS.minRotateIntervalMs,
+    WIDGET_LIMITS.maxRotateIntervalMs,
   );
 
   if (merged.layout !== "carousel") {

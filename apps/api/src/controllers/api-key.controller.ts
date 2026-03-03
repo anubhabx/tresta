@@ -21,6 +21,7 @@ import {
 } from '../lib/errors.js';
 import { prisma } from '@workspace/database/prisma';
 import { requireUserId } from '../lib/auth.js';
+import { API_KEY_LIMITS } from '../config/constants.js';
 
 /**
  * Create a new API key for a project
@@ -43,18 +44,18 @@ export async function createApiKeyHandler(
       });
     }
 
-    if (name.trim().length < 3) {
+    if (name.trim().length < API_KEY_LIMITS.nameMinLength) {
       throw new ValidationError('API key name must be at least 3 characters long', {
         field: 'name',
-        minLength: 3,
+        minLength: API_KEY_LIMITS.nameMinLength,
         received: name.trim().length
       });
     }
 
-    if (name.length > 255) {
+    if (name.length > API_KEY_LIMITS.nameMaxLength) {
       throw new ValidationError('API key name must not exceed 255 characters', {
         field: 'name',
-        maxLength: 255,
+        maxLength: API_KEY_LIMITS.nameMaxLength,
         received: name.length
       });
     }
@@ -88,11 +89,11 @@ export async function createApiKeyHandler(
     // Validate rate limit if provided
     if (rateLimit !== undefined) {
       const parsedRate = parseInt(rateLimit);
-      if (isNaN(parsedRate) || parsedRate < 1 || parsedRate > 10000) {
+      if (isNaN(parsedRate) || parsedRate < API_KEY_LIMITS.rateLimitMin || parsedRate > API_KEY_LIMITS.rateLimitMax) {
         throw new ValidationError('Rate limit must be between 1 and 10000 requests per hour', {
           field: 'rateLimit',
-          min: 1,
-          max: 10000,
+          min: API_KEY_LIMITS.rateLimitMin,
+          max: API_KEY_LIMITS.rateLimitMax,
           received: rateLimit
         });
       }
@@ -164,7 +165,7 @@ export async function createApiKeyHandler(
         {
           permissions: permissions || { widgets: true, testimonials: true },
           usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
-          rateLimit: rateLimit ? parseInt(rateLimit) : 100,
+          rateLimit: rateLimit ? parseInt(rateLimit) : API_KEY_LIMITS.defaultRateLimit,
           expiresAt: expirationDate,
         }
       );
@@ -593,10 +594,10 @@ export async function createAccountApiKeyHandler(
       });
     }
 
-    if (name.trim().length < 3) {
+    if (name.trim().length < API_KEY_LIMITS.nameMinLength) {
       throw new ValidationError('API key name must be at least 3 characters long', {
         field: 'name',
-        minLength: 3,
+        minLength: API_KEY_LIMITS.nameMinLength,
         received: name.trim().length,
       });
     }
@@ -628,11 +629,11 @@ export async function createAccountApiKeyHandler(
 
     if (rateLimit !== undefined) {
       const parsedRate = parseInt(rateLimit);
-      if (isNaN(parsedRate) || parsedRate < 1 || parsedRate > 10000) {
+      if (isNaN(parsedRate) || parsedRate < API_KEY_LIMITS.rateLimitMin || parsedRate > API_KEY_LIMITS.rateLimitMax) {
         throw new ValidationError('Rate limit must be between 1 and 10000 requests per hour', {
           field: 'rateLimit',
-          min: 1,
-          max: 10000,
+          min: API_KEY_LIMITS.rateLimitMin,
+          max: API_KEY_LIMITS.rateLimitMax,
           received: rateLimit,
         });
       }
@@ -684,7 +685,7 @@ export async function createAccountApiKeyHandler(
     const apiKey = await createApiKey(userId, project.id, name.trim(), environment as ApiKeyEnvironment, {
       permissions: permissions || { widgets: true, testimonials: true },
       usageLimit: usageLimit ? parseInt(usageLimit) : undefined,
-      rateLimit: rateLimit ? parseInt(rateLimit) : 100,
+      rateLimit: rateLimit ? parseInt(rateLimit) : API_KEY_LIMITS.defaultRateLimit,
       expiresAt: expirationDate,
     });
 
