@@ -22,6 +22,7 @@ import type { WidgetData } from "../../types/api-responses.js";
 import { validateApiKey } from "../services/api-key.service.js";
 import { WIDGET_LIMITS } from "../config/constants.js";
 import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
+import { requireUserId } from "../lib/auth.js";
 
 const escapeHtmlAttribute = (value: string): string =>
   value
@@ -37,6 +38,7 @@ const createWidget = async (
 ) => {
   try {
     const { projectId, config } = req.body;
+    const userId = requireUserId(req);
 
     // Validate required fields
     if (!projectId || typeof projectId !== "string") {
@@ -87,6 +89,10 @@ const createWidget = async (
       });
     }
 
+    if (project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to create widgets for this project");
+    }
+
     await assertCanUseCustomColors(
       project.userId,
       { primaryColor: validatedConfig.primaryColor },
@@ -120,10 +126,11 @@ const createWidget = async (
 const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { slug } = req.params;
+    const userId = requireUserId(req);
 
     // Find project by slug
-    const project = await prisma.project.findUnique({
-      where: { slug },
+    const project = await prisma.project.findFirst({
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -152,6 +159,7 @@ const updateWidget = async (
   try {
     const { widgetId } = req.params;
     const { config } = req.body;
+    const userId = requireUserId(req);
 
     // Validate widget ID
     if (!widgetId) {
@@ -161,25 +169,27 @@ const updateWidget = async (
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
       where: { id: widgetId },
+      include: {
+        Project: {
+          select: { userId: true },
+        },
+      },
     });
 
     if (!existingWidget) {
       throw new NotFoundError("Widget not found");
     }
 
-    if (config?.primaryColor && existingWidget.projectId) {
-      const widgetProject = await prisma.project.findUnique({
-        where: { id: existingWidget.projectId },
-        select: { userId: true },
-      });
+    if (!existingWidget.Project || existingWidget.Project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to update this widget");
+    }
 
-      if (widgetProject) {
-        await assertCanUseCustomColors(
-          widgetProject.userId,
-          { primaryColor: config.primaryColor },
-          'accent',
-        );
-      }
+    if (config?.primaryColor && existingWidget.projectId) {
+      await assertCanUseCustomColors(
+        existingWidget.Project.userId,
+        { primaryColor: config.primaryColor },
+        'accent',
+      );
     }
 
     // Validate the config if provided
@@ -231,6 +241,7 @@ const deleteWidget = async (
 ) => {
   try {
     const { widgetId } = req.params;
+    const userId = requireUserId(req);
 
     // Validate widget ID
     if (!widgetId || typeof widgetId !== "string") {
@@ -245,6 +256,11 @@ const deleteWidget = async (
     try {
       existingWidget = await prisma.widget.findUnique({
         where: { id: widgetId },
+        include: {
+          Project: {
+            select: { userId: true },
+          },
+        },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -255,6 +271,10 @@ const deleteWidget = async (
         widgetId,
         suggestion: "The widget may have already been deleted",
       });
+    }
+
+    if (!existingWidget.Project || existingWidget.Project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to delete this widget");
     }
 
     // Delete the widget
