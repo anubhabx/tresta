@@ -58,7 +58,7 @@ export function TestimonialCard({
     setIsLoading(true);
     try {
       await action();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Error handling done by parent component
       console.error("Action failed:", error);
     } finally {
