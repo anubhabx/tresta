@@ -11,14 +11,11 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { useUpgradeModal } from "@/store/upgrade-modal-store";
-
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useApi } from "@/hooks/use-api";
 import { toast } from "sonner";
 import { Loader2, RefreshCcw } from "lucide-react";
-import { Progress } from "@workspace/ui/components/progress";
 import { Separator } from "@workspace/ui/components/separator";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useCancelSubscription } from "@/hooks/use-cancel-subscription";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 // We can fetch the subscription details to show current plan
@@ -28,30 +25,24 @@ import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 export function BillingSection() {
   const { open } = useUpgradeModal();
-  const api = useApi();
-  const queryClient = useQueryClient();
 
   // Use shared hook for data
   const { data, isLoading } = useSubscription();
+  const { cancelSubscription, isCanceling } = useCancelSubscription();
 
-  // Cancel Mutation (could be moved to hook too, but fine here for now)
-  const { mutate: cancelSubscription, isPending: isCanceling } = useMutation({
-    mutationFn: async () => {
-      await api.post("/api/payments/cancel");
-    },
-    onSuccess: () => {
+  const handleCancelSubscription = async () => {
+    try {
+      await cancelSubscription();
       toast.success("Subscription Canceled", {
         description:
           "Your subscription will remain active until the end of the billing period.",
       });
-      queryClient.invalidateQueries({ queryKey: ["subscription-details"] });
-    },
-    onError: (error: unknown) => {
+    } catch (error) {
       toast.error("Cancellation Failed", {
         description: getHttpErrorMessage(error, "Something went wrong."),
       });
-    },
-  });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -136,7 +127,7 @@ export function BillingSection() {
               <Button
                 variant="outline"
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => cancelSubscription()}
+                onClick={() => void handleCancelSubscription()}
                 disabled={isCanceling}
               >
                 {isCanceling ? (
