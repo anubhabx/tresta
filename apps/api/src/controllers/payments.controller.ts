@@ -155,13 +155,23 @@ export const verifyPayment = async (
     if (currentPeriodStart) periodData.currentPeriodStart = currentPeriodStart;
     if (currentPeriodEnd) periodData.currentPeriodEnd = currentPeriodEnd;
 
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: {
+        externalSubscriptionId: razorpay_subscription_id,
+        userId,
+      },
+    });
+
+    if (!existingSubscription) {
+      throw new NotFoundError("Subscription not found for current user");
+    }
+
     const subscription = await prisma.subscription.update({
-      where: { externalSubscriptionId: razorpay_subscription_id },
+      where: { id: existingSubscription.id },
       data: {
         status: "ACTIVE",
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
-        razorpayOrderId: razorpay_subscription_id,
         ...periodData,
       },
     });
