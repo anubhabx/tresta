@@ -1,6 +1,7 @@
 import { prisma } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
 import { ForbiddenError, handlePrismaError, UnauthorizedError } from "../lib/errors.js";
+import { ResponseHandler } from "../lib/response.js";
 
 import { getUsageCount } from "../services/usage.service.js";
 
@@ -59,13 +60,17 @@ export const checkUsageLimit = (resource: "projects" | "widgets" | "testimonials
                 // Check usage using service
                 const count = await getUsageCount(resource, userId);
                 if (count >= limit) {
-                    return res.status(403).json({
-                        code: "LIMIT_EXCEEDED",
-                        message: `You have reached the limit for ${resource} on your current plan.`,
-                        limit,
-                        current: count,
-                        resource
-                    });
+                    return ResponseHandler.error(
+                        res,
+                        403,
+                        `You have reached the limit for ${resource} on your current plan.`,
+                        "LIMIT_EXCEEDED",
+                        {
+                            limit,
+                            current: count,
+                            resource,
+                        },
+                    );
                 }
                 return next();
             }
@@ -81,14 +86,18 @@ export const checkUsageLimit = (resource: "projects" | "widgets" | "testimonials
 
             if (count >= limit) {
                 // Return specific error structure for frontend to intercept
-                return res.status(403).json({
-                    code: "LIMIT_EXCEEDED", // Global error handler looks for this
-                    message: `You have reached the limit for ${resource} (${limit}) on the ${plan.name}.`,
-                    limit,
-                    current: count,
-                    resource,
-                    planName: plan.name
-                });
+                return ResponseHandler.error(
+                    res,
+                    403,
+                    `You have reached the limit for ${resource} (${limit}) on the ${plan.name}.`,
+                    "LIMIT_EXCEEDED",
+                    {
+                        limit,
+                        current: count,
+                        resource,
+                        planName: plan.name,
+                    },
+                );
             }
 
             next();

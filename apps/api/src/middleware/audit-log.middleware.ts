@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { getAuth } from '@clerk/express';
 import { v4 as uuidv4 } from 'uuid';
 import { getRedisClient } from '../lib/redis.js';
+import { prisma } from '@workspace/database/prisma';
 
 /**
  * Audit log middleware with guaranteed delivery
@@ -136,8 +137,6 @@ function sanitizeRequestBody(body: any): any {
  * Write audit log to database
  */
 async function writeAuditLog(entry: any): Promise<void> {
-  const { prisma } = await import('@workspace/database/prisma');
-
   await prisma.auditLog.create({
     data: {
       adminId: entry.adminId,
