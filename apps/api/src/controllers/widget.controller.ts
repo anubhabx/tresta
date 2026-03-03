@@ -15,13 +15,13 @@ import { ResponseHandler } from "../lib/response.js";
 import {
   DEFAULT_WIDGET_CONFIG,
   WIDGET_CONFIG_FIELDS,
-  isFreeColor,
   type WidgetConfig,
 } from "@workspace/types";
 import { validateWidgetConfig } from "../validators/widget.validator.js";
 import type { WidgetData } from "../../types/api-responses.js";
 import { validateApiKey } from "../services/api-key.service.js";
 import { WIDGET_LIMITS } from "../config/constants.js";
+import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
 
 const escapeHtmlAttribute = (value: string): string =>
   value
@@ -87,19 +87,11 @@ const createWidget = async (
       });
     }
 
-    // Plan-gate custom accent colors: free users can only use palette colors
-    if (validatedConfig.primaryColor) {
-      const projectOwner = await prisma.user.findUnique({
-        where: { id: project.userId },
-        select: { plan: true },
-      });
-
-      if (projectOwner?.plan === 'FREE' && !isFreeColor(validatedConfig.primaryColor)) {
-        throw new ForbiddenError(
-          "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-    }
+    await assertCanUseCustomColors(
+      project.userId,
+      { primaryColor: validatedConfig.primaryColor },
+      'accent',
+    );
 
     // Create the widget with validated config
     const normalizedConfig = normalizeWidgetConfig(validatedConfig);
@@ -175,7 +167,6 @@ const updateWidget = async (
       throw new NotFoundError("Widget not found");
     }
 
-    // Plan-gate custom accent colors: free users can only use palette colors
     if (config?.primaryColor && existingWidget.projectId) {
       const widgetProject = await prisma.project.findUnique({
         where: { id: existingWidget.projectId },
@@ -183,16 +174,11 @@ const updateWidget = async (
       });
 
       if (widgetProject) {
-        const projectOwner = await prisma.user.findUnique({
-          where: { id: widgetProject.userId },
-          select: { plan: true },
-        });
-
-        if (projectOwner?.plan === 'FREE' && !isFreeColor(config.primaryColor)) {
-          throw new ForbiddenError(
-            "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-          );
-        }
+        await assertCanUseCustomColors(
+          widgetProject.userId,
+          { primaryColor: config.primaryColor },
+          'accent',
+        );
       }
     }
 

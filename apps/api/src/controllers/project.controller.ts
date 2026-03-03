@@ -5,7 +5,6 @@ import {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
-  ForbiddenError,
   ValidationError,
   handlePrismaError,
 } from "../lib/errors.js";
@@ -17,13 +16,13 @@ import {
 import type {
   ProjectData,
 } from "../../types/api-responses.js";
-import { isFreeColor } from "@workspace/types";
 import { requireUserId } from "../lib/auth.js";
 import {
   CreateProjectSchema,
   UpdateProjectSchema,
   zodErrorDetails,
 } from "../validators/schemas.js";
+import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
 
 /**
  * Helper to serialize Prisma Project to ProjectData
@@ -67,24 +66,11 @@ const createProject = async (
     } = parsedBody.data;
     const id = requireUserId(req);
 
-    // Plan-gate custom brand colors: free users can only use palette colors
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: { plan: true },
-    });
-
-    if (user?.plan === "FREE") {
-      if (brandColorPrimary && !isFreeColor(brandColorPrimary)) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-      if (brandColorSecondary && !isFreeColor(brandColorSecondary)) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-    }
+    await assertCanUseCustomColors(
+      id,
+      { primaryColor: brandColorPrimary, secondaryColor: brandColorSecondary },
+      "brand",
+    );
 
     // Check for existing project with same slug
     let existingProject;
@@ -354,36 +340,14 @@ const updateProject = async (
       });
     }
 
-    // Check user plan implementation
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true }, // Assuming 'plan' field stores 'FREE' or 'PRO' or we check subscription
-    });
-    // In our schema User.plan is an Enum "FREE" | "PRO"
-
-    // Check if trying to update brand colors — free users can only use palette colors
-    if (
-      (payload.brandColorPrimary !== undefined ||
-        payload.brandColorSecondary !== undefined) &&
-      user?.plan === "FREE"
-    ) {
-      if (
-        payload.brandColorPrimary &&
-        !isFreeColor(payload.brandColorPrimary)
-      ) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-      if (
-        payload.brandColorSecondary &&
-        !isFreeColor(payload.brandColorSecondary)
-      ) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-    }
+    await assertCanUseCustomColors(
+      userId,
+      {
+        primaryColor: payload.brandColorPrimary,
+        secondaryColor: payload.brandColorSecondary,
+      },
+      "brand",
+    );
 
     // Check if project exists and belongs to user
     let existingProject;
