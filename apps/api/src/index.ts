@@ -29,8 +29,10 @@ import { planRouter } from './routes/plan.route.js';
 import { paymentsRouter } from './routes/payments.route.js';
 import { privacyRouter } from './routes/privacy.routes.js';
 import { blobStorageService } from './services/blob-storage.service.js';
+import { validateEnv } from './config/env.js';
 
 dotenv.config();
+validateEnv('api');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

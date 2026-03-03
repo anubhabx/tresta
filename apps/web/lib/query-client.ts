@@ -5,6 +5,9 @@ type LimitExceededError = {
   response?: {
     data?: {
       code?: string;
+      error?: {
+        code?: string;
+      };
     };
   };
 };
@@ -15,7 +18,9 @@ const isLimitExceededError = (error: unknown): error is LimitExceededError => {
   }
 
   const maybeError = error as LimitExceededError;
-  return maybeError.response?.data?.code === "LIMIT_EXCEEDED";
+  const topLevelCode = maybeError.response?.data?.code;
+  const nestedCode = maybeError.response?.data?.error?.code;
+  return topLevelCode === "LIMIT_EXCEEDED" || nestedCode === "LIMIT_EXCEEDED";
 };
 
 const globalErrorHandler = (error: unknown) => {

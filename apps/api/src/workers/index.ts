@@ -16,11 +16,13 @@ import {
   performanceCheckJob,
   analyticsCleanupJob,
 } from '../jobs/widget-analytics.job.js';
+import { validateEnv } from '../config/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+validateEnv('worker');
 
 type OutboxRuntime = {
   cleanup: () => Promise<unknown>;
