@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { testimonials, moderation } from "@/lib/queries";
+import { testimonials } from "@/lib/queries";
 import { TestimonialCard } from "./testimonial-card";
 import { ModerationTestimonialCard } from "../moderation/moderation-testimonial-card";
 import { ModerationStatsDashboard } from "../moderation/moderation-stats-dashboard";
@@ -21,13 +21,11 @@ import {
   getStatusCounts,
   getModerationCounts,
   calculateModerationStats,
-  getValidTestimonialsForAction,
-  addToActionHistory,
-  type BulkActionHistory,
   type FilterStatus,
   type ModerationFilter,
 } from "@/lib/testimonial-list-utils";
-import type { Testimonial, ModerationStatus } from "@/types/api";
+import type { Testimonial } from "@/types/api";
+import { useTestimonialListActions } from "./use-testimonial-list-actions";
 
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "sonner";
@@ -37,13 +35,6 @@ interface TestimonialListProps {
   projectSlug: string;
   moderationMode?: boolean;
 }
-
-const getErrorMessage = (error: unknown, fallback: string): string => {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  return fallback;
-};
 
 export function TestimonialList({
   projectSlug,
@@ -59,11 +50,6 @@ export function TestimonialList({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>("all");
-  const [loadingState, setLoadingState] = useState<{
-    id: string;
-    action: string;
-  } | null>(null);
-  const [actionHistory, setActionHistory] = useState<BulkActionHistory[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const limit = 10;
 
@@ -83,15 +69,32 @@ export function TestimonialList({
     limit,
   );
 
-  // Create mutation hooks at component level
-  const updateMutation = testimonials.mutations.useUpdate(projectSlug);
-  const deleteMutation = testimonials.mutations.useDelete(projectSlug);
-  const bulkModerationMutation =
-    moderation.mutations.useBulkAction(projectSlug);
-
   const allTestimonials = useMemo<Testimonial[]>(() => {
     return Array.isArray(data?.data) ? (data.data as Testimonial[]) : [];
   }, [data?.data]);
+
+  const {
+    loadingState,
+    actionHistory,
+    bulkMutationPending,
+    validForApprove,
+    validForReject,
+    validForFlag,
+    handleApprove,
+    handleReject,
+    handlePublish,
+    handleUnpublish,
+    handleDelete,
+    handleUndoBulkAction,
+    handleBulkApprove,
+    handleBulkReject,
+    handleBulkFlag,
+  } = useTestimonialListActions({
+    projectSlug,
+    allTestimonials,
+    selectedIds,
+    setSelectedIds,
+  });
 
   // Calculate stats for moderation mode
   const stats = useMemo(
@@ -122,357 +125,6 @@ export function TestimonialList({
     ],
   );
 
-  const handleApprove = async (id: string) => {
-    setLoadingState({ id, action: "approve" });
-    try {
-      await updateMutation.mutateAsync({
-        id,
-        data: {
-          isApproved: true,
-          moderationStatus: "APPROVED" as ModerationStatus,
-        },
-      });
-      toast.success(
-        "Testimonial approved! View in Testimonials tab to publish it.",
-      );
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to approve testimonial"));
-    } finally {
-      setLoadingState(null);
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    setLoadingState({ id, action: "reject" });
-    try {
-      await updateMutation.mutateAsync({
-        id,
-        data: {
-          isApproved: false,
-          moderationStatus: "REJECTED" as ModerationStatus,
-        },
-      });
-      toast.success("Testimonial rejected");
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to reject testimonial"));
-    } finally {
-      setLoadingState(null);
-    }
-  };
-
-  const handlePublish = async (id: string) => {
-    setLoadingState({ id, action: "publish" });
-    try {
-      await updateMutation.mutateAsync({ id, data: { isPublished: true } });
-      toast.success("Testimonial published!");
-    } catch (error: unknown) {
-      const errorMessage = getErrorMessage(
-        error,
-        "Failed to publish testimonial",
-      );
-      // Check if it's the approval workflow error
-      if (errorMessage.includes("approved")) {
-        toast.error(
-          "Cannot publish unapproved testimonial. Approve it in the Moderation tab first.",
-        );
-      } else {
-        toast.error(errorMessage);
-      }
-    } finally {
-      setLoadingState(null);
-    }
-  };
-
-  const handleUnpublish = async (id: string) => {
-    setLoadingState({ id, action: "unpublish" });
-    try {
-      await updateMutation.mutateAsync({ id, data: { isPublished: false } });
-      toast.success("Testimonial unpublished");
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to unpublish testimonial"));
-    } finally {
-      setLoadingState(null);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    setLoadingState({ id, action: "delete" });
-    try {
-      await deleteMutation.mutateAsync(id);
-      toast.success("Testimonial deleted");
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to delete testimonial"));
-    } finally {
-      setLoadingState(null);
-    }
-  };
-
-  // Calculate valid testimonials for each action
-  const validForApprove = useMemo(
-    () =>
-      getValidTestimonialsForAction(allTestimonials, selectedIds, "approve")
-        .length,
-    [selectedIds, allTestimonials],
-  );
-  const validForReject = useMemo(
-    () =>
-      getValidTestimonialsForAction(allTestimonials, selectedIds, "reject")
-        .length,
-    [selectedIds, allTestimonials],
-  );
-  const validForFlag = useMemo(
-    () =>
-      getValidTestimonialsForAction(allTestimonials, selectedIds, "flag")
-        .length,
-    [selectedIds, allTestimonials],
-  );
-
-  // Undo handler for bulk actions
-  const handleUndoBulkAction = async (actionId: string) => {
-    const action = actionHistory.find((a) => a.id === actionId);
-    if (!action) return;
-
-    const { testimonialIds, previousStatuses } = action;
-
-    try {
-      // Restore each testimonial to its previous status
-      for (const id of testimonialIds) {
-        const previousStatus = previousStatuses.get(id);
-        if (previousStatus) {
-          await bulkModerationMutation.mutateAsync({
-            testimonialIds: [id],
-            action:
-              previousStatus === "APPROVED"
-                ? "approve"
-                : previousStatus === "REJECTED"
-                  ? "reject"
-                  : "flag",
-          });
-        }
-      }
-
-      toast.success(`Undid action on ${testimonialIds.length} testimonial(s)`);
-
-      // Remove this action from history
-      setActionHistory((prev) => prev.filter((a) => a.id !== actionId));
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to undo action"));
-    }
-  };
-
-  // Bulk moderation handlers
-  const handleBulkApprove = async () => {
-    if (selectedIds.length === 0) {
-      toast.error("No testimonials selected");
-      return;
-    }
-
-    const validTestimonials = getValidTestimonialsForAction(
-      allTestimonials,
-      selectedIds,
-      "approve",
-    );
-    const validIds = validTestimonials.map((t) => t.id);
-
-    if (validIds.length === 0) {
-      toast.info("All selected testimonials are already approved");
-      return;
-    }
-
-    // Store previous statuses for undo
-    const previousStatuses = new Map<string, ModerationStatus>();
-    validTestimonials.forEach((t) => {
-      previousStatuses.set(t.id, t.moderationStatus);
-    });
-
-    const skipped = selectedIds.length - validIds.length;
-
-    try {
-      await bulkModerationMutation.mutateAsync({
-        testimonialIds: validIds,
-        action: "approve",
-      });
-
-      // Add to history
-      const { history: newHistory, actionId } = addToActionHistory(
-        actionHistory,
-        {
-          testimonialIds: validIds,
-          action: "approve",
-          previousStatuses,
-          count: validIds.length,
-        },
-      );
-      setActionHistory(newHistory);
-
-      if (skipped > 0) {
-        toast.success(
-          `${validIds.length} testimonial(s) approved (${skipped} already approved, skipped)`,
-          {
-            action: {
-              label: "Undo",
-              onClick: () => handleUndoBulkAction(actionId),
-            },
-            duration: 10000,
-          },
-        );
-      } else {
-        toast.success(`${validIds.length} testimonial(s) approved`, {
-          action: {
-            label: "Undo",
-            onClick: () => handleUndoBulkAction(actionId),
-          },
-          duration: 10000,
-        });
-      }
-
-      setSelectedIds([]);
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to approve testimonials"));
-    }
-  };
-
-  const handleBulkReject = async () => {
-    if (selectedIds.length === 0) {
-      toast.error("No testimonials selected");
-      return;
-    }
-
-    const validTestimonials = getValidTestimonialsForAction(
-      allTestimonials,
-      selectedIds,
-      "reject",
-    );
-    const validIds = validTestimonials.map((t) => t.id);
-
-    if (validIds.length === 0) {
-      toast.info("All selected testimonials are already rejected");
-      return;
-    }
-
-    // Store previous statuses for undo
-    const previousStatuses = new Map<string, ModerationStatus>();
-    validTestimonials.forEach((t) => {
-      previousStatuses.set(t.id, t.moderationStatus);
-    });
-
-    const skipped = selectedIds.length - validIds.length;
-
-    try {
-      await bulkModerationMutation.mutateAsync({
-        testimonialIds: validIds,
-        action: "reject",
-      });
-
-      // Add to history
-      const { history: newHistory, actionId } = addToActionHistory(
-        actionHistory,
-        {
-          testimonialIds: validIds,
-          action: "reject",
-          previousStatuses,
-          count: validIds.length,
-        },
-      );
-      setActionHistory(newHistory);
-
-      if (skipped > 0) {
-        toast.success(
-          `${validIds.length} testimonial(s) rejected (${skipped} already rejected, skipped)`,
-          {
-            action: {
-              label: "Undo",
-              onClick: () => handleUndoBulkAction(actionId),
-            },
-            duration: 10000,
-          },
-        );
-      } else {
-        toast.success(`${validIds.length} testimonial(s) rejected`, {
-          action: {
-            label: "Undo",
-            onClick: () => handleUndoBulkAction(actionId),
-          },
-          duration: 10000,
-        });
-      }
-
-      setSelectedIds([]);
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to reject testimonials"));
-    }
-  };
-
-  const handleBulkFlag = async () => {
-    if (selectedIds.length === 0) {
-      toast.error("No testimonials selected");
-      return;
-    }
-
-    const validTestimonials = getValidTestimonialsForAction(
-      allTestimonials,
-      selectedIds,
-      "flag",
-    );
-    const validIds = validTestimonials.map((t) => t.id);
-
-    if (validIds.length === 0) {
-      toast.info("All selected testimonials are already flagged");
-      return;
-    }
-
-    // Store previous statuses for undo
-    const previousStatuses = new Map<string, ModerationStatus>();
-    validTestimonials.forEach((t) => {
-      previousStatuses.set(t.id, t.moderationStatus);
-    });
-
-    const skipped = selectedIds.length - validIds.length;
-
-    try {
-      await bulkModerationMutation.mutateAsync({
-        testimonialIds: validIds,
-        action: "flag",
-      });
-
-      // Add to history
-      const { history: newHistory, actionId } = addToActionHistory(
-        actionHistory,
-        {
-          testimonialIds: validIds,
-          action: "flag",
-          previousStatuses,
-          count: validIds.length,
-        },
-      );
-      setActionHistory(newHistory);
-
-      if (skipped > 0) {
-        toast.success(
-          `${validIds.length} testimonial(s) flagged for review (${skipped} already flagged, skipped)`,
-          {
-            action: {
-              label: "Undo",
-              onClick: () => handleUndoBulkAction(actionId),
-            },
-            duration: 10000,
-          },
-        );
-      } else {
-        toast.success(`${validIds.length} testimonial(s) flagged for review`, {
-          action: {
-            label: "Undo",
-            onClick: () => handleUndoBulkAction(actionId),
-          },
-          duration: 10000,
-        });
-      }
-
-      setSelectedIds([]);
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "Failed to flag testimonials"));
-    }
-  };
 
   const toggleSelection = (id: string) => {
     setSelectedIds((prev) =>
@@ -509,7 +161,7 @@ export function TestimonialList({
     validForReject,
     validForFlag,
     loadingState,
-    bulkMutationPending: bulkModerationMutation.isPending,
+    bulkMutationPending,
     onApprove: handleApprove,
     onReject: handleReject,
     onDelete: handleDelete,
@@ -551,7 +203,7 @@ export function TestimonialList({
         <ActionHistoryPanel
           history={actionHistory}
           showHistory={showHistory}
-          isPending={bulkModerationMutation.isPending}
+          isPending={bulkMutationPending}
           onToggleHistory={() => setShowHistory(!showHistory)}
           onUndo={handleUndoBulkAction}
         />
@@ -650,7 +302,7 @@ export function TestimonialList({
               validForApprove={validForApprove}
               validForReject={validForReject}
               validForFlag={validForFlag}
-              isPending={bulkModerationMutation.isPending}
+              isPending={bulkMutationPending}
               onApprove={handleBulkApprove}
               onReject={handleBulkReject}
               onFlag={handleBulkFlag}
