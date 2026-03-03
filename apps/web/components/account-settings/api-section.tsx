@@ -75,6 +75,25 @@ interface AccountApiKey {
   };
 }
 
+interface ProjectLike {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+const isProjectLike = (value: unknown): value is ProjectLike => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.slug === "string" &&
+    typeof candidate.name === "string"
+  );
+};
+
 export function ApiSection() {
   const { getToken } = useAuth();
   const [keys, setKeys] = useState<AccountApiKey[]>([]);
@@ -134,11 +153,13 @@ export function ApiSection() {
       }
 
       const payload = await response.json();
-      const projectList = Array.isArray(payload?.data) ? payload.data : [];
+      const projectList: unknown[] = Array.isArray(payload?.data)
+        ? payload.data
+        : [];
 
       const normalized: ProjectOption[] = projectList
-        .filter((project: any) => project?.id && project?.slug && project?.name)
-        .map((project: any) => ({
+        .filter(isProjectLike)
+        .map((project) => ({
           id: project.id,
           slug: project.slug,
           name: project.name,

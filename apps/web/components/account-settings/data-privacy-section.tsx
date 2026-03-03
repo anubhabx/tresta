@@ -34,6 +34,105 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 
+interface ExportProject {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  website?: string | null;
+  logo?: string | null;
+  visibility?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface ExportWidget {
+  id: string;
+  name?: string;
+  projectId?: string;
+  layout?: string;
+  config?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface ExportTestimonial {
+  id: string;
+  projectId?: string;
+  name?: string;
+  email?: string;
+  content?: string;
+  rating?: number | null;
+  verified?: boolean;
+  featured?: boolean;
+  status?: string;
+  createdAt?: string;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const toProject = (value: unknown): ExportProject | null => {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  if (
+    typeof value.id !== "string" ||
+    typeof value.slug !== "string" ||
+    typeof value.name !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    slug: value.slug,
+    name: value.name,
+    description: typeof value.description === "string" ? value.description : null,
+    website: typeof value.website === "string" ? value.website : null,
+    logo: typeof value.logo === "string" ? value.logo : null,
+    visibility: typeof value.visibility === "string" ? value.visibility : undefined,
+    createdAt: typeof value.createdAt === "string" ? value.createdAt : undefined,
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : undefined,
+  };
+};
+
+const toWidget = (value: unknown): ExportWidget | null => {
+  if (!isRecord(value) || typeof value.id !== "string") {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    name: typeof value.name === "string" ? value.name : undefined,
+    projectId: typeof value.projectId === "string" ? value.projectId : undefined,
+    layout: typeof value.layout === "string" ? value.layout : undefined,
+    config: isRecord(value.config) ? value.config : undefined,
+    createdAt: typeof value.createdAt === "string" ? value.createdAt : undefined,
+    updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : undefined,
+  };
+};
+
+const toTestimonial = (value: unknown): ExportTestimonial | null => {
+  if (!isRecord(value) || typeof value.id !== "string") {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    projectId: typeof value.projectId === "string" ? value.projectId : undefined,
+    name: typeof value.name === "string" ? value.name : undefined,
+    email: typeof value.email === "string" ? value.email : undefined,
+    content: typeof value.content === "string" ? value.content : undefined,
+    rating: typeof value.rating === "number" ? value.rating : null,
+    verified: typeof value.verified === "boolean" ? value.verified : undefined,
+    featured: typeof value.featured === "boolean" ? value.featured : undefined,
+    status: typeof value.status === "string" ? value.status : undefined,
+    createdAt: typeof value.createdAt === "string" ? value.createdAt : undefined,
+  };
+};
+
 interface DataPrivacySectionProps {
   onAccountDeleted?: () => void;
 }
@@ -54,29 +153,42 @@ export function DataPrivacySection({
 
       // Fetch user's projects
       const projectsResponse = await api.get("/api/projects");
-      const projects = projectsResponse.data?.data || [];
+      const rawProjects: unknown[] = Array.isArray(projectsResponse.data?.data)
+        ? projectsResponse.data.data
+        : [];
+      const projects = rawProjects
+        .map((project) => toProject(project))
+        .filter((project): project is ExportProject => project !== null);
 
       // Fetch user's widgets (from all projects)
-      const widgetsPromises = projects.map((project: any) =>
+      const widgetsPromises = projects.map((project) =>
         api
           .get(`/api/widgets/project/${project.slug}`)
           .catch(() => ({ data: { data: [] } }))
       );
       const widgetsResponses = await Promise.all(widgetsPromises);
-      const widgets = widgetsResponses.flatMap(
-        (response) => response.data?.data || []
-      );
+      const widgets = widgetsResponses
+        .flatMap((response) =>
+          Array.isArray(response.data?.data) ? response.data.data : []
+        )
+        .map((widget) => toWidget(widget))
+        .filter((widget): widget is ExportWidget => widget !== null);
 
       // Fetch user's testimonials (from all projects)
-      const testimonialsPromises = projects.map((project: any) =>
+      const testimonialsPromises = projects.map((project) =>
         api
           .get(`/api/projects/${project.slug}/testimonials`)
           .catch(() => ({ data: { data: [] } }))
       );
       const testimonialsResponses = await Promise.all(testimonialsPromises);
-      const testimonials = testimonialsResponses.flatMap(
-        (response) => response.data?.data || []
-      );
+      const testimonials = testimonialsResponses
+        .flatMap((response) =>
+          Array.isArray(response.data?.data) ? response.data.data : []
+        )
+        .map((testimonial) => toTestimonial(testimonial))
+        .filter(
+          (testimonial): testimonial is ExportTestimonial => testimonial !== null,
+        );
 
       // Compile all user data
       const userData = {
@@ -95,7 +207,7 @@ export function DataPrivacySection({
           emailAddress: account.emailAddress,
           username: account.username
         })),
-        projects: projects.map((project: any) => ({
+        projects: projects.map((project) => ({
           id: project.id,
           name: project.name,
           slug: project.slug,
@@ -106,7 +218,7 @@ export function DataPrivacySection({
           createdAt: project.createdAt,
           updatedAt: project.updatedAt
         })),
-        widgets: widgets.map((widget: any) => ({
+        widgets: widgets.map((widget) => ({
           id: widget.id,
           name: widget.name,
           projectId: widget.projectId,
@@ -115,7 +227,7 @@ export function DataPrivacySection({
           createdAt: widget.createdAt,
           updatedAt: widget.updatedAt
         })),
-        testimonials: testimonials.map((testimonial: any) => ({
+        testimonials: testimonials.map((testimonial) => ({
           id: testimonial.id,
           projectId: testimonial.projectId,
           name: testimonial.name,

@@ -14,11 +14,12 @@ import { ProfileInformationSection } from "./profile-information-section";
 import { PasswordSection } from "./password-section";
 import { ConnectedAccountsSection } from "./connected-accounts-section";
 import { NotificationSettings } from "../notifications/notification-settings";
+import type { AccountConnectedExternal, AccountUser } from "./types";
 
 interface GeneralSettingsSectionProps {
-  user: any;
+  user: AccountUser;
   hasPassword: boolean;
-  externalAccounts: any[];
+  externalAccounts: AccountConnectedExternal[];
 }
 
 export function GeneralSettingsSection({

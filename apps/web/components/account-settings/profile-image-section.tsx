@@ -6,9 +6,11 @@ import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { toast } from "sonner";
 import { InlineLoader } from "../loader";
 import { UserCircleIcon, CameraIcon } from "lucide-react";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import type { AccountUser } from "./types";
 
 interface ProfileImageSectionProps {
-  user: any;
+  user: AccountUser;
   onImageUpdate?: () => void;
 }
 
@@ -36,12 +38,12 @@ export function ProfileImageSection({
 
     try {
       setImageLoading(true);
-      await user.setProfileImage({ file });
+      await user.setProfileImage?.({ file });
       toast.success("Profile image updated successfully!");
       onImageUpdate?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Image upload error:", error);
-      toast.error(error?.errors?.[0]?.message || "Failed to upload image");
+      toast.error(getHttpErrorMessage(error, "Failed to upload image"));
     } finally {
       setImageLoading(false);
     }
@@ -50,12 +52,12 @@ export function ProfileImageSection({
   const handleRemoveImage = async () => {
     try {
       setImageLoading(true);
-      await user.setProfileImage({ file: null });
+      await user.setProfileImage?.({ file: null });
       toast.success("Profile image removed successfully!");
       onImageUpdate?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Image removal error:", error);
-      toast.error(error?.errors?.[0]?.message || "Failed to remove image");
+      toast.error(getHttpErrorMessage(error, "Failed to remove image"));
     } finally {
       setImageLoading(false);
     }

@@ -46,7 +46,7 @@ export function BillingSection() {
       });
       queryClient.invalidateQueries({ queryKey: ["subscription-details"] });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Cancellation Failed", {
         description: getHttpErrorMessage(error, "Something went wrong."),
       });
