@@ -49,7 +49,7 @@ const restrictiveCorsConfig = {
  */
 const publicCorsConfig = {
   origin: "*",
-  methods: ["GET", "OPTIONS"],
+  methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: false,
   maxAge: 86400 // 24 hours

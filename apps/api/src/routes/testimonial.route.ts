@@ -18,13 +18,14 @@ router.post("/", createTestimonial);
 
 // Protected routes - require authentication
 router.get("/", attachUser, requireAuth, listTestimonials);
-router.get("/:id", attachUser, requireAuth, getTestimonialById);
-router.put("/:id", attachUser, requireAuth, updateTestimonial);
-router.delete("/:id", attachUser, requireAuth, deleteTestimonial);
 
 // Moderation routes
 router.get("/moderation/queue", attachUser, requireAuth, getModerationQueue);
 router.post("/moderation/bulk", attachUser, requireAuth, bulkModerationAction);
 router.put("/:id/moderation", attachUser, requireAuth, updateModerationStatus);
+
+router.get("/:id", attachUser, requireAuth, getTestimonialById);
+router.put("/:id", attachUser, requireAuth, updateTestimonial);
+router.delete("/:id", attachUser, requireAuth, deleteTestimonial);
 
 export { router as testimonialRouter };

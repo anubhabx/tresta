@@ -1,5 +1,6 @@
 import { prisma } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
+import { getAuth } from "@clerk/express";
 import {
   BadRequestError,
   NotFoundError,
@@ -7,6 +8,43 @@ import {
   handlePrismaError,
 } from '../lib/errors.js';
 import { ResponseHandler } from '../lib/response.js';
+
+async function assertWidgetAccess(req: Request, widgetId: string): Promise<{ id: string; projectId: string | null; projectName?: string; }> {
+  const widget = await prisma.widget.findUnique({
+    where: { id: widgetId },
+    include: {
+      Project: {
+        select: {
+          id: true,
+          name: true,
+          userId: true,
+        },
+      },
+    },
+  });
+
+  if (!widget) {
+    throw new NotFoundError("Widget not found");
+  }
+
+  const isAdminSurface = req.originalUrl.startsWith('/admin/');
+  if (!isAdminSurface) {
+    const { userId } = getAuth(req);
+    if (!userId) {
+      throw new BadRequestError("User ID is required");
+    }
+
+    if (!widget.Project || widget.Project.userId !== userId) {
+      throw new NotFoundError("Widget not found");
+    }
+  }
+
+  return {
+    id: widget.id,
+    projectId: widget.projectId,
+    projectName: widget.Project?.name,
+  };
+}
 
 /**
  * Track widget load event (telemetry endpoint)
@@ -85,15 +123,7 @@ const getWidgetAnalytics = async (
       throw new ValidationError("days must be between 1 and 90");
     }
 
-    // Verify widget exists
-    const widget = await prisma.widget.findUnique({
-      where: { id: widgetId },
-      include: { Project: true },
-    });
-
-    if (!widget) {
-      throw new NotFoundError("Widget not found");
-    }
+    const widget = await assertWidgetAccess(req, widgetId);
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysNum);
@@ -174,7 +204,7 @@ const getWidgetAnalytics = async (
         widget: {
           id: widget.id,
           projectId: widget.projectId,
-          projectName: widget.Project?.name,
+          projectName: widget.projectName,
         },
         period: {
           days: daysNum,
@@ -237,14 +267,7 @@ const getRealtimeAnalytics = async (
       throw new BadRequestError("Widget ID is required");
     }
 
-    // Verify widget exists
-    const widget = await prisma.widget.findUnique({
-      where: { id: widgetId },
-    });
-
-    if (!widget) {
-      throw new NotFoundError("Widget not found");
-    }
+    await assertWidgetAccess(req, widgetId);
 
     const fiveMinutesAgo = new Date();
     fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
@@ -318,6 +341,8 @@ const getPerformanceAlerts = async (
 
     const showResolved = resolved === 'true';
 
+    await assertWidgetAccess(req, widgetId);
+
     const alerts = await prisma.widgetPerformanceAlert.findMany({
       where: {
         widgetId,
@@ -374,6 +399,8 @@ const resolvePerformanceAlert = async (
     if (!alert) {
       throw new NotFoundError("Alert not found");
     }
+
+    await assertWidgetAccess(req, alert.widgetId);
 
     const updatedAlert = await prisma.widgetPerformanceAlert.update({
       where: { id: alertId },
