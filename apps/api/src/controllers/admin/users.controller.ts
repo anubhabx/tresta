@@ -2,6 +2,7 @@ import { prisma } from '@workspace/database/prisma';
 import type { Request, Response, NextFunction } from 'express';
 import { NotFoundError, handlePrismaError } from '../../lib/errors.js';
 import { ResponseHandler } from '../../lib/response.js';
+import { requireUserId } from '../../lib/auth.js';
 
 /**
  * GET /admin/users
@@ -197,7 +198,7 @@ export const exportUserData = async (
 ) => {
   try {
     const { id } = req.params;
-    const adminId = (req as any).auth?.userId;
+    const adminId = requireUserId(req);
     
     // Fetch all user data
     let user;

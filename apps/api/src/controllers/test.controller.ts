@@ -9,7 +9,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { NotificationService } from '../services/notification.service.js';
 import { NotificationType } from '@workspace/database/prisma';
 import { ResponseHandler } from '../lib/response.js';
-import { BadRequestError } from '../lib/errors.js';
+import { requireUserId } from '../lib/auth.js';
 
 /**
  * Create a test notification for the authenticated user
@@ -21,11 +21,7 @@ export async function createTestNotification(
     next: NextFunction
 ): Promise<void> {
     try {
-        const userId = (req as any).auth?.userId;
-
-        if (!userId) {
-            throw new BadRequestError('User ID is required');
-        }
+        const userId = requireUserId(req);
 
         const {
             type = NotificationType.NEW_TESTIMONIAL,
@@ -66,11 +62,7 @@ export async function createMultipleTestNotifications(
     next: NextFunction
 ): Promise<void> {
     try {
-        const userId = (req as any).auth?.userId;
-
-        if (!userId) {
-            throw new BadRequestError('User ID is required');
-        }
+        const userId = requireUserId(req);
 
         const { count = 10 } = req.body;
         const actualCount = Math.min(Math.max(1, count), 50);
@@ -118,11 +110,7 @@ export async function clearTestNotifications(
     next: NextFunction
 ): Promise<void> {
     try {
-        const userId = (req as any).auth?.userId;
-
-        if (!userId) {
-            throw new BadRequestError('User ID is required');
-        }
+        const userId = requireUserId(req);
 
         const { prisma } = await import('@workspace/database/prisma');
 

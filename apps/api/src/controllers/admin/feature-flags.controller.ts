@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ResponseHandler } from '../../lib/response.js';
-import { BadRequestError, UnauthorizedError } from '../../lib/errors.js';
+import { BadRequestError } from '../../lib/errors.js';
 import {
   getAllFeatureFlags,
   updateFeatureFlag,
   createFeatureFlag,
 } from '../../services/feature-flags.service.js';
+import { requireUserId } from '../../lib/auth.js';
 
 /**
  * GET /admin/feature-flags
@@ -39,16 +40,12 @@ export const updateFeatureFlagController = async (
   try {
     const { key } = req.params;
     const { enabled } = req.body;
-    const { userId } = (req as any).auth || {};
+    const userId = requireUserId(req);
     
     if (typeof enabled !== 'boolean') {
       throw new BadRequestError('enabled must be a boolean');
     }
     
-    if (!userId) {
-      throw new UnauthorizedError('Unauthorized');
-    }
-
     if (!key) {
       throw new BadRequestError('key is required');
     }
@@ -78,7 +75,7 @@ export const createFeatureFlagController = async (
 ) => {
   try {
     const { key, name, description, enabled, metadata } = req.body;
-    const { userId } = (req as any).auth || {};
+    const userId = requireUserId(req);
     
     if (!key || !name) {
       throw new BadRequestError('key and name are required');

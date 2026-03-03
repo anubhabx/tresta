@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import Ably from 'ably';
-import { BadRequestError, InternalServerError } from '../lib/errors.js';
+import { InternalServerError } from '../lib/errors.js';
 import { ResponseHandler } from '../lib/response.js';
+import { requireUserId } from '../lib/auth.js';
 
 const ablyApiKey = process.env.ABLY_API_KEY;
 
@@ -22,11 +23,7 @@ export const generateToken = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     if (!ablyApiKey) {
       throw new InternalServerError('ABLY_API_KEY not configured');

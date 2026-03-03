@@ -3,6 +3,7 @@ import { ResponseHandler } from '../../lib/response.js';
 import { clerkClient } from '@clerk/express';
 import { getCachedUser } from '../../lib/clerk-cache.js';
 import { InternalServerError } from '../../lib/errors.js';
+import { requireUserId } from '../../lib/auth.js';
 
 /**
  * GET /admin/sessions
@@ -80,7 +81,7 @@ export const revokeSession = async (
 ) => {
   try {
     const { sessionId } = req.params;
-    const adminId = (req as any).auth?.userId;
+    const adminId = requireUserId(req);
 
     if (!sessionId) {
       return ResponseHandler.error(res, 400, 'Session ID is required');
