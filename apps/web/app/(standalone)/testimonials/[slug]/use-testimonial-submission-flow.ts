@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import axios from "axios";
 import type { CredentialResponse } from "@react-oauth/google";
-import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
+import type { ApiSuccessResponse } from "@workspace/types";
+import type { CreateTestimonialPayload, Project } from "@/types/api";
 import { getPublicApiBaseUrl } from "@/config/env";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import {
@@ -68,7 +69,7 @@ export function useTestimonialSubmissionFlow(slug: string) {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await publicApi.get<ApiResponse<Project>>(
+        const res = await publicApi.get<ApiSuccessResponse<Project>>(
           `/api/public/projects/${slug}`,
         );
         setProject(res.data.data);
@@ -264,7 +265,7 @@ export function useTestimonialSubmissionFlow(slug: string) {
         headers["x-anonymous-submission"] = "true";
       }
 
-      await publicApi.post<ApiResponse<unknown>>(
+      await publicApi.post<ApiSuccessResponse<unknown>>(
         `/api/public/projects/${slug}/testimonials`,
         payload,
         { headers },

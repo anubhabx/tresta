@@ -1,11 +1,6 @@
-export interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data: T;
-  meta: {
-    timestamp: string;
-  };
-}
+import type { ApiSuccessResponse } from "@workspace/types";
+
+export type ApiResponse<T> = ApiSuccessResponse<T>;
 
 export interface PaginatedResponse<T> {
   success: boolean;

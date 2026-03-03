@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
+import type { ApiSuccessResponse } from "@workspace/types";
 import type {
-  ApiResponse,
   PaginatedResponse,
   Testimonial,
   CreateTestimonialPayload,
@@ -44,7 +44,7 @@ export const useTestimonialDetail = (slug: string, id: string) => {
   return useQuery({
     queryKey: testimonialKeys.detail(id),
     queryFn: async () => {
-      const response = await api.get<ApiResponse<Testimonial>>(
+      const response = await api.get<ApiSuccessResponse<Testimonial>>(
         `/api/projects/${slug}/testimonials/${id}`,
       );
       return response.data.data;
@@ -60,7 +60,7 @@ export const useCreateTestimonial = (slug: string) => {
 
   return useMutation({
     mutationFn: async (data: CreateTestimonialPayload) => {
-      const response = await api.post<ApiResponse<Testimonial>>(
+      const response = await api.post<ApiSuccessResponse<Testimonial>>(
         `/api/projects/${slug}/testimonials`,
         data,
       );
@@ -87,7 +87,7 @@ export const useUpdateTestimonial = (slug: string) => {
       id: string;
       data: UpdateTestimonialPayload;
     }) => {
-      const response = await api.put<ApiResponse<Testimonial>>(
+      const response = await api.put<ApiSuccessResponse<Testimonial>>(
         `/api/projects/${slug}/testimonials/${id}`,
         data,
       );
@@ -113,7 +113,7 @@ export const useDeleteTestimonial = (slug: string) => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.delete<ApiResponse<void>>(
+      const response = await api.delete<ApiSuccessResponse<void>>(
         `/api/projects/${slug}/testimonials/${id}`,
       );
       return response.data;

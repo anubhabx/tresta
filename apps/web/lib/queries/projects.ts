@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
 import { toast } from "sonner";
+import type { ApiSuccessResponse } from "@workspace/types";
 import type {
   Project,
   PaginatedResponse,
-  ApiResponse,
   CreateProjectPayload,
   UpdateProjectPayload,
 } from "@/types/api";
@@ -34,7 +34,7 @@ export const projects = {
       return useQuery<Project, Error>({
         queryKey: ["projects", "detail", slug],
         queryFn: async () => {
-          const response = await api.get<ApiResponse<Project>>(
+          const response = await api.get<ApiSuccessResponse<Project>>(
             `/api/projects/${slug}`,
           );
           return response.data.data;
@@ -51,7 +51,7 @@ export const projects = {
 
       return useMutation<Project, Error, CreateProjectPayload>({
         mutationFn: async (data: CreateProjectPayload) => {
-          const response = await api.post<ApiResponse<Project>>(
+          const response = await api.post<ApiSuccessResponse<Project>>(
             "/api/projects",
             data,
           );
@@ -74,7 +74,7 @@ export const projects = {
 
       return useMutation<Project, Error, UpdateProjectPayload>({
         mutationFn: async (data: UpdateProjectPayload) => {
-          const response = await api.put<ApiResponse<Project>>(
+          const response = await api.put<ApiSuccessResponse<Project>>(
             `/api/projects/${slug}`,
             data,
           );
