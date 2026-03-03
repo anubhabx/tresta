@@ -1,5 +1,5 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { useUpgradeModal } from "@/components/billing/upgrade-modal";
+import { useUpgradeModal } from "@/store/upgrade-modal-store";
 
 type LimitExceededError = {
   response?: {

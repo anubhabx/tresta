@@ -20,7 +20,7 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { toast } from "sonner";
-import { useUpgradeModal } from "@/components/billing/upgrade-modal";
+import { useUpgradeModal } from "@/store/upgrade-modal-store";
 
 // ============================================================================
 // TYPES

@@ -10,22 +10,9 @@ import {
 import { PricingTableView } from "./pricing-table";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { create } from "zustand";
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
-
-// Global state for Upgrade Modal using Zustand (simple store)
-interface UpgradeModalStore {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-}
-
-export const useUpgradeModal = create<UpgradeModalStore>((set) => ({
-  isOpen: false,
-  open: () => set({ isOpen: true }),
-  close: () => set({ isOpen: false }),
-}));
+import { useUpgradeModal } from "@/store/upgrade-modal-store";
 
 export function UpgradeModal() {
   const { isOpen, close, open } = useUpgradeModal();
