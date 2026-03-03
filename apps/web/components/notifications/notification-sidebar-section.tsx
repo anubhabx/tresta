@@ -7,7 +7,7 @@ import {
   useNotificationList,
   useUnreadCount,
 } from "@/lib/queries/notifications";
-import { useAbly } from "@/components/ably-provider";
+import { useAbly } from "@/components/notifications/ably-provider";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@workspace/ui/lib/utils";
 import {

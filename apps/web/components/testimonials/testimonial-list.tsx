@@ -3,16 +3,16 @@
 import { useState, useMemo } from "react";
 import { testimonials, moderation } from "@/lib/queries";
 import { TestimonialCard } from "./testimonial-card";
-import { ModerationTestimonialCard } from "./moderation/moderation-testimonial-card";
-import { ModerationStatsDashboard } from "./moderation/moderation-stats-dashboard";
-import { FilterPresets, FilterPreset } from "./moderation/filter-presets";
-import { TestimonialListPageSkeleton } from "./skeletons";
-import { KeyboardShortcutsHelp } from "./keyboard-shortcuts-help";
-import { BulkActionsBar } from "./testimonials/bulk-actions-bar";
-import { ActionHistoryPanel } from "./testimonials/action-history-panel";
-import { SearchAndFilters } from "./testimonials/search-and-filters";
-import { EmptyStates } from "./testimonials/empty-states";
-import { StatusHeader } from "./testimonials/status-header";
+import { ModerationTestimonialCard } from "../moderation/moderation-testimonial-card";
+import { ModerationStatsDashboard } from "../moderation/moderation-stats-dashboard";
+import { FilterPresets, FilterPreset } from "../moderation/filter-presets";
+import { TestimonialListPageSkeleton } from "../skeletons";
+import { KeyboardShortcutsHelp } from "../keyboard-shortcuts-help";
+import { BulkActionsBar } from "./bulk-actions-bar";
+import { ActionHistoryPanel } from "./action-history-panel";
+import { SearchAndFilters } from "./search-and-filters";
+import { EmptyStates } from "./empty-states";
+import { StatusHeader } from "./status-header";
 import {
   useTestimonialKeyboardShortcuts,
   filterTestimonials,

@@ -4,7 +4,7 @@ import { Bell } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
 import { useUnreadCount } from "@/lib/queries/notifications";
-import { useAbly } from "@/components/ably-provider";
+import { useAbly } from "@/components/notifications/ably-provider";
 
 export function NotificationBadge() {
   const { toggleCenter } = useNotificationStore();

@@ -13,7 +13,7 @@ import { ProfileImageSection } from "./profile-image-section";
 import { ProfileInformationSection } from "./profile-information-section";
 import { PasswordSection } from "./password-section";
 import { ConnectedAccountsSection } from "./connected-accounts-section";
-import { NotificationSettings } from "../notification-settings";
+import { NotificationSettings } from "../notifications/notification-settings";
 
 interface GeneralSettingsSectionProps {
   user: any;

@@ -43,8 +43,8 @@ import {
 } from "lucide-react";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { cn } from "@workspace/ui/lib/utils";
-import { CustomFormField } from "@/components/custom-form-field";
-import { AzureFileUpload } from "@/components/azure-file-upload";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
+import { AzureFileUpload } from "@/components/forms/fields/azure-file-upload";
 import type { FormConfig } from "@/types/api";
 import type { TestimonialFormData } from "./schema";
 

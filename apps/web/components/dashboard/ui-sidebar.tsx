@@ -36,7 +36,7 @@ import {
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import { Separator } from "@workspace/ui/components/separator";
 import { projects } from "@/lib/queries";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import Image from "next/image";
 import { useUpgradeModal } from "@/store/upgrade-modal-store";
 

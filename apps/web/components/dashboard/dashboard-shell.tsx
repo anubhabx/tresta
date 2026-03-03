@@ -1,8 +1,8 @@
 "use client";
 
 import { ReactNode, useState, useEffect } from "react";
-import UISidebar from "@/components/ui-sidebar";
-import UIBreadcrumb from "@/components/ui-breadcrumbs";
+import UISidebar from "@/components/dashboard/ui-sidebar";
+import UIBreadcrumb from "@/components/dashboard/ui-breadcrumbs";
 import { useUIStore } from "@/store/ui-store";
 import {
   SidebarProvider,
@@ -13,7 +13,7 @@ import {
   NotificationBadge,
   NotificationCenter,
 } from "@/components/notifications";
-import { CommandPalette } from "@/components/command-palette";
+import { CommandPalette } from "@/components/dashboard/command-palette";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface DashboardShellProps {

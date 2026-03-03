@@ -4,7 +4,7 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
-import { AblyProvider } from "./ably-provider";
+import { AblyProvider } from "./notifications/ably-provider";
 
 import { Toaster } from "@workspace/ui/components/sonner";
 import dynamic from "next/dynamic";

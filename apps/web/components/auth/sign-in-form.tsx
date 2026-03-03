@@ -21,9 +21,9 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
-import { InlineLoader } from "./loader";
-import { CustomFormField } from "./custom-form-field";
-import { OAuthButtons } from "./auth/oauth-buttons";
+import { InlineLoader } from "../loader";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
+import { OAuthButtons } from "@/components/auth/oauth-buttons";
 
 const SignInFormSchema = z.object({
   email: z.string().min(2, { message: "Email is required" }).email(),

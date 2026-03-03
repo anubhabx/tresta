@@ -10,7 +10,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
 import { useMarkAllAsRead, useUnreadCount } from "@/lib/queries/notifications";
 import { NotificationList } from "./notification-list";
-import { useAbly } from "@/components/ably-provider";
+import { useAbly } from "@/components/notifications/ably-provider";
 import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 

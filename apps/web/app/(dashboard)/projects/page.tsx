@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyProjects } from "@/components/empty-projects";
+import { EmptyProjects } from "@/components/dashboard/empty-projects";
 import { ProjectsListPageSkeleton } from "@/components/skeletons";
 import { projects } from "@/lib/queries";
 import { Button } from "@workspace/ui/components/button";

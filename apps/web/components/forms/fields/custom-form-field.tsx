@@ -19,7 +19,7 @@ import {
 import { Info, Star, X } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Button } from "@workspace/ui/components/button";
-import { ColorPicker } from "@/components/color-picker";
+import { ColorPicker } from "@/components/forms/fields/color-picker";
 import { FileUpload } from "@workspace/ui/components/file-upload";
 
 // Base props shared by all field types

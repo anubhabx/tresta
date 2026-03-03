@@ -9,7 +9,7 @@ import { Ban, CheckCircle2, Linkedin, Twitter } from "lucide-react";
 import axios from "axios";
 import { motion } from "motion/react";
 import type { ApiResponse, CreateTestimonialPayload, Project } from "@/types/api";
-import { GoogleOAuthProvider } from "@/components/google-oauth-provider";
+import { GoogleOAuthProvider } from "@/components/auth/google-oauth-provider";
 import type { CredentialResponse } from "@react-oauth/google";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";

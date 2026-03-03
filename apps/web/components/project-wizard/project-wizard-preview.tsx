@@ -12,7 +12,7 @@ import { Monitor, Smartphone, Tablet, Eye, Folder } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { cn } from "@workspace/ui/lib/utils";
-import { SasImage } from "@/components/sas-image";
+import { SasImage } from "@/components/forms/fields/sas-image";
 import type { ProjectIdentity } from "./types";
 
 // ============================================================================

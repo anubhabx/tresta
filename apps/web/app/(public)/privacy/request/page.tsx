@@ -7,7 +7,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
-import { CustomFormField } from "@/components/custom-form-field";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import {
   Card,
   CardContent,
