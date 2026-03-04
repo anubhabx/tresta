@@ -8,7 +8,7 @@ interface Notification {
   title: string;
   message: string;
   link?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   isRead: boolean;
   createdAt: string;
 }
@@ -50,7 +50,7 @@ export function useNotificationList() {
   return useInfiniteQuery({
     queryKey: ["notifications"],
     queryFn: async ({ pageParam }) => {
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (pageParam) {
         params.cursor = pageParam;
       }
@@ -76,8 +76,7 @@ export function useUnreadCount(isAblyConnected: boolean) {
       const response = await api.get("/api/notifications/unread-count");
       return response.data as UnreadCountResponse;
     },
-    // Poll every 30 seconds when Ably is disconnected
-    refetchInterval: false,
+    refetchInterval: isAblyConnected ? false : 30_000,
   });
 }
 

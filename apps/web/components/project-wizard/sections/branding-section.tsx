@@ -20,11 +20,11 @@ import {
 } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { AzureFileUpload } from "@/components/azure-file-upload";
+import { AzureFileUpload } from "@/components/forms/fields/azure-file-upload";
 import { UploadDirectory } from "@/hooks/use-azure-sas";
 import { ProjectFormData } from "@/lib/schemas/project-schema";
 import { LockedToggle } from "@/components/paywall";
-import { ConditionalColorPicker } from "@/components/conditional-color-picker";
+import { ConditionalColorPicker } from "@/components/forms/fields/conditional-color-picker";
 
 // ============================================================================
 // THEME OPTIONS

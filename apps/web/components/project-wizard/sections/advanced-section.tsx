@@ -23,7 +23,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { CustomFormField } from "@/components/custom-form-field";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { ProjectFormData } from "@/lib/schemas/project-schema";
 import { LockedToggle, ProBadge } from "@/components/paywall";
 

@@ -6,7 +6,7 @@ import { prisma } from "@workspace/database/prisma";
 import { ResponseHandler } from "../src/lib/response.js";
 import { NotFoundError } from "../src/lib/errors.js";
 import {
-  verifyRazorpaySignature,
+  verifyPaymentSignature,
   getSubscription,
 } from "../src/services/razorpay.service.js";
 
@@ -32,7 +32,7 @@ vi.mock("../src/lib/response.js", () => ({
 }));
 
 vi.mock("../src/services/razorpay.service.js", () => ({
-  verifyRazorpaySignature: vi.fn(),
+  verifyPaymentSignature: vi.fn(),
   getSubscription: vi.fn(),
 }));
 
@@ -51,7 +51,7 @@ type MockedPrisma = typeof prisma & {
 
 const mockedPrisma = prisma as unknown as MockedPrisma;
 
-const mockedVerifySignature = verifyRazorpaySignature as unknown as ReturnType<
+const mockedVerifySignature = verifyPaymentSignature as unknown as ReturnType<
   typeof vi.fn
 >;
 const mockedGetSubscription = getSubscription as unknown as ReturnType<

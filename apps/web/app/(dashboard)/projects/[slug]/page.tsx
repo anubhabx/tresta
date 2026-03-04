@@ -18,7 +18,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import Link from "next/link";
-import { TestimonialList } from "@/components/testimonial-list";
+import { TestimonialList } from "@/components/testimonials/testimonial-list";
 import {
   ProjectHeader,
   ProjectStatsCards,

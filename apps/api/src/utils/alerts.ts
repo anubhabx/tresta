@@ -1,5 +1,6 @@
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS } from '../lib/redis-keys.js';
+import { EMAIL_LIMITS } from '../config/constants.js';
 
 /**
  * Check email quota and send alerts at key thresholds
@@ -16,12 +17,13 @@ import { REDIS_KEYS } from '../lib/redis-keys.js';
  */
 export async function checkAndAlertQuota(currentCount: number): Promise<void> {
   const redis = getRedisClient();
+  const quota = EMAIL_LIMITS.dailyQuota;
 
   // Define thresholds
   const thresholds = [
-    { count: 160, percentage: 80, level: 'warning', emoji: '⚠️' },
-    { count: 180, percentage: 90, level: 'critical', emoji: '🚨' },
-    { count: 200, percentage: 100, level: 'exhausted', emoji: '🔴' },
+    { count: Math.floor((quota * 80) / 100), percentage: 80, level: 'warning', emoji: '⚠️' },
+    { count: Math.floor((quota * 90) / 100), percentage: 90, level: 'critical', emoji: '🚨' },
+    { count: quota, percentage: 100, level: 'exhausted', emoji: '🔴' },
   ];
 
   for (const threshold of thresholds) {
@@ -35,9 +37,9 @@ export async function checkAndAlertQuota(currentCount: number): Promise<void> {
       }
 
       // Send alert
-      const message = threshold.count === 200
-        ? `${threshold.emoji} Email quota exhausted (200/200) - non-critical emails deferred to tomorrow's digest`
-        : `${threshold.emoji} Email quota at ${threshold.percentage}% (${currentCount}/200)${threshold.count === 180 ? ' - approaching limit' : ''}`;
+      const message = threshold.count === quota
+        ? `${threshold.emoji} Email quota exhausted (${quota}/${quota}) - non-critical emails deferred to tomorrow's digest`
+        : `${threshold.emoji} Email quota at ${threshold.percentage}% (${currentCount}/${quota})${threshold.percentage === 90 ? ' - approaching limit' : ''}`;
 
       await sendSlackAlert(message, threshold.level);
 

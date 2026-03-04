@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Upload, X, Loader2, CheckCircle2 } from "lucide-react";
 import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -21,6 +20,7 @@ import {
   UploadDirectory,
   validateFile,
 } from "@/hooks/use-azure-sas";
+import { SasImage } from "@/components/forms/fields/sas-image";
 
 interface AzureFileUploadProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -202,13 +202,13 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
                   <div className="space-y-2">
                     <div className="flex items-center gap-4 p-4 border rounded-lg">
                       {preview && isImage ? (
-                        <Image
+                        <SasImage
                           src={displayUrl}
                           alt="Upload preview"
                           width={64}
                           height={64}
-                          unoptimized
                           className="w-16 h-16 object-cover rounded"
+                          skeletonClassName="w-16 h-16 rounded"
                         />
                       ) : (
                         <div className="w-16 h-16 flex items-center justify-center bg-muted rounded">

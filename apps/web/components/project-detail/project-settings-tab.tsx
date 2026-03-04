@@ -22,6 +22,7 @@ import {
 } from "@workspace/ui/components/alert-dialog";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import type { Project } from "@/types/api";
 import { ModerationSettingsForm } from "./moderation-settings-form";
 import { FormConfigSettings } from "./form-config-settings";
@@ -41,9 +42,11 @@ export function ProjectSettingsTab({
     setIsDeleting(true);
     try {
       await onDelete();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to delete project:", error);
-      toast.error("Failed to delete project. Please try again.");
+      toast.error(
+        getHttpErrorMessage(error, "Failed to delete project. Please try again."),
+      );
       setIsDeleting(false);
     }
   };

@@ -2,6 +2,7 @@ import { prisma } from '@workspace/database/prisma';
 import type { Request, Response, NextFunction } from 'express';
 import { BadRequestError, NotFoundError } from '../lib/errors.js';
 import { ResponseHandler } from '../lib/response.js';
+import { requireUserId } from '../lib/auth.js';
 
 /**
  * GET /api/notifications
@@ -13,10 +14,7 @@ export const listNotifications = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     const { cursor, limit = '20' } = req.query;
     const limitNum = Math.min(parseInt(limit as string) || 20, 100);
@@ -78,10 +76,7 @@ export const getUnreadCount = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     const count = await prisma.notification.count({
       where: {
@@ -108,10 +103,7 @@ export const markAsRead = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     const { id } = req.params;
     const { isRead } = req.body;
@@ -154,10 +146,7 @@ export const markAllAsRead = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     const result = await prisma.notification.updateMany({
       where: {
@@ -190,10 +179,7 @@ export const getPreferences = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     // Get or create preferences
     let preferences = await prisma.notificationPreferences.findUnique({
@@ -228,10 +214,7 @@ export const updatePreferences = async (
   next: NextFunction
 ) => {
   try {
-    const userId = (req as any).auth?.userId;
-    if (!userId) {
-      throw new BadRequestError('User ID is required');
-    }
+    const userId = requireUserId(req);
 
     const { emailEnabled } = req.body;
 

@@ -8,6 +8,7 @@ import { Switch } from "@workspace/ui/components/switch";
 import { Label } from "@workspace/ui/components/label";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 export function NotificationSettings() {
   const { data, isLoading } = useNotificationPreferences();
@@ -23,8 +24,8 @@ export function NotificationSettings() {
           ? "Email notifications enabled"
           : "Email notifications disabled",
       );
-    } catch (error) {
-      toast.error("Failed to update preferences");
+    } catch (error: unknown) {
+      toast.error(getHttpErrorMessage(error, "Failed to update preferences"));
     }
   };
 

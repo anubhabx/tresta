@@ -7,7 +7,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
-import { Spotlight } from "@/components/ui/spotlight-new";
+import { Spotlight } from "@/components/landing/ui/spotlight";
 
 const WidgetPreview = dynamic(
   () =>

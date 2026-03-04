@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ApiError } from '../lib/errors.js';
 import { ResponseHandler } from '../lib/response.js';
+import { getRequestLogger } from '../lib/logger.js';
 
 /**
  * Global error handling middleware
@@ -12,7 +13,8 @@ export const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  // Log error for debugging (in production, use a proper logger like Winston or Pino)
+  const requestLogger = getRequestLogger(req);
+
   const errorLog = {
     message: error.message,
     name: error.name,
@@ -20,36 +22,31 @@ export const errorHandler = (
     method: req.method,
     timestamp: new Date().toISOString(),
     userId: (req as any).user?.id,
-    ...(error instanceof ApiError && { 
+    ...(error instanceof ApiError && {
       statusCode: error.statusCode,
       code: error.code,
-      details: error.details 
+      details: error.details,
     }),
   };
 
-  // Log stack trace only in development
   if (process.env.NODE_ENV === "development") {
-    console.error("Error:", errorLog);
-    console.error("Stack:", error.stack);
+    requestLogger.error({ ...errorLog, stack: error.stack }, "Request error");
   } else {
-    // In production, log without stack trace (use proper logger)
-    console.error("Error:", errorLog);
+    requestLogger.error(errorLog, "Request error");
   }
 
-  // Handle ApiError instances (custom errors from errors.ts)
   if (error instanceof ApiError) {
     return ResponseHandler.error(
       res,
       error.statusCode,
       error.message,
       error.code,
-      process.env.NODE_ENV === "development" 
+      process.env.NODE_ENV === "development"
         ? { ...error.details, stack: error.stack }
         : error.details,
     );
   }
 
-  // Handle Zod validation errors
   if (error.name === "ZodError") {
     const zodError = error as any;
     return ResponseHandler.validationError(
@@ -65,7 +62,6 @@ export const errorHandler = (
     );
   }
 
-  // Handle express-validator errors
   if (error.name === "ValidationError" && (error as any).errors) {
     return ResponseHandler.validationError(
       res,
@@ -74,56 +70,51 @@ export const errorHandler = (
     );
   }
 
-  // Handle JSON parsing errors
   if (error instanceof SyntaxError && "body" in error) {
     return ResponseHandler.badRequest(
-      res, 
+      res,
       "Invalid JSON payload. Please check your request body.",
-      { syntaxError: error.message }
+      { syntaxError: error.message },
     );
   }
 
-  // Handle JWT/Token errors
   if (error.name === "JsonWebTokenError") {
     return ResponseHandler.unauthorized(
       res,
-      "Invalid authentication token"
+      "Invalid authentication token",
     );
   }
 
   if (error.name === "TokenExpiredError") {
     return ResponseHandler.unauthorized(
       res,
-      "Authentication token has expired"
+      "Authentication token has expired",
     );
   }
 
-  // Handle Multer file upload errors
   if (error.name === "MulterError") {
     const multerError = error as any;
     if (multerError.code === "LIMIT_FILE_SIZE") {
       return ResponseHandler.badRequest(
         res,
         "File size exceeds the maximum allowed limit",
-        { maxSize: multerError.limit }
+        { maxSize: multerError.limit },
       );
     }
     return ResponseHandler.badRequest(
       res,
       `File upload error: ${multerError.message}`,
-      { code: multerError.code }
+      { code: multerError.code },
     );
   }
 
-  // Handle database connection errors
   if (error.message?.includes("Can't reach database server")) {
     return ResponseHandler.serviceUnavailable(
       res,
-      "Database connection failed. Please try again later."
+      "Database connection failed. Please try again later.",
     );
   }
 
-  // Default to 500 Internal Server Error for unknown errors
   return ResponseHandler.internalError(
     res,
     process.env.NODE_ENV === "development"
@@ -133,24 +124,6 @@ export const errorHandler = (
 };
 
 /**
- * Helper function to get error code from status code
- */
-function getErrorCode(statusCode: number): string {
-  const errorCodes: Record<number, string> = {
-    400: "BAD_REQUEST",
-    401: "UNAUTHORIZED",
-    403: "FORBIDDEN",
-    404: "NOT_FOUND",
-    409: "CONFLICT",
-    422: "VALIDATION_ERROR",
-    500: "INTERNAL_ERROR",
-    503: "SERVICE_UNAVAILABLE",
-  };
-
-  return errorCodes[statusCode] || `ERROR_${statusCode}`;
-}
-
-/**
  * 404 Not Found handler for unmatched routes
  */
 export const notFoundHandler = (
@@ -158,6 +131,8 @@ export const notFoundHandler = (
   res: Response,
   next: NextFunction,
 ) => {
+  const requestLogger = getRequestLogger(req);
+  requestLogger.warn({ path: req.path, method: req.method }, "Route not found");
   ResponseHandler.notFound(res, `Route ${req.method} ${req.path} not found`);
 };
 

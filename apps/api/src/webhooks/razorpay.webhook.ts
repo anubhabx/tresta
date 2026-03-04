@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import { Prisma, prisma } from "@workspace/database/prisma";
 
-import { verifyRazorpaySignature } from "../services/razorpay.service.js";
+import { verifyWebhookSignature } from "../services/razorpay.service.js";
 import { mapProviderSignalsToInternal } from "../services/subscription-status.service.js";
 
 type RazorpayEventPayload = {
@@ -69,7 +69,7 @@ const getRawBody = (req: Request): Buffer => {
     return Buffer.from(req.body);
   }
 
-  return Buffer.from(JSON.stringify(req.body || {}));
+  throw new Error("Raw request body is required for webhook signature verification");
 };
 
 const toDate = (epochSeconds?: number): Date | undefined => {
@@ -220,10 +220,17 @@ export const handleRazorpayWebhook = async (
     return;
   }
 
-  const rawBody = getRawBody(req);
+  let rawBody: Buffer;
+  try {
+    rawBody = getRawBody(req);
+  } catch {
+    res.status(400).json({ success: false, message: "Missing raw request body" });
+    return;
+  }
+
   const rawBodyString = rawBody.toString("utf8");
 
-  const isValidSignature = verifyRazorpaySignature(
+  const isValidSignature = verifyWebhookSignature(
     rawBodyString,
     signature,
     secret,

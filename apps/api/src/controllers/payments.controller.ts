@@ -10,7 +10,7 @@ import {
 import { ResponseHandler } from "../lib/response.js";
 import {
   createRazorpaySubscription,
-  verifyRazorpaySignature,
+  verifyPaymentSignature,
 } from "../services/razorpay.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
 import { requireUserId } from "../lib/auth.js";
@@ -122,7 +122,7 @@ export const verifyPayment = async (
       throw new BadRequestError("Missing payment verification details");
     }
 
-    const isValid = verifyRazorpaySignature(
+    const isValid = verifyPaymentSignature(
       razorpay_subscription_id,
       razorpay_payment_id,
       razorpay_signature,
@@ -155,13 +155,23 @@ export const verifyPayment = async (
     if (currentPeriodStart) periodData.currentPeriodStart = currentPeriodStart;
     if (currentPeriodEnd) periodData.currentPeriodEnd = currentPeriodEnd;
 
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: {
+        externalSubscriptionId: razorpay_subscription_id,
+        userId,
+      },
+    });
+
+    if (!existingSubscription) {
+      throw new NotFoundError("Subscription not found for current user");
+    }
+
     const subscription = await prisma.subscription.update({
-      where: { externalSubscriptionId: razorpay_subscription_id },
+      where: { id: existingSubscription.id },
       data: {
         status: "ACTIVE",
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
-        razorpayOrderId: razorpay_subscription_id,
         ...periodData,
       },
     });

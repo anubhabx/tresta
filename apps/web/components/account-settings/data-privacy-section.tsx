@@ -12,7 +12,6 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -23,13 +22,11 @@ import {
 } from "@workspace/ui/components/alert-dialog";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
-import { useApi } from "@/hooks/use-api";
+import { useAccountDataExport } from "@/hooks/use-account-data-export";
 import {
   DownloadIcon,
-  Trash2Icon,
   ShieldAlertIcon,
   Loader2,
-  InfoIcon
 } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
@@ -42,115 +39,8 @@ export function DataPrivacySection({
   onAccountDeleted
 }: DataPrivacySectionProps) {
   const { user } = useUser();
-  const api = useApi();
-  const [isExporting, setIsExporting] = useState(false);
+  const { isExporting, exportAccountData } = useAccountDataExport();
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleExportData = async () => {
-    if (!user) return;
-
-    try {
-      setIsExporting(true);
-
-      // Fetch user's projects
-      const projectsResponse = await api.get("/api/projects");
-      const projects = projectsResponse.data?.data || [];
-
-      // Fetch user's widgets (from all projects)
-      const widgetsPromises = projects.map((project: any) =>
-        api
-          .get(`/api/projects/${project.slug}/widgets`)
-          .catch(() => ({ data: { data: [] } }))
-      );
-      const widgetsResponses = await Promise.all(widgetsPromises);
-      const widgets = widgetsResponses.flatMap(
-        (response) => response.data?.data || []
-      );
-
-      // Fetch user's testimonials (from all projects)
-      const testimonialsPromises = projects.map((project: any) =>
-        api
-          .get(`/api/projects/${project.slug}/testimonials`)
-          .catch(() => ({ data: { data: [] } }))
-      );
-      const testimonialsResponses = await Promise.all(testimonialsPromises);
-      const testimonials = testimonialsResponses.flatMap(
-        (response) => response.data?.data || []
-      );
-
-      // Compile all user data
-      const userData = {
-        profile: {
-          id: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          username: user.username,
-          imageUrl: user.imageUrl,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        },
-        externalAccounts: user.externalAccounts?.map((account) => ({
-          provider: account.provider,
-          emailAddress: account.emailAddress,
-          username: account.username
-        })),
-        projects: projects.map((project: any) => ({
-          id: project.id,
-          name: project.name,
-          slug: project.slug,
-          description: project.description,
-          website: project.website,
-          logo: project.logo,
-          visibility: project.visibility,
-          createdAt: project.createdAt,
-          updatedAt: project.updatedAt
-        })),
-        widgets: widgets.map((widget: any) => ({
-          id: widget.id,
-          name: widget.name,
-          projectId: widget.projectId,
-          layout: widget.layout,
-          config: widget.config,
-          createdAt: widget.createdAt,
-          updatedAt: widget.updatedAt
-        })),
-        testimonials: testimonials.map((testimonial: any) => ({
-          id: testimonial.id,
-          projectId: testimonial.projectId,
-          name: testimonial.name,
-          email: testimonial.email,
-          content: testimonial.content,
-          rating: testimonial.rating,
-          verified: testimonial.verified,
-          featured: testimonial.featured,
-          status: testimonial.status,
-          createdAt: testimonial.createdAt
-        })),
-        exportedAt: new Date().toISOString()
-      };
-
-      // Create and download JSON file
-      const blob = new Blob([JSON.stringify(userData, null, 2)], {
-        type: "application/json"
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `tresta-data-export-${new Date().toISOString().split("T")[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success("Your data has been downloaded successfully.");
-    } catch (error) {
-      console.error("Export error:", error);
-      toast.error("Failed to export your data. Please try again.");
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!user) return;
@@ -194,7 +84,7 @@ export function DataPrivacySection({
           </div>
           <Button
             variant="outline"
-            onClick={handleExportData}
+            onClick={() => void exportAccountData()}
             disabled={isExporting}
             className="ml-4"
           >

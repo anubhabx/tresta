@@ -10,7 +10,7 @@ interface PrivacyDataResponse {
     data: {
         email: string;
         count: number;
-        testimonials: any[];
+        testimonials: Array<Record<string, unknown>>;
     };
 }
 

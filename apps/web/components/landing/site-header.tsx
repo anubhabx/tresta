@@ -9,14 +9,7 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 sm:px-6 py-2 flex h-14 items-center justify-between">
         <div className="flex flex-1 items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Image
-              src="/branding/tresta.svg"
-              alt="Tresta logo"
-              width={32}
-              height={32}
-              className="h-8 w-8"
-              priority
-            />            
+            <Image src="/branding/tresta.svg" alt="Tresta Logo" width={32} height={32} />
             <span className="font-bold sm:inline-block">Tresta</span>
           </Link>
         </div>

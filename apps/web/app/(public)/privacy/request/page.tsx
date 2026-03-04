@@ -7,7 +7,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
-import { CustomFormField } from "@/components/custom-form-field";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import {
   Card,
   CardContent,
@@ -18,6 +18,7 @@ import {
 import { ShieldCheck, Mail, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRequestPrivacyAccess } from "@/lib/queries/privacy";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 const requestFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -49,9 +50,11 @@ export default function PrivacyRequestPage() {
           setMagicLink(res.debugLink);
         }
       },
-      onError: (error) => {
+      onError: (error: unknown) => {
         console.error(error);
-        toast.error("Failed to submit request. Please try again.");
+        toast.error(
+          getHttpErrorMessage(error, "Failed to submit request. Please try again."),
+        );
       },
     });
   };

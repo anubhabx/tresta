@@ -26,6 +26,7 @@ import {
   AdvancedModerationSettings,
 } from "@/components/forms/moderation";
 import { projects } from "@/lib/queries";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import {
   Alert,
   AlertDescription,
@@ -57,7 +58,9 @@ export function ModerationSettingsForm({
       toast.success("Moderation settings updated successfully!");
     } catch (error: any) {
       console.error("Failed to update moderation settings:", error);
-      toast.error(error?.message || "Failed to update moderation settings");
+      toast.error(
+        getHttpErrorMessage(error, "Failed to update moderation settings"),
+      );
     } finally {
       setIsSubmitting(false);
     }

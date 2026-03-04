@@ -4,6 +4,7 @@ import { getRedisClient } from '../../lib/redis.js';
 import { BadRequestError, ConflictError } from '../../lib/errors.js';
 import crypto from 'crypto';
 import { SETTINGS_HMAC_SECRET } from '../../config/secrets.js';
+import { requireUserId } from '../../lib/auth.js';
 
 const SETTINGS_CHANGE_CHANNEL = 'settings:changes';
 
@@ -61,6 +62,7 @@ export const updateSettings = async (
   next: NextFunction
 ) => {
   try {
+    const adminId = requireUserId(req);
     const {
       emailQuotaLimit,
       ablyConnectionLimit,
@@ -86,7 +88,7 @@ export const updateSettings = async (
     if (autoModerationEnabled !== undefined && typeof autoModerationEnabled !== 'boolean') {
       throw new BadRequestError('autoModerationEnabled must be a boolean');
     }
-    
+
     const redis = getRedisClient();
     
     // Check version for optimistic locking
@@ -129,7 +131,7 @@ export const updateSettings = async (
         ...(autoModerationEnabled !== undefined && { autoModerationEnabled }),
       },
       timestamp: new Date().toISOString(),
-      updatedBy: (req as any).auth?.userId || 'unknown',
+      updatedBy: adminId,
     };
     
     // Generate HMAC signature

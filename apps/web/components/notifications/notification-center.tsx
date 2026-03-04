@@ -10,9 +10,10 @@ import { Button } from "@workspace/ui/components/button";
 import { useNotificationStore } from "@/store/notification-store";
 import { useMarkAllAsRead, useUnreadCount } from "@/lib/queries/notifications";
 import { NotificationList } from "./notification-list";
-import { useAbly } from "@/components/ably-provider";
+import { useAbly } from "@/components/notifications/ably-provider";
 import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 export function NotificationCenter() {
   const { isOpen, closeCenter } = useNotificationStore();
@@ -26,8 +27,8 @@ export function NotificationCenter() {
     try {
       await markAllAsRead.mutateAsync();
       toast.success("All notifications marked as read");
-    } catch (error) {
-      toast.error("Failed to mark all as read");
+    } catch (error: unknown) {
+      toast.error(getHttpErrorMessage(error, "Failed to mark all as read"));
     }
   };
 

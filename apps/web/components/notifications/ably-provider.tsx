@@ -4,6 +4,7 @@ import * as React from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getApiUrl } from "@/config/env";
 
 // import Ably from "ably"; // Dynamically imported
 
@@ -84,7 +85,7 @@ export function AblyProvider({ children }: { children: React.ReactNode }) {
           try {
             const token = await getToken();
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/ably/token`,
+              getApiUrl("/api/ably/token"),
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

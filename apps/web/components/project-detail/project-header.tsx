@@ -6,11 +6,8 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
+import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
+import { SasImage } from "@/components/forms/fields/sas-image";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +30,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import { EmbedDialog } from "./embed-dialog";
 import type { Project } from "@/types/api";
 
@@ -52,9 +50,14 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
     try {
       await onDelete();
       router.push("/projects");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to delete project:", error);
-      toast.error("Failed to delete project. Please try again.");
+      toast.error(
+        getHttpErrorMessage(
+          error,
+          "Failed to delete project. Please try again.",
+        ),
+      );
       setIsDeleting(false);
     }
   };
@@ -80,14 +83,18 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
         <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
             <Avatar className="rounded-lg w-12 h-12 sm:w-14 sm:h-14">
-              <AvatarImage
-                src={project.logoUrl!}
+              <SasImage
+                src={project.logoUrl}
                 alt={project.name}
-                className="object-cover"
+                className="w-full h-full object-cover rounded-lg"
+                skeletonClassName="w-12 h-12 sm:w-14 sm:h-14 rounded-lg"
+                showSkeleton
+                fallback={
+                  <AvatarFallback className="bg-transparent text-primary rounded-lg w-full h-full">
+                    <FolderIcon className="h-6 w-6 sm:h-7 sm:w-7" />
+                  </AvatarFallback>
+                }
               />
-              <AvatarFallback className="bg-transparent text-primary rounded-lg">
-                <FolderIcon className="h-6 w-6 sm:h-7 sm:w-7" />
-              </AvatarFallback>
             </Avatar>
           </div>
           <div className="min-w-0 flex-1">

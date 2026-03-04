@@ -4,9 +4,10 @@ import React from "react";
 import { Badge } from "@workspace/ui/components/badge";
 import { LinkIcon, CheckCircle2Icon } from "lucide-react";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import type { AccountConnectedExternal } from "./types";
 
 interface ConnectedAccountsSectionProps {
-  externalAccounts: any[];
+  externalAccounts: AccountConnectedExternal[];
 }
 
 export function ConnectedAccountsSection({

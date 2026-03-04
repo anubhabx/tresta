@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
-import type { ApiResponse } from "@/types/api";
 import type {
+  ApiSuccessResponse,
   Widget,
   WidgetConfig,
   WidgetLayout,
   WidgetTheme,
   CardStyle,
   AnimationType,
+  PublicWidgetData,
   CreateWidgetPayload,
   UpdateWidgetPayload,
 } from "@workspace/types";
@@ -22,36 +23,10 @@ export type {
   WidgetTheme,
   CardStyle,
   AnimationType,
+  PublicWidgetData,
   CreateWidgetPayload,
   UpdateWidgetPayload,
 };
-
-export interface PublicWidgetData {
-  widget: {
-    id: string;
-    config: WidgetConfig;
-  };
-  project: {
-    name: string;
-    slug: string;
-    logoUrl: string | null;
-    brandColorPrimary: string | null;
-    brandColorSecondary: string | null;
-  };
-  testimonials: Array<{
-    id: string;
-    authorName: string;
-    content: string;
-    rating: number | null;
-    videoUrl: string | null;
-    type: string;
-    createdAt: string;
-  }>;
-  meta: {
-    total: number;
-    fetchedAt: string;
-  };
-}
 
 // Query Keys Factory
 export const widgetKeys = {
@@ -76,7 +51,7 @@ export const useWidgetList = (projectSlug: string) => {
   return useQuery({
     queryKey: widgetKeys.list(projectSlug),
     queryFn: async () => {
-      const response = await api.get<ApiResponse<Widget[]>>(
+      const response = await api.get<ApiSuccessResponse<Widget[]>>(
         `/api/widgets/project/${projectSlug}`,
       );
       return response.data.data;
@@ -99,7 +74,7 @@ export const usePublicWidgetData = (widgetId: string) => {
   return useQuery({
     queryKey: widgetKeys.public(widgetId),
     queryFn: async () => {
-      const response = await api.get<ApiResponse<PublicWidgetData>>(
+      const response = await api.get<ApiSuccessResponse<PublicWidgetData>>(
         `/api/widgets/${widgetId}/public`,
       );
       return response.data.data;
@@ -128,7 +103,7 @@ export const useCreateWidget = () => {
 
   return useMutation({
     mutationFn: async (data: CreateWidgetPayload) => {
-      const response = await api.post<ApiResponse<Widget>>(
+      const response = await api.post<ApiSuccessResponse<Widget>>(
         "/api/widgets",
         data,
       );
@@ -152,7 +127,7 @@ export const useUpdateWidget = (widgetId: string) => {
 
   return useMutation({
     mutationFn: async (data: UpdateWidgetPayload) => {
-      const response = await api.put<ApiResponse<Widget>>(
+      const response = await api.put<ApiSuccessResponse<Widget>>(
         `/api/widgets/${widgetId}`,
         data,
       );
@@ -183,7 +158,7 @@ export const useDeleteWidget = (widgetId: string) => {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await api.delete<ApiResponse<void>>(
+      const response = await api.delete<ApiSuccessResponse<void>>(
         `/api/widgets/${widgetId}`,
       );
       return response.data;

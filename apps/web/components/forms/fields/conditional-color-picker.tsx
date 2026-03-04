@@ -25,9 +25,9 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { FREE_COLOR_PALETTE, type FreeColorPreset } from "@workspace/types";
 
-import { ColorPicker } from "@/components/color-picker";
+import { ColorPicker } from "@/components/forms/fields/color-picker";
 import { ProBadge } from "@/components/paywall";
-import { useUpgradeModal } from "@/components/billing/upgrade-modal";
+import { useUpgradeModal } from "@/store/upgrade-modal-store";
 
 // ============================================================================
 // TYPES

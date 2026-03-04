@@ -22,7 +22,7 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { CustomFormField } from "@/components/custom-form-field";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { ProjectFormData, generateSlug } from "@/lib/schemas/project-schema";
 
 import { IndustryPresetCards } from "../components/industry-preset-cards";

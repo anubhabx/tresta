@@ -5,13 +5,13 @@ import { Button } from "@workspace/ui/components/button";
 import { useApi } from "@/hooks/use-api";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
-import axios from "axios";
 import type {
   ApiSuccessResponse,
   CreateSubscriptionRequest,
   CreateSubscriptionResponseData,
   VerifyPaymentRequest,
 } from "@workspace/types";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 interface CheckoutButtonProps {
   planId: string;
@@ -49,18 +49,6 @@ type RazorpayInstance = {
 };
 
 type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
-
-const getErrorMessage = (error: unknown, fallback: string): string => {
-  if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message || error.message || fallback;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return fallback;
-};
 
 const loadRazorpayCallback = (): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -168,9 +156,7 @@ export const CheckoutButton = forwardRef<
       paymentObject.open();
     } catch (error: unknown) {
       console.error("Payment error:", error);
-      toast.error(
-        getErrorMessage(error, "Something went wrong initiating payment."),
-      );
+      toast.error(getHttpErrorMessage(error, "Something went wrong initiating payment."));
       setLoading(false);
     }
     // Note: We deliberately do NOT set loading(false) in a finally block here

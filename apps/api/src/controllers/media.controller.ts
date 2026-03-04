@@ -13,6 +13,24 @@ import {
 } from '../services/blob-storage.service.js';
 import { requireUserId } from '../lib/auth.js';
 
+function assertBlobOwnership(blobName: string, userId: string): void {
+  const blobParts = blobName.split("/");
+
+  if (blobParts.length >= 2) {
+    const blobUserId = blobParts[1];
+    if (blobUserId !== userId) {
+      throw new ForbiddenError(
+        "You do not have permission to access this file",
+        {
+          blobName,
+          userId,
+          blobUserId,
+        },
+      );
+    }
+  }
+}
+
 // Validation schema for upload URL request
 const generateUploadUrlSchema = z.object({
   filename: z.string().min(1, "Filename is required"),
@@ -99,6 +117,7 @@ const generateReadUrl = async (
 ) => {
   try {
     const { blobName } = req.body;
+    const userId = requireUserId(req);
 
     if (!blobName || typeof blobName !== "string") {
       throw new ValidationError("Blob name is required and must be a string", {
@@ -113,9 +132,12 @@ const generateReadUrl = async (
       });
     }
 
+    const decodedBlobName = decodeURIComponent(blobName);
+    assertBlobOwnership(decodedBlobName, userId);
+
     // Generate read URL with SAS token
     const readUrl = await blobStorageService.generateReadUrl(
-      blobName,
+      decodedBlobName,
       60, // URL valid for 60 minutes
     );
 
@@ -145,28 +167,7 @@ const deleteBlob = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const decodedBlobName = decodeURIComponent(blobName);
-
-    // Authorization check: verify user owns this blob
-    // Blob paths include userId: directory/userId/filename
-    // Example: logos/user_clx123abc/1234567890-uuid-logo.png
-    const blobParts = decodedBlobName.split("/");
-
-    // Check if blob path contains userId (should be second segment for user-specific files)
-    if (blobParts.length >= 2) {
-      const blobUserId = blobParts[1];
-
-      // If the blob has a userId in its path, verify it matches
-      if (blobUserId !== userId) {
-        throw new ForbiddenError(
-          "You do not have permission to delete this file",
-          {
-            blobName: decodedBlobName,
-            userId,
-            blobUserId
-          }
-        );
-      }
-    }
+    assertBlobOwnership(decodedBlobName, userId);
 
     await blobStorageService.deleteBlob(decodedBlobName);
 
@@ -187,6 +188,7 @@ const getBlobMetadata = async (
 ) => {
   try {
     const { blobName } = req.params;
+    const userId = requireUserId(req);
 
     if (!blobName || typeof blobName !== 'string') {
       throw new ValidationError("Blob name is required", {
@@ -195,9 +197,10 @@ const getBlobMetadata = async (
       });
     }
 
-    const metadata = await blobStorageService.getBlobMetadata(
-      decodeURIComponent(blobName),
-    );
+    const decodedBlobName = decodeURIComponent(blobName);
+    assertBlobOwnership(decodedBlobName, userId);
+
+    const metadata = await blobStorageService.getBlobMetadata(decodedBlobName);
 
     return ResponseHandler.success(res, {
       data: metadata,

@@ -28,7 +28,7 @@ import {
   PremiumWarningBanner,
   LockedToggle,
 } from "@/components/paywall/PaywallComponents";
-import { ConditionalColorPicker } from "@/components/conditional-color-picker";
+import { ConditionalColorPicker } from "@/components/forms/fields/conditional-color-picker";
 
 // Layout options with visual icons
 const layouts = [

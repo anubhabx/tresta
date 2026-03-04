@@ -41,9 +41,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
-import { AzureFileUpload } from "@/components/azure-file-upload";
+import { AzureFileUpload } from "@/components/forms/fields/azure-file-upload";
 import { UploadDirectory } from "@/hooks/use-azure-sas";
-import { ConditionalColorPicker } from "@/components/conditional-color-picker";
+import { ConditionalColorPicker } from "@/components/forms/fields/conditional-color-picker";
 import type { FormConfig, Project } from "@/types/api";
 
 // ============================================================================

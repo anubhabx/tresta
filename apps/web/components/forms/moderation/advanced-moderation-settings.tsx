@@ -1,7 +1,7 @@
 "use client";
 
 import { Control } from "react-hook-form";
-import { CustomFormField } from "@/components/custom-form-field";
+import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { ModerationSettingsFormData } from "@/lib/schemas/moderation-settings-schema";
 import { Info } from "lucide-react";
 import {

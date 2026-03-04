@@ -1,15 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import routePolicy from "@/config/route-policy.json";
 
-const PUBLIC_ROUTES = ["/", "/testimonial(.*)"];
-const PROTECTED_ROUTES = [
-  "/dashboard(.*)",
-  "/settings(.*)",
-  "/products(.*)",
-  "/projects(.*)",
-  "/account(.*)",
-];
-const AUTH_ROUTES = ["/sign-in(.*)", "/sign-up(.*)", "/sso-callback(.*)"];
+const PUBLIC_ROUTES = routePolicy.publicRoutes;
+const PROTECTED_ROUTES = routePolicy.protectedRoutes;
+const AUTH_ROUTES = routePolicy.authRoutes;
 
 const isPublicRoute = createRouteMatcher(PUBLIC_ROUTES);
 const isProtectedRoute = createRouteMatcher(PROTECTED_ROUTES);

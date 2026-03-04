@@ -3,7 +3,7 @@
  * Server component for the moderation queue route
  */
 
-import { TestimonialList } from "@/components/testimonial-list";
+import { TestimonialList } from "@/components/testimonials/testimonial-list";
 
 interface ModerationPageProps {
   params: Promise<{

@@ -9,13 +9,12 @@ import type { WidgetFormData } from "@/components/widgets/widget-form";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import { useState, useCallback, useEffect } from "react";
 import { DEFAULT_WIDGET_CONFIG } from "@workspace/types";
 import { useSubscription } from "@/hooks/use-subscription";
 
-const isTheme = (
-  theme: unknown,
-): theme is WidgetFormData["theme"] =>
+const isTheme = (theme: unknown): theme is WidgetFormData["theme"] =>
   theme === "light" || theme === "dark" || theme === "auto";
 
 interface WidgetBuilderProps {
@@ -134,9 +133,7 @@ export function WidgetBuilder({
         toast.success("Widget updated successfully!");
       }
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : `Failed to ${mode} widget`;
-      toast.error(message);
+      toast.error(getHttpErrorMessage(error, `Failed to ${mode} widget`));
     }
   };
 

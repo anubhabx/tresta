@@ -7,12 +7,12 @@ import {
   resolvePerformanceAlert,
 } from '../controllers/widget-analytics.controller.js';
 import { attachUser, requireAuth } from '../middleware/auth.middleware.js';
-import { createRateLimiter } from '../middleware/rate-limiter.js';
+import { createIpRateLimiter, createRateLimiter } from '../middleware/rate-limiter.js';
 
 const router: Router = Router();
 
 // Create rate limiters for different endpoints
-const publicTelemetryLimiter = createRateLimiter(1000, 60, 'telemetry'); // 1000 requests per minute
+const publicTelemetryLimiter = createIpRateLimiter(1000, 60, 'telemetry:ip'); // 1000 requests per minute per IP
 const analyticsLimiter = createRateLimiter(100, 60, 'analytics'); // 100 requests per minute
 
 // Public telemetry endpoint (no auth required)

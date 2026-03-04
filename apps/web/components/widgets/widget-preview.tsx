@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { WidgetFormData } from "./widget-form";
 import { Loader2 } from "lucide-react";
 import { DEFAULT_WIDGET_CONFIG, type WidgetConfig } from "@workspace/types";
+import { getPublicApiBaseUrl } from "@/config/env";
 
 const WIDGET_SCRIPT_PATH = "/widget/tresta-widget.js";
-const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const ENV_API_BASE_URL = getPublicApiBaseUrl();
 const PREVIEW_MAX_TESTIMONIALS = 6;
 
 const PREVIEW_FETCHED_AT = "2024-01-01T00:00:00.000Z";

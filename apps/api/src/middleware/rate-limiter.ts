@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { getAuth } from '@clerk/express';
 import { getRedisClient } from '../lib/redis.js';
+import { ResponseHandler } from '../lib/response.js';
 
 /**
  * Rate limiter instances
@@ -65,6 +66,20 @@ function getClientIp(req: Request): string {
   return req.ip || req.socket.remoteAddress || 'unknown';
 }
 
+function sendRateLimitError(
+  res: Response,
+  message: string,
+  retryAfterSeconds: number,
+): void {
+  ResponseHandler.error(
+    res,
+    429,
+    message,
+    'RATE_LIMIT_EXCEEDED',
+    { retryAfter: retryAfterSeconds },
+  );
+}
+
 /**
  * Express middleware for API rate limiting
  * 
@@ -110,15 +125,16 @@ export async function rateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many requests',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many requests',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       // Redis error - don't block the request
       console.error('Rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }
@@ -161,14 +177,15 @@ export async function publicRateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many requests from this IP',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many requests from this IP',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       console.error('Public rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }
@@ -216,15 +233,16 @@ export async function emailRateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many email requests',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many email requests',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       // Redis error - don't block the request
       console.error('Email rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }
@@ -281,14 +299,72 @@ export function createRateLimiter(
         );
         res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-        res.status(429).json({
-          success: false,
-          error: 'Too many requests',
-          retryAfter: Math.ceil(error.msBeforeNext / 1000),
-        });
+        sendRateLimitError(
+          res,
+          'Too many requests',
+          Math.ceil(error.msBeforeNext / 1000),
+        );
+        return;
       } else {
         console.error('Rate limiter error:', error);
-        next();
+        return next();
+      }
+    }
+  };
+}
+
+/**
+ * Create an IP-based custom rate limiter.
+ * Intended for public/unauthenticated endpoints.
+ */
+export function createIpRateLimiter(
+  points: number,
+  duration: number,
+  keyPrefix: string
+) {
+  const limiter = new RateLimiterRedis({
+    storeClient: getRedisClient(),
+    keyPrefix: `tresta:ratelimit:${keyPrefix}`,
+    points,
+    duration,
+  });
+
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const clientIp = getClientIp(req);
+    if (!clientIp) {
+      return next();
+    }
+
+    try {
+      const rateLimitRes = await limiter.consume(clientIp);
+
+      res.setHeader('X-RateLimit-Limit', points.toString());
+      res.setHeader('X-RateLimit-Remaining', rateLimitRes.remainingPoints.toString());
+      res.setHeader(
+        'X-RateLimit-Reset',
+        new Date(Date.now() + rateLimitRes.msBeforeNext).toISOString()
+      );
+
+      next();
+    } catch (error: any) {
+      if (error.remainingPoints !== undefined) {
+        res.setHeader('X-RateLimit-Limit', points.toString());
+        res.setHeader('X-RateLimit-Remaining', '0');
+        res.setHeader(
+          'X-RateLimit-Reset',
+          new Date(Date.now() + error.msBeforeNext).toISOString()
+        );
+        res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
+
+        sendRateLimitError(
+          res,
+          'Too many requests',
+          Math.ceil(error.msBeforeNext / 1000),
+        );
+        return;
+      } else {
+        console.error('IP rate limiter error:', error);
+        return next();
       }
     }
   };
@@ -332,14 +408,15 @@ export async function adminReadRateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many admin read requests',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many admin read requests',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       console.error('Admin read rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }
@@ -382,14 +459,15 @@ export async function adminWriteRateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many admin write requests',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many admin write requests',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       console.error('Admin write rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }
@@ -432,14 +510,15 @@ export async function adminHeavyRateLimitMiddleware(
       );
       res.setHeader('Retry-After', Math.ceil(error.msBeforeNext / 1000).toString());
 
-      res.status(429).json({
-        success: false,
-        error: 'Too many heavy admin operations. Please wait before retrying.',
-        retryAfter: Math.ceil(error.msBeforeNext / 1000),
-      });
+      sendRateLimitError(
+        res,
+        'Too many heavy admin operations. Please wait before retrying.',
+        Math.ceil(error.msBeforeNext / 1000),
+      );
+      return;
     } else {
       console.error('Admin heavy rate limiter error:', error);
-      next();
+      return next();
     }
   }
 }

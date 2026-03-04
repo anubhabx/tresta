@@ -5,7 +5,6 @@ import {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
-  ForbiddenError,
   ValidationError,
   handlePrismaError,
 } from "../lib/errors.js";
@@ -14,22 +13,16 @@ import {
   extractPaginationParams,
   calculateSkip,
 } from "../lib/response.js";
-import {
-  isValidHexColor,
-  isValidUrl,
-  isValidSlug,
-  isValidProjectType,
-  isValidVisibility,
-  validateSocialLinks,
-  validateTags,
-} from "../lib/validators.js";
 import type {
-  CreateProjectPayload,
-  UpdateProjectPayload,
   ProjectData,
 } from "../../types/api-responses.js";
-import { isFreeColor } from "@workspace/types";
 import { requireUserId } from "../lib/auth.js";
+import {
+  CreateProjectSchema,
+  UpdateProjectSchema,
+  zodErrorDetails,
+} from "../validators/schemas.js";
+import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
 
 /**
  * Helper to serialize Prisma Project to ProjectData
@@ -48,6 +41,13 @@ const createProject = async (
   next: NextFunction,
 ) => {
   try {
+    const parsedBody = CreateProjectSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      throw new ValidationError("Validation failed", {
+        issues: zodErrorDetails(parsedBody.error),
+      });
+    }
+
     const {
       name,
       shortDescription,
@@ -63,137 +63,14 @@ const createProject = async (
       tags,
       visibility,
       formConfig,
-    } = req.body as CreateProjectPayload;
+    } = parsedBody.data;
     const id = requireUserId(req);
 
-    // Required field validations
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      throw new ValidationError(
-        "Project name is required and must be a non-empty string",
-        {
-          field: "name",
-          received: typeof name,
-        },
-      );
-    }
-
-    if (name.length > 255) {
-      throw new ValidationError(
-        "Project name must be less than 255 characters",
-        {
-          field: "name",
-          maxLength: 255,
-          received: name.length,
-        },
-      );
-    }
-
-    if (!slug || typeof slug !== "string" || slug.trim().length === 0) {
-      throw new ValidationError(
-        "Project slug is required and must be a non-empty string",
-        {
-          field: "slug",
-          received: typeof slug,
-        },
-      );
-    }
-
-    if (!isValidSlug(slug)) {
-      throw new ValidationError(
-        "Slug can only contain lowercase letters, numbers, and hyphens",
-        {
-          field: "slug",
-          pattern: "^[a-z0-9-]+$",
-          received: slug,
-        },
-      );
-    }
-
-    if (slug.length > 255) {
-      throw new ValidationError("Slug must be less than 255 characters", {
-        field: "slug",
-        maxLength: 255,
-        received: slug.length,
-      });
-    }
-
-    // Optional field validations
-    if (shortDescription && shortDescription.length > 500) {
-      throw new BadRequestError(
-        "Short description must be less than 500 characters",
-      );
-    }
-
-    if (description && description.length > 10000) {
-      throw new BadRequestError(
-        "Description must be less than 10,000 characters",
-      );
-    }
-
-    if (logoUrl && !isValidUrl(logoUrl)) {
-      throw new BadRequestError("Invalid logo URL format");
-    }
-
-    if (projectType && !isValidProjectType(projectType)) {
-      throw new BadRequestError("Invalid project type");
-    }
-
-    if (websiteUrl && !isValidUrl(websiteUrl)) {
-      throw new BadRequestError("Invalid website URL format");
-    }
-
-    if (collectionFormUrl && !isValidUrl(collectionFormUrl)) {
-      throw new BadRequestError("Invalid collection form URL format");
-    }
-
-    if (brandColorPrimary && !isValidHexColor(brandColorPrimary)) {
-      throw new BadRequestError(
-        "Invalid primary brand color. Use hex format (e.g., #FF5733)",
-      );
-    }
-
-    if (brandColorSecondary && !isValidHexColor(brandColorSecondary)) {
-      throw new BadRequestError(
-        "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
-      );
-    }
-
-    // Plan-gate custom brand colors: free users can only use palette colors
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: { plan: true },
-    });
-
-    if (user?.plan === "FREE") {
-      if (brandColorPrimary && !isFreeColor(brandColorPrimary)) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-      if (brandColorSecondary && !isFreeColor(brandColorSecondary)) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-    }
-
-    if (socialLinks) {
-      const { valid, errors } = validateSocialLinks(socialLinks);
-      if (!valid) {
-        throw new BadRequestError(`Invalid social links: ${errors.join(", ")}`);
-      }
-    }
-
-    if (tags) {
-      const { valid, errors } = validateTags(tags);
-      if (!valid) {
-        throw new BadRequestError(`Invalid tags: ${errors.join(", ")}`);
-      }
-    }
-
-    if (visibility && !isValidVisibility(visibility)) {
-      throw new BadRequestError("Invalid visibility option");
-    }
+    await assertCanUseCustomColors(
+      id,
+      { primaryColor: brandColorPrimary, secondaryColor: brandColorSecondary },
+      "brand",
+    );
 
     // Check for existing project with same slug
     let existingProject;
@@ -448,7 +325,13 @@ const updateProject = async (
 ) => {
   try {
     const { slug } = req.params;
-    const payload = req.body as UpdateProjectPayload;
+    const parsedBody = UpdateProjectSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      throw new ValidationError("Validation failed", {
+        issues: zodErrorDetails(parsedBody.error),
+      });
+    }
+    const payload = parsedBody.data;
     const userId = requireUserId(req);
 
     if (!slug || typeof slug !== "string") {
@@ -458,36 +341,14 @@ const updateProject = async (
       });
     }
 
-    // Check user plan implementation
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true }, // Assuming 'plan' field stores 'FREE' or 'PRO' or we check subscription
-    });
-    // In our schema User.plan is an Enum "FREE" | "PRO"
-
-    // Check if trying to update brand colors — free users can only use palette colors
-    if (
-      (payload.brandColorPrimary !== undefined ||
-        payload.brandColorSecondary !== undefined) &&
-      user?.plan === "FREE"
-    ) {
-      if (
-        payload.brandColorPrimary &&
-        !isFreeColor(payload.brandColorPrimary)
-      ) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-      if (
-        payload.brandColorSecondary &&
-        !isFreeColor(payload.brandColorSecondary)
-      ) {
-        throw new ForbiddenError(
-          "Custom brand colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
-    }
+    await assertCanUseCustomColors(
+      userId,
+      {
+        primaryColor: payload.brandColorPrimary,
+        secondaryColor: payload.brandColorSecondary,
+      },
+      "brand",
+    );
 
     // Check if project exists and belongs to user
     let existingProject;
@@ -508,31 +369,7 @@ const updateProject = async (
       });
     }
 
-    // Validate optional fields if provided
-    if (payload.name !== undefined) {
-      if (!payload.name || payload.name.trim().length === 0) {
-        throw new BadRequestError("Project name cannot be empty");
-      }
-      if (payload.name.length > 255) {
-        throw new BadRequestError(
-          "Project name must be less than 255 characters",
-        );
-      }
-    }
-
     if (payload.slug !== undefined) {
-      if (!payload.slug || payload.slug.trim().length === 0) {
-        throw new BadRequestError("Slug cannot be empty");
-      }
-      if (!isValidSlug(payload.slug)) {
-        throw new BadRequestError(
-          "Slug can only contain lowercase letters, numbers, and hyphens",
-        );
-      }
-      if (payload.slug.length > 255) {
-        throw new BadRequestError("Slug must be less than 255 characters");
-      }
-
       // Check if new slug already exists (and it's not the current project)
       let slugExists;
       try {
@@ -552,169 +389,6 @@ const updateProject = async (
           value: payload.slug,
           suggestion: "Please choose a different slug",
         });
-      }
-    }
-
-    if (
-      payload.shortDescription !== undefined &&
-      payload.shortDescription &&
-      payload.shortDescription.length > 500
-    ) {
-      throw new BadRequestError(
-        "Short description must be less than 500 characters",
-      );
-    }
-
-    if (
-      payload.description !== undefined &&
-      payload.description &&
-      payload.description.length > 10000
-    ) {
-      throw new BadRequestError(
-        "Description must be less than 10,000 characters",
-      );
-    }
-
-    if (
-      payload.logoUrl !== undefined &&
-      payload.logoUrl &&
-      !isValidUrl(payload.logoUrl)
-    ) {
-      throw new BadRequestError("Invalid logo URL format");
-    }
-
-    if (
-      payload.projectType !== undefined &&
-      payload.projectType &&
-      !isValidProjectType(payload.projectType)
-    ) {
-      throw new BadRequestError("Invalid project type");
-    }
-
-    if (
-      payload.websiteUrl !== undefined &&
-      payload.websiteUrl &&
-      !isValidUrl(payload.websiteUrl)
-    ) {
-      throw new BadRequestError("Invalid website URL format");
-    }
-
-    if (
-      payload.collectionFormUrl !== undefined &&
-      payload.collectionFormUrl &&
-      !isValidUrl(payload.collectionFormUrl)
-    ) {
-      throw new BadRequestError("Invalid collection form URL format");
-    }
-
-    if (
-      payload.brandColorPrimary !== undefined &&
-      payload.brandColorPrimary &&
-      !isValidHexColor(payload.brandColorPrimary)
-    ) {
-      throw new BadRequestError(
-        "Invalid primary brand color. Use hex format (e.g., #FF5733)",
-      );
-    }
-
-    if (
-      payload.brandColorSecondary !== undefined &&
-      payload.brandColorSecondary &&
-      !isValidHexColor(payload.brandColorSecondary)
-    ) {
-      throw new BadRequestError(
-        "Invalid secondary brand color. Use hex format (e.g., #FF5733)",
-      );
-    }
-
-    if (payload.socialLinks !== undefined) {
-      const { valid, errors } = validateSocialLinks(payload.socialLinks);
-      if (!valid) {
-        throw new BadRequestError(`Invalid social links: ${errors.join(", ")}`);
-      }
-    }
-
-    if (payload.tags !== undefined) {
-      const { valid, errors } = validateTags(payload.tags);
-      if (!valid) {
-        throw new BadRequestError(`Invalid tags: ${errors.join(", ")}`);
-      }
-    }
-
-    if (
-      payload.visibility !== undefined &&
-      !isValidVisibility(payload.visibility)
-    ) {
-      throw new BadRequestError("Invalid visibility option");
-    }
-
-    // Validate moderation settings if provided
-    if (payload.profanityFilterLevel !== undefined) {
-      const validLevels = ["STRICT", "MODERATE", "LENIENT"];
-      if (!validLevels.includes(payload.profanityFilterLevel)) {
-        throw new BadRequestError(
-          "Invalid profanity filter level. Must be STRICT, MODERATE, or LENIENT",
-        );
-      }
-    }
-
-    if (
-      payload.moderationSettings !== undefined &&
-      payload.moderationSettings
-    ) {
-      const settings = payload.moderationSettings;
-
-      if (settings.minContentLength !== undefined) {
-        if (
-          typeof settings.minContentLength !== "number" ||
-          settings.minContentLength < 0 ||
-          settings.minContentLength > 1000
-        ) {
-          throw new BadRequestError(
-            "Minimum content length must be between 0 and 1000",
-          );
-        }
-      }
-
-      if (settings.maxUrlCount !== undefined) {
-        if (
-          typeof settings.maxUrlCount !== "number" ||
-          settings.maxUrlCount < 0 ||
-          settings.maxUrlCount > 10
-        ) {
-          throw new BadRequestError(
-            "Maximum URL count must be between 0 and 10",
-          );
-        }
-      }
-
-      // Validate domain arrays
-      if (
-        settings.allowedDomains !== undefined &&
-        !Array.isArray(settings.allowedDomains)
-      ) {
-        throw new BadRequestError("Allowed domains must be an array");
-      }
-
-      if (
-        settings.blockedDomains !== undefined &&
-        !Array.isArray(settings.blockedDomains)
-      ) {
-        throw new BadRequestError("Blocked domains must be an array");
-      }
-
-      if (
-        settings.customProfanityList !== undefined &&
-        !Array.isArray(settings.customProfanityList)
-      ) {
-        throw new BadRequestError("Custom profanity list must be an array");
-      }
-
-      if (
-        settings.brandKeywords !== undefined &&
-        !Array.isArray(settings.brandKeywords)
-      ) {
-        throw new BadRequestError("Brand keywords must be an array");
       }
     }
 

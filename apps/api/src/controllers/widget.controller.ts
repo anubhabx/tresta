@@ -15,12 +15,14 @@ import { ResponseHandler } from "../lib/response.js";
 import {
   DEFAULT_WIDGET_CONFIG,
   WIDGET_CONFIG_FIELDS,
-  isFreeColor,
   type WidgetConfig,
 } from "@workspace/types";
 import { validateWidgetConfig } from "../validators/widget.validator.js";
 import type { WidgetData } from "../../types/api-responses.js";
 import { validateApiKey } from "../services/api-key.service.js";
+import { WIDGET_LIMITS } from "../config/constants.js";
+import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
+import { requireUserId } from "../lib/auth.js";
 
 const escapeHtmlAttribute = (value: string): string =>
   value
@@ -36,6 +38,7 @@ const createWidget = async (
 ) => {
   try {
     const { projectId, config } = req.body;
+    const userId = requireUserId(req);
 
     // Validate required fields
     if (!projectId || typeof projectId !== "string") {
@@ -86,19 +89,15 @@ const createWidget = async (
       });
     }
 
-    // Plan-gate custom accent colors: free users can only use palette colors
-    if (validatedConfig.primaryColor) {
-      const projectOwner = await prisma.user.findUnique({
-        where: { id: project.userId },
-        select: { plan: true },
-      });
-
-      if (projectOwner?.plan === 'FREE' && !isFreeColor(validatedConfig.primaryColor)) {
-        throw new ForbiddenError(
-          "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-        );
-      }
+    if (project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to create widgets for this project");
     }
+
+    await assertCanUseCustomColors(
+      project.userId,
+      { primaryColor: validatedConfig.primaryColor },
+      'accent',
+    );
 
     // Create the widget with validated config
     const normalizedConfig = normalizeWidgetConfig(validatedConfig);
@@ -127,10 +126,11 @@ const createWidget = async (
 const listWidgets = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { slug } = req.params;
+    const userId = requireUserId(req);
 
     // Find project by slug
-    const project = await prisma.project.findUnique({
-      where: { slug },
+    const project = await prisma.project.findFirst({
+      where: { slug, userId },
     });
 
     if (!project) {
@@ -159,6 +159,7 @@ const updateWidget = async (
   try {
     const { widgetId } = req.params;
     const { config } = req.body;
+    const userId = requireUserId(req);
 
     // Validate widget ID
     if (!widgetId) {
@@ -168,31 +169,27 @@ const updateWidget = async (
     // Find the existing widget
     const existingWidget = await prisma.widget.findUnique({
       where: { id: widgetId },
+      include: {
+        Project: {
+          select: { userId: true },
+        },
+      },
     });
 
     if (!existingWidget) {
       throw new NotFoundError("Widget not found");
     }
 
-    // Plan-gate custom accent colors: free users can only use palette colors
+    if (!existingWidget.Project || existingWidget.Project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to update this widget");
+    }
+
     if (config?.primaryColor && existingWidget.projectId) {
-      const widgetProject = await prisma.project.findUnique({
-        where: { id: existingWidget.projectId },
-        select: { userId: true },
-      });
-
-      if (widgetProject) {
-        const projectOwner = await prisma.user.findUnique({
-          where: { id: widgetProject.userId },
-          select: { plan: true },
-        });
-
-        if (projectOwner?.plan === 'FREE' && !isFreeColor(config.primaryColor)) {
-          throw new ForbiddenError(
-            "Custom accent colors are available only for Pro plans. Please choose from the preset palette or upgrade.",
-          );
-        }
-      }
+      await assertCanUseCustomColors(
+        existingWidget.Project.userId,
+        { primaryColor: config.primaryColor },
+        'accent',
+      );
     }
 
     // Validate the config if provided
@@ -244,6 +241,7 @@ const deleteWidget = async (
 ) => {
   try {
     const { widgetId } = req.params;
+    const userId = requireUserId(req);
 
     // Validate widget ID
     if (!widgetId || typeof widgetId !== "string") {
@@ -258,6 +256,11 @@ const deleteWidget = async (
     try {
       existingWidget = await prisma.widget.findUnique({
         where: { id: widgetId },
+        include: {
+          Project: {
+            select: { userId: true },
+          },
+        },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -268,6 +271,10 @@ const deleteWidget = async (
         widgetId,
         suggestion: "The widget may have already been deleted",
       });
+    }
+
+    if (!existingWidget.Project || existingWidget.Project.userId !== userId) {
+      throw new ForbiddenError("You do not have permission to delete this widget");
     }
 
     // Delete the widget
@@ -530,10 +537,6 @@ export {
   renderWidgetPage,
 };
 
-const MAX_MVP_TESTIMONIALS = 20;
-const MIN_ROTATE_INTERVAL = 2000;
-const MAX_ROTATE_INTERVAL = 10000;
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -547,13 +550,13 @@ function mergeWithWidgetDefaults(config?: WidgetConfig | null): WidgetConfig {
   merged.maxTestimonials = clamp(
     merged.maxTestimonials ?? DEFAULT_WIDGET_CONFIG.maxTestimonials,
     1,
-    MAX_MVP_TESTIMONIALS,
+    WIDGET_LIMITS.maxMvpTestimonials,
   );
 
   merged.rotateInterval = clamp(
     merged.rotateInterval ?? DEFAULT_WIDGET_CONFIG.rotateInterval,
-    MIN_ROTATE_INTERVAL,
-    MAX_ROTATE_INTERVAL,
+    WIDGET_LIMITS.minRotateIntervalMs,
+    WIDGET_LIMITS.maxRotateIntervalMs,
   );
 
   if (merged.layout !== "carousel") {

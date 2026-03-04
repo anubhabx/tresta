@@ -8,9 +8,11 @@ import { Input } from "@workspace/ui/components/input";
 import { toast } from "sonner";
 import { InlineLoader } from "../loader";
 import { KeyIcon, ShieldCheckIcon } from "lucide-react";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import type { AccountUser } from "./types";
 
 interface PasswordSectionProps {
-  user: any;
+  user: AccountUser;
   hasPassword: boolean;
 }
 
@@ -41,7 +43,7 @@ export function PasswordSection({ user, hasPassword }: PasswordSectionProps) {
     try {
       setLoading(true);
 
-      await user.updatePassword({
+      await user.updatePassword?.({
         currentPassword,
         newPassword,
       });
@@ -50,9 +52,9 @@ export function PasswordSection({ user, hasPassword }: PasswordSectionProps) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password update error:", error);
-      toast.error(error?.errors?.[0]?.message || "Failed to update password");
+      toast.error(getHttpErrorMessage(error, "Failed to update password"));
     } finally {
       setLoading(false);
     }

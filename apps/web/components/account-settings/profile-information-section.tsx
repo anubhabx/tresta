@@ -8,9 +8,11 @@ import { Input } from "@workspace/ui/components/input";
 import { toast } from "sonner";
 import { InlineLoader } from "../loader";
 import { UserIcon, MailIcon } from "lucide-react";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import type { AccountUser } from "./types";
 
 interface ProfileInformationSectionProps {
-  user: any;
+  user: AccountUser;
   onUpdate?: () => void;
 }
 
@@ -28,16 +30,16 @@ export function ProfileInformationSection({
     try {
       setLoading(true);
 
-      await user.update({
+      await user.update?.({
         firstName: firstName || undefined,
         lastName: lastName || undefined,
       });
 
       toast.success("Profile updated successfully!");
       onUpdate?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Profile update error:", error);
-      toast.error(error?.errors?.[0]?.message || "Failed to update profile");
+      toast.error(getHttpErrorMessage(error, "Failed to update profile"));
     } finally {
       setLoading(false);
     }
