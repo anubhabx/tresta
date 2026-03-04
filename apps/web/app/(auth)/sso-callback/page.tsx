@@ -63,8 +63,8 @@ export default function SSOCallbackPage() {
       {/* Clerk does the actual work — renders nothing visually */}
       <div className="hidden">
         <AuthenticateWithRedirectCallback
-          afterSignInUrl="/dashboard"
-          afterSignUpUrl="/dashboard"
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
         />
       </div>
     </div>

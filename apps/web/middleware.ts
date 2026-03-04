@@ -11,6 +11,24 @@ const isProtectedRoute = createRouteMatcher(PROTECTED_ROUTES);
 const isAuthRoute = createRouteMatcher(AUTH_ROUTES);
 
 export default clerkMiddleware(async (auth, req) => {
+  const { nextUrl } = req;
+
+  if (nextUrl.pathname.startsWith("/sso-callback")) {
+    const hasOAuthCallbackParams =
+      nextUrl.searchParams.has("code") ||
+      nextUrl.searchParams.has("state") ||
+      nextUrl.searchParams.has("__clerk_ticket") ||
+      nextUrl.searchParams.has("__clerk_status") ||
+      nextUrl.searchParams.has("rotating_token_nonce") ||
+      nextUrl.searchParams.has("saml_response");
+
+    if (!hasOAuthCallbackParams && !(await auth()).isAuthenticated) {
+      const signInUrl = new URL("/sign-in", req.url);
+      signInUrl.searchParams.set("redirect_url", "/dashboard");
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
