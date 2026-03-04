@@ -7,27 +7,18 @@ type OAuthProvider = "google" | "github";
 
 interface OAuthButtonsProps {
   onOAuthClick: (provider: OAuthProvider) => void;
-  layout?: "horizontal" | "vertical";
   disabled?: boolean;
 }
 
 export function OAuthButtons({
   onOAuthClick,
-  layout = "horizontal",
   disabled = false,
 }: OAuthButtonsProps) {
-  const containerClass =
-    layout === "horizontal"
-      ? "flex gap-2 items-center justify-center"
-      : "flex flex-col gap-2 items-center justify-center";
-
-  const buttonClass = layout === "horizontal" ? "flex-1 px-2" : "w-full";
-
   return (
-    <div className={containerClass}>
+    <div className="flex flex-col gap-2 items-center justify-center md:flex-row">
       <Button
         variant="secondary"
-        className={buttonClass}
+        className="flex-1 px-2 w-full"
         onClick={() => onOAuthClick("google")}
         disabled={disabled}
         type="button"
@@ -37,7 +28,7 @@ export function OAuthButtons({
       </Button>
       <Button
         variant="secondary"
-        className={buttonClass}
+        className="flex-1 px-2 w-full"
         onClick={() => onOAuthClick("github")}
         disabled={disabled}
         type="button"

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
-import { Spotlight } from "@/components/landing/ui/spotlight";
 
 const FEATURES = [
   "Collect testimonials with a custom-branded form",
@@ -14,42 +13,29 @@ const FEATURES = [
 export function AuthBrandPanel() {
   return (
     <div className="relative hidden lg:flex flex-col h-full bg-background overflow-hidden">
-      {/* Spotlight sweep */}
-      <Spotlight
-        gradientFirst="radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.05) 50%, transparent 80%)"
-        gradientSecond="radial-gradient(50% 50% at 50% 50%, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.02) 80%, transparent 100%)"
-        gradientThird="radial-gradient(50% 50% at 50% 50%, hsl(var(--primary) / 0.06) 0%, hsl(var(--primary) / 0.02) 80%, transparent 100%)"
-        translateY={-200}
-        width={480}
-        height={900}
-        smallWidth={180}
-        duration={9}
-        xOffset={60}
-      />
-
-      {/* Right-edge gradient fade into the form panel */}
+      {/* Subtle radial glow — rgba avoids the hex-var hsl() parsing issue */}
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-24 z-10"
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
         style={{
           background:
-            "linear-gradient(to right, transparent, hsl(var(--background)))",
+            "radial-gradient(ellipse 80% 60% at 5% 10%, rgba(59,130,246,0.22) 0%, transparent 65%)," +
+            "radial-gradient(ellipse 55% 45% at 90% 85%, rgba(59,130,246,0.10) 0%, transparent 60%)",
         }}
-        aria-hidden="true"
       />
 
-      {/* Grid dot overlay */}
+      {/* Right-edge fade into form panel */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, hsl(var(--foreground)) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
+        className="pointer-events-none absolute inset-y-0 right-0 w-20"
         aria-hidden="true"
+        style={{
+          background:
+            "linear-gradient(to right, transparent, var(--background))",
+        }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col h-full px-10 py-10">
+      <div className="relative flex flex-col h-full px-10 py-10">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
           <Image
@@ -64,7 +50,7 @@ export function AuthBrandPanel() {
           </span>
         </div>
 
-        {/* Hero text — vertically centered */}
+        {/* Hero text — vertically centred */}
         <div className="my-auto max-w-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary mb-4">
             Testimonial collection, simplified
@@ -78,7 +64,6 @@ export function AuthBrandPanel() {
             required.
           </p>
 
-          {/* Feature list */}
           <ul className="space-y-3.5">
             {FEATURES.map((feature) => (
               <li key={feature} className="flex items-start gap-3">
@@ -91,7 +76,7 @@ export function AuthBrandPanel() {
           </ul>
         </div>
 
-        {/* Footer trust line */}
+        {/* Trust footnote */}
         <p className="text-xs text-muted-foreground/60">
           Free forever · No credit card · Cancel anytime
         </p>
