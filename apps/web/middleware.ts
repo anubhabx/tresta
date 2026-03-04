@@ -24,7 +24,26 @@ export default clerkMiddleware(async (auth, req) => {
 
     if (!hasOAuthCallbackParams && !(await auth()).isAuthenticated) {
       const signInUrl = new URL("/sign-in", req.url);
-      signInUrl.searchParams.set("redirect_url", "/dashboard");
+
+      const requestedRedirect = nextUrl.searchParams.get("redirect_url");
+      let safeRedirect = "/dashboard";
+
+      if (requestedRedirect) {
+        if (requestedRedirect.startsWith("/")) {
+          safeRedirect = requestedRedirect;
+        } else {
+          try {
+            const parsed = new URL(requestedRedirect);
+            if (parsed.origin === nextUrl.origin) {
+              safeRedirect = `${parsed.pathname}${parsed.search}${parsed.hash}`;
+            }
+          } catch {
+            safeRedirect = "/dashboard";
+          }
+        }
+      }
+
+      signInUrl.searchParams.set("redirect_url", safeRedirect);
       return NextResponse.redirect(signInUrl);
     }
   }
