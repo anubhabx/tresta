@@ -7,12 +7,12 @@ type Props = {
 
 const AuthLayout = ({ children }: Props) => {
   return (
-    <div className="h-screen w-full grid lg:grid-cols-[45%_55%] bg-background overflow-hidden">
-      {/* Left: Brand panel — hidden on mobile */}
+    <div className="min-h-screen w-full lg:h-screen lg:grid lg:grid-cols-[45%_55%] bg-background">
+      {/* Left: Brand panel — desktop only */}
       <AuthBrandPanel />
 
-      {/* Right: Form panel */}
-      <div className="flex items-center justify-center px-6 py-10 lg:px-16 bg-background">
+      {/* Right: Form panel — full page on mobile, scrollable column on desktop */}
+      <div className="flex items-center justify-center px-5 py-12 sm:px-8 lg:px-16 lg:overflow-y-auto">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>
