@@ -2,23 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useSignIn } from "@clerk/nextjs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Form } from "@workspace/ui/components/form";
 import { Button } from "@workspace/ui/components/button";
-import { Separator } from "@workspace/ui/components/separator";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import Link from "next/link";
+import Image from "next/image";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { InlineLoader } from "../loader";
@@ -48,7 +40,7 @@ const SignInForm = () => {
     }
   }, [resendCooldown]);
 
-  const SignInForm = useForm<z.infer<typeof SignInFormSchema>>({
+  const form = useForm<z.infer<typeof SignInFormSchema>>({
     resolver: zodResolver(SignInFormSchema),
     defaultValues: {
       email: "",
@@ -62,13 +54,13 @@ const SignInForm = () => {
       return;
     }
 
-    if (SignInForm.formState.errors.email) {
-      toast.error(SignInForm.formState.errors.email.message);
+    if (form.formState.errors.email) {
+      toast.error(form.formState.errors.email.message);
       return;
     }
 
-    if (SignInForm.formState.errors.password) {
-      toast.error(SignInForm.formState.errors.password.message);
+    if (form.formState.errors.password) {
+      toast.error(form.formState.errors.password.message);
       return;
     }
 
@@ -84,6 +76,7 @@ const SignInForm = () => {
         return;
       }
 
+      await setActive?.({ session: completeSignIn.createdSessionId });
       toast.success("Signed in successfully!");
       router.push(redirectUrl || "/dashboard");
     } catch (error) {
@@ -98,7 +91,7 @@ const SignInForm = () => {
     }
   };
 
-  const onOAuthSignUp = (provider: "google" | "github") => {
+  const onOAuthSignIn = (provider: "google" | "github") => {
     const finalRedirect = redirectUrl || "/dashboard";
     void signIn?.authenticateWithRedirect({
       strategy: `oauth_${provider}`,
@@ -108,71 +101,95 @@ const SignInForm = () => {
   };
 
   return (
-    <Card className="min-w-[350px] text-center">
-      <CardHeader>
-        <CardTitle className="text-lg">Create Account</CardTitle>
-        <CardDescription>Sign up to get stared with Tresta</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <OAuthButtons onOAuthClick={onOAuthSignUp} />
+    <div className="w-full">
+      {/* Mobile-only logo */}
+      <div className="flex items-center gap-2.5 mb-8 lg:hidden">
+        <Image
+          src="/branding/tresta.svg"
+          alt="Tresta"
+          width={24}
+          height={24}
+          className="shrink-0"
+        />
+        <span className="text-base font-semibold tracking-tight">Tresta</span>
+      </div>
 
-        <div className="flex gap-2 items-center my-4">
-          <hr className="flex-1 border-border" />
-          <span className="text-sm text-muted-foreground">OR</span>
-          <hr className="flex-1 border-border" />
-        </div>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Welcome back
+        </h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Sign in to your Tresta dashboard.
+        </p>
+      </div>
 
-        <Form {...SignInForm}>
-          <form
-            className="space-y-4 text-justify"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void SignInForm.handleSubmit(onSubmitSignIn)(e);
-            }}
-          >
-            <CustomFormField
-              type="email"
-              control={SignInForm.control}
-              name="email"
-              label="Email"
-              placeholder="Enter your email"
-              required
-            />
+      {/* OAuth */}
+      <OAuthButtons onOAuthClick={onOAuthSignIn} />
 
-            <CustomFormField
-              type="password"
-              control={SignInForm.control}
-              name="password"
-              label="Password"
-              placeholder="Enter your password"
-              required
-            />
-            <Button className="w-full" type="submit" disabled={loading}>
-              {loading && <InlineLoader className="mr-2 h-4 w-4" />}
-              Continue
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
+      {/* Divider */}
+      <div className="flex gap-3 items-center my-6">
+        <hr className="flex-1 border-border" />
+        <span className="text-xs text-muted-foreground">
+          or continue with email
+        </span>
+        <hr className="flex-1 border-border" />
+      </div>
 
-      <Separator />
+      {/* Email / password form */}
+      <Form {...form}>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void form.handleSubmit(onSubmitSignIn)(e);
+          }}
+        >
+          <CustomFormField
+            type="email"
+            control={form.control}
+            name="email"
+            label="Email"
+            placeholder="you@example.com"
+            required
+          />
 
-      <CardFooter className="text-sm w-full justify-between">
-        <div className="text-primary hover:underline hover:underline-offset-4 cursor-pointer">
+          <CustomFormField
+            type="password"
+            control={form.control}
+            name="password"
+            label="Password"
+            placeholder="Enter your password"
+            required
+          />
+
+          <Button className="w-full" type="submit" disabled={loading}>
+            {loading && <InlineLoader className="mr-2 h-4 w-4" />}
+            Continue
+          </Button>
+        </form>
+      </Form>
+
+      {/* Footer */}
+      <div className="mt-6 flex items-center justify-between text-sm">
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
           Forgot password?
-        </div>
+        </button>
 
-        <div>
-          Don&apos;t have an account?
+        <span className="text-muted-foreground">
+          No account?{" "}
           <Link
             href="/sign-up"
-            className="text-primary ml-1 hover:underline hover:underline-offset-4"
+            className="text-primary font-medium hover:underline underline-offset-4"
           >
-            Sign Up
+            Sign up
           </Link>
-        </div>
-      </CardFooter>
-    </Card>
+        </span>
+      </div>
+    </div>
   );
 };
 
