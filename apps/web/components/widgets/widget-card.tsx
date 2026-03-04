@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Widget } from "@/lib/queries/widgets";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 
 interface WidgetCardProps {
   widget: Widget;
@@ -60,9 +61,7 @@ export function WidgetCard({
       await onDelete(widget.id);
       toast.success("Widget deleted successfully");
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Failed to delete widget";
-      toast.error(message);
+      toast.error(getHttpErrorMessage(error, "Failed to delete widget"));
       setIsDeleting(false);
     }
   };

@@ -27,6 +27,7 @@ import {
   convertFormConfigToForm,
 } from "@/lib/schemas/form-config-schema";
 import { projects } from "@/lib/queries";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import {
   Alert,
   AlertDescription,
@@ -54,7 +55,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
       toast.success("Collection form settings updated successfully!");
     } catch (error: any) {
       console.error("Failed to update form config:", error);
-      toast.error(error?.message || "Failed to update form settings");
+      toast.error(getHttpErrorMessage(error, "Failed to update form settings"));
     } finally {
       setIsSubmitting(false);
     }
@@ -392,7 +393,9 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Require Company</FormLabel>
+                      <FormLabel className="text-base">
+                        Require Company
+                      </FormLabel>
                       <FormDescription>
                         Customers must provide their company name
                       </FormDescription>
@@ -462,7 +465,9 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
 
           {/* Submission Behavior Section */}
           <div>
-            <h3 className="text-base font-semibold mb-1">Submission Behavior</h3>
+            <h3 className="text-base font-semibold mb-1">
+              Submission Behavior
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
               Control how users can submit testimonials.
             </p>
@@ -524,7 +529,8 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                         Allow Fingerprint Opt-Out
                       </FormLabel>
                       <FormDescription>
-                        Show reviewers a checkbox to opt out of IP/device logging
+                        Show reviewers a checkbox to opt out of IP/device
+                        logging
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -558,7 +564,8 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                         Notify on New Submission
                       </FormLabel>
                       <FormDescription>
-                        Send project owner notifications when a testimonial is submitted
+                        Send project owner notifications when a testimonial is
+                        submitted
                       </FormDescription>
                     </div>
                     <FormControl>

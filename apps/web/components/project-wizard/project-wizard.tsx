@@ -35,6 +35,7 @@ import { AdvancedSection } from "./sections/advanced-section";
 import { useApi } from "@/hooks/use-api";
 import { useSubscription } from "@/hooks/use-subscription";
 import { projects } from "@/lib/queries";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import {
   projectFormSchema,
   ProjectFormData,
@@ -43,10 +44,7 @@ import { ProjectType, ProjectVisibility, type SocialLinks } from "@/types/api";
 import type { UpdateProjectPayload } from "@/types/api";
 
 // Types
-import type {
-  IndustryPreset,
-  ProjectIdentity,
-} from "./types";
+import type { IndustryPreset, ProjectIdentity } from "./types";
 
 // ============================================================================
 // CONSTANTS
@@ -104,7 +102,7 @@ export function ProjectWizard({
   const createProject = projects.mutations.useCreate();
   const updateProject = projects.mutations.useUpdate(slug || "");
   const { data: projectData, isLoading: isLoadingProject } =
-    projects.queries.useDetail(mode === "edit" ? (slug || "") : "");
+    projects.queries.useDetail(mode === "edit" ? slug || "" : "");
   const {
     isPro,
     usage,
@@ -269,8 +267,10 @@ export function ProjectWizard({
       }
     } catch (error: any) {
       toast.error(
-        error.message ||
+        getHttpErrorMessage(
+          error,
           `Failed to ${mode === "edit" ? "update" : "create"} project. Please try again.`,
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -298,8 +298,8 @@ export function ProjectWizard({
         <div className="text-center">
           <h2 className="text-2xl font-bold">Project Not Found</h2>
           <p className="text-muted-foreground mt-2">
-            The project you&apos;re looking for doesn&apos;t exist or you don&apos;t have
-            access to it.
+            The project you&apos;re looking for doesn&apos;t exist or you
+            don&apos;t have access to it.
           </p>
           <Button asChild className="mt-4">
             <Link href="/projects">Back to Projects</Link>

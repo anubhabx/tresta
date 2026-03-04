@@ -3,12 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Loader2,
-} from "lucide-react";
+import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
@@ -21,7 +17,10 @@ import {
   type Step1FormData,
 } from "./collection-form-step";
 import { CollectionFormPreview } from "./collection-form-preview";
-import { WidgetConfigStep, type WidgetConfigStepRef } from "./widget-config-step";
+import {
+  WidgetConfigStep,
+  type WidgetConfigStepRef,
+} from "./widget-config-step";
 
 // ============================================================================
 // TYPES
@@ -71,9 +70,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
     savedProjectSlug || slug || "",
   );
   const createWidget = widgets.mutations.useCreate();
-  const updateWidget = widgets.mutations.useUpdate(
-    widgetsList?.[0]?.id ?? "",
-  );
+  const updateWidget = widgets.mutations.useUpdate(widgetsList?.[0]?.id ?? "");
 
   // Sync project data into local state (edit mode)
   useEffect(() => {
@@ -158,11 +155,9 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
 
       setStep(2);
     } catch (error: unknown) {
-      const msg =
-        error instanceof Error
-          ? error.message
-          : "Failed to save. Please try again.";
-      toast.error(msg);
+      toast.error(
+        getHttpErrorMessage(error, "Failed to save. Please try again."),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -204,11 +199,9 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
 
       router.push(`/projects/${savedProjectSlug}`);
     } catch (error: unknown) {
-      const msg =
-        error instanceof Error
-          ? error.message
-          : "Failed to save widget. Please try again.";
-      toast.error(msg);
+      toast.error(
+        getHttpErrorMessage(error, "Failed to save widget. Please try again."),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -217,8 +210,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
   // ── Derived display values ─────────────────────────────────────────────
   const headerTitle =
     mode === "create" ? "New Project" : (project?.name ?? "Edit Project");
-  const headerBackHref =
-    mode === "edit" ? `/projects/${slug}` : "/dashboard";
+  const headerBackHref = mode === "edit" ? `/projects/${slug}` : "/dashboard";
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
@@ -434,8 +426,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
                   projectDescription={project?.description}
                   logoUrl={previewData?.logoUrl || project?.logoUrl}
                   brandColorPrimary={
-                    previewData?.brandColorPrimary ||
-                    project?.brandColorPrimary
+                    previewData?.brandColorPrimary || project?.brandColorPrimary
                   }
                 />
               </div>
