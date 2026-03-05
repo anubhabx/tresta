@@ -16,9 +16,6 @@ vi.mock("@workspace/database/prisma", () => ({
       findFirst: vi.fn(),
       update: vi.fn(),
     },
-    plan: {
-      findUnique: vi.fn(),
-    },
     user: {
       update: vi.fn(),
     },
@@ -40,9 +37,6 @@ type MockedPrisma = typeof prisma & {
   subscription: {
     findFirst: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
-  };
-  plan: {
-    findUnique: ReturnType<typeof vi.fn>;
   };
   user: {
     update: ReturnType<typeof vi.fn>;
@@ -68,7 +62,6 @@ const createRequest = (overrides?: Partial<Request>, userId = "user_1") =>
       razorpay_payment_id: "pay_123",
       razorpay_subscription_id: "sub_123",
       razorpay_signature: "sig_123",
-      planId: "plan_razor",
       ...(overrides?.body as any),
     },
     user: { id: userId },
@@ -84,7 +77,7 @@ describe("verifyPayment", () => {
     vi.clearAllMocks();
   });
 
-  it("updates only the authenticated user's subscription and does not write razorpayOrderId", async () => {
+  it("updates only the authenticated user's subscription and sets user plan to PRO", async () => {
     mockedVerifySignature.mockReturnValue(true);
     mockedGetSubscription.mockResolvedValue({
       status: "active",
@@ -101,11 +94,6 @@ describe("verifyPayment", () => {
     mockedPrisma.subscription.update.mockResolvedValue({
       id: "sub_db_1",
       status: "ACTIVE",
-    });
-
-    mockedPrisma.plan.findUnique.mockResolvedValue({
-      id: "plan_db_1",
-      type: "PRO",
     });
 
     const req = createRequest();
@@ -126,6 +114,12 @@ describe("verifyPayment", () => {
 
     expect(updateArgs.where).toEqual({ id: "sub_db_1" });
     expect(updateArgs.data).not.toHaveProperty("razorpayOrderId");
+
+    // Verify user plan is set directly to PRO (no Plan table lookup)
+    expect(mockedPrisma.user.update).toHaveBeenCalledWith({
+      where: { id: "user_1" },
+      data: { plan: "PRO" },
+    });
 
     expect(mockedSuccess).toHaveBeenCalledTimes(1);
     expect(next).not.toHaveBeenCalled();
@@ -153,4 +147,3 @@ describe("verifyPayment", () => {
     expect(err).toBeInstanceOf(NotFoundError);
   });
 });
-

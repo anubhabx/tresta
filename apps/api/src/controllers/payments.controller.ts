@@ -14,6 +14,7 @@ import {
 } from "../services/razorpay.service.js";
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
 import { requireUserId } from "../lib/auth.js";
+import { PLAN_LIMITS } from "../config/constants.js";
 
 export const createSubscription = async (
   req: Request,
@@ -21,22 +22,15 @@ export const createSubscription = async (
   next: NextFunction,
 ) => {
   try {
-    const { planId } = req.body; // This is now the Razorpay Plan ID directly
+    const { planId } = req.body; // Razorpay Plan ID from static pricing.ts
     const userId = requireUserId(req);
 
     if (!planId) {
       throw new BadRequestError("Plan ID is required");
     }
 
-    // Optional: Try to find the plan in our DB to link it, but don't block if missing
-    // This maintains compatibility if the admin panel is still updating the Plan table
-    const plan = await prisma.plan.findUnique({
-      where: { razorpayPlanId: planId },
-    });
-
-    // Determine user plan type (fallback to PRO for any paid subscription)
-    const userPlanType = plan?.type || "PRO";
-    const dbPlanId = plan?.id || null;
+    // All paid subscriptions are PRO (no Plan table lookup needed)
+    const userPlanType = "PRO" as const;
 
     // Create Subscription on Razorpay
     let subscription: Subscriptions.RazorpaySubscription;
@@ -57,12 +51,10 @@ export const createSubscription = async (
     }
 
     // Create or Update Subscription in DB
-    // We upsert to allow retry or upgrade
     await prisma.subscription.upsert({
       where: { userId },
       create: {
         userId,
-        planId: dbPlanId,
         status: "INCOMPLETE", // Will be ACTIVE after verification
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
@@ -74,7 +66,6 @@ export const createSubscription = async (
           : null,
       },
       update: {
-        planId: dbPlanId,
         status: "INCOMPLETE",
         externalSubscriptionId: subscription.id,
         userPlan: userPlanType,
@@ -92,7 +83,7 @@ export const createSubscription = async (
       data: {
         subscriptionId: subscription.id,
         key: process.env.RAZORPAY_KEY_ID,
-        planName: plan?.name || "Pro Plan", // Fallback name
+        planName: "Pro Plan",
       },
     });
   } catch (error) {
@@ -110,7 +101,6 @@ export const verifyPayment = async (
       razorpay_payment_id,
       razorpay_subscription_id,
       razorpay_signature,
-      planId,
     } = req.body;
     const userId = requireUserId(req);
 
@@ -176,18 +166,11 @@ export const verifyPayment = async (
       },
     });
 
-    // Also update User's relation if not already correct (UserPlan enum)
-    // Try to find plan again if possible, or default to PRO
-    // Note: verifyPayment endpoint uses `planId` from body which is the Razorpay Plan ID now
-    const plan = await prisma.plan.findUnique({
-      where: { razorpayPlanId: planId },
-    });
-    const userPlanType = plan?.type || "PRO";
-
+    // Set user plan to PRO (no Plan table lookup needed)
     await prisma.user.update({
       where: { id: userId },
       data: {
-        plan: userPlanType,
+        plan: "PRO",
       },
     });
 
@@ -211,11 +194,7 @@ export const getSubscriptionDetails = async (
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        subscription: {
-          include: {
-            plan: true,
-          },
-        },
+        subscription: true,
       },
     });
 
@@ -224,32 +203,30 @@ export const getSubscriptionDetails = async (
     }
 
     const subscription = user.subscription;
-    let plan = subscription?.plan;
 
-    // If no active DB plan linked, check subscription enum type to fallback to a PRO structure
-    if (!plan && subscription?.userPlan === "PRO") {
-      plan = {
-        id: "pro-legacy-or-static",
-        name: "Pro Plan",
-        description: "Unlimited access",
-        type: "PRO",
-        price: subscription.amount || 30000,
-        currency: subscription.currency || "INR",
-        interval: subscription.interval || "month",
-        limits: { projects: -1, testimonials: -1, widgets: -1 },
-        isActive: true,
-        razorpayPlanId: subscription.externalSubscriptionId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
-    }
+    // Build plan details from static config based on user.plan enum
+    const planType = user.plan; // FREE or PRO
+    const limits = PLAN_LIMITS[planType] ?? PLAN_LIMITS.FREE;
+    const isActive = subscription?.status === "ACTIVE";
 
-    // If no active plan, fetch free details
-    if (!plan) {
-      plan = await prisma.plan.findFirst({
-        where: { type: "FREE" },
-      });
-    }
+    const planData =
+      planType === "PRO"
+        ? {
+            id: "pro",
+            name: "Pro Plan",
+            interval: subscription?.interval || "month",
+            price: subscription?.amount || 30000,
+            limits,
+            type: "PRO" as const,
+          }
+        : {
+            id: "free",
+            name: "Free Plan",
+            interval: "month",
+            price: 0,
+            limits,
+            type: "FREE" as const,
+          };
 
     // Get usage stats
     const { getUsageStats } = await import("../services/usage.service.js");
@@ -257,16 +234,7 @@ export const getSubscriptionDetails = async (
 
     return ResponseHandler.success(res, {
       data: {
-        plan: plan
-          ? {
-              id: plan.id,
-              name: plan.name,
-              interval: plan.interval,
-              price: plan.price,
-              limits: plan.limits,
-              type: plan.type,
-            }
-          : null,
+        plan: planData,
         subscription: subscription
           ? {
               id: subscription.id,
@@ -329,4 +297,3 @@ export const cancelSubscription = async (
     next(handlePrismaError(error));
   }
 };
-

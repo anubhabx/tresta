@@ -1,6 +1,6 @@
 import { prisma, NotificationType } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
-import { NotificationService } from '../services/notification.service.js';
+import { NotificationService } from "../services/notification.service.js";
 import {
   BadRequestError,
   ConflictError,
@@ -9,20 +9,20 @@ import {
   ForbiddenError,
   ValidationError,
   handlePrismaError,
-} from '../lib/errors.js';
+} from "../lib/errors.js";
 import {
   ResponseHandler,
   extractPaginationParams,
   calculateSkip,
-} from '../lib/response.js';
-import { verifyGoogleIdToken } from '../lib/google-oauth.js';
+} from "../lib/response.js";
+import { verifyGoogleIdToken } from "../lib/google-oauth.js";
 import {
   moderateTestimonial,
   checkDuplicateContent,
   analyzeReviewerBehavior,
-} from '../services/moderation.service.js';
-import { hashIp, encrypt } from '../utils/encryption.js';
-import { requireUserId } from '../lib/auth.js';
+} from "../services/moderation.service.js";
+import { hashIp, encrypt } from "../utils/encryption.js";
+import { requireUserId } from "../lib/auth.js";
 
 const FALLBACK_TESTIMONIAL_LIMIT = 10;
 
@@ -45,63 +45,33 @@ type SubmissionFormConfig = {
 };
 
 const normalizeFormConfig = (formConfig: unknown): SubmissionFormConfig => {
-  if (!formConfig || typeof formConfig !== 'object' || Array.isArray(formConfig)) {
+  if (
+    !formConfig ||
+    typeof formConfig !== "object" ||
+    Array.isArray(formConfig)
+  ) {
     return {};
   }
 
   return formConfig as SubmissionFormConfig;
 };
 
-const resolvePlanLimit = (plan: { limits?: unknown } | null): number | null => {
-  if (!plan || !plan.limits || typeof plan.limits !== 'object') {
-    return null;
-  }
-
-  const rawLimit = (plan.limits as Record<string, unknown>).testimonials;
-
-  if (typeof rawLimit === 'number' && Number.isFinite(rawLimit)) {
-    return rawLimit;
-  }
-
-  if (typeof rawLimit === 'string') {
-    const parsed = Number(rawLimit);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return null;
-};
-
 const enforceTestimonialLimit = async (userId: string): Promise<void> => {
+  const { PLAN_LIMITS } = await import("../config/constants.js");
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
-      subscription: {
-        include: {
-          plan: true,
-        },
-      },
-    },
+    select: { plan: true },
   });
 
   if (!user) {
-    throw new UnauthorizedError('User not found');
+    throw new UnauthorizedError("User not found");
   }
 
-  let effectivePlan = user.subscription?.status === 'ACTIVE'
-    ? user.subscription.plan
-    : null;
+  const limits = PLAN_LIMITS[user.plan] ?? PLAN_LIMITS.FREE;
+  const limit = limits.testimonials ?? FALLBACK_TESTIMONIAL_LIMIT;
 
-  if (!effectivePlan) {
-    effectivePlan = await prisma.plan.findFirst({
-      where: { type: 'FREE', isActive: true },
-    });
-  }
-
-  const resolvedLimit = resolvePlanLimit(effectivePlan);
-  const limit = resolvedLimit ?? FALLBACK_TESTIMONIAL_LIMIT;
-
+  // -1 means unlimited
   if (limit === -1) {
     return;
   }
@@ -118,7 +88,7 @@ const enforceTestimonialLimit = async (userId: string): Promise<void> => {
     throw new ForbiddenError(
       `You have reached the limit for testimonials (${limit}) on your current plan.`,
       {
-        resource: 'testimonials',
+        resource: "testimonials",
         limit,
         current: used,
       },
@@ -145,29 +115,36 @@ const createTestimonial = async (
       videoUrl,
       googleIdToken, // Google OAuth ID token
     } = req.body;
-    const isAnonymousSubmission = req.headers['x-anonymous-submission'] === 'true';
+    const isAnonymousSubmission =
+      req.headers["x-anonymous-submission"] === "true";
 
     // Validate required fields
-    if (!authorName || typeof authorName !== 'string') {
-      throw new ValidationError("Author name is required and must be a string", {
-        field: 'authorName',
-        received: typeof authorName
-      });
+    if (!authorName || typeof authorName !== "string") {
+      throw new ValidationError(
+        "Author name is required and must be a string",
+        {
+          field: "authorName",
+          received: typeof authorName,
+        },
+      );
     }
 
-    if (!content || typeof content !== 'string') {
+    if (!content || typeof content !== "string") {
       throw new ValidationError("Content is required and must be a string", {
-        field: 'content',
-        received: typeof content
+        field: "content",
+        received: typeof content,
       });
     }
 
     // Email is now required for data access rights
-    if (!authorEmail || typeof authorEmail !== 'string') {
-      throw new ValidationError("Email is required for data privacy rights management", {
-        field: 'authorEmail',
-        received: typeof authorEmail
-      });
+    if (!authorEmail || typeof authorEmail !== "string") {
+      throw new ValidationError(
+        "Email is required for data privacy rights management",
+        {
+          field: "authorEmail",
+          received: typeof authorEmail,
+        },
+      );
     }
 
     // Validate authorName length
@@ -175,11 +152,11 @@ const createTestimonial = async (
       throw new ValidationError(
         "Author name must be between 2 and 255 characters",
         {
-          field: 'authorName',
+          field: "authorName",
           minLength: 2,
           maxLength: 255,
-          received: authorName.length
-        }
+          received: authorName.length,
+        },
       );
     }
 
@@ -188,18 +165,22 @@ const createTestimonial = async (
       throw new ValidationError(
         "Content must be between 10 and 2000 characters",
         {
-          field: 'content',
+          field: "content",
           minLength: 10,
           maxLength: 2000,
-          received: content.length
-        }
+          received: content.length,
+        },
       );
     }
 
     // Validate optional field types
-    if (authorRole !== undefined && authorRole !== null && typeof authorRole !== 'string') {
-      throw new ValidationError('Author role must be a string', {
-        field: 'authorRole',
+    if (
+      authorRole !== undefined &&
+      authorRole !== null &&
+      typeof authorRole !== "string"
+    ) {
+      throw new ValidationError("Author role must be a string", {
+        field: "authorRole",
         received: typeof authorRole,
       });
     }
@@ -207,39 +188,49 @@ const createTestimonial = async (
     if (
       authorCompany !== undefined &&
       authorCompany !== null &&
-      typeof authorCompany !== 'string'
+      typeof authorCompany !== "string"
     ) {
-      throw new ValidationError('Author company must be a string', {
-        field: 'authorCompany',
+      throw new ValidationError("Author company must be a string", {
+        field: "authorCompany",
         received: typeof authorCompany,
       });
     }
 
-    if (authorAvatar !== undefined && authorAvatar !== null && typeof authorAvatar !== 'string') {
-      throw new ValidationError('Author avatar must be a string', {
-        field: 'authorAvatar',
+    if (
+      authorAvatar !== undefined &&
+      authorAvatar !== null &&
+      typeof authorAvatar !== "string"
+    ) {
+      throw new ValidationError("Author avatar must be a string", {
+        field: "authorAvatar",
         received: typeof authorAvatar,
       });
     }
 
-    if (videoUrl !== undefined && videoUrl !== null && typeof videoUrl !== 'string') {
-      throw new ValidationError('Video URL must be a string', {
-        field: 'videoUrl',
+    if (
+      videoUrl !== undefined &&
+      videoUrl !== null &&
+      typeof videoUrl !== "string"
+    ) {
+      throw new ValidationError("Video URL must be a string", {
+        field: "videoUrl",
         received: typeof videoUrl,
       });
     }
 
     const normalizedRating =
-      rating !== undefined && rating !== null && rating !== ''
+      rating !== undefined && rating !== null && rating !== ""
         ? Number(rating)
         : undefined;
 
     if (
       normalizedRating !== undefined &&
-      (Number.isNaN(normalizedRating) || normalizedRating < 1 || normalizedRating > 5)
+      (Number.isNaN(normalizedRating) ||
+        normalizedRating < 1 ||
+        normalizedRating > 5)
     ) {
       throw new ValidationError("Rating must be a number between 1 and 5", {
-        field: 'rating',
+        field: "rating",
         min: 1,
         max: 5,
         received: rating,
@@ -267,10 +258,10 @@ const createTestimonial = async (
     let isOAuthVerified = false;
     let oauthSubject: string | null = null;
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
-        received: typeof slug
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
       });
     }
 
@@ -287,17 +278,20 @@ const createTestimonial = async (
     if (!project) {
       throw new NotFoundError(`Project with slug "${slug}" not found`, {
         slug,
-        suggestion: 'Please check the project slug'
+        suggestion: "Please check the project slug",
       });
     }
 
     // Check if project is active
     if (!project.isActive) {
-      throw new BadRequestError("This project is not currently accepting testimonials", {
-        projectId: project.id,
-        projectName: project.name,
-        suggestion: 'Please contact the project owner'
-      });
+      throw new BadRequestError(
+        "This project is not currently accepting testimonials",
+        {
+          projectId: project.id,
+          projectName: project.name,
+          suggestion: "Please contact the project owner",
+        },
+      );
     }
 
     // Enforce owner plan testimonial quota for both authenticated and public submissions
@@ -315,23 +309,27 @@ const createTestimonial = async (
     const requireRating = isRatingEnabled && formConfig.requireRating === true;
     const requireJobTitle =
       isJobTitleEnabled && formConfig.requireJobTitle === true;
-    const requireCompany = isCompanyEnabled && formConfig.requireCompany === true;
+    const requireCompany =
+      isCompanyEnabled && formConfig.requireCompany === true;
     const requireAvatar = isAvatarEnabled && formConfig.requireAvatar === true;
-    const requireVideoUrl = isVideoEnabled && formConfig.requireVideoUrl === true;
+    const requireVideoUrl =
+      isVideoEnabled && formConfig.requireVideoUrl === true;
     const requireGoogleVerification =
-      isGoogleVerificationEnabled && formConfig.requireGoogleVerification === true;
+      isGoogleVerificationEnabled &&
+      formConfig.requireGoogleVerification === true;
     const allowAnonymousSubmissions =
       formConfig.allowAnonymousSubmissions !== false;
-    const allowFingerprintOptOut =
-      formConfig.allowFingerprintOptOut === true;
+    const allowFingerprintOptOut = formConfig.allowFingerprintOptOut === true;
     const notifyOnSubmission = formConfig.notifyOnSubmission !== false;
 
-    const hasRole = typeof authorRole === 'string' && authorRole.trim().length > 0;
+    const hasRole =
+      typeof authorRole === "string" && authorRole.trim().length > 0;
     const hasCompany =
-      typeof authorCompany === 'string' && authorCompany.trim().length > 0;
+      typeof authorCompany === "string" && authorCompany.trim().length > 0;
     const hasAvatar =
-      typeof authorAvatar === 'string' && authorAvatar.trim().length > 0;
-    const hasVideoUrl = typeof videoUrl === 'string' && videoUrl.trim().length > 0;
+      typeof authorAvatar === "string" && authorAvatar.trim().length > 0;
+    const hasVideoUrl =
+      typeof videoUrl === "string" && videoUrl.trim().length > 0;
     const normalizedEmail = authorEmail.trim().toLowerCase();
 
     if (
@@ -340,70 +338,81 @@ const createTestimonial = async (
       !allowFingerprintOptOut
     ) {
       throw new ForbiddenError(
-        'IP/device data opt-out is disabled for this project',
+        "IP/device data opt-out is disabled for this project",
       );
     }
 
     if (!isRatingEnabled && normalizedRating !== undefined) {
-      throw new BadRequestError('Rating is disabled for this collection form');
+      throw new BadRequestError("Rating is disabled for this collection form");
     }
 
     if (requireRating && normalizedRating === undefined) {
-      throw new ValidationError('Rating is required for this collection form', {
-        field: 'rating',
+      throw new ValidationError("Rating is required for this collection form", {
+        field: "rating",
       });
     }
 
     if (!isJobTitleEnabled && hasRole) {
-      throw new BadRequestError('Job title is disabled for this collection form');
+      throw new BadRequestError(
+        "Job title is disabled for this collection form",
+      );
     }
 
     if (requireJobTitle && !hasRole) {
-      throw new ValidationError('Job title is required for this collection form', {
-        field: 'authorRole',
-      });
+      throw new ValidationError(
+        "Job title is required for this collection form",
+        {
+          field: "authorRole",
+        },
+      );
     }
 
     if (!isCompanyEnabled && hasCompany) {
-      throw new BadRequestError('Company is disabled for this collection form');
+      throw new BadRequestError("Company is disabled for this collection form");
     }
 
     if (requireCompany && !hasCompany) {
-      throw new ValidationError('Company is required for this collection form', {
-        field: 'authorCompany',
-      });
+      throw new ValidationError(
+        "Company is required for this collection form",
+        {
+          field: "authorCompany",
+        },
+      );
     }
 
     if (!isAvatarEnabled && hasAvatar) {
       throw new BadRequestError(
-        'Avatar uploads are disabled for this collection form',
+        "Avatar uploads are disabled for this collection form",
       );
     }
 
     if (requireAvatar && !hasAvatar) {
       throw new ValidationError(
-        'Profile picture is required for this collection form',
+        "Profile picture is required for this collection form",
         {
-          field: 'authorAvatar',
+          field: "authorAvatar",
         },
       );
     }
 
     if (!isVideoEnabled && hasVideoUrl) {
       throw new BadRequestError(
-        'Video testimonials are disabled for this collection form',
+        "Video testimonials are disabled for this collection form",
       );
     }
 
     if (requireVideoUrl && !hasVideoUrl) {
-      throw new ValidationError('Video URL is required for this collection form', {
-        field: 'videoUrl',
-      });
+      throw new ValidationError(
+        "Video URL is required for this collection form",
+        {
+          field: "videoUrl",
+        },
+      );
     }
 
     if (googleIdToken && !isGoogleVerificationEnabled) {
       throw new BadRequestError(
-        'Google verification is disabled for this collection form',
+        "Google verification is disabled for this collection form",
       );
     }
 
@@ -411,11 +420,11 @@ const createTestimonial = async (
       googleProfile = await verifyGoogleIdToken(googleIdToken);
 
       if (!googleProfile) {
-        throw new BadRequestError('Invalid Google authentication token');
+        throw new BadRequestError("Invalid Google authentication token");
       }
 
       if (!googleProfile.email_verified) {
-        throw new BadRequestError('Google email must be verified');
+        throw new BadRequestError("Google email must be verified");
       }
 
       if (
@@ -423,7 +432,7 @@ const createTestimonial = async (
         googleProfile.email.toLowerCase() !== normalizedEmail
       ) {
         throw new BadRequestError(
-          'Email must match the verified Google account email',
+          "Email must match the verified Google account email",
         );
       }
 
@@ -433,9 +442,9 @@ const createTestimonial = async (
 
     if (requireGoogleVerification && !isOAuthVerified) {
       throw new ValidationError(
-        'Google verification is required for this collection form',
+        "Google verification is required for this collection form",
         {
-          field: 'googleIdToken',
+          field: "googleIdToken",
         },
       );
     }
@@ -447,7 +456,7 @@ const createTestimonial = async (
       reviewerIdentityFilters.push({
         authorEmail: {
           equals: normalizedEmail,
-          mode: 'insensitive',
+          mode: "insensitive",
         },
       });
     }
@@ -457,7 +466,7 @@ const createTestimonial = async (
     }
 
     const clientIp = req.ip || req.socket.remoteAddress;
-    const userAgent = req.get('user-agent') || undefined;
+    const userAgent = req.get("user-agent") || undefined;
 
     if (clientIp) {
       const ipFilter: Record<string, string> = { ipAddress: clientIp };
@@ -478,12 +487,12 @@ const createTestimonial = async (
 
       if (existingReviewer) {
         throw new ConflictError(
-          'Each user can only submit one testimonial per project',
+          "Each user can only submit one testimonial per project",
           {
             projectId: project.id,
             existingTestimonialId: existingReviewer.id,
             createdAt: existingReviewer.createdAt,
-          }
+          },
         );
       }
     }
@@ -548,9 +557,11 @@ const createTestimonial = async (
     } else {
       // User consented - Store processed data
       // Hash IP for privacy (matches schema varchar constraint)
-      testimonialData.ipAddress = hashIp(req.ip || req.socket.remoteAddress || '');
+      testimonialData.ipAddress = hashIp(
+        req.ip || req.socket.remoteAddress || "",
+      );
       // Encrypt User Agent
-      testimonialData.userAgent = encrypt(req.get("user-agent") || '');
+      testimonialData.userAgent = encrypt(req.get("user-agent") || "");
     }
 
     // Add optional fields if provided
@@ -590,17 +601,20 @@ const createTestimonial = async (
     // Send notification to project owner if enabled
     if (notifyOnSubmission) {
       try {
-        const notificationType = moderationResult.status === 'FLAGGED'
-          ? NotificationType.TESTIMONIAL_FLAGGED
-          : NotificationType.NEW_TESTIMONIAL;
+        const notificationType =
+          moderationResult.status === "FLAGGED"
+            ? NotificationType.TESTIMONIAL_FLAGGED
+            : NotificationType.NEW_TESTIMONIAL;
 
-        const title = moderationResult.status === 'FLAGGED'
-          ? 'Testimonial Flagged for Review'
-          : 'New Testimonial Received';
+        const title =
+          moderationResult.status === "FLAGGED"
+            ? "Testimonial Flagged for Review"
+            : "New Testimonial Received";
 
-        const message = moderationResult.status === 'FLAGGED'
-          ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
-          : `You received a new testimonial from ${authorName}.`;
+        const message =
+          moderationResult.status === "FLAGGED"
+            ? `A new testimonial from ${authorName} was flagged by auto-moderation.`
+            : `You received a new testimonial from ${authorName}.`;
 
         await NotificationService.create({
           userId: project.userId,
@@ -619,26 +633,28 @@ const createTestimonial = async (
         });
       } catch (error) {
         // Non-blocking error - don't fail the request if notification fails
-        console.error('Failed to create notification:', error);
+        console.error("Failed to create notification:", error);
       }
     }
 
     return ResponseHandler.created(res, {
-      message: moderationResult.status === 'APPROVED'
-        ? "Testimonial submitted and approved successfully"
-        : "Testimonial submitted successfully and is pending review",
+      message:
+        moderationResult.status === "APPROVED"
+          ? "Testimonial submitted and approved successfully"
+          : "Testimonial submitted successfully and is pending review",
       data: {
         ...newTestimonial,
         moderationInfo: {
           status: moderationResult.status,
           autoPublished: moderationResult.autoPublish,
-          message: moderationResult.status === 'APPROVED'
-            ? 'Your testimonial has been automatically approved and published'
-            : moderationResult.status === 'FLAGGED'
-              ? 'Your testimonial is under review'
-              : 'Your testimonial is pending approval'
-        }
-      }
+          message:
+            moderationResult.status === "APPROVED"
+              ? "Your testimonial has been automatically approved and published"
+              : moderationResult.status === "FLAGGED"
+                ? "Your testimonial is under review"
+                : "Your testimonial is pending approval",
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -694,15 +710,15 @@ const listPublicTestimonialsByApiKey = async (
   try {
     const { slug } = req.params;
 
-    if (!slug || typeof slug !== 'string') {
-      throw new ValidationError('Project slug is required', {
-        field: 'slug',
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
         received: typeof slug,
       });
     }
 
     if (!req.apiKey) {
-      throw new UnauthorizedError('API key validation required');
+      throw new UnauthorizedError("API key validation required");
     }
 
     const project = await prisma.project.findUnique({
@@ -720,11 +736,11 @@ const listPublicTestimonialsByApiKey = async (
     }
 
     if (!project.isActive) {
-      throw new ForbiddenError('This project is not active');
+      throw new ForbiddenError("This project is not active");
     }
 
     if (req.apiKey.projectId !== project.id) {
-      throw new ForbiddenError('API key does not have access to this project');
+      throw new ForbiddenError("API key does not have access to this project");
     }
 
     const testimonials = await prisma.testimonial.findMany({
@@ -748,12 +764,12 @@ const listPublicTestimonialsByApiKey = async (
         oauthProvider: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     return ResponseHandler.success(res, {
-      message: 'Public testimonials retrieved successfully',
+      message: "Public testimonials retrieved successfully",
       data: {
         project: {
           id: project.id,
@@ -1156,4 +1172,3 @@ export {
   bulkModerationAction,
   updateModerationStatus,
 };
-
