@@ -65,7 +65,9 @@ export function BillingSection() {
   const usage = data?.usage;
 
   const isPro = plan?.type === "PRO";
-  const isActive = subscription?.status === "ACTIVE";
+  const normalizedSubscriptionStatus = subscription?.status?.toUpperCase();
+  const isSubscriptionCanceled = normalizedSubscriptionStatus === "CANCELED";
+  const isActive = isPro && !isSubscriptionCanceled;
   const isCanceled = subscription?.cancelAtPeriodEnd;
 
   // Usage Helpers
@@ -154,7 +156,7 @@ export function BillingSection() {
                 Upgrade Plan
               </Button>
             )}
-            {isPro && !isCanceled && (
+            {isPro && !isCanceled && !isSubscriptionCanceled && (
               <Button
                 variant="outline"
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -171,7 +173,7 @@ export function BillingSection() {
                 )}
               </Button>
             )}
-            {isPro && isCanceled && (
+            {isPro && (isCanceled || isSubscriptionCanceled) && (
               <Button onClick={open} variant="outline">
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Renew Plan
