@@ -12,7 +12,7 @@ interface ProjectSettingsClientProps {
 
 export function ProjectSettingsClient({ projectId }: ProjectSettingsClientProps) {
   const router = useRouter();
-  const { data: project, isLoading } = useProject(projectId);
+  const { data: project, isLoading, refetch } = useProject(projectId);
 
   if (isLoading) {
     return (
@@ -44,7 +44,14 @@ export function ProjectSettingsClient({ projectId }: ProjectSettingsClientProps)
       <div className="space-y-6">
         {/* Telemetry Settings */}
         <div className="bg-card rounded-lg shadow p-6">
-          <TelemetrySettings projectId={projectId} />
+          <TelemetrySettings
+            projectId={projectId}
+            currentSetting={project?.telemetrySettings?.mode ?? 'sampled'}
+            samplingRate={project?.telemetrySettings?.samplingRate ?? 1}
+            onUpdate={() => {
+              void refetch();
+            }}
+          />
         </div>
 
         {/* Additional Settings Sections Can Be Added Here */}

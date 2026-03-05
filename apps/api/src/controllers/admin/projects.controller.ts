@@ -1,7 +1,70 @@
 import type { Request, Response, NextFunction } from 'express';
 import { prisma } from '@workspace/database/prisma';
 import { ResponseHandler } from '../../lib/response.js';
-import { NotFoundError, handlePrismaError } from '../../lib/errors.js';
+import { BadRequestError, NotFoundError, handlePrismaError } from '../../lib/errors.js';
+import { getRedisClient } from '../../lib/redis.js';
+
+type TelemetryMode = 'off' | 'sampled' | 'opt-in';
+
+type ProjectTelemetrySettings = {
+  mode: TelemetryMode;
+  samplingRate: number;
+};
+
+const DEFAULT_PROJECT_TELEMETRY_SETTINGS: ProjectTelemetrySettings = {
+  mode: 'sampled',
+  samplingRate: 1,
+};
+
+const getProjectTelemetrySettingsKey = (projectId: string): string =>
+  `settings:project:${projectId}:telemetry`;
+
+function normalizeTelemetrySettings(
+  value: unknown,
+): ProjectTelemetrySettings {
+  if (!value || typeof value !== 'object') {
+    return DEFAULT_PROJECT_TELEMETRY_SETTINGS;
+  }
+
+  const maybeMode = (value as Record<string, unknown>).mode;
+  const maybeRate = (value as Record<string, unknown>).samplingRate;
+
+  const mode: TelemetryMode =
+    maybeMode === 'off' || maybeMode === 'sampled' || maybeMode === 'opt-in'
+      ? maybeMode
+      : DEFAULT_PROJECT_TELEMETRY_SETTINGS.mode;
+
+  const samplingRateRaw =
+    typeof maybeRate === 'number'
+      ? maybeRate
+      : typeof maybeRate === 'string'
+        ? Number(maybeRate)
+        : DEFAULT_PROJECT_TELEMETRY_SETTINGS.samplingRate;
+
+  const samplingRate = Number.isFinite(samplingRateRaw)
+    ? Math.min(10, Math.max(0.1, samplingRateRaw))
+    : DEFAULT_PROJECT_TELEMETRY_SETTINGS.samplingRate;
+
+  return { mode, samplingRate };
+}
+
+async function getProjectTelemetrySettings(
+  projectId: string,
+): Promise<ProjectTelemetrySettings> {
+  const redis = getRedisClient();
+  const key = getProjectTelemetrySettingsKey(projectId);
+  const raw = await redis.get(key);
+
+  if (!raw) {
+    return DEFAULT_PROJECT_TELEMETRY_SETTINGS;
+  }
+
+  try {
+    return normalizeTelemetrySettings(JSON.parse(raw));
+  } catch {
+    return DEFAULT_PROJECT_TELEMETRY_SETTINGS;
+  }
+}
 
 /**
  * GET /admin/projects
@@ -202,6 +265,8 @@ export const getProjectById = async (
       return acc;
     }, {} as Record<string, number>);
     
+    const telemetrySettings = await getProjectTelemetrySettings(project.id);
+
     return ResponseHandler.success(res, {
       data: {
         id: project.id,
@@ -243,6 +308,7 @@ export const getProjectById = async (
           widgetCount: project._count.widgets,
           apiKeyCount: project._count.apiKeys,
         },
+        telemetrySettings,
         recentTestimonials: project.testimonials.map(t => ({
           id: t.id,
           authorName: t.authorName,
@@ -259,6 +325,61 @@ export const getProjectById = async (
           } : null,
         })),
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * PATCH /admin/projects/:id/telemetry-settings
+ * Update telemetry settings for a specific project
+ */
+export const updateProjectTelemetrySettings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const { mode, samplingRate } = req.body ?? {};
+
+    if (!id) {
+      throw new BadRequestError('Project ID is required');
+    }
+
+    if (mode !== 'off' && mode !== 'sampled' && mode !== 'opt-in') {
+      throw new BadRequestError("mode must be one of: 'off', 'sampled', 'opt-in'");
+    }
+
+    const numericSamplingRate = Number(samplingRate);
+    if (!Number.isFinite(numericSamplingRate) || numericSamplingRate < 0.1 || numericSamplingRate > 10) {
+      throw new BadRequestError('samplingRate must be between 0.1 and 10');
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!project) {
+      throw new NotFoundError('Project not found');
+    }
+
+    const normalized = normalizeTelemetrySettings({
+      mode,
+      samplingRate: numericSamplingRate,
+    });
+
+    const redis = getRedisClient();
+    await redis.set(
+      getProjectTelemetrySettingsKey(project.id),
+      JSON.stringify(normalized),
+    );
+
+    return ResponseHandler.success(res, {
+      message: 'Telemetry settings updated successfully',
+      data: normalized,
     });
   } catch (error) {
     next(error);

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { apiClient } from '@/lib/api-client';
 
 interface TelemetrySettingsProps {
   projectId: string;
@@ -12,12 +13,11 @@ interface TelemetrySettingsProps {
 }
 
 export function TelemetrySettings({ 
-  projectId: _projectId, 
+  projectId,
   currentSetting = 'sampled',
   samplingRate = 1,
   onUpdate 
 }: TelemetrySettingsProps) {
-  void _projectId; // reserved for future API call payloads
   const [telemetrySetting, setTelemetrySetting] = useState<'off' | 'sampled' | 'opt-in'>(currentSetting);
   const [rate, setRate] = useState(samplingRate);
   const [isSaving, setIsSaving] = useState(false);
@@ -25,11 +25,15 @@ export function TelemetrySettings({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const response = await apiClient.patch(`/admin/projects/${projectId}/telemetry-settings`, {
+        mode: telemetrySetting,
+        samplingRate: rate,
+      });
+
+      const saved = response.data?.data;
       
       if (onUpdate) {
-        onUpdate(telemetrySetting, rate);
+        onUpdate(saved?.mode ?? telemetrySetting, saved?.samplingRate ?? rate);
       }
       
       toast.success('Telemetry settings updated successfully');

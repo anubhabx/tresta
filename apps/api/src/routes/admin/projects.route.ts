@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { listProjects, getProjectById } from '../../controllers/admin/projects.controller.js';
+import { auditLog } from '../../middleware/audit-log.middleware.js';
+import {
+	listProjects,
+	getProjectById,
+	updateProjectTelemetrySettings,
+} from '../../controllers/admin/projects.controller.js';
 
 const router: Router = Router();
 
@@ -14,5 +19,11 @@ router.get('/projects', listProjects);
  * Get detailed information about a specific project
  */
 router.get('/projects/:id', getProjectById);
+
+/**
+ * PATCH /admin/projects/:id/telemetry-settings
+ * Update project-level telemetry settings
+ */
+router.patch('/projects/:id/telemetry-settings', auditLog, updateProjectTelemetrySettings);
 
 export default router;

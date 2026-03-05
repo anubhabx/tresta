@@ -99,6 +99,10 @@ export interface ProjectDetail {
     widgetCount: number;
     apiKeyCount: number;
   };
+  telemetrySettings?: {
+    mode: 'off' | 'sampled' | 'opt-in';
+    samplingRate: number;
+  };
   recentTestimonials: Array<{
     id: string;
     content: string;
