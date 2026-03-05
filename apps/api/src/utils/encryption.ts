@@ -1,7 +1,9 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex'); // Fallback for dev only
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY ?? (() => {
+    throw new Error('ENCRYPTION_KEY environment variable must be set');
+})();
 const IV_LENGTH = 16;
 
 /**

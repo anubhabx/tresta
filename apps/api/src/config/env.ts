@@ -12,6 +12,7 @@ const baseSchema = z.object({
 
   JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
   SETTINGS_HMAC_SECRET: z.string().min(1, 'SETTINGS_HMAC_SECRET is required'),
+  ENCRYPTION_KEY: z.string().min(1, 'ENCRYPTION_KEY is required'),
 
   CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1, 'CLERK_WEBHOOK_SIGNING_SECRET is required'),
 
