@@ -123,9 +123,14 @@ app.use("/api/plans", planRouter);
 app.use("/api/payments", paymentsRouter);
 app.use("/api/privacy", privacyRouter);
 
-// Test routes (remove in production)
-if (process.env.NODE_ENV !== "production") {
+// Test routes (local development only, opt-out via ENABLE_TEST_ROUTES=false)
+const shouldEnableTestRoutes =
+  process.env.NODE_ENV === "development" &&
+  process.env.ENABLE_TEST_ROUTES !== "false";
+
+if (shouldEnableTestRoutes) {
   app.use("/api/test", attachUser, requireAuth, testRouter);
+  logger.warn('Test routes are enabled at /api/test (development-only)');
 }
 
 // 404 handler for unmatched routes

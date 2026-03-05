@@ -22,6 +22,7 @@ const baseSchema = z.object({
 
   ENABLE_REAL_EMAILS: z.enum(['true', 'false']).optional(),
   RESEND_API_KEY: z.string().optional(),
+  ENABLE_TEST_ROUTES: z.enum(['true', 'false']).optional(),
 });
 
 export type ValidatedEnv = z.infer<typeof baseSchema>;
