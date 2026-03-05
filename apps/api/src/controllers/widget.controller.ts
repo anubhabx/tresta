@@ -21,6 +21,7 @@ import { validateWidgetConfig } from "../validators/widget.validator.js";
 import type { WidgetData } from "../../types/api-responses.js";
 import { validateApiKey } from "../services/api-key.service.js";
 import { WIDGET_LIMITS } from "../config/constants.js";
+import { getApiBaseUrl } from "../config/urls.js";
 import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
 import { requireUserId } from "../lib/auth.js";
 
@@ -484,8 +485,7 @@ const renderWidgetPage = async (
 
     const sanitizedApiKey = escapeHtmlAttribute(apiKey);
 
-    const apiUrl =
-      process.env.API_URL || `http://localhost:${process.env.PORT || 8000}`;
+    const apiUrl = getApiBaseUrl(req);
     const widgetScriptUrl = `${apiUrl}/widget/tresta-widget.js`;
 
     // Generate simple HTML page that loads the widget

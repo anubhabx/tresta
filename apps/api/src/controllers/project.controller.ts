@@ -23,6 +23,7 @@ import {
   zodErrorDetails,
 } from "../validators/schemas.js";
 import { assertCanUseCustomColors } from "../services/plan-gate.service.js";
+import { getAppBaseUrl } from "../config/urls.js";
 
 /**
  * Helper to serialize Prisma Project to ProjectData
@@ -93,7 +94,7 @@ const createProject = async (
     // Auto-generate collection form URL if not provided
     const finalCollectionFormUrl =
       collectionFormUrl ||
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/testimonials/${slug}`;
+      `${getAppBaseUrl()}/testimonials/${slug}`;
 
     // Create project
     let newProject;

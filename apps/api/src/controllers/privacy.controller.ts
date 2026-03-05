@@ -12,6 +12,7 @@ import { NotificationService } from '../services/notification.service.js';
 import { EmailService } from '../services/email.service.js';
 import { NotificationType } from '@workspace/database/prisma';
 import { decrypt } from '../utils/encryption.js';
+import { getAppBaseUrl } from '../config/urls.js';
 
 const JWT_SECRET = process.env.JWT_SECRET ?? (() => { throw new Error('JWT_SECRET environment variable must be set'); })();
 
@@ -62,7 +63,7 @@ export const requestPrivacyAccess = async (
         // "Security: The Data Request Form will send a verification email".
 
         // We will simulate sending email by logging it and returning it in a specific dev-mode header or response for the user to copy.
-        const magicLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/privacy/manage?token=${token}`;
+        const magicLink = `${getAppBaseUrl()}/privacy/manage?token=${token}`;
 
         // Send email
         await EmailService.sendEmail({
