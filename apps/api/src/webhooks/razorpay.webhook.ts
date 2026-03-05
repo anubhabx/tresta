@@ -49,10 +49,16 @@ type RazorpayEventPayload = {
   };
 };
 
-const SUPPORTED_EVENT_PREFIXES = ["subscription.", "invoice.", "payment."] as const;
+const SUPPORTED_EVENT_PREFIXES = [
+  "subscription.",
+  "invoice.",
+  "payment.",
+] as const;
 
 const isSupportedWebhookEvent = (eventName: string): boolean => {
-  return SUPPORTED_EVENT_PREFIXES.some((prefix) => eventName.startsWith(prefix));
+  return SUPPORTED_EVENT_PREFIXES.some((prefix) =>
+    eventName.startsWith(prefix),
+  );
 };
 
 const getRawBody = (req: Request): Buffer => {
@@ -69,7 +75,9 @@ const getRawBody = (req: Request): Buffer => {
     return Buffer.from(req.body);
   }
 
-  throw new Error("Raw request body is required for webhook signature verification");
+  throw new Error(
+    "Raw request body is required for webhook signature verification",
+  );
 };
 
 const toDate = (epochSeconds?: number): Date | undefined => {
@@ -92,7 +100,9 @@ const getNoteString = (
   return value.length > 0 ? value : undefined;
 };
 
-const getSubscriptionId = (payload: RazorpayEventPayload): string | undefined => {
+const getSubscriptionId = (
+  payload: RazorpayEventPayload,
+): string | undefined => {
   const paymentNotes = payload.payload?.payment?.entity?.notes;
   const invoiceNotes = payload.payload?.invoice?.entity?.notes;
   const invoiceLineItems = payload.payload?.invoice?.entity?.line_items;
@@ -105,12 +115,16 @@ const getSubscriptionId = (payload: RazorpayEventPayload): string | undefined =>
     payload.payload?.invoice?.entity?.subscription_id ||
     getNoteString(invoiceNotes, "subscription_id") ||
     getNoteString(invoiceNotes, "razorpay_subscription_id") ||
-    invoiceLineItems?.find((lineItem) => lineItem.subscription_id)?.subscription_id
+    invoiceLineItems?.find((lineItem) => lineItem.subscription_id)
+      ?.subscription_id
   );
 };
 
 const getPaymentId = (payload: RazorpayEventPayload): string | undefined => {
-  return payload.payload?.payment?.entity?.id || payload.payload?.invoice?.entity?.payment_id;
+  return (
+    payload.payload?.payment?.entity?.id ||
+    payload.payload?.invoice?.entity?.payment_id
+  );
 };
 
 const getInvoiceId = (payload: RazorpayEventPayload): string | undefined => {
@@ -216,7 +230,12 @@ export const handleRazorpayWebhook = async (
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
   if (!signature || !secret) {
-    res.status(400).json({ success: false, message: "Missing webhook signature configuration" });
+    res
+      .status(400)
+      .json({
+        success: false,
+        message: "Missing webhook signature configuration",
+      });
     return;
   }
 
@@ -224,7 +243,9 @@ export const handleRazorpayWebhook = async (
   try {
     rawBody = getRawBody(req);
   } catch {
-    res.status(400).json({ success: false, message: "Missing raw request body" });
+    res
+      .status(400)
+      .json({ success: false, message: "Missing raw request body" });
     return;
   }
 
@@ -237,7 +258,9 @@ export const handleRazorpayWebhook = async (
   );
 
   if (!isValidSignature) {
-    res.status(400).json({ success: false, message: "Invalid Razorpay webhook signature" });
+    res
+      .status(400)
+      .json({ success: false, message: "Invalid Razorpay webhook signature" });
     return;
   }
 
@@ -279,7 +302,9 @@ export const handleRazorpayWebhook = async (
       },
     });
 
-    res.status(200).json({ success: true, message: `Event ${payload.event} ignored` });
+    res
+      .status(200)
+      .json({ success: true, message: `Event ${payload.event} ignored` });
     return;
   }
 
@@ -325,7 +350,10 @@ export const handleRazorpayWebhook = async (
       }
 
       const eventCreatedAt = toDate(payload.created_at) || new Date();
-      if (subscription.lastWebhookAt && eventCreatedAt < subscription.lastWebhookAt) {
+      if (
+        subscription.lastWebhookAt &&
+        eventCreatedAt < subscription.lastWebhookAt
+      ) {
         await tx.paymentWebhookEvent.update({
           where: { providerEventId },
           data: {
@@ -336,7 +364,8 @@ export const handleRazorpayWebhook = async (
         return;
       }
 
-      const providerStatusFromPayload = payload.payload?.subscription?.entity?.status;
+      const providerStatusFromPayload =
+        payload.payload?.subscription?.entity?.status;
       const providerStatusFromEvent = getProviderStatusFromEvent(payload.event);
       const providerStatus =
         providerStatusFromPayload ||
@@ -351,16 +380,23 @@ export const handleRazorpayWebhook = async (
       const invoiceStatusFromEvent = getInvoiceStatusFromEvent(payload.event);
 
       const lastPaymentStatus =
-        paymentEntity?.status || paymentStatusFromEvent || subscription.lastPaymentStatus || undefined;
+        paymentEntity?.status ||
+        paymentStatusFromEvent ||
+        subscription.lastPaymentStatus ||
+        undefined;
       const lastInvoiceStatus =
-        invoiceEntity?.status || invoiceStatusFromEvent || subscription.lastInvoiceStatus || undefined;
+        invoiceEntity?.status ||
+        invoiceStatusFromEvent ||
+        subscription.lastInvoiceStatus ||
+        undefined;
 
       const mappedStatusFromSignals = mapProviderSignalsToInternal(
         providerStatus,
         lastInvoiceStatus,
         lastPaymentStatus,
       );
-      const mappedStatus = getInternalStatusOverride(payload.event) || mappedStatusFromSignals;
+      const mappedStatus =
+        getInternalStatusOverride(payload.event) || mappedStatusFromSignals;
 
       const currentPeriodStart =
         toDate(payload.payload?.subscription?.entity?.current_start) ||
@@ -383,8 +419,11 @@ export const handleRazorpayWebhook = async (
           currentPeriodStart,
           currentPeriodEnd,
           cancelAtPeriodEnd:
-            payload.payload?.subscription?.entity?.cancel_at_cycle_end !== undefined
-              ? Boolean(payload.payload?.subscription?.entity?.cancel_at_cycle_end)
+            payload.payload?.subscription?.entity?.cancel_at_cycle_end !==
+            undefined
+              ? Boolean(
+                  payload.payload?.subscription?.entity?.cancel_at_cycle_end,
+                )
               : subscription.cancelAtPeriodEnd,
           razorpayPaymentId:
             paymentEntity?.id ||
@@ -400,7 +439,9 @@ export const handleRazorpayWebhook = async (
         },
       });
 
-      const hasPaymentSignal = payload.event.startsWith("payment.") || payload.event.startsWith("invoice.");
+      const hasPaymentSignal =
+        payload.event.startsWith("payment.") ||
+        payload.event.startsWith("invoice.");
       if (hasPaymentSignal && (paymentIdFromPayload || invoiceIdFromPayload)) {
         const paymentAmount =
           payload.payload?.payment?.entity?.amount ||
@@ -429,10 +470,12 @@ export const handleRazorpayWebhook = async (
           eventType: payload.event,
           eventCreatedAt,
           paidAt:
-            payload.event === "payment.captured" || payload.event === "invoice.paid"
+            payload.event === "payment.captured" ||
+            payload.event === "invoice.paid"
               ? eventCreatedAt
               : undefined,
-          failedAt: payload.event === "payment.failed" ? eventCreatedAt : undefined,
+          failedAt:
+            payload.event === "payment.failed" ? eventCreatedAt : undefined,
           rawSnapshot: payload as unknown as Prisma.InputJsonValue,
         };
 
@@ -497,7 +540,8 @@ export const handleRazorpayWebhook = async (
         where: { providerEventId },
         data: {
           status: "failed",
-          error: error instanceof Error ? error.message : "Unknown webhook error",
+          error:
+            error instanceof Error ? error.message : "Unknown webhook error",
           processedAt: new Date(),
         },
       });
@@ -505,6 +549,8 @@ export const handleRazorpayWebhook = async (
       // Ignore secondary failures
     }
 
-    res.status(500).json({ success: false, message: "Webhook processing failed" });
+    res
+      .status(500)
+      .json({ success: false, message: "Webhook processing failed" });
   }
 };
