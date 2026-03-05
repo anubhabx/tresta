@@ -6,8 +6,13 @@ import { REDIS_KEYS } from '../lib/redis-keys.js';
 import { NotificationService } from '../services/notification.service.js';
 import { renderDigestTemplate, renderPlainTextDigest } from '../templates/notification-email.js';
 import { NotificationType } from '@workspace/database/prisma';
+import {
+  assertResendApiKey,
+  isRealEmailDeliveryEnabled,
+} from '../config/email-delivery.js';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const realEmailEnabled = isRealEmailDeliveryEnabled();
+const resend = realEmailEnabled ? new Resend(assertResendApiKey()) : null;
 
 /**
  * Daily digest job - sends batched email summaries
@@ -87,6 +92,12 @@ export const dailyDigestJob = new CronJob(
           continue; // Skip if no notifications
         }
 
+        if (!realEmailEnabled) {
+          console.log(`[MOCK] Digest email for ${user.email}: ${notifications.length} notifications`);
+          sentCount++;
+          continue;
+        }
+
         // Atomic check-and-increment quota
         const { success, count } = await NotificationService.tryIncrementEmailUsage('normal');
 
@@ -97,13 +108,6 @@ export const dailyDigestJob = new CronJob(
           // Lock quota for rest of day and record next retry time
           await NotificationService.setQuotaLock();
           break;
-        }
-
-        // Check if real emails are enabled
-        if (process.env.ENABLE_REAL_EMAILS !== 'true') {
-          console.log(`[MOCK] Digest email for ${user.email}: ${notifications.length} notifications (${count}/200)`);
-          sentCount++;
-          continue;
         }
 
         if (!resend) {

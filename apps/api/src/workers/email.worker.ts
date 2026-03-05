@@ -4,19 +4,23 @@ import { prisma } from '@workspace/database/prisma';
 import { NotificationService } from '../services/notification.service.js';
 import { getRedisClient } from '../lib/redis.js';
 import { POP_WORKER_OPTIONS } from '../lib/worker-options.js';
+import {
+  assertResendApiKey,
+  isRealEmailDeliveryEnabled,
+} from '../config/email-delivery.js';
 
 const redisUrl = process.env.REDIS_URL;
-const resendApiKey = process.env.RESEND_API_KEY;
+const realEmailEnabled = isRealEmailDeliveryEnabled();
 
 if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is required');
 }
 
-if (!resendApiKey) {
-  console.warn('RESEND_API_KEY not configured - email sending will be mocked');
+if (!realEmailEnabled) {
+  console.warn('ENABLE_REAL_EMAILS is disabled - email worker will run in mock mode');
 }
 
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const resend = realEmailEnabled ? new Resend(assertResendApiKey()) : null;
 
 /**
  * Email worker - processes email sending with quota management
@@ -46,15 +50,6 @@ export const createEmailWorker = () => {
     async (job) => {
       const { userId, notificationId, priority = 'normal' } = job.data;
 
-      // Atomic check-and-increment quota (Lua script)
-      const { success, count } = await NotificationService.tryIncrementEmailUsage(priority);
-
-      if (!success) {
-        console.log(`Email quota exhausted (${count}/200), deferring email ${notificationId}`);
-        // Don't retry quota failures - will be picked up by next day's digest
-        throw new Error('QUOTA_EXCEEDED');
-      }
-
       const notification = await prisma.notification.findUnique({
         where: { id: notificationId },
         include: { user: true },
@@ -64,19 +59,26 @@ export const createEmailWorker = () => {
         throw new Error('Notification not found');
       }
 
-      // Check if real emails are enabled
-      if (process.env.ENABLE_REAL_EMAILS !== 'true') {
+      if (!realEmailEnabled) {
         console.log('[MOCK] Email:', {
           to: notification.user.email,
           subject: notification.title,
           notificationId,
-          count: `${count}/200`,
+          userId,
         });
         return;
       }
 
       if (!resend) {
         throw new Error('RESEND_API_KEY not configured');
+      }
+
+      // Atomic check-and-increment quota (Lua script)
+      const { success, count } = await NotificationService.tryIncrementEmailUsage(priority);
+
+      if (!success) {
+        console.log(`Email quota exhausted (${count}/200), deferring email ${notificationId}`);
+        throw new Error('QUOTA_EXCEEDED');
       }
 
       try {
