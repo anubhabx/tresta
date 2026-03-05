@@ -7,6 +7,7 @@ import { ArrowLeft, RefreshCw, Download, Loader2 } from 'lucide-react';
 import { formatDate, formatNumber, formatRelativeTime } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { apiClient } from '@/lib/api-client';
 
 interface UserDetailClientProps {
   userId: string;
@@ -15,9 +16,25 @@ interface UserDetailClientProps {
 export function UserDetailClient({ userId }: UserDetailClientProps) {
   const router = useRouter();
   const { data: user, isLoading, error, refetch } = useUser(userId);
+  const [isExporting, setIsExporting] = useState(false);
   
-  const handleExport = () => {
-    toast.info('Export functionality not yet implemented');
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await apiClient.post(`/admin/users/${userId}/export`);
+      const downloadUrl = response.data?.data?.downloadUrl as string | undefined;
+
+      if (!downloadUrl) {
+        throw new Error('Export download URL was not returned');
+      }
+
+      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+      toast.success('Export generated. Download started in a new tab.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to export user data');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   if (isLoading) {
@@ -85,9 +102,14 @@ export function UserDetailClient({ userId }: UserDetailClientProps) {
           <Button
             variant="outline"
             onClick={handleExport}
+            disabled={isExporting}
           >
-            <Download className="h-4 w-4" />
-            Export Data
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {isExporting ? 'Generating...' : 'Export Data'}
           </Button>
           <Button onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
