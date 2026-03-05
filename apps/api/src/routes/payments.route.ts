@@ -5,6 +5,7 @@ import {
     verifyPayment,
     getSubscriptionDetails,
     cancelSubscription,
+    listUserInvoices,
 } from "../controllers/payments.controller.js";
 import { attachUser, requireAuth } from "../middleware/auth.middleware.js";
 
@@ -13,6 +14,7 @@ const paymentsRouter: Router = Router();
 // Protected routes (require login)
 paymentsRouter.post("/subscription", attachUser, requireAuth, createSubscription);
 paymentsRouter.get("/subscription", attachUser, requireAuth, getSubscriptionDetails);
+paymentsRouter.get("/invoices", attachUser, requireAuth, listUserInvoices);
 paymentsRouter.post("/verify", attachUser, requireAuth, verifyPayment);
 paymentsRouter.post("/cancel", attachUser, requireAuth, cancelSubscription);
 

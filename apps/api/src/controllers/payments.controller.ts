@@ -297,3 +297,85 @@ export const cancelSubscription = async (
     next(handlePrismaError(error));
   }
 };
+
+const getInvoiceDownloadUrl = (rawSnapshot: unknown): string | null => {
+  if (!rawSnapshot || typeof rawSnapshot !== "object") {
+    return null;
+  }
+
+  const snapshot = rawSnapshot as {
+    payload?: {
+      invoice?: {
+        entity?: {
+          short_url?: string;
+          invoice_url?: string;
+        };
+      };
+    };
+    invoice?: {
+      short_url?: string;
+      invoice_url?: string;
+    };
+  };
+
+  return (
+    snapshot.payload?.invoice?.entity?.short_url ??
+    snapshot.payload?.invoice?.entity?.invoice_url ??
+    snapshot.invoice?.short_url ??
+    snapshot.invoice?.invoice_url ??
+    null
+  );
+};
+
+export const listUserInvoices = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = requireUserId(req);
+
+    const records = await prisma.subscriptionPayment.findMany({
+      where: {
+        userId,
+        OR: [
+          { externalInvoiceId: { not: null } },
+          { paymentStatus: { not: null } },
+          { invoiceStatus: { not: null } },
+        ],
+      },
+      orderBy: [{ eventCreatedAt: "desc" }, { createdAt: "desc" }],
+      take: 25,
+      select: {
+        id: true,
+        externalInvoiceId: true,
+        amount: true,
+        currency: true,
+        paymentStatus: true,
+        invoiceStatus: true,
+        paidAt: true,
+        eventCreatedAt: true,
+        createdAt: true,
+        rawSnapshot: true,
+      },
+    });
+
+    return ResponseHandler.success(res, {
+      data: {
+        invoices: records.map((record) => ({
+          id: record.id,
+          invoiceId: record.externalInvoiceId,
+          amount: record.amount,
+          currency: record.currency,
+          status: record.invoiceStatus ?? record.paymentStatus ?? "unknown",
+          paidAt: record.paidAt?.toISOString() ?? null,
+          date:
+            record.eventCreatedAt?.toISOString() ?? record.createdAt.toISOString(),
+          downloadUrl: getInvoiceDownloadUrl(record.rawSnapshot),
+        })),
+      },
+    });
+  } catch (error) {
+    next(handlePrismaError(error));
+  }
+};

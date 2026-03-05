@@ -17,6 +17,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useCancelSubscription } from "@/hooks/use-cancel-subscription";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
+import { useInvoiceHistory } from "@/hooks/use-invoice-history";
 
 // We can fetch the subscription details to show current plan
 // For now, we rely on what we know or fetch it.
@@ -29,6 +30,7 @@ export function BillingSection() {
   // Use shared hook for data
   const { data, isLoading } = useSubscription();
   const { cancelSubscription, isCanceling } = useCancelSubscription();
+  const { invoices, isLoading: isInvoicesLoading } = useInvoiceHistory();
 
   const handleCancelSubscription = async () => {
     try {
@@ -77,6 +79,35 @@ export function BillingSection() {
     if (limit === -1) return 100; // Always full bar for unlimited or just hidden?
     const percent = (current / limit) * 100;
     return Math.min(percent, 100);
+  };
+
+  const formatCurrency = (amount: number | null, currency: string | null) => {
+    if (amount == null) return "-";
+
+    const normalizedCurrency = (currency || "INR").toUpperCase();
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: normalizedCurrency,
+      maximumFractionDigits: 2,
+    }).format(amount / 100);
+  };
+
+  const getStatusLabel = (status: string) => {
+    const normalized = status.toLowerCase();
+    if (normalized === "paid" || normalized === "captured") return "Paid";
+    if (normalized === "expired" || normalized === "failed") return "Failed";
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  };
+
+  const getStatusBadgeClassName = (status: string) => {
+    const normalized = status.toLowerCase();
+    if (normalized === "paid" || normalized === "captured") {
+      return "text-green-600 border-green-200 bg-green-50";
+    }
+    if (normalized === "expired" || normalized === "failed") {
+      return "text-red-600 border-red-200 bg-red-50";
+    }
+    return "";
   };
 
   return (
@@ -218,7 +249,7 @@ export function BillingSection() {
 
         <Separator />
 
-        {/* Invoice History (Mock for now) */}
+        {/* Invoice History */}
         <div className="space-y-4">
           <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Invoice History
@@ -242,41 +273,57 @@ export function BillingSection() {
                 </tr>
               </thead>
               <tbody>
-                {/* Mock Rows */}
-                <tr className="border-b last:border-0 hover:bg-muted/50 transition-colors">
-                  <td className="p-4">Oct 01, 2023</td>
-                  <td className="p-4">$19.00</td>
-                  <td className="p-4">
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50"
+                {isInvoicesLoading ? (
+                  <tr>
+                    <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                      Loading invoices...
+                    </td>
+                  </tr>
+                ) : invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                      No invoices yet.
+                    </td>
+                  </tr>
+                ) : (
+                  invoices.map((invoice) => (
+                    <tr
+                      key={invoice.id}
+                      className="border-b last:border-0 hover:bg-muted/50 transition-colors"
                     >
-                      Paid
-                    </Badge>
-                  </td>
-                  <td className="p-4 text-right">
-                    <Button variant="ghost" size="sm" className="h-8">
-                      Download
-                    </Button>
-                  </td>
-                </tr>
-                <tr className="border-b last:border-0 hover:bg-muted/50 transition-colors">
-                  <td className="p-4">Sep 01, 2023</td>
-                  <td className="p-4">$19.00</td>
-                  <td className="p-4">
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50"
-                    >
-                      Paid
-                    </Badge>
-                  </td>
-                  <td className="p-4 text-right">
-                    <Button variant="ghost" size="sm" className="h-8">
-                      Download
-                    </Button>
-                  </td>
-                </tr>
+                      <td className="p-4">
+                        {new Date(invoice.date).toLocaleDateString()}
+                      </td>
+                      <td className="p-4">
+                        {formatCurrency(invoice.amount, invoice.currency)}
+                      </td>
+                      <td className="p-4">
+                        <Badge
+                          variant="outline"
+                          className={getStatusBadgeClassName(invoice.status)}
+                        >
+                          {getStatusLabel(invoice.status)}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-right">
+                        {invoice.downloadUrl ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8"
+                            onClick={() =>
+                              window.open(invoice.downloadUrl as string, "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            Download
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
