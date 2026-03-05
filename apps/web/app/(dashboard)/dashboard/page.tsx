@@ -2,6 +2,7 @@
 
 import React from "react";
 import { projects } from "@/lib/queries";
+import { useNotificationList } from "@/lib/queries/notifications";
 import { DashboardPageSkeleton } from "@/components/skeletons";
 import dynamic from "next/dynamic";
 import { Button } from "@workspace/ui/components/button";
@@ -48,6 +49,7 @@ import { useUser } from "@clerk/nextjs";
 const DashboardPage = () => {
   const { data: projectsData, isLoading: isLoadingProjects } =
     projects.queries.useList(1, 100);
+  const { data: notificationsData } = useNotificationList();
 
   const user = useUser();
 
@@ -78,6 +80,10 @@ const DashboardPage = () => {
   ).length;
 
   const recentProjects = projectsList.slice(0, 5);
+  const recentNotifications =
+    notificationsData?.pages
+      .flatMap((page) => page.data.notifications)
+      .slice(0, 10) ?? [];
 
   return (
     <div className="mx-auto h-full w-full max-w-7xl p-4 sm:p-6">
@@ -120,7 +126,11 @@ const DashboardPage = () => {
             <PendingActionsCard projects={projectsList} />
 
             {/* Recent Activity Feed */}
-            <ActivityFeed projects={projectsList} maxItems={5} />
+            <ActivityFeed
+              projects={projectsList}
+              notifications={recentNotifications}
+              maxItems={5}
+            />
 
             {/* Recent Projects */}
             <section>

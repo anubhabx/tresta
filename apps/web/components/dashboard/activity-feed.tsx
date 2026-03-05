@@ -34,8 +34,20 @@ interface ActivityItem {
 
 interface ActivityFeedProps {
   projects: Project[];
+  notifications?: Array<{
+    id: string;
+    type: string;
+    title: string;
+    createdAt: string;
+  }>;
   maxItems?: number;
 }
+
+const notificationTypeToActivityType: Record<string, ActivityType> = {
+  NEW_TESTIMONIAL: "testimonial_submitted",
+  TESTIMONIAL_APPROVED: "testimonial_approved",
+  TESTIMONIAL_REJECTED: "testimonial_rejected",
+};
 
 /**
  * Activity icon component with appropriate colors
@@ -131,9 +143,22 @@ function ActivityDescription({ item }: { item: ActivityItem }) {
  * In a full implementation, this would come from an activity log API.
  */
 export function ActivityFeed({ projects, maxItems = 5 }: ActivityFeedProps) {
-  // Generate activity items from projects
-  // In production, this would come from an activity log API
-  const activityItems: ActivityItem[] = projects
+export function ActivityFeed({
+  projects,
+  notifications,
+  maxItems = 5,
+}: ActivityFeedProps) {
+  const notificationActivityItems: ActivityItem[] = (notifications ?? [])
+    .map((notification) => ({
+      id: notification.id,
+      type: notificationTypeToActivityType[notification.type],
+      projectName: "your project",
+      projectSlug: "",
+      timestamp: new Date(notification.createdAt),
+    }))
+    .filter((item): item is ActivityItem => Boolean(item.type));
+
+  const fallbackProjectActivityItems: ActivityItem[] = projects
     .slice(0, maxItems)
     .map((project) => ({
       id: `project-created-${project.id}`,
@@ -142,10 +167,18 @@ export function ActivityFeed({ projects, maxItems = 5 }: ActivityFeedProps) {
       projectSlug: project.slug,
       timestamp: new Date(project.createdAt),
     }))
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  const activityItems: ActivityItem[] =
+    notificationActivityItems.length > 0
+      ? notificationActivityItems
+      : fallbackProjectActivityItems;
+
+  const visibleItems = activityItems
     .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
     .slice(0, maxItems);
 
-  if (activityItems.length === 0) {
+  if (visibleItems.length === 0) {
     return (
       <Card className="border-border">
         <CardHeader className="pb-3">
@@ -179,7 +212,7 @@ export function ActivityFeed({ projects, maxItems = 5 }: ActivityFeedProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {activityItems.map((item) => (
+          {visibleItems.map((item) => (
             <div key={item.id} className="flex items-start gap-2">
               <ActivityIcon type={item.type} />
               <div className="flex-1 min-w-0">
