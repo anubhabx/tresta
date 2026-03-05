@@ -17,6 +17,8 @@ export function StatusBadge({
   moderationFlags,
   variant = "simple",
 }: StatusBadgeProps) {
+  const effectiveStatus = moderationStatus ?? (isApproved ? "APPROVED" : "PENDING");
+
   // Show published status first if applicable
   if (isPublished) {
     return (
@@ -28,23 +30,7 @@ export function StatusBadge({
   }
 
   // Show moderation status
-  if (!moderationStatus) {
-    if (isApproved) {
-      return (
-        <Badge variant="outline">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          Approved
-        </Badge>
-      );
-    }
-    return (
-      <Badge variant="outline" className="text-muted-foreground">
-        Pending
-      </Badge>
-    );
-  }
-
-  switch (moderationStatus) {
+  switch (effectiveStatus) {
     case "APPROVED":
       return (
         <Badge variant="outline">

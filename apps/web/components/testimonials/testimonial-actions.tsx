@@ -45,6 +45,8 @@ export function TestimonialActions({
   moderationMode = false,
 }: TestimonialActionsProps) {
   const isLoading = loadingState?.id === testimonialId;
+  const effectiveStatus = moderationStatus ?? (isApproved ? "APPROVED" : "PENDING");
+  const canPublish = effectiveStatus === "APPROVED";
 
   return (
     <DropdownMenu>
@@ -83,9 +85,9 @@ export function TestimonialActions({
         ) : (
           <>
             {/* Regular actions */}
-            {moderationStatus && moderationStatus !== "PENDING" && (
+            {effectiveStatus !== "PENDING" && (
               <>
-                {isApproved && (
+                {canPublish && (
                   <>
                     {isPublished && onUnpublish && (
                       <DropdownMenuItem

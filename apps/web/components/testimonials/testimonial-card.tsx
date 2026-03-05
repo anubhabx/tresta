@@ -38,6 +38,10 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
+import {
+  getEffectiveModerationStatus,
+  isModerationApproved,
+} from "@/lib/testimonial-list-utils";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -53,6 +57,7 @@ export function TestimonialCard({
   onDelete,
 }: TestimonialCardProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const effectiveModerationStatus = getEffectiveModerationStatus(testimonial);
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsLoading(true);
@@ -75,7 +80,7 @@ export function TestimonialCard({
         </Badge>
       );
     }
-    if (testimonial.isApproved) {
+    if (isModerationApproved(testimonial)) {
       return (
         <Badge variant="outline">
           <CheckCircle className="h-3 w-3 mr-1" />
@@ -91,9 +96,7 @@ export function TestimonialCard({
   };
 
   const getModerationBadge = () => {
-    if (!testimonial.moderationStatus) return null;
-
-    switch (testimonial.moderationStatus) {
+    switch (effectiveModerationStatus) {
       case "APPROVED":
         return (
           <Badge variant="outline">
@@ -268,8 +271,7 @@ export function TestimonialCard({
         )}
 
         {/* Moderation Info */}
-        {testimonial.moderationStatus &&
-          testimonial.moderationStatus !== "PENDING" && (
+        {effectiveModerationStatus !== "PENDING" && (
             <div className="mb-4">{getModerationBadge()}</div>
           )}
 
@@ -277,7 +279,7 @@ export function TestimonialCard({
         <div className="flex items-center gap-2 flex-wrap">
           <TooltipProvider>
             {/* Publish/Unpublish - Only for approved testimonials */}
-            {testimonial.isApproved && (
+            {isModerationApproved(testimonial) && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   {testimonial.isPublished ? (

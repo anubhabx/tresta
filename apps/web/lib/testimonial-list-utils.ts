@@ -43,16 +43,22 @@ export interface ModerationStats {
   verified: number;
 }
 
+export function getEffectiveModerationStatus(
+  testimonial: Pick<Testimonial, "moderationStatus" | "isApproved">,
+): ModerationStatus {
+  return testimonial.moderationStatus ?? (testimonial.isApproved ? "APPROVED" : "PENDING");
+}
+
 /**
  * Canonical status helpers
  * Moderation workflow should be derived from moderationStatus first.
  */
 export function isModerationApproved(testimonial: Testimonial): boolean {
-  return testimonial.moderationStatus === "APPROVED" || testimonial.isApproved;
+  return getEffectiveModerationStatus(testimonial) === "APPROVED";
 }
 
 export function isModerationPending(testimonial: Testimonial): boolean {
-  return testimonial.moderationStatus === "PENDING" || !isModerationApproved(testimonial);
+  return getEffectiveModerationStatus(testimonial) === "PENDING";
 }
 
 export function matchesFilterStatus(
@@ -89,13 +95,13 @@ export function getModerationCounts(
   testimonials: Testimonial[],
 ): ModerationCounts {
   return {
-    pending: testimonials.filter((t) => t.moderationStatus === "PENDING")
+    pending: testimonials.filter((t) => getEffectiveModerationStatus(t) === "PENDING")
       .length,
-    approved: testimonials.filter((t) => t.moderationStatus === "APPROVED")
+    approved: testimonials.filter((t) => getEffectiveModerationStatus(t) === "APPROVED")
       .length,
-    flagged: testimonials.filter((t) => t.moderationStatus === "FLAGGED")
+    flagged: testimonials.filter((t) => getEffectiveModerationStatus(t) === "FLAGGED")
       .length,
-    rejected: testimonials.filter((t) => t.moderationStatus === "REJECTED")
+    rejected: testimonials.filter((t) => getEffectiveModerationStatus(t) === "REJECTED")
       .length,
   };
 }
@@ -107,16 +113,16 @@ export function calculateModerationStats(
   testimonials: Testimonial[],
 ): ModerationStats {
   const pending = testimonials.filter(
-    (t) => t.moderationStatus === "PENDING",
+    (t) => getEffectiveModerationStatus(t) === "PENDING",
   ).length;
   const flagged = testimonials.filter(
-    (t) => t.moderationStatus === "FLAGGED",
+    (t) => getEffectiveModerationStatus(t) === "FLAGGED",
   ).length;
   const approved = testimonials.filter(
-    (t) => t.moderationStatus === "APPROVED",
+    (t) => getEffectiveModerationStatus(t) === "APPROVED",
   ).length;
   const rejected = testimonials.filter(
-    (t) => t.moderationStatus === "REJECTED",
+    (t) => getEffectiveModerationStatus(t) === "REJECTED",
   ).length;
   const oauthVerified = testimonials.filter((t) => t.isOAuthVerified).length;
   const autoModerated = testimonials.filter((t) => t.autoPublished).length;
