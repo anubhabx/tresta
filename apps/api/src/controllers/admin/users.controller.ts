@@ -3,6 +3,10 @@ import type { Request, Response, NextFunction } from 'express';
 import { NotFoundError, handlePrismaError } from '../../lib/errors.js';
 import { ResponseHandler } from '../../lib/response.js';
 import { requireUserId } from '../../lib/auth.js';
+import {
+  blobStorageService,
+  StorageDirectory,
+} from '../../services/blob-storage.service.js';
 
 /**
  * GET /admin/users
@@ -302,12 +306,18 @@ export const exportUserData = async (
       },
     };
 
-    // Convert to JSON string
     const exportJson = JSON.stringify(exportData, null, 2);
     const filename = `user-export-${user.id}-${Date.now()}.json`;
 
-    // TODO: Upload to Azure Blob Storage and generate signed URL
-    // For now, return the data directly with a download instruction
+    const { blobName } = await blobStorageService.uploadText(
+      StorageDirectory.DOCUMENTS,
+      filename,
+      exportJson,
+      'application/json',
+      user.id,
+    );
+
+    const readUrl = await blobStorageService.generateReadUrl(blobName, 60);
     
     // Log export action in audit log
     try {
@@ -330,10 +340,15 @@ export const exportUserData = async (
       console.error('Failed to log export action:', error);
     }
 
-    // Return export data as downloadable JSON
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    return res.send(exportJson);
+    return ResponseHandler.success(res, {
+      message: 'User export generated successfully',
+      data: {
+        filename,
+        blobName,
+        downloadUrl: readUrl,
+        expiresInMinutes: 60,
+      },
+    });
   } catch (error) {
     next(error);
   }

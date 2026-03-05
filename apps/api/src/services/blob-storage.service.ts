@@ -465,6 +465,41 @@ class BlobStorageService {
       throw new InternalServerError("Failed to upload image from URL");
     }
   }
+
+  /**
+   * Upload plain text content (e.g. JSON exports) to Blob Storage
+   */
+  async uploadText(
+    directory: StorageDirectory,
+    filename: string,
+    content: string,
+    contentType: string = 'application/json',
+    userId?: string,
+  ): Promise<{ blobName: string; blobUrl: string }> {
+    try {
+      const blobName = this.generateBlobName(directory, filename, userId);
+      const containerClient = getContainerClient();
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+      const buffer = Buffer.from(content, 'utf8');
+
+      await blockBlobClient.upload(buffer, buffer.length, {
+        blobHTTPHeaders: {
+          blobContentType: contentType,
+        },
+      });
+
+      const { accountName, containerName } = getStorageConfig();
+
+      return {
+        blobName,
+        blobUrl: `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}`,
+      };
+    } catch (error) {
+      console.error('Error uploading text content:', error);
+      throw new InternalServerError('Failed to upload export file');
+    }
+  }
 }
 
 // Export singleton instance
