@@ -44,12 +44,40 @@ export interface ModerationStats {
 }
 
 /**
+ * Canonical status helpers
+ * Moderation workflow should be derived from moderationStatus first.
+ */
+export function isModerationApproved(testimonial: Testimonial): boolean {
+  return testimonial.moderationStatus === "APPROVED" || testimonial.isApproved;
+}
+
+export function isModerationPending(testimonial: Testimonial): boolean {
+  return testimonial.moderationStatus === "PENDING" || !isModerationApproved(testimonial);
+}
+
+export function matchesFilterStatus(
+  testimonial: Testimonial,
+  filterStatus: FilterStatus,
+): boolean {
+  if (filterStatus === "all") return true;
+  if (filterStatus === "published") return testimonial.isPublished;
+  if (filterStatus === "approved") {
+    return isModerationApproved(testimonial) && !testimonial.isPublished;
+  }
+  if (filterStatus === "pending") {
+    return isModerationPending(testimonial);
+  }
+
+  return true;
+}
+
+/**
  * Calculate status counts from testimonials array
  */
 export function getStatusCounts(testimonials: Testimonial[]): StatusCounts {
   return {
-    pending: testimonials.filter((t) => !t.isApproved).length,
-    approved: testimonials.filter((t) => t.isApproved && !t.isPublished).length,
+    pending: testimonials.filter((t) => isModerationPending(t)).length,
+    approved: testimonials.filter((t) => isModerationApproved(t) && !t.isPublished).length,
     published: testimonials.filter((t) => t.isPublished).length,
   };
 }

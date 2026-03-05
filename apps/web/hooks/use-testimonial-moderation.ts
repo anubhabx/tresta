@@ -2,6 +2,11 @@ import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { toast } from "sonner";
 import type { Testimonial } from "@/types/api";
 import type { FilterPreset } from "@/components/moderation/filter-presets";
+import {
+  type FilterStatus,
+  isModerationApproved,
+  matchesFilterStatus,
+} from "@/lib/testimonial-list-utils";
 
 interface UseTestimonialKeyboardShortcutsOptions {
   moderationMode: boolean;
@@ -223,12 +228,9 @@ export function filterTestimonials(
 
   // Status filter
   if (filterStatus !== "all") {
-    filtered = filtered.filter((t) => {
-      if (filterStatus === "pending") return !t.isApproved;
-      if (filterStatus === "approved") return t.isApproved && !t.isPublished;
-      if (filterStatus === "published") return t.isPublished;
-      return true;
-    });
+    filtered = filtered.filter((t) =>
+      matchesFilterStatus(t, filterStatus as FilterStatus),
+    );
   }
 
   // Verification filter
@@ -266,7 +268,7 @@ export function filterTestimonials(
   } else {
     // Regular mode: Show only APPROVED testimonials, unless user specifically asks for pending or all
     if (filterStatus !== "pending" && filterStatus !== "all") {
-      filtered = filtered.filter((t) => t.isApproved === true);
+      filtered = filtered.filter((t) => isModerationApproved(t));
     }
   }
 
