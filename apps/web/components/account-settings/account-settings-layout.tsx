@@ -81,7 +81,7 @@ export function AccountSettingsLayout({
             onTabChange={handleTabChange}
           />
         </aside>
-        <div className="flex-1 lg:max-w-3xl">
+        <div className="flex-1">
           {currentTab === "general" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
               {profileContent}
