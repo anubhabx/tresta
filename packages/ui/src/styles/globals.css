@@ -107,9 +107,9 @@
   --foreground: #fafafa;
 
   /* Card & Popover Surfaces */
-  --card: #0f0f0f;
+  --card: #111111;
   --card-foreground: #fafafa;
-  --popover: #0f0f0f;
+  --popover: #111111;
   --popover-foreground: #fafafa;
 
   /* Primary - Blue (Developer Trust) */
@@ -117,15 +117,15 @@
   --primary-foreground: #ffffff;
 
   /* Secondary - Dark gray */
-  --secondary: #1a1a1a;
+  --secondary: #0a0a0a;
   --secondary-foreground: #fafafa;
 
   /* Muted - For secondary surfaces */
-  --muted: #1a1a1a;
+  --muted: #0a0a0a;
   --muted-foreground: #a3a3a3;
 
   /* Accent - Same as secondary for consistency */
-  --accent: #1a1a1a;
+  --accent: #0a0a0a;
   --accent-foreground: #fafafa;
 
   /* Semantic Colors */
@@ -156,7 +156,7 @@
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a1a;
+  --sidebar-accent: #0a0a0a;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #262626;
   --sidebar-ring: #3b82f6;
@@ -167,7 +167,7 @@
 
   /* Border Radius - Consistent across modes */
   --radius: 6px;
-  --radius-sm: 4px;
+  --radius-sm: 4px; /* Unused in standard UI via utility script replacement, kept for reference */
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
@@ -319,9 +319,9 @@
   --foreground: #fafafa;
 
   /* Card & Popover Surfaces - Slightly elevated */
-  --card: #0f0f0f;
+  --card: #0a0a0a;
   --card-foreground: #fafafa;
-  --popover: #0f0f0f;
+  --popover: #0a0a0a;
   --popover-foreground: #fafafa;
 
   /* Primary - Blue */
@@ -329,15 +329,15 @@
   --primary-foreground: #ffffff;
 
   /* Secondary - Dark gray */
-  --secondary: #1a1a1a;
+  --secondary: #0a0a0a;
   --secondary-foreground: #fafafa;
 
   /* Muted - For secondary surfaces */
-  --muted: #1a1a1a;
+  --muted: #0a0a0a;
   --muted-foreground: #a3a3a3;
 
   /* Accent */
-  --accent: #1a1a1a;
+  --accent: #0a0a0a;
   --accent-foreground: #fafafa;
 
   /* Semantic Colors */
@@ -368,7 +368,7 @@
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a1a;
+  --sidebar-accent: #0a0a0a;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #262626;
   --sidebar-ring: #3b82f6;

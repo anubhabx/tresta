@@ -146,7 +146,7 @@ export function InlineCode({
   return (
     <code
       className={cn(
-        "rounded-sm bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground",
+        "rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground",
         className
       )}
     >
