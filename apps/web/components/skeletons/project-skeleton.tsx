@@ -13,7 +13,7 @@ import {
  */
 export function ProjectCardSkeleton() {
   return (
-    <Card className="h-full">
+    <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl h-full">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 flex-1">
@@ -112,7 +112,10 @@ export function ProjectStatsSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {[1, 2, 3, 4].map((i) => (
-        <Card key={i}>
+        <Card
+          key={i}
+          className=" backdrop-blur-xl border border-white/5 shadow-2xl"
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-4 w-4 rounded" />
@@ -146,7 +149,7 @@ export function TabNavigationSkeleton() {
 export function ProjectDetailContentSkeleton() {
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardHeader>
           <div className="space-y-2">
             <Skeleton className="h-6 w-40" />

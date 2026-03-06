@@ -11,7 +11,7 @@ export default function UnauthorizedPage() {
       </div>
 
       {/* Card */}
-      <div className="relative z-10 max-w-md w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl">
+      <div className="relative z-10 max-w-md w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl">
         {/* Top glow line */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
 
@@ -35,7 +35,7 @@ export default function UnauthorizedPage() {
           </div>
 
           {/* Tip box */}
-          <div className="rounded-lg border border-white/8 bg-white/5 p-4 text-sm text-zinc-400">
+          <div className="rounded-lg border border-white/8 p-4 text-sm text-zinc-400">
             Tip: If you just signed out, signing back in will return you to this
             page automatically.
           </div>
@@ -56,7 +56,7 @@ export default function UnauthorizedPage() {
               variant="ghost"
               asChild
               size="lg"
-              className="flex-1 text-zinc-300 hover:text-white hover:bg-white/5 border border-white/10"
+              className="flex-1 text-zinc-300 hover:text-white hover:border border-white/10"
             >
               <Link href="/">Return home</Link>
             </Button>

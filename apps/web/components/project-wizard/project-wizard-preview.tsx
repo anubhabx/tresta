@@ -157,7 +157,7 @@ export function ProjectWizardPreview({
       {/* Preview Container */}
       <div
         className={cn(
-          "relative rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted/30 overflow-hidden transition-all duration-300",
+          "relative rounded-lg border-2 border-dashed border-muted-foreground/20 bg-muted/30 overflow-hidden transition-all duration-300",
           deviceMode === "desktop" && "min-h-[500px]",
           deviceMode === "tablet" && "min-h-[400px] max-w-[768px] mx-auto",
           deviceMode === "mobile" && "min-h-[500px] max-w-[375px] mx-auto",

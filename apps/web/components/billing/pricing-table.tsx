@@ -8,7 +8,6 @@ import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   Check,
-  Zap,
   Shield,
   Video,
   Palette,
@@ -21,7 +20,7 @@ import { CheckoutButton } from "./checkout-button";
 import { useSubscription } from "@/hooks/use-subscription";
 
 const featureIcons: Record<string, React.ReactNode> = {
-  Unlimited: <Zap className="h-3.5 w-3.5" />,
+  Unlimited: <Check className="h-3.5 w-3.5" />,
   Video: <Video className="h-3.5 w-3.5" />,
   Custom: <Palette className="h-3.5 w-3.5" />,
   API: <Code className="h-3.5 w-3.5" />,
@@ -81,8 +80,8 @@ function PricingCard({
       className={cn(
         "relative flex flex-col rounded-lg border transition-all duration-300",
         isPopular
-          ? "border-primary/60 bg-primary/[0.04] shadow-[0_0_60px_-15px_rgba(37,99,235,0.35)]"
-          : "border-white/10 bg-white/[0.02] hover:border-white/20",
+          ? "border-primary/60 bg-primary/[0.04]"
+          : "border-white/10  hover:border-white/20",
         compact && "gap-0",
       )}
     >
@@ -97,7 +96,7 @@ function PricingCard({
             className={cn(
               "px-3 py-1 text-xs font-medium",
               isPopular
-                ? "bg-primary text-white border-0 shadow-[0_0_20px_-5px_rgba(37,99,235,0.6)]"
+                ? "bg-primary text-white border-0"
                 : "bg-zinc-800 text-zinc-300 border border-zinc-700",
             )}
           >
@@ -143,7 +142,7 @@ function PricingCard({
       </div>
 
       {/* Divider */}
-      <div className="mx-6 h-px bg-white/5" />
+      <div className="mx-6 h-px " />
 
       {/* Features */}
       <div className={cn("flex-1 p-6", compact && "p-4")}>
@@ -238,11 +237,7 @@ function PricingCard({
           )
         ) : (
           <Button
-            className={cn(
-              "w-full rounded-md",
-              isPopular &&
-                "shadow-[0_0_30px_-8px_rgba(37,99,235,0.5)] hover:shadow-[0_0_40px_-8px_rgba(37,99,235,0.7)]",
-            )}
+            className="w-full rounded-md"
             variant={isPopular ? "default" : "outline"}
             size="lg"
             onClick={() => onUnauthenticatedClick(plan.id)}

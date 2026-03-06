@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export function SiteHeader() {
   return (
-    <header className="fixed top-4 inset-x-0 mx-auto w-[95%] max-w-5xl z-50 rounded-xl border border-border/40 bg-background/60 backdrop-blur-md shadow-sm supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-4 inset-x-0 mx-auto w-[95%] max-w-5xl z-50 rounded-lg border border-border/40 bg-background/60 backdrop-blur-md shadow-sm supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 py-2 flex h-14 items-center justify-between">
         <div className="flex flex-1 items-center">
           <Link href="/" className="flex items-center space-x-2">

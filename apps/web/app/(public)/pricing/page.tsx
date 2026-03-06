@@ -99,7 +99,7 @@ export default function PricingPage() {
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Eyebrow */}
-          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-md border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm mb-8">
+          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-md border border-white/10 backdrop-blur-sm shadow-sm mb-8">
             <span className="text-sm font-medium tracking-tight text-zinc-300">
               Simple, Transparent Pricing
             </span>
@@ -142,7 +142,7 @@ export default function PricingPage() {
             {planJustifications.map((item) => (
               <div
                 key={item.title}
-                className="group relative rounded-lg border border-white/8 bg-white/[0.02] p-6 hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-300"
+                className="group relative rounded-lg border border-white/8  p-6 hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-300"
               >
                 {/* Subtle top glow on hover */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/0 to-transparent group-hover:via-primary/40 transition-all duration-500" />

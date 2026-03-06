@@ -60,7 +60,7 @@ function TocNav({
                 item.level === 3 && "pl-6",
                 activeId === item.id
                   ? "bg-white/10 text-white font-medium"
-                  : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5",
+                  : "text-zinc-500 hover:text-zinc-200 hover:",
               )}
             >
               {item.title}
@@ -158,7 +158,7 @@ export function LegalLayout({
 
           {/* Last Updated Badge */}
           <div className="mt-5 flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-zinc-400 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-1 text-xs font-mono text-zinc-400 backdrop-blur-sm">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Last updated: {lastUpdated}
             </span>
@@ -174,7 +174,7 @@ export function LegalLayout({
               <Button
                 variant="ghost"
                 size="sm"
-                className="my-2 gap-2 text-zinc-400 hover:text-white hover:bg-white/5"
+                className="my-2 gap-2 text-zinc-400 hover:text-white hover:"
               >
                 <List className="h-4 w-4" />
                 On this page

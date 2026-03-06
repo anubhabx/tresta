@@ -110,7 +110,7 @@ export function CollectionFormPreview({
           width: DEVICE_FRAME_WIDTH.desktop,
           height: DEVICE_FRAME_HEIGHT.desktop,
         }}
-        className="overflow-hidden rounded-2xl border border-border/70 bg-background/95 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.55)] transition-all duration-300 ease-out"
+        className="overflow-hidden rounded-lg border border-border/70 bg-background/95 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.55)] transition-all duration-300 ease-out"
       >
         <div className="flex h-11 items-center gap-3 border-b border-border/70 bg-muted/35 px-4">
           <div className="flex items-center gap-1.5">

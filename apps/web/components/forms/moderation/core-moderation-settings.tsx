@@ -45,7 +45,7 @@ export function CoreModerationSettings({
             control={control}
             name="autoModeration"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/10 p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">
                     Enable Auto-Moderation
@@ -69,7 +69,7 @@ export function CoreModerationSettings({
             control={control}
             name="autoApproveVerified"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/10 p-4">
                 <div className="space-y-0.5 flex-1">
                   <div className="flex items-center gap-2">
                     <FormLabel className="text-base">

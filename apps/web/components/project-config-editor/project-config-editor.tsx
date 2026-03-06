@@ -217,7 +217,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
     <div className="min-h-screen bg-background">
       {/* ── Sticky Header ───────────────────────────────────────────────── */}
       <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 gap-3">
             {/* Left: Back + Title */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -318,8 +318,8 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
       </div>
 
       {/* ── Mobile step label ────────────────────────────────────────────── */}
-      <div className="sm:hidden border-b bg-muted/20 px-4 py-2">
-        <div className="container mx-auto flex items-center gap-2">
+      <div className="sm:hidden border-b bg-muted/20 py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2">
           <StepBadge num={step} completed={false} active />
           <span className="text-sm font-medium">
             {step === 1 ? "Collection Form" : "Widget Display"}
@@ -331,7 +331,7 @@ export function ProjectConfigEditor({ mode, slug }: ProjectConfigEditorProps) {
       </div>
 
       {/* ── Page body ────────────────────────────────────────────────────── */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {step === 1 ? (
           // ── STEP 1 ────────────────────────────────────────────────────────
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">

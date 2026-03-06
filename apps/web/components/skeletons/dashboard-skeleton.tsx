@@ -10,7 +10,10 @@ export function DashboardStatsSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <Card key={i} className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <Card
+          key={i}
+          className=" backdrop-blur-xl border border-white/5 shadow-2xl"
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-8 w-8 rounded-lg" />
@@ -33,7 +36,7 @@ export function DashboardStatsSkeleton() {
  */
 export function RecentProjectsListSkeleton() {
   return (
-    <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+    <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
       <CardContent className="p-6">
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -75,7 +78,7 @@ export function SectionHeaderSkeleton() {
  */
 export function GettingStartedCardSkeleton() {
   return (
-    <Card className="border-0 shadow-sm bg-muted/30">
+    <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
       <CardHeader>
         <div className="space-y-2">
           <Skeleton className="h-5 w-36" />

@@ -24,7 +24,7 @@ export default function ContactUsPage() {
             {/* Left Column */}
             <div className="flex flex-col items-start space-y-8">
               {/* Eyebrow pill */}
-              <div className="inline-flex items-center px-4 py-1.5 rounded-md border border-white/10 bg-white/5 backdrop-blur-sm">
+              <div className="inline-flex items-center px-4 py-1.5 rounded-md border border-white/10 backdrop-blur-sm">
                 <span className="text-sm font-medium tracking-tight text-zinc-300">
                   We&apos;re here to help
                 </span>
@@ -65,7 +65,7 @@ export default function ContactUsPage() {
             </div>
 
             {/* Right Column — Glass Card */}
-            <div className="relative rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-2xl overflow-hidden">
+            <div className="relative rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-2xl overflow-hidden">
               {/* Top glow line */}
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 

@@ -90,7 +90,7 @@ export function IndustryPresetCards({
               type="button"
               onClick={() => onChange(preset.id)}
               className={cn(
-                "relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                "relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
                 "hover:border-primary/50 hover:bg-muted/50",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 isSelected

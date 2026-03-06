@@ -8,6 +8,7 @@ import { formatDate, formatNumber, formatRelativeTime } from '@/lib/utils/format
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
+import { useState } from 'react';
 
 interface UserDetailClientProps {
   userId: string;

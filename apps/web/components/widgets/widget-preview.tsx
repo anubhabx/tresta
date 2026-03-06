@@ -255,7 +255,7 @@ export function WidgetPreview({
         </div>
       )}
 
-      <div className="rounded-xl border overflow-hidden shadow-sm bg-card">
+      <div className="rounded-lg border overflow-hidden shadow-sm bg-card">
         {error || !iframeDocument ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-destructive mb-2">Preview Error</p>

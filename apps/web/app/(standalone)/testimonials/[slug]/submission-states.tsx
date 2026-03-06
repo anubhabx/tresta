@@ -166,7 +166,7 @@ export function SuccessSubmissionState({ project }: SuccessSubmissionStateProps)
 export function LoadingSubmissionState() {
   return (
     <CollectionPageShell>
-      <Card className="w-full border-border/60 bg-card shadow-sm rounded-2xl overflow-hidden">
+      <Card className="w-full border-border/60 bg-card shadow-sm rounded-lg overflow-hidden">
         <CardHeader className="text-center pt-8 pb-5 px-6">
           <div className="flex flex-col items-center gap-4">
             <div className="h-16 w-16 rounded-full bg-muted animate-pulse" />
@@ -181,7 +181,7 @@ export function LoadingSubmissionState() {
             <div key={item} className="h-10 bg-muted animate-pulse rounded-md" />
           ))}
           <div className="h-24 bg-muted animate-pulse rounded-md" />
-          <div className="h-12 bg-muted animate-pulse rounded-xl" />
+          <div className="h-12 bg-muted animate-pulse rounded-lg" />
         </div>
       </Card>
     </CollectionPageShell>

@@ -66,7 +66,7 @@ export function BrandingWizardSection({
   });
 
   return (
-    <Card>
+    <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <Palette className="h-5 w-5" />

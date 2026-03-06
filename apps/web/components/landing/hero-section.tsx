@@ -33,7 +33,7 @@ export function HeroSection() {
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
           {/* MVP Pill */}
-          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-md border border-white/10 bg-white/5 backdrop-blur-sm shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
+          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-md border border-white/10 backdrop-blur-sm shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
             <span className="text-sm font-medium tracking-tight text-zinc-300 flex items-center">
               <span className="text-primary mr-2">
                 <StarsIcon size={16} />
@@ -58,7 +58,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
             <Button
               size="lg"
-              className="rounded-md w-full sm:w-auto px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-[0_0_40px_-10px_rgba(37,99,235,0.4)] transition-all hover:shadow-[0_0_60px_-10px_rgba(37,99,235,0.6)]"
+              className="rounded-md w-full sm:w-auto px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium transition-all"
             >
               <Link href="/sign-up" className="flex items-center">
                 Start For Free
@@ -68,7 +68,7 @@ export function HeroSection() {
             <Button
               size="lg"
               variant="ghost"
-              className="rounded-md w-full sm:w-auto px-8 h-12 text-zinc-300 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+              className="rounded-md w-full sm:w-auto px-8 h-12 text-zinc-300 hover:text-white hover:border border-transparent hover:border-white/10 transition-all"
               asChild
             >
               <Link href="/pricing" className="flex items-center">
@@ -93,7 +93,7 @@ export function HeroSection() {
           className="mt-20 md:mt-32 max-w-5xl mx-auto"
           style={{ perspective: "1000px" }}
         >
-          <div className="relative rounded-lg border border-white/10 bg-background/40 backdrop-blur-xl p-2 shadow-2xl overflow-hidden ring-1 ring-white/5">
+          <div className="relative rounded-lg border border-white/10  backdrop-blur-xl p-2 shadow-2xl overflow-hidden ring-1 ring-white/5">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
             {/* Fake IDE Header */}

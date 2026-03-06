@@ -136,7 +136,7 @@ const UISidebar = () => {
                 title="Create New Project"
                 onClick={closeMobileSidebar}
               >
-                <PlusIcon className="h-6 w-6 cursor-pointer transition-colors rounded-[2px]" />
+                <PlusIcon className="h-6 w-6 cursor-pointer transition-colors rounded-md" />
               </Link>
             </SidebarMenuAction>
 

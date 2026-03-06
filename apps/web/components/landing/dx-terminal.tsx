@@ -227,7 +227,7 @@ export function DxTerminal() {
                   {activeTab === tab && (
                     <motion.div
                       layoutId="tab-indicator"
-                      className="absolute inset-0 bg-white/5 rounded-sm border-t-2 border-primary"
+                      className="absolute inset-0 rounded-md border-t-2 border-primary"
                       transition={{
                         type: "spring",
                         stiffness: 400,

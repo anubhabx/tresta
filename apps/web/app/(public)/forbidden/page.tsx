@@ -11,7 +11,7 @@ export default function ForbiddenPage() {
       </div>
 
       {/* Card */}
-      <div className="relative z-10 max-w-md w-full rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl">
+      <div className="relative z-10 max-w-md w-full rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl">
         {/* Top glow line */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-destructive/40 to-transparent" />
 
@@ -36,7 +36,7 @@ export default function ForbiddenPage() {
           </div>
 
           {/* Next steps box */}
-          <div className="rounded-lg border border-white/8 bg-white/5 p-4 text-sm text-zinc-400 text-left">
+          <div className="rounded-lg border border-white/8 p-4 text-sm text-zinc-400 text-left">
             <p className="font-medium text-zinc-200 mb-2">Next steps:</p>
             <ul className="list-disc space-y-1 pl-5">
               <li>Return to the dashboard to continue working</li>
@@ -61,7 +61,7 @@ export default function ForbiddenPage() {
               variant="ghost"
               asChild
               size="lg"
-              className="flex-1 text-zinc-300 hover:text-white hover:bg-white/5 border border-white/10"
+              className="flex-1 text-zinc-300 hover:text-white hover:border border-white/10"
             >
               <a href="mailto:support@tresta.app">Contact support</a>
             </Button>

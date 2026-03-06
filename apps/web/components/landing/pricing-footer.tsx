@@ -22,14 +22,14 @@ export function PricingCTA() {
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Button
             size="lg"
-            className="rounded-md px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-[0_0_40px_-10px_rgba(37,99,235,0.4)] transition-all"
+            className="rounded-md px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium transition-all"
           >
             <Link href="/sign-up">Start Free Trial</Link>
           </Button>
           <Button
             size="lg"
             variant="ghost"
-            className="rounded-md px-8 h-12 text-zinc-300 hover:text-white hover:bg-white/5 border border-white/10 transition-all"
+            className="rounded-md px-8 h-12 text-zinc-300 hover:text-white hover:border border-white/10 transition-all"
           >
             <Link href="/pricing" className="flex items-center">
               View Pricing Plan

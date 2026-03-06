@@ -47,7 +47,7 @@ export function AdvancedSection({
   isPro = false,
 }: AdvancedSectionProps) {
   return (
-    <Card className="overflow-hidden">
+    <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl overflow-hidden">
       <Accordion type="single" collapsible className="w-full">
         {/* URLs Section */}
         <AccordionItem value="urls" className="border-b-0">
@@ -196,7 +196,9 @@ export function AdvancedSection({
                 featureName="custom_domain"
                 checked={false}
                 onCheckedChange={() => {
-                  toast.info("Coming soon! Custom domains are not yet available.");
+                  toast.info(
+                    "Coming soon! Custom domains are not yet available.",
+                  );
                 }}
                 label="Custom Domain"
                 description="Use yourdomain.com for your testimonial pages"
@@ -204,7 +206,9 @@ export function AdvancedSection({
 
               {/* Detailed Description */}
               <div className="space-y-2">
-                <Label htmlFor="project-description">Detailed Description</Label>
+                <Label htmlFor="project-description">
+                  Detailed Description
+                </Label>
                 <Textarea
                   id="project-description"
                   {...register("description")}
