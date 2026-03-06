@@ -7,12 +7,12 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage
+  AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -21,7 +21,7 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger
+  CollapsibleTrigger,
 } from "@workspace/ui/components/collapsible";
 import {
   Dialog,
@@ -29,7 +29,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
 import {
@@ -39,13 +39,14 @@ import {
   ChevronDown,
   Upload,
   Lock,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { cn } from "@workspace/ui/lib/utils";
 import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { AzureFileUpload } from "@/components/forms/fields/azure-file-upload";
 import type { FormConfig } from "@/types/api";
+import { useSasUrl } from "@/hooks/use-sas-url";
 import type { TestimonialFormData } from "./schema";
 
 // ============================================================================
@@ -86,7 +87,7 @@ function PreviewInput({
   placeholder,
   required,
   optional,
-  type = "text"
+  type = "text",
 }: {
   label: string;
   placeholder: string;
@@ -141,7 +142,7 @@ function PreviewStarRating({ required }: { required?: boolean }) {
               "h-6 w-6",
               i <= 4
                 ? "fill-amber-400 text-amber-400"
-                : "text-muted-foreground/20"
+                : "text-muted-foreground/20",
             )}
           />
         ))}
@@ -182,7 +183,7 @@ function ProjectContextPanel({
   projectDescription,
   logoUrl,
   brandHex,
-  compact
+  compact,
 }: {
   projectName: string;
   projectTagline: string;
@@ -197,11 +198,11 @@ function ProjectContextPanel({
   return (
     <aside
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/70 bg-card/85 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.38)] w-full max-w-[560px] mx-auto",
-        compact ? "p-5" : "p-6 sm:p-8 lg:p-10"
+        "relative overflow-hidden rounded-lg border border-border/70 bg-card/85 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.38)] w-full max-w-[560px] mx-auto",
+        compact ? "p-5" : "p-6 sm:p-8 lg:p-10",
       )}
       style={{
-        background: `radial-gradient(135% 120% at 0% 0%, ${withAlpha(accentHex, "24")} 0%, transparent 56%), radial-gradient(120% 120% at 100% 100%, ${withAlpha(accentHex, "14")} 0%, transparent 62%), hsl(var(--card) / 0.88)`
+        background: `radial-gradient(135% 120% at 0% 0%, ${withAlpha(accentHex, "24")} 0%, transparent 56%), radial-gradient(120% 120% at 100% 100%, ${withAlpha(accentHex, "14")} 0%, transparent 62%), hsl(var(--card) / 0.88)`,
       }}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -219,17 +220,17 @@ function ProjectContextPanel({
       <div
         className={cn(
           "relative flex h-fit flex-col",
-          compact ? "justify-start gap-4" : "justify-center gap-6"
+          compact ? "justify-start gap-4" : "justify-center gap-6",
         )}
       >
         {logoUrl ? (
-          <Avatar className="h-24 w-24 rounded-2xl ring-1 ring-border/65 shadow-[0_16px_35px_-20px_rgba(15,23,42,0.5)]">
-            <AvatarImage src={logoUrl} alt={`${projectName} logo`} />
+          <Avatar className="h-24 w-24 rounded-lg ring-1 ring-border/65 shadow-[0_16px_35px_-20px_rgba(15,23,42,0.5)]">
+            <AvatarImage src={logoUrl} alt={`${projectName} logo`} className="object-cover" />
             <AvatarFallback
               className={cn(
                 "text-2xl font-semibold text-foreground",
                 brandHex &&
-                  "bg-[var(--collection-brand-soft)] text-[var(--collection-brand-primary)]"
+                  "bg-[var(--collection-brand-soft)] text-[var(--collection-brand-primary)]",
               )}
             >
               {projectInitial}
@@ -238,9 +239,9 @@ function ProjectContextPanel({
         ) : (
           <div
             className={cn(
-              "flex h-24 w-24 items-center justify-center rounded-2xl border border-border/70 bg-muted/40 text-2xl font-semibold text-foreground shadow-[0_16px_35px_-20px_rgba(15,23,42,0.5)]",
+              "flex h-24 w-24 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-2xl font-semibold text-foreground shadow-[0_16px_35px_-20px_rgba(15,23,42,0.5)]",
               brandHex &&
-                "border-[var(--collection-brand-soft)] bg-[var(--collection-brand-soft)] text-[var(--collection-brand-primary)]"
+                "border-[var(--collection-brand-soft)] bg-[var(--collection-brand-soft)] text-[var(--collection-brand-primary)]",
             )}
           >
             {projectInitial}
@@ -251,7 +252,7 @@ function ProjectContextPanel({
           <h2
             className={cn(
               "font-semibold tracking-tight text-foreground",
-              compact ? "text-xl" : "text-2xl sm:text-[2rem]"
+              compact ? "text-xl" : "text-2xl sm:text-[2rem]",
             )}
           >
             {projectName}
@@ -259,7 +260,7 @@ function ProjectContextPanel({
           <p
             className={cn(
               "font-medium leading-relaxed text-foreground/75",
-              compact ? "text-sm" : "text-sm sm:text-base"
+              compact ? "text-sm" : "text-sm sm:text-base",
             )}
           >
             {projectTagline}
@@ -267,7 +268,7 @@ function ProjectContextPanel({
           <p
             className={cn(
               "max-w-md leading-relaxed text-muted-foreground",
-              compact ? "text-xs" : "text-sm sm:text-[0.95rem]"
+              compact ? "text-xs" : "text-sm sm:text-[0.95rem]",
             )}
           >
             {projectDescription}
@@ -333,7 +334,7 @@ export function CollectionFormBody({
   fingerprintOptOut = false,
   onFingerprintOptOutChange,
   onFormSubmit,
-  className
+  className,
 }: CollectionFormBodyProps) {
   const isPreview = mode === "preview";
   const isHosted = mode === "hosted";
@@ -380,9 +381,12 @@ export function CollectionFormBody({
         "--collection-brand-primary": brandHex,
         "--collection-brand-soft": withAlpha(brandHex, "1A"),
         "--collection-brand-hover": withAlpha(brandHex, "E6"),
-        "--collection-brand-subtle": withAlpha(brandHex, "0D")
+        "--collection-brand-subtle": withAlpha(brandHex, "0D"),
       } as CSSProperties)
     : undefined;
+
+  // ── Resolve SAS URL for Azure blob storage logos ───────────────────────────
+  const { sasUrl: sasLogoUrl } = useSasUrl(logoUrl);
 
   // ── Card header ───────────────────────────────────────────────────────────
   const cardHeader = (
@@ -391,7 +395,7 @@ export function CollectionFormBody({
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: `radial-gradient(ellipse at 50% -20%, ${brandHex}22 0%, transparent 65%)`
+            background: `radial-gradient(ellipse at 50% -20%, ${brandHex}22 0%, transparent 65%)`,
           }}
         />
       )}
@@ -402,20 +406,24 @@ export function CollectionFormBody({
               "h-16 w-16 mx-auto mb-4 ring-2 ring-offset-2 ring-offset-card",
               brandHex
                 ? "ring-[var(--collection-brand-soft)]"
-                : "ring-border/40"
+                : "ring-border/40",
             )}
           >
-            <AvatarImage src={logoUrl} alt={`${projectName} logo`} />
+            <AvatarImage
+              src={sasLogoUrl ?? undefined}
+              alt={`${projectName} logo`}
+              className="object-cover"
+            />
             <AvatarFallback
               className={cn(
                 "bg-primary/10",
-                brandHex && "bg-[var(--collection-brand-soft)]"
+                brandHex && "bg-[var(--collection-brand-soft)]",
               )}
             >
               <MessageSquare
                 className={cn(
                   "h-7 w-7 text-primary",
-                  brandHex && "text-[var(--collection-brand-primary)]"
+                  brandHex && "text-[var(--collection-brand-primary)]",
                 )}
               />
             </AvatarFallback>
@@ -424,13 +432,13 @@ export function CollectionFormBody({
           <div
             className={cn(
               "h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-primary/10 ring-2 ring-offset-2 ring-offset-card ring-border/30",
-              brandHex && "bg-[var(--collection-brand-soft)]"
+              brandHex && "bg-[var(--collection-brand-soft)]",
             )}
           >
             <MessageSquare
               className={cn(
                 "h-7 w-7 text-primary",
-                brandHex && "text-[var(--collection-brand-primary)]"
+                brandHex && "text-[var(--collection-brand-primary)]",
               )}
             />
           </div>
@@ -448,7 +456,7 @@ export function CollectionFormBody({
   // ── Google section ────────────────────────────────────────────────────────
   const googleSection = isGoogleEnabled ? (
     isHosted && isGoogleVerified ? (
-      <div className="rounded-xl border border-success/30 bg-success/10 px-4 py-3.5">
+      <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3.5">
         <div className="flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -469,18 +477,18 @@ export function CollectionFormBody({
         </div>
       </div>
     ) : (
-      <div className="rounded-xl border border-border/65 bg-muted/[0.14] p-4">
+      <div className="rounded-lg border border-border/65 bg-muted/[0.14] p-4">
         <div className="flex items-start gap-3">
           <div
             className={cn(
               "rounded-lg p-1.5 mt-0.5 bg-primary/8 flex-shrink-0",
-              brandHex && "bg-[var(--collection-brand-subtle)]"
+              brandHex && "bg-[var(--collection-brand-subtle)]",
             )}
           >
             <ShieldCheck
               className={cn(
                 "h-4 w-4 text-primary",
-                brandHex && "text-[var(--collection-brand-primary)]"
+                brandHex && "text-[var(--collection-brand-primary)]",
               )}
             />
           </div>
@@ -579,7 +587,7 @@ export function CollectionFormBody({
           <div
             className={cn(
               "grid gap-3",
-              previewIsCompact ? "grid-cols-1" : "grid-cols-2"
+              previewIsCompact ? "grid-cols-1" : "grid-cols-2",
             )}
           >
             <PreviewInput label="Your Name" placeholder="John Doe" required />
@@ -621,7 +629,7 @@ export function CollectionFormBody({
                   ? previewIsCompact
                     ? "grid-cols-1"
                     : "grid-cols-2"
-                  : "grid-cols-1"
+                  : "grid-cols-1",
               )}
             >
               {isJobTitleEnabled && (
@@ -645,7 +653,7 @@ export function CollectionFormBody({
             <div
               className={cn(
                 "grid grid-cols-1 gap-3",
-                isJobTitleEnabled && isCompanyEnabled && "sm:grid-cols-2"
+                isJobTitleEnabled && isCompanyEnabled && "sm:grid-cols-2",
               )}
             >
               {isJobTitleEnabled && (
@@ -743,7 +751,7 @@ export function CollectionFormBody({
                 <ChevronDown
                   className={cn(
                     "h-4 w-4 text-muted-foreground transition-transform",
-                    isVideoOpen && "rotate-180"
+                    isVideoOpen && "rotate-180",
                   )}
                 />
               </Button>
@@ -807,7 +815,7 @@ export function CollectionFormBody({
             !brandHex &&
               "bg-primary text-primary-foreground hover:bg-primary/90",
             brandHex &&
-              "border-0 text-white hover:opacity-90 active:opacity-95 focus-visible:ring-[var(--collection-brand-primary)]"
+              "border-0 text-white hover:opacity-90 active:opacity-95 focus-visible:ring-[var(--collection-brand-primary)]",
           )}
           style={brandHex ? { backgroundColor: brandHex } : undefined}
           disabled={
@@ -882,7 +890,7 @@ export function CollectionFormBody({
       projectName={normalizedProjectName}
       projectTagline={contextTagline}
       projectDescription={contextDescription}
-      logoUrl={logoUrl}
+      logoUrl={sasLogoUrl}
       brandHex={brandHex}
       compact={isPreview ? previewViewport !== "desktop" : false}
     />
@@ -891,8 +899,8 @@ export function CollectionFormBody({
   const card = (
     <Card
       className={cn(
-        "mx-auto w-full max-w-[560px] overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.45)]",
-        className
+        "mx-auto w-full max-w-[560px] overflow-hidden rounded-lg border border-border/70 bg-card/95 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.45)]",
+        className,
       )}
     >
       {cardHeader}
@@ -919,7 +927,7 @@ export function CollectionFormBody({
           ? previewViewport === "desktop"
             ? "grid grid-cols-[minmax(0,35%)_minmax(0,65%)] items-start gap-6"
             : "space-y-4"
-          : "grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,35%)_minmax(0,65%)] lg:items-start lg:gap-6"
+          : "grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,35%)_minmax(0,65%)] lg:items-start lg:gap-6",
       )}
       style={brandStyles}
     >
@@ -928,7 +936,7 @@ export function CollectionFormBody({
           "w-full",
           isPreview
             ? previewViewport === "desktop" && "sticky top-4 self-start"
-            : "lg:sticky lg:top-6 lg:self-start"
+            : "lg:sticky lg:top-16 lg:self-start",
         )}
       >
         {contextPanel}
@@ -940,7 +948,7 @@ export function CollectionFormBody({
             ? previewViewport === "desktop"
               ? "flex items-start justify-start"
               : "flex items-start justify-center"
-            : "flex items-start justify-center lg:justify-start"
+            : "flex items-start justify-center lg:justify-start",
         )}
       >
         {formCard}

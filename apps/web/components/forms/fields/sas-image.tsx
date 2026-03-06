@@ -112,7 +112,7 @@ export function SasImage({
       width={200}
       height={200}
       unoptimized
-      className={className}
+      className={cn("object-cover", className)}
       onError={() => setImageError(true)}
       {...props}
     />
