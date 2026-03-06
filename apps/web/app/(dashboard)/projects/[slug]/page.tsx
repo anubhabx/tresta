@@ -84,126 +84,128 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 w-full min-w-0 h-full p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto overflow-x-hidden">
-      <ProjectHeader project={project} slug={slug} onDelete={handleDelete} />
+    <div className="flex flex-col gap-6 w-full min-w-0 h-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto overflow-x-hidden relative">
+      {/* Background Effect matching landing page */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none" />
 
-      <section>
-        <div className="mb-2 sm:mb-3 lg:mb-4">
-          <h2 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Project Statistics
-          </h2>
-        </div>
-        <ProjectStatsCards project={project} />
-      </section>
+      {/* Header and Integrated Stats */}
+      <div className="relative z-10">
+        <ProjectHeader project={project} slug={slug} onDelete={handleDelete} />
+      </div>
 
-      <Tabs defaultValue={initialTab} className="w-full">
-        <div className="overflow-x-auto pb-2 -mx-2 px-2 pr-6 sm:pr-0 sm:mx-0 sm:px-0 scroll-smooth no-scrollbar tabs-scroll-fade sm:[mask-image:none] sm:[-webkit-mask-image:none]">
-          <TabsList className="w-max sm:w-auto inline-flex">
-            <TabsTrigger
-              value="overview"
-              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="testimonials"
-              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
-            >
-              Testimonials
-            </TabsTrigger>
-            <TabsTrigger
-              value="moderation"
-              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
-            >
-              Moderation
-            </TabsTrigger>
-            <TabsTrigger
-              value="widgets"
-              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
-            >
-              Widgets
-            </TabsTrigger>
-            <TabsTrigger
-              value="settings"
-              className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none"
-            >
-              Settings
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent
-          value="overview"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <ProjectOverviewTab project={project} collectionUrl={collectionUrl} />
-        </TabsContent>
-
-        <TabsContent
-          value="testimonials"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">
+      <div className="relative z-10 mt-4">
+        <Tabs defaultValue={initialTab} className="w-full">
+          <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth no-scrollbar tabs-scroll-fade">
+            <TabsList className="w-max sm:w-auto inline-flex  backdrop-blur-xl border border-white/10 rounded-lg p-1 shadow-2xl">
+              <TabsTrigger
+                value="overview"
+                className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none rounded-md data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400 transition-all px-4 py-2"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="testimonials"
+                className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none rounded-md data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400 transition-all px-4 py-2"
+              >
                 Testimonials
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                View and manage approved testimonials for this project.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TestimonialList projectSlug={slug} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </TabsTrigger>
+              <TabsTrigger
+                value="moderation"
+                className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none rounded-md data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400 transition-all px-4 py-2"
+              >
+                Moderation
+              </TabsTrigger>
+              <TabsTrigger
+                value="widgets"
+                className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none rounded-md data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400 transition-all px-4 py-2"
+              >
+                Widgets
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="text-xs sm:text-sm whitespace-nowrap min-w-0 flex-none rounded-md data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400 transition-all px-4 py-2"
+              >
+                Settings
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-        <TabsContent
-          value="moderation"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">
-                Moderation Queue
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Review pending testimonials with advanced moderation tools, bulk
-                actions, and auto-moderation insights.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TestimonialList projectSlug={slug} moderationMode={true} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent
+            value="overview"
+            className="space-y-4 sm:space-y-6 mt-6 focus-visible:outline-none focus-visible:ring-0"
+          >
+            <ProjectOverviewTab
+              project={project}
+              collectionUrl={collectionUrl}
+            />
+          </TabsContent>
 
-        <TabsContent
-          value="widgets"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg">
-                Display Widgets
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Create widgets to display testimonials on your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent
+            value="testimonials"
+            className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+          >
+            <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg text-white">
+                  Testimonials
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-zinc-400">
+                  View and manage approved testimonials for this project.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TestimonialList projectSlug={slug} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent
-          value="settings"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
-        >
-          <ProjectSettingsTab project={project} onDelete={handleDelete} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent
+            value="moderation"
+            className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+          >
+            <Card className=" backdrop-blur-xl border border-white/5 shadow-2xl">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg text-white">
+                  Moderation Queue
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-zinc-400">
+                  Review pending testimonials with advanced moderation tools,
+                  bulk actions, and auto-moderation insights.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TestimonialList projectSlug={slug} moderationMode={true} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent
+            value="widgets"
+            className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+          >
+            <Card className="backdrop-blur-xl border border-white/5 shadow-2xl">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg text-white">
+                  Display Widgets
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-zinc-400">
+                  Create widgets to display testimonials on your website
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent
+            value="settings"
+            className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+          >
+            <ProjectSettingsTab project={project} onDelete={handleDelete} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

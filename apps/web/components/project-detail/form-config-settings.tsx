@@ -70,15 +70,6 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
 
   return (
     <div className="space-y-6">
-      <Alert>
-        <FileText className="h-4 w-4" />
-        <AlertTitle>Collection Form Settings</AlertTitle>
-        <AlertDescription>
-          Customize the testimonial collection form that your customers see.
-          Changes apply immediately to your public collection page.
-        </AlertDescription>
-      </Alert>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Custom Text Section */}
@@ -160,12 +151,12 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
               Choose which optional fields appear on your collection form. Name,
               email, and testimonial content are always required.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 border p-4 border-border rounded-lg">
               <FormField
                 control={form.control}
                 name="enableRating"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">Star Rating</FormLabel>
                       <FormDescription>
@@ -192,7 +183,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="enableJobTitle"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Job Title / Role
@@ -221,7 +212,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="enableCompany"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">Company</FormLabel>
                       <FormDescription>
@@ -247,7 +238,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="enableAvatar"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Photo / Avatar Upload
@@ -275,7 +266,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="enableVideoUrl"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Video Testimonial URL
@@ -304,7 +295,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="enableGoogleVerification"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Google Verification
@@ -338,12 +329,12 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
             <p className="text-sm text-muted-foreground mb-4">
               Make optional fields mandatory for submission.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 border p-4 border-border rounded-lg">
               <FormField
                 control={form.control}
                 name="requireRating"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Star Rating
@@ -367,7 +358,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="requireJobTitle"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Job Title / Role
@@ -391,7 +382,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="requireCompany"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Company
@@ -415,7 +406,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="requireAvatar"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Profile Picture
@@ -439,7 +430,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="requireVideoUrl"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Video URL
@@ -471,12 +462,12 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
             <p className="text-sm text-muted-foreground mb-4">
               Control how users can submit testimonials.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 border p-4 border-border rounded-lg">
               <FormField
                 control={form.control}
                 name="requireGoogleVerification"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Require Google Verification
@@ -500,7 +491,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="allowAnonymousSubmissions"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Allow Anonymous Submissions
@@ -523,7 +514,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                 control={form.control}
                 name="allowFingerprintOptOut"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Allow Fingerprint Opt-Out
@@ -553,12 +544,12 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
             <p className="text-sm text-muted-foreground mb-4">
               Configure notifications for new submissions.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 border p-4 border-border rounded-lg">
               <FormField
                 control={form.control}
                 name="notifyOnSubmission"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <FormItem className="flex flex-row items-center justify-between ">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base">
                         Notify on New Submission

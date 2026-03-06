@@ -76,89 +76,25 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
   const widgetCount = project._count?.widgets ?? 0;
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      {/* Top Row: Avatar + Info + Quick Actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        {/* Left: Avatar and Info */}
-        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-          <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
-            <Avatar className="rounded-lg w-12 h-12 sm:w-14 sm:h-14">
-              <SasImage
-                src={project.logoUrl}
-                alt={project.name}
-                className="w-full h-full object-cover rounded-lg"
-                skeletonClassName="w-12 h-12 sm:w-14 sm:h-14 rounded-lg"
-                showSkeleton
-                fallback={
-                  <AvatarFallback className="bg-transparent text-primary rounded-lg w-full h-full">
-                    <FolderIcon className="h-6 w-6 sm:h-7 sm:w-7" />
-                  </AvatarFallback>
-                }
-              />
-            </Avatar>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
-                {project.name}
-              </h1>
-              {!project.isActive && (
-                <Badge variant="outline" className="text-xs">
-                  Inactive
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1 font-mono">
-              /{project.slug}
-            </p>
-            {project.description && (
-              <p className="text-xs sm:text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2 sm:line-clamp-none">
-                {project.description}
-              </p>
-            )}
-
-            {/* Mini Stats */}
-            <div className="flex items-center gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <MessageSquare className="h-4 w-4" />
-                <span className="font-medium text-foreground">
-                  {testimonialCount}
-                </span>
-                <span className="hidden sm:inline">testimonials</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="font-medium text-foreground">
-                  {widgetCount}
-                </span>
-                <span className="hidden sm:inline">widgets</span>
-              </div>
-              <span className="text-xs text-muted-foreground">
-                · Created{" "}
-                {formatDistanceToNow(new Date(project.createdAt), {
-                  addSuffix: true,
-                })}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Quick Actions (primary) */}
-        <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+    <div className="relative flex flex-col w-full rounded-lg overflow-hidden  backdrop-blur-xl border border-white/5 shadow-2xl ring-1 ring-white/5">
+      {/* Cover Image Background */}
+      <div className="h-32 sm:h-48 w-full bg-gradient-to-br from-blue-500/20 via-blue-900/10 to-transparent relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
           <Button
             variant="outline"
             size="sm"
-            className="gap-2"
+            className=" backdrop-blur-md border border-white/10 text-white hover:bg-white/10 transition-colors h-8"
             onClick={handleCopyCollectionLink}
           >
             {linkCopied ? (
               <>
-                <Check className="h-4 w-4 text-success" />
+                <Check className="h-3.5 w-3.5 text-emerald-400 mr-2" />
                 <span className="hidden sm:inline">Copied!</span>
               </>
             ) : (
               <>
-                <Link2 className="h-4 w-4" />
+                <Link2 className="h-3.5 w-3.5 mr-2" />
                 <span className="hidden sm:inline">Collection Link</span>
               </>
             )}
@@ -167,62 +103,104 @@ export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
           <EmbedDialog
             project={project}
             trigger={
-              <Button size="sm" className="gap-2">
-                <Code className="h-4 w-4" />
-                <span className="hidden sm:inline">Get Embed Code</span>
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-white h-8 transition-shadow"
+              >
+                <Code className="h-3.5 w-3.5 sm:mr-2" />
+                <span className="hidden sm:inline">Embed Code</span>
               </Button>
             }
           />
         </div>
       </div>
 
-      {/* Bottom Row: Secondary Actions */}
-      <div className="flex items-center gap-2 border-t border-border pt-4">
-        <Link href={`/projects/${slug}/edit`}>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <EditIcon className="h-4 w-4" />
-            Edit Project
-          </Button>
-        </Link>
+      {/* Content Area */}
+      <div className="relative px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+        {/* Overlapping Avatar */}
+        <div className="relative -mt-12 sm:-mt-16 mb-4 flex items-end justify-between">
+          <div className="p-1.5 sm:p-2 bg-background rounded-lg ring-1 ring-white/10 shadow-xl">
+            <Avatar className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg bg-zinc-900/50">
+              <SasImage
+                src={project.logoUrl}
+                alt={project.name}
+                className="w-full h-full object-cover rounded-lg"
+                skeletonClassName="w-20 h-20 sm:w-28 sm:h-28 rounded-lg"
+                showSkeleton
+                fallback={
+                  <AvatarFallback className="bg-blue-500/10 text-blue-500 rounded-lg w-full h-full">
+                    <FolderIcon className="h-10 w-10 sm:h-12 sm:w-12 text-blue-500/50" />
+                  </AvatarFallback>
+                }
+              />
+            </Avatar>
+          </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-muted-foreground hover:text-destructive"
-            >
-              <TrashIcon className="h-4 w-4" />
-              Delete
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                project "{project.name}" and all associated testimonials and
-                widgets.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          {/* Integrated Stats Row */}
+          <div className="hidden md:flex items-center gap-3 backdrop-blur-md border border-white/5 rounded-lg px-4 py-2 mt-4 self-end">
+            <div className="flex items-center gap-2 pr-3 border-r border-white/10">
+              <MessageSquare className="h-4 w-4 text-blue-400" />
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-bold text-white leading-none">
+                  {testimonialCount}
+                </span>
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider mt-0.5">
+                  Testimonials
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pl-1">
+              <LayoutGrid className="h-4 w-4 text-purple-400" />
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-bold text-white leading-none">
+                  {widgetCount}
+                </span>
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider mt-0.5">
+                  Widgets
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Project Info */}
+        <div className="flex flex-col gap-1 sm:gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-medium text-white tracking-tight">
+              {project.name}
+            </h1>
+            {!project.isActive && (
+              <Badge
+                variant="outline"
+                className="bg-red-500/10 text-red-400 border-red-500/20 text-[10px] uppercase tracking-wider"
               >
-                {isDeleting ? "Deleting..." : "Delete Project"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                Inactive
+              </Badge>
+            )}
+            <span className="text-sm text-zinc-500 font-mono hidden sm:inline-block">
+              /{project.slug}
+            </span>
+          </div>
+
+          <p className="text-sm text-zinc-500 font-mono sm:hidden">
+            /{project.slug}
+          </p>
+
+          {project.description && (
+            <p className="text-sm sm:text-base text-zinc-400 mt-2 max-w-3xl leading-relaxed">
+              {project.description}
+            </p>
+          )}
+
+          <div className="flex items-center gap-2 mt-4 text-xs text-zinc-500">
+            <span>
+              Created{" "}
+              {formatDistanceToNow(new Date(project.createdAt), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

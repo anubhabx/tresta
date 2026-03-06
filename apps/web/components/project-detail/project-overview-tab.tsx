@@ -44,78 +44,81 @@ export function ProjectOverviewTab({
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Collection URL Card */}
-      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg">Collection URL</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Share this URL to collect testimonials from your customers
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex-1 p-3 bg-muted rounded-lg font-mono text-xs break-all">
-              {collectionUrl}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopyUrl}
-                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
-              >
-                <CopyIcon className="h-4 w-4 mr-2" />
-                Copy
-              </Button>
-              <a
-                href={collectionUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 sm:flex-none"
-              >
+      <div className="relative group">
+        <Card className="relative backdrop-blur-xl border border-white/5 rounded-lg overflow-hidden shadow-2xl">
+          <CardHeader className="border-b border-white/5">
+            <CardTitle className="text-lg sm:text-xl text-white">
+              Share Collection Link
+            </CardTitle>
+            <CardDescription className="text-zinc-400">
+              Send this link to your customers to start collecting testimonials.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 p-3.5 border border-white/10 rounded-lg flex items-center overflow-hidden">
+                <span className="font-mono text-sm text-foreground truncate select-all">
+                  {collectionUrl}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full touch-manipulation min-h-[44px] sm:min-h-0"
+                  onClick={handleCopyUrl}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all h-12 px-6"
                 >
-                  <ExternalLinkIcon className="h-4 w-4 mr-2" />
-                  Visit
+                  <CopyIcon className="h-4 w-4 mr-2" />
+                  Copy Link
                 </Button>
-              </a>
+                <Button variant="outline" asChild className="h-12 w-12 p-0">
+                  <a
+                    href={collectionUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLinkIcon className="h-5 w-5" />
+                    <span className="sr-only">Visit</span>
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-info-highlight-bg border border-border/50 rounded-lg">
-            <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 flex-shrink-0">
-              <LinkIcon className="h-4 w-4 text-primary dark:text-primary" />
+
+            <div className="flex items-start gap-4 p-4 border border-white/10 rounded-lg">
+              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                <LinkIcon className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-zinc-200">
+                  Ready to receive submissions
+                </p>
+                <p className="text-sm text-zinc-500 mt-1 leading-relaxed">
+                  Anyone with this link can submit a testimonial. You'll be able
+                  to review and approve all submissions before they become
+                  visible.
+                </p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-medium">
-                Share this link with your customers
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Anyone with this link can submit a testimonial for your project.
-                You can moderate submissions before they appear publicly.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Quick Actions / Next Steps */}
-      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <Card className="bg-white/[0.02] backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardHeader>
           <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
+          <CardDescription className="text-zinc-400">
             Common tasks for this project
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {!hasTestimonials && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg bg-warning-muted">
-                <div className="flex items-start gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
+              <div className="p-4 border border-white/5 rounded-lg">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-orange-500/10 shrink-0">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">
+                    <h4 className="text-sm font-medium text-foreground">
                       No testimonials yet
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -127,7 +130,7 @@ export function ProjectOverviewTab({
                   size="sm"
                   variant="outline"
                   onClick={handleCopyUrl}
-                  className="w-full mt-2 touch-manipulation min-h-[44px] sm:min-h-0"
+                  className="w-full text-foreground transition-colors"
                 >
                   <CopyIcon className="h-4 w-4 mr-2" />
                   Copy Collection URL
@@ -136,11 +139,13 @@ export function ProjectOverviewTab({
             )}
 
             {!hasWidgets && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
-                <div className="flex items-start gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+              <div className="p-4 border border-white/5 rounded-lg ">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">
+                    <h4 className="text-sm font-medium text-foreground">
                       Create a widget
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -152,7 +157,7 @@ export function ProjectOverviewTab({
                   size="sm"
                   variant="outline"
                   asChild
-                  className="w-full mt-2 touch-manipulation min-h-[44px] sm:min-h-0"
+                  className="w-full transition-colors"
                 >
                   <a href={`/projects/${project.slug}?tab=widgets`}>
                     Go to Widgets
@@ -162,11 +167,13 @@ export function ProjectOverviewTab({
             )}
 
             {hasTestimonials && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
-                <div className="flex items-start gap-2 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0 mt-0.5" />
+              <div className="p-4 border border-white/5 rounded-lg ">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">
+                    <h4 className="text-sm font-medium text-foreground">
                       Review testimonials
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -178,7 +185,7 @@ export function ProjectOverviewTab({
                   size="sm"
                   variant="outline"
                   asChild
-                  className="w-full mt-2 touch-manipulation min-h-[44px] sm:min-h-0"
+                  className="w-full transition-colors"
                 >
                   <a href={`/projects/${project.slug}?tab=moderation`}>
                     Go to Moderation
@@ -188,11 +195,13 @@ export function ProjectOverviewTab({
             )}
 
             {hasWidgets && (
-              <div className="p-3 sm:p-4 border border-border/50 rounded-lg">
-                <div className="flex items-start gap-2 mb-2">
-                  <BarChart3 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+              <div className="p-4 border border-white/5 rounded-lg ">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                    <BarChart3 className="h-4 w-4 text-primary" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-medium">
+                    <h4 className="text-sm font-medium text-foreground">
                       Manage widgets
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -204,7 +213,7 @@ export function ProjectOverviewTab({
                   size="sm"
                   variant="outline"
                   asChild
-                  className="w-full mt-2 touch-manipulation min-h-[44px] sm:min-h-0"
+                  className="w-full transition-colors"
                 >
                   <a href={`/projects/${project.slug}?tab=widgets`}>
                     Go to Widgets
@@ -218,46 +227,53 @@ export function ProjectOverviewTab({
 
       {/* Auto-Moderation Info (if enabled) */}
       {(project.autoModeration || project.autoApproveVerified) && (
-        <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <Card className="bg-white/[0.02] backdrop-blur-xl border border-white/5 shadow-2xl">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-success" />
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               Auto-Moderation Active
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription>
               Automated moderation is helping protect your project
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {project.autoModeration && (
-                <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Badge variant="secondary" className="text-xs">
+                <div className="flex items-center gap-3 text-sm">
+                  <Badge
+                    variant="outline"
+                    className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs uppercase tracking-wider"
+                  >
                     Enabled
                   </Badge>
-                  <span className="text-muted-foreground">
+                  <span className="text-zinc-400">
                     AI-powered content moderation
                   </span>
                 </div>
               )}
               {project.autoApproveVerified && (
-                <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Badge variant="secondary" className="text-xs">
+                <div className="flex items-center gap-3 text-sm">
+                  <Badge
+                    variant="outline"
+                    className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs uppercase tracking-wider"
+                  >
                     Enabled
                   </Badge>
-                  <span className="text-muted-foreground">
+                  <span className="text-zinc-400">
                     Auto-approve verified users
                   </span>
                 </div>
               )}
               {project.profanityFilterLevel && (
-                <div className="flex items-center gap-2 text-xs sm:text-sm">
-                  <Badge variant="secondary" className="text-xs capitalize">
-                    {project.profanityFilterLevel.toLowerCase()}
+                <div className="flex items-center gap-3 text-sm">
+                  <Badge
+                    variant="outline"
+                    className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-xs uppercase tracking-wider px-2"
+                  >
+                    {project.profanityFilterLevel}
                   </Badge>
-                  <span className="text-muted-foreground">
-                    Profanity filter level
-                  </span>
+                  <span className="text-zinc-400">Profanity filter level</span>
                 </div>
               )}
             </div>

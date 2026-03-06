@@ -70,18 +70,6 @@ export function ModerationSettingsForm({
 
   return (
     <div className="space-y-6">
-      {/* Info Alert */}
-      <Alert>
-        <Shield className="h-4 w-4" />
-        <AlertTitle>About Auto-Moderation</AlertTitle>
-        <AlertDescription>
-          Auto-moderation uses advanced heuristics to analyze testimonials for
-          spam, profanity, negative sentiment, and suspicious patterns.
-          High-quality submissions can be auto-approved, while problematic
-          content is flagged for manual review.
-        </AlertDescription>
-      </Alert>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Core Settings */}
@@ -97,7 +85,7 @@ export function ModerationSettingsForm({
 
           {/* Info Card */}
           {autoModerationEnabled && (
-            <Card className="border-primary/20 bg-primary/5">
+            <Card className="border border-white/10 shadow-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Info className="h-4 w-4" />
