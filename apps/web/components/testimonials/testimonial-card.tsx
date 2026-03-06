@@ -172,7 +172,7 @@ export function TestimonialCard({
   };
 
   return (
-    <Card className="transition-all hover:shadow-md">
+    <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl transition-all hover:border-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
       <CardContent className="p-6 h-full">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -272,8 +272,8 @@ export function TestimonialCard({
 
         {/* Moderation Info */}
         {effectiveModerationStatus !== "PENDING" && (
-            <div className="mb-4">{getModerationBadge()}</div>
-          )}
+          <div className="mb-4">{getModerationBadge()}</div>
+        )}
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-wrap">

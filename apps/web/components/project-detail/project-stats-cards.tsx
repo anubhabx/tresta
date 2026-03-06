@@ -16,7 +16,7 @@ interface ProjectStatsCardsProps {
 export function ProjectStatsCards({ project }: ProjectStatsCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
           <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
             Total Testimonials
@@ -35,7 +35,7 @@ export function ProjectStatsCards({ project }: ProjectStatsCardsProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
           <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
             Active Widgets
@@ -54,7 +54,7 @@ export function ProjectStatsCards({ project }: ProjectStatsCardsProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
           <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
             Status

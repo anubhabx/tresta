@@ -93,19 +93,17 @@ export function ApiSection() {
 
     try {
       const key = await createKey({
-          name: newKeyName.trim(),
-          projectSlug: selectedProjectSlug,
-          environment: "live",
-          permissions: { widgets: true, testimonials: true },
+        name: newKeyName.trim(),
+        projectSlug: selectedProjectSlug,
+        environment: "live",
+        permissions: { widgets: true, testimonials: true },
       });
 
       setCreatedKey(key);
       setNewKeyName("");
       toast.success("API key created successfully");
     } catch (error) {
-      toast.error(
-        getHttpErrorMessage(error, "Failed to create API key"),
-      );
+      toast.error(getHttpErrorMessage(error, "Failed to create API key"));
     }
   };
 
@@ -115,9 +113,7 @@ export function ApiSection() {
       setKeyToRevoke(null);
       toast.success("API key revoked successfully");
     } catch (error) {
-      toast.error(
-        getHttpErrorMessage(error, "Failed to revoke API key"),
-      );
+      toast.error(getHttpErrorMessage(error, "Failed to revoke API key"));
     }
   };
 
@@ -131,14 +127,14 @@ export function ApiSection() {
   };
 
   return (
-    <Card>
+    <Card className="bg-card border-white/5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <CardTitle>API Keys</CardTitle>
             <CardDescription>
-              Create and manage all API keys from this account-level page.
-              Keys are stored in the database and scoped to selected projects.
+              Create and manage all API keys from this account-level page. Keys
+              are stored in the database and scoped to selected projects.
             </CardDescription>
           </div>
 
@@ -287,7 +283,9 @@ export function ApiSection() {
                     <TableCell>
                       <div className="text-sm">
                         <div>{key.project.name}</div>
-                        <div className="text-muted-foreground">/{key.project.slug}</div>
+                        <div className="text-muted-foreground">
+                          /{key.project.slug}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="font-mono text-xs">

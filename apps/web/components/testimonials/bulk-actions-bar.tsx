@@ -39,7 +39,7 @@ export function BulkActionsBar({
 
   return (
     <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 slide-out-to-bottom-4 w-[95%] sm:w-[90%] max-w-3xl">
-      <Card className="shadow-2xl border-2">
+      <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl">
         <CardContent className="p-3 sm:px-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
             {/* Selection Count */}

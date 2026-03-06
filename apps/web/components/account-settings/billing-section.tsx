@@ -48,7 +48,7 @@ export function BillingSection() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="bg-card border-white/5">
         <CardHeader>
           <CardTitle>Plan & Billing</CardTitle>
           <CardDescription>Loading subscription details...</CardDescription>
@@ -113,7 +113,7 @@ export function BillingSection() {
   };
 
   return (
-    <Card>
+    <Card className="bg-card border-white/5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -277,13 +277,19 @@ export function BillingSection() {
               <tbody>
                 {isInvoicesLoading ? (
                   <tr>
-                    <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-muted-foreground"
+                    >
                       Loading invoices...
                     </td>
                   </tr>
                 ) : invoices.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-muted-foreground"
+                    >
                       No invoices yet.
                     </td>
                   </tr>
@@ -314,13 +320,19 @@ export function BillingSection() {
                             size="sm"
                             className="h-8"
                             onClick={() =>
-                              window.open(invoice.downloadUrl as string, "_blank", "noopener,noreferrer")
+                              window.open(
+                                invoice.downloadUrl as string,
+                                "_blank",
+                                "noopener,noreferrer",
+                              )
                             }
                           >
                             Download
                           </Button>
                         ) : (
-                          <span className="text-xs text-muted-foreground">-</span>
+                          <span className="text-xs text-muted-foreground">
+                            -
+                          </span>
                         )}
                       </td>
                     </tr>

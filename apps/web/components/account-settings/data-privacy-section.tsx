@@ -7,7 +7,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -18,16 +18,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { useAccountDataExport } from "@/hooks/use-account-data-export";
-import {
-  DownloadIcon,
-  ShieldAlertIcon,
-  Loader2,
-} from "lucide-react";
+import { DownloadIcon, ShieldAlertIcon, Loader2 } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 
@@ -36,7 +32,7 @@ interface DataPrivacySectionProps {
 }
 
 export function DataPrivacySection({
-  onAccountDeleted
+  onAccountDeleted,
 }: DataPrivacySectionProps) {
   const { user } = useUser();
   const { isExporting, exportAccountData } = useAccountDataExport();
@@ -62,7 +58,7 @@ export function DataPrivacySection({
   };
 
   return (
-    <Card>
+    <Card className="bg-card border-white/5">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldAlertIcon className="h-5 w-5" />
@@ -167,7 +163,7 @@ export function DataPrivacySection({
                           autoComplete="off"
                           onChange={(e) => {
                             const btn = document.getElementById(
-                              "confirm-delete-btn"
+                              "confirm-delete-btn",
                             ) as HTMLButtonElement;
                             if (btn)
                               btn.disabled =

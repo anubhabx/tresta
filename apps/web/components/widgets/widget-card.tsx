@@ -91,7 +91,7 @@ export function WidgetCard({
   };
 
   return (
-    <Card className="border border-border/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg transition-all duration-200 overflow-hidden min-w-0">
+    <Card className="bg-card backdrop-blur-xl border border-white/5 shadow-2xl transition-all duration-300 hover:border-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden min-w-0">
       <CardHeader className="space-y-3 pb-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -163,7 +163,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={() => onViewEmbed(widget.id)}
-                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
+                className="w-[calc(50%-0.25rem)] sm:w-auto sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <Code2Icon className="h-4 w-4 mr-1.5" />
                 Embed
@@ -178,7 +178,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={() => onEdit(widget.id)}
-                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
+                className="w-[calc(50%-0.25rem)] sm:w-auto sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <EditIcon className="h-4 w-4 mr-1.5" />
                 Edit
@@ -193,7 +193,7 @@ export function WidgetCard({
                 size="sm"
                 variant="outline"
                 onClick={handleCopyId}
-                className="flex-1 sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
+                className="w-[calc(50%-0.25rem)] sm:w-auto sm:flex-none touch-manipulation min-h-[44px] sm:min-h-0"
               >
                 <CopyIcon className="h-4 w-4 mr-1.5" />
                 ID
@@ -209,7 +209,7 @@ export function WidgetCard({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="ml-auto text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation min-h-[44px] sm:min-h-0"
+                    className="ml-auto w-[calc(50%-0.25rem)] sm:w-auto text-destructive hover:text-destructive hover:bg-destructive/10 touch-manipulation min-h-[44px] sm:min-h-0"
                     disabled={isDeleting}
                   >
                     <TrashIcon className="h-4 w-4" />

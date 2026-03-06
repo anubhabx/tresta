@@ -28,7 +28,7 @@ export function GeneralSettingsSection({
   externalAccounts,
 }: GeneralSettingsSectionProps) {
   return (
-    <Card>
+    <Card className="bg-card border-white/5">
       <CardHeader>
         <CardTitle>Profile & Account</CardTitle>
         <CardDescription>
