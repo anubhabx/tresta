@@ -44,17 +44,17 @@ export function DashboardShell({ children }: DashboardShellProps) {
         {/* Global Command Palette (⌘K) */}
         <CommandPalette />
 
-        <div className="flex min-h-svh w-full overflow-x-hidden">
+        <div className="flex min-h-svh w-full overflow-x-hidden bg-background">
           <UISidebar />
           <div className="flex-1 w-full min-w-0 p-0 sm:p-2">
-            <div className="w-full h-full flex flex-col bg-background sm:rounded-md sm:shadow-lg relative overflow-x-hidden">
+            <div className="w-full h-full flex flex-col bg-background relative overflow-x-hidden">
               {/* Glass Navbar */}
               <header
                 className={cn(
                   "w-full z-10 sticky top-0",
-                  "bg-background/80 backdrop-blur-md",
+                  " backdrop-blur-md",
                   "transition-colors duration-200",
-                  isScrolled && "border-b border-border",
+                  isScrolled && "border-b border-white/5 shadow-sm",
                 )}
                 data-scrolled={isScrolled}
               >
@@ -80,16 +80,20 @@ export function DashboardShell({ children }: DashboardShellProps) {
               </main>
 
               {/* Status Bar */}
-              <footer className="shell-statusbar border-t border-border bg-background/80 backdrop-blur-sm px-3 flex items-center justify-between text-muted-foreground">
+              <footer className="shell-statusbar border-t border-white/5  backdrop-blur-md px-4 py-2 flex items-center justify-between text-zinc-400">
                 <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                    Connected
+                  <span className="flex items-center gap-2 text-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                    System Online
                   </span>
                 </div>
-                <div className="hidden sm:flex items-center gap-4">
-                  <span className="opacity-60">⌘K — Command Menu</span>
-                  <span className="opacity-60">⌘B — Toggle Sidebar</span>
+                <div className="hidden sm:flex items-center gap-6 text-xs">
+                  <span className="hover:text-zinc-300 transition-colors cursor-default">
+                    ⌘K to search
+                  </span>
+                  <span className="hover:text-zinc-300 transition-colors cursor-default">
+                    ⌘B to toggle navigation
+                  </span>
                 </div>
               </footer>
             </div>

@@ -172,53 +172,52 @@ export function ActivityFeed({
 
   if (visibleItems.length === 0) {
     return (
-      <Card className="border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Activity className="h-4 w-4 text-primary" />
+      <Card className="backdrop-blur-xl border border-white/5 p-6 shadow-2xl relative overflow-hidden ring-1 ring-white/5 flex-1 min-h-[300px] flex flex-col">
+        <div className="flex items-center justify-between mb-8">
+          <Activity className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
             Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <Activity className="h-8 w-8 text-muted-foreground/50 mb-2" />
-            <p className="text-sm text-muted-foreground">
-              No recent activity yet
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Activity will appear here as you use Tresta
-            </p>
-          </div>
-        </CardContent>
+          </h3>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <Activity className="h-8 w-8 text-zinc-700 mb-3" />
+          <p className="text-sm text-zinc-400">No recent activity yet</p>
+          <p className="text-xs text-zinc-600 mt-1">
+            Activity will appear here as you use Tresta
+          </p>
+        </div>
       </Card>
     );
   }
 
   return (
-    <Card className="border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-sm font-medium">
-          <Activity className="h-4 w-4 text-primary" />
+    <Card className="backdrop-blur-xl border border-white/5 p-6 shadow-2xl relative overflow-hidden ring-1 ring-white/5 flex-1 min-h-[300px]">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+      <div className="flex items-center gap-2 mb-6">
+        <Activity className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
           Recent Activity
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {visibleItems.map((item) => (
-            <div key={item.id} className="flex items-start gap-2">
+        </h3>
+      </div>
+
+      <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+        {visibleItems.map((item, index) => (
+          <div key={item.id} className="relative flex items-start gap-4 z-10">
+            <div className="relative z-10 -ml-[11px] md:ml-0 md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center justify-center bg-background rounded-full border border-white/10 shadow-[0_0_15px_-3px_rgba(0,0,0,0.5)]">
               <ActivityIcon type={item.type} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-muted-foreground">
-                  <ActivityDescription item={item} />
-                </p>
-                <p className="text-xs text-muted-foreground/70 mt-0.5">
-                  {formatDistanceToNow(item.timestamp, { addSuffix: true })}
-                </p>
-              </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
+            {/* Added left padding to account for the line and icon so text aligns nicely */}
+            <div className="flex-1 min-w-0 md:ml-[calc(50%+24px)] pl-4 md:pl-0">
+              <p className="text-sm text-zinc-300">
+                <ActivityDescription item={item} />
+              </p>
+              <p className="text-xs text-zinc-500 mt-1">
+                {formatDistanceToNow(item.timestamp, { addSuffix: true })}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }

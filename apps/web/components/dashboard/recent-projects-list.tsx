@@ -15,53 +15,56 @@ export function RecentProjectsList({ projects }: RecentProjectsListProps) {
   const hasMore = projects.length > 3;
 
   return (
-    <Card className="border border-0 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-      <CardContent>
-        <div className="space-y-2 sm:space-y-3">
-          {displayProjects.map((project) => (
-            <Link
-              key={project.id}
-              href={`/projects/${project.slug}`}
-              className="flex items-center border border-border/50 shadow-md justify-between p-3 sm:p-4 rounded-lg hover:border-border hover:shadow-lg active:bg-accent transition-colors group min-h-[60px] touch-manipulation"
-            >
-              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                <div className="p-2 sm:p-2.5 rounded-lg bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                  <FolderIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold truncate text-sm sm:text-base">
-                    {project.name}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                    {project._count?.testimonials || 0} testimonial
-                    {(project._count?.testimonials ?? 0) !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm text-muted-foreground">
-                <ClockIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">
-                  {formatDistanceToNow(new Date(project.createdAt), {
-                    addSuffix: true,
-                  })}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {hasMore && (
-          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
-            <Link
-              href="/projects"
-              className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 touch-manipulation min-h-[44px] items-center"
-            >
-              View all projects
-              <span className="text-xs">→</span>
-            </Link>
+    <div className="space-y-3">
+      {displayProjects.map((project) => (
+        <Link
+          key={project.id}
+          href={`/projects/${project.slug}`}
+          className="flex items-center justify-between p-4 rounded-lg border border-white/5 hover:bg-white/10 hover:border-white/10 transition-colors group min-h-[64px]"
+        >
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
+              <FolderIcon className="h-5 w-5 text-blue-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-white truncate text-base">
+                {project.name}
+              </h4>
+              <p className="text-sm text-zinc-500 mt-0.5 font-mono">
+                /{project.slug}
+              </p>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-2 px-2 py-1 rounded border border-white/5">
+              <span className="text-xs text-zinc-300 font-medium">
+                {project._count?.testimonials || 0}{" "}
+                <span className="text-zinc-500 font-normal">testimonials</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+              <ClockIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {formatDistanceToNow(new Date(project.createdAt), {
+                  addSuffix: true,
+                })}
+              </span>
+            </div>
+          </div>
+        </Link>
+      ))}
+
+      {hasMore && (
+        <div className="mt-4 pt-4 border-t border-white/5 flex justify-center">
+          <Link
+            href="/projects"
+            className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center gap-1.5"
+          >
+            View all projects
+            <span>&rarr;</span>
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }

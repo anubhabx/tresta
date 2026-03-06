@@ -59,25 +59,31 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
     : "";
 
   return (
-    <Card className="border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-sm font-medium">
-          <Code2 className="h-4 w-4 text-primary" />
+    <Card className="backdrop-blur-xl border border-white/5 p-6 shadow-2xl relative overflow-hidden ring-1 ring-white/5">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+      <div className="flex items-center gap-2 mb-6">
+        <Code2 className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
           Quick Embed
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </h3>
+      </div>
+
+      <div className="space-y-4">
         {/* Project Selector */}
         <Select
           value={selectedProjectSlug}
           onValueChange={setSelectedProjectSlug}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full border-white/10 text-white focus:border-primary/50 focus:ring-primary/20 hover:bg-white/10 transition-colors">
             <SelectValue placeholder="Select a project" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-zinc-900 border-white/10 text-zinc-300">
             {projects.map((project) => (
-              <SelectItem key={project.id} value={project.slug}>
+              <SelectItem
+                key={project.id}
+                value={project.slug}
+                className="hover:bg-white/10 focus:bg-white/10 cursor-pointer"
+              >
                 {project.name}
               </SelectItem>
             ))}
@@ -87,15 +93,17 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
         {/* Embed Code */}
         {selectedProjectSlug && (
           <>
-            <CodeBlock code={embedCode} language="html" copyable />
+            <div className="rounded-lg overflow-hidden border border-white/10 bg-[#0d0d0d]">
+              <CodeBlock code={embedCode} language="html" copyable />
+            </div>
 
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-zinc-400">
               Replace{" "}
-              <code className="bg-muted px-1 py-0.5 rounded text-xs">
+              <code className="border border-white/10 text-zinc-300 px-1 py-0.5 rounded text-xs font-mono">
                 {API_KEY_PLACEHOLDER}
               </code>{" "}
               and{" "}
-              <code className="bg-muted px-1 py-0.5 rounded text-xs">
+              <code className="border border-white/10 text-zinc-300 px-1 py-0.5 rounded text-xs font-mono">
                 YOUR_WIDGET_ID
               </code>{" "}
               with values from the project&apos;s Widgets tab.
@@ -105,7 +113,7 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
             <Button
               variant="outline"
               size="sm"
-              className="w-full gap-2"
+              className="w-full gap-2 border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
               onClick={handleCopyCollectionLink}
             >
               <Link2 className="h-4 w-4" />
@@ -113,7 +121,7 @@ export function QuickEmbedCard({ projects }: QuickEmbedCardProps) {
             </Button>
           </>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 }

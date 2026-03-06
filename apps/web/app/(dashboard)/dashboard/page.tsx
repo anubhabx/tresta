@@ -6,6 +6,7 @@ import { useNotificationList } from "@/lib/queries/notifications";
 import { DashboardPageSkeleton } from "@/components/skeletons";
 import dynamic from "next/dynamic";
 import { Button } from "@workspace/ui/components/button";
+import { Card } from "@workspace/ui/components/card";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -86,19 +87,26 @@ const DashboardPage = () => {
       .slice(0, 10) ?? [];
 
   return (
-    <div className="mx-auto h-full w-full max-w-7xl p-4 sm:p-6">
+    <div className="mx-auto h-full w-full max-w-7xl p-4 sm:p-6 relative">
+      {/* Background Effect matching landing page */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.05),transparent_50%)] pointer-events-none" />
+
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between relative z-10">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-zinc-400 font-sans">
             Welcome back
-            {user.user?.firstName ? `, ${user.user.firstName}` : ""}!
+            {user.user?.firstName ? `, ${user.user.firstName}` : ""}! Here's
+            what's happening.
           </p>
         </div>
-        <Button asChild>
+        <Button
+          asChild
+          className="bg-primary hover:bg-primary/90 text-white font-medium shadow-[0_0_20px_-5px_rgba(37,99,235,0.4)] transition-all hover:shadow-[0_0_30px_-5px_rgba(37,99,235,0.6)]"
+        >
           <Link href="/projects/new">
             <Plus className="mr-2 h-4 w-4" />
             New Project
@@ -110,10 +118,9 @@ const DashboardPage = () => {
       {projectsList.length === 0 ? (
         <DashboardEmptyState />
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Left Column - Main Content (8 cols) */}
-          <div className="space-y-6 lg:col-span-8">
-            {/* Stats Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+          {/* Top Row: Stats (Full Width) */}
+          <div className="md:col-span-12">
             <DashboardStats
               totalProjects={totalProjects}
               activeProjects={activeProjects}
@@ -121,38 +128,43 @@ const DashboardPage = () => {
               recentProjectsCount={recentProjectsCount}
               mostRecentUpdate={mostRecentUpdate}
             />
+          </div>
 
-            {/* Pending Actions */}
+          {/* Middle Row Left: Activities (8 cols) */}
+          <div className="md:col-span-8 flex flex-col gap-6">
             <PendingActionsCard projects={projectsList} />
-
-            {/* Recent Activity Feed */}
             <ActivityFeed
               projects={projectsList}
               notifications={recentNotifications}
               maxItems={5}
             />
+          </div>
 
-            {/* Recent Projects */}
-            <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+          {/* Middle Row Right: Quick Actions & Snippets (4 cols) */}
+          <div className="md:col-span-4 flex flex-col gap-6">
+            <QuickEmbedCard projects={projectsList} />
+            <KeyboardShortcutsCard />
+          </div>
+
+          {/* Bottom Row: Recent Projects (Full Width) */}
+          <div className="md:col-span-12">
+            <Card className="backdrop-blur-xl border border-white/5 p-6 shadow-2xl overflow-hidden ring-1 ring-white/5 relative mt-2">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
                   Your Projects
                 </h2>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/projects">View all</Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-zinc-400 hover:text-white"
+                  asChild
+                >
+                  <Link href="/projects">View all projects &rarr;</Link>
                 </Button>
               </div>
               <RecentProjectsList projects={recentProjects} />
-            </section>
-          </div>
-
-          {/* Right Column - Sidebar (4 cols) */}
-          <div className="space-y-6 lg:col-span-4">
-            {/* Quick Embed */}
-            <QuickEmbedCard projects={projectsList} />
-
-            {/* Keyboard Shortcuts */}
-            <KeyboardShortcutsCard />
+            </Card>
           </div>
         </div>
       )}
