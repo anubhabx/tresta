@@ -32,7 +32,7 @@ import {
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
-import type { Project } from "@/types/api";
+import type { Project, ProjectVisibility } from "@/types/api";
 import { ModerationSettingsForm } from "./moderation-settings-form";
 import { FormConfigSettings } from "./form-config-settings";
 import { projects } from "@/lib/queries";
@@ -88,7 +88,7 @@ export function ProjectSettingsTab({
     }
   };
 
-  const handleUpdateVisibility = async (visibility: string) => {
+  const handleUpdateVisibility = async (visibility: ProjectVisibility) => {
     try {
       await updateProject.mutateAsync({ visibility });
       toast.success("Project visibility updated.");
