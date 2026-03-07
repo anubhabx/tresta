@@ -27,6 +27,7 @@ import {
   ProjectWidgetsTab,
 } from "@/components/project-detail";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -60,6 +61,7 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
 
   const handleDelete = async () => {
     await deleteProject.mutateAsync();
+    toast.success("Project deleted successfully!");
   };
 
   if (isLoadingProject) {
