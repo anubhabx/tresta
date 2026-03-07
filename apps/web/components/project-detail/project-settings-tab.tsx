@@ -9,6 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Switch } from "@workspace/ui/components/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
 
 import {
   AlertDialog,
@@ -27,6 +35,7 @@ import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import type { Project } from "@/types/api";
 import { ModerationSettingsForm } from "./moderation-settings-form";
 import { FormConfigSettings } from "./form-config-settings";
+import { projects } from "@/lib/queries";
 
 interface ProjectSettingsTabProps {
   project: Project;
@@ -38,6 +47,8 @@ export function ProjectSettingsTab({
   onDelete,
 }: ProjectSettingsTabProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingActive, setIsTogglingActive] = useState(false);
+  const updateProject = projects.mutations.useUpdate(project.slug);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -52,6 +63,38 @@ export function ProjectSettingsTab({
         ),
       );
       setIsDeleting(false);
+    }
+  };
+
+  const handleToggleActive = async () => {
+    setIsTogglingActive(true);
+    try {
+      await updateProject.mutateAsync({
+        isActive: !project.isActive,
+      });
+      toast.success(
+        `Project successfully ${project.isActive ? "deactivated" : "activated"}.`,
+      );
+    } catch (error: unknown) {
+      console.error("Failed to toggle project state:", error);
+      toast.error(
+        getHttpErrorMessage(
+          error,
+          `Failed to ${project.isActive ? "deactivate" : "activate"} project. Details have been logged.`,
+        ),
+      );
+    } finally {
+      setIsTogglingActive(false);
+    }
+  };
+
+  const handleUpdateVisibility = async (visibility: string) => {
+    try {
+      await updateProject.mutateAsync({ visibility });
+      toast.success("Project visibility updated.");
+    } catch (error: unknown) {
+      console.error("Failed to update visibility:", error);
+      toast.error(getHttpErrorMessage(error, "Failed to update visibility."));
     }
   };
 
@@ -130,9 +173,31 @@ export function ProjectSettingsTab({
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border/50 gap-2">
                     <span className="text-muted-foreground">Status</span>
-                    <Badge variant="outline">
-                      {project.isActive ? "Active" : "Inactive"}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {project.isActive ? "Active" : "Locked"}
+                      </span>
+                      <Switch
+                        checked={project.isActive}
+                        onCheckedChange={handleToggleActive}
+                        disabled={isTogglingActive}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border/50 gap-2">
+                    <span className="text-muted-foreground">Visibility</span>
+                    <Select
+                      value={project.visibility || "PRIVATE"}
+                      onValueChange={handleUpdateVisibility}
+                    >
+                      <SelectTrigger className="w-[140px] h-8 text-xs bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PUBLIC">Public</SelectItem>
+                        <SelectItem value="PRIVATE">Private</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-border/50 gap-2">
                     <span className="text-muted-foreground">Created</span>
@@ -227,6 +292,64 @@ export function ProjectSettingsTab({
                 <div className="h-px bg-destructive/20" />
 
                 <div className="space-y-4">
+                  <div className="p-4 border border-orange-500/20 bg-orange-500/10 rounded-lg">
+                    <h4 className="font-medium text-foreground mb-1">
+                      {project.isActive
+                        ? "Deactivate Project"
+                        : "Activate Project"}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {project.isActive
+                        ? "Deactivating this project will make it inaccessible and its public endpoints will return a 403 error. You can reactivate it later if you have enough quota."
+                        : "Reactivate this project. This will consume your active project quota limit."}
+                    </p>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="border-orange-500/50 text-orange-500 hover:bg-orange-500/20 focus:ring-orange-500"
+                        >
+                          {project.isActive
+                            ? "Deactivate Project"
+                            : "Activate Project"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-[#0a0a0a] border-white/5 sm:max-w-[425px]">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {project.isActive
+                              ? "Deactivate Project?"
+                              : "Activate Project?"}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {project.isActive
+                              ? "This will make your collection form and widgets inaccessible until reactivated."
+                              : "This will make your project endpoints accessible again."}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-6">
+                          <AlertDialogCancel
+                            disabled={isTogglingActive}
+                            className="bg-transparent border-border hover:bg-muted"
+                          >
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleToggleActive}
+                            disabled={isTogglingActive}
+                            className="bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500"
+                          >
+                            {isTogglingActive
+                              ? "Processing..."
+                              : project.isActive
+                                ? "Yes, Deactivate"
+                                : "Yes, Activate"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+
                   <div className="p-4 border border-red-500/20 bg-red-500/10 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">
                       Delete Project

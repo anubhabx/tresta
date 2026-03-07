@@ -138,35 +138,39 @@ const ProjectsPage = () => {
                       variant="outline"
                       className="text-[10px] uppercase font-bold tracking-wider flex-shrink-0 bg-red-500/10 text-red-400 border-red-500/20"
                     >
-                      Inactive
+                      Locked
                     </Badge>
                   )}
                 </div>
 
-                {project.description ? (
-                  <p className="flex-1 text-sm text-zinc-400 line-clamp-2 leading-relaxed mb-6">
-                    {project.description}
-                  </p>
-                ) : (
-                  <p className="flex-1 text-sm text-zinc-600 italic mb-6">
-                    No description provided
-                  </p>
-                )}
+                <div
+                  className={!project.isActive ? "opacity-50 grayscale" : ""}
+                >
+                  {project.description ? (
+                    <p className="flex-1 text-sm text-zinc-400 line-clamp-2 leading-relaxed mb-6">
+                      {project.description}
+                    </p>
+                  ) : (
+                    <p className="flex-1 text-sm text-zinc-600 italic mb-6">
+                      No description provided
+                    </p>
+                  )}
 
-                <div className="flex items-center justify-between pt-4 border-t border-white/5 text-xs font-medium text-zinc-400 mt-auto">
-                  <div className="flex items-center gap-2 px-2 py-1 rounded ">
-                    <MessageSquareIcon className="h-3.5 w-3.5 text-blue-400" />
-                    <span className="text-zinc-300">
-                      {project._count?.testimonials || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 opacity-60">
-                    <CalendarIcon className="h-3.5 w-3.5" />
-                    <span className="truncate">
-                      {formatDistanceToNow(new Date(project.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </span>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/5 text-xs font-medium text-zinc-400 mt-auto">
+                    <div className="flex items-center gap-2 px-2 py-1 rounded ">
+                      <MessageSquareIcon className="h-3.5 w-3.5 text-blue-400" />
+                      <span className="text-zinc-300">
+                        {project._count?.testimonials || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 opacity-60">
+                      <CalendarIcon className="h-3.5 w-3.5" />
+                      <span className="truncate">
+                        {formatDistanceToNow(new Date(project.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Card>

@@ -13,9 +13,7 @@ import {
   extractPaginationParams,
   calculateSkip,
 } from "../lib/response.js";
-import type {
-  ProjectData,
-} from "../../types/api-responses.js";
+import type { ProjectData } from "../../types/api-responses.js";
 import { requireUserId } from "../lib/auth.js";
 import {
   CreateProjectSchema,
@@ -93,8 +91,7 @@ const createProject = async (
 
     // Auto-generate collection form URL if not provided
     const finalCollectionFormUrl =
-      collectionFormUrl ||
-      `${getAppBaseUrl()}/testimonials/${slug}`;
+      collectionFormUrl || `${getAppBaseUrl()}/testimonials/${slug}`;
 
     // Create project
     let newProject;
@@ -117,7 +114,6 @@ const createProject = async (
           visibility: visibility || "PRIVATE",
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           formConfig: formConfig ? (formConfig as any) : undefined,
-          
         },
       });
     } catch (error) {
@@ -356,6 +352,7 @@ const updateProject = async (
     try {
       existingProject = await prisma.project.findFirst({
         where: { slug, userId },
+        include: { user: true },
       });
     } catch (error) {
       throw handlePrismaError(error);
@@ -419,7 +416,28 @@ const updateProject = async (
     if (payload.tags !== undefined) updateData.tags = payload.tags;
     if (payload.visibility !== undefined)
       updateData.visibility = payload.visibility;
-    if (payload.isActive !== undefined) updateData.isActive = payload.isActive;
+    if (payload.isActive !== undefined) {
+      // If we are activating an inactive project, check limits
+      if (payload.isActive === true && !existingProject.isActive) {
+        const { PLAN_LIMITS, FALLBACK_PLAN_LIMITS } = await import(
+          "../config/constants.js"
+        );
+        const { getUsageCount } = await import("../services/usage.service.js");
+        const limits =
+          PLAN_LIMITS[existingProject.user.plan] ?? PLAN_LIMITS.FREE;
+        const limit = limits.projects ?? FALLBACK_PLAN_LIMITS.projects ?? 0;
+
+        if (limit !== -1) {
+          const count = await getUsageCount("projects", userId);
+          if (count >= limit) {
+            throw new ConflictError(
+              `You have reached the limit for projects (${limit}). Please upgrade or deactivate another project first.`,
+            );
+          }
+        }
+      }
+      updateData.isActive = payload.isActive;
+    }
 
     // Add moderation settings
     if (payload.autoModeration !== undefined)

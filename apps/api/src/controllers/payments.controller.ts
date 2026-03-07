@@ -360,19 +360,45 @@ export const listUserInvoices = async (
       },
     });
 
+    // Map records and resolve download URLs, with Razorpay API fallback
+    const invoicePromises = records.map(async (record) => {
+      let downloadUrl = getInvoiceDownloadUrl(record.rawSnapshot);
+
+      // Fallback: if no URL in snapshot but we have an invoice ID, fetch from Razorpay API
+      if (!downloadUrl && record.externalInvoiceId) {
+        try {
+          const { fetchRazorpayInvoice } = await import(
+            "../services/razorpay.service.js"
+          );
+          const invoiceDetails = await fetchRazorpayInvoice(
+            record.externalInvoiceId,
+          );
+          downloadUrl =
+            invoiceDetails?.short_url ?? invoiceDetails?.invoice_url ?? null;
+        } catch {
+          // Silently fail — download URL will be null
+        }
+      }
+
+      return {
+        id: record.id,
+        invoiceId: record.externalInvoiceId,
+        amount: record.amount,
+        currency: record.currency,
+        status: record.invoiceStatus ?? record.paymentStatus ?? "unknown",
+        paidAt: record.paidAt?.toISOString() ?? null,
+        date:
+          record.eventCreatedAt?.toISOString() ??
+          record.createdAt.toISOString(),
+        downloadUrl,
+      };
+    });
+
+    const invoices = await Promise.all(invoicePromises);
+
     return ResponseHandler.success(res, {
       data: {
-        invoices: records.map((record) => ({
-          id: record.id,
-          invoiceId: record.externalInvoiceId,
-          amount: record.amount,
-          currency: record.currency,
-          status: record.invoiceStatus ?? record.paymentStatus ?? "unknown",
-          paidAt: record.paidAt?.toISOString() ?? null,
-          date:
-            record.eventCreatedAt?.toISOString() ?? record.createdAt.toISOString(),
-          downloadUrl: getInvoiceDownloadUrl(record.rawSnapshot),
-        })),
+        invoices,
       },
     });
   } catch (error) {

@@ -40,6 +40,8 @@ type RazorpayEventPayload = {
         amount?: number;
         amount_paid?: number;
         currency?: string;
+        short_url?: string;
+        invoice_url?: string;
         notes?: Record<string, unknown>;
         line_items?: Array<{
           subscription_id?: string;
@@ -54,6 +56,64 @@ const SUPPORTED_EVENT_PREFIXES = [
   "invoice.",
   "payment.",
 ] as const;
+
+/**
+ * Extract the invoice short_url from an existing rawSnapshot.
+ * Used to preserve download URLs when a payment.* event would overwrite
+ * a record that was previously created by an invoice.* event.
+ */
+const getExistingInvoiceUrl = (rawSnapshot: unknown): string | null => {
+  if (!rawSnapshot || typeof rawSnapshot !== "object") return null;
+  const snap = rawSnapshot as {
+    payload?: {
+      invoice?: { entity?: { short_url?: string; invoice_url?: string } };
+    };
+  };
+  return (
+    snap.payload?.invoice?.entity?.short_url ??
+    snap.payload?.invoice?.entity?.invoice_url ??
+    null
+  );
+};
+
+/**
+ * Merge the incoming webhook payload with an existing rawSnapshot,
+ * preserving the invoice entity (and its short_url) if the incoming
+ * event is a payment.* event that doesn't carry invoice data.
+ */
+const mergeSnapshot = (
+  incoming: RazorpayEventPayload,
+  existingSnapshot: unknown,
+): RazorpayEventPayload => {
+  // If the incoming event already has invoice data, use it as-is.
+  if (incoming.payload?.invoice?.entity?.short_url) {
+    return incoming;
+  }
+
+  // If no existing snapshot to merge from, use incoming as-is.
+  if (!existingSnapshot || typeof existingSnapshot !== "object") {
+    return incoming;
+  }
+
+  const existing = existingSnapshot as RazorpayEventPayload;
+  const existingInvoice = existing.payload?.invoice;
+
+  // If the old snapshot has invoice data with a download URL, preserve it.
+  if (
+    existingInvoice?.entity?.short_url ||
+    existingInvoice?.entity?.invoice_url
+  ) {
+    return {
+      ...incoming,
+      payload: {
+        ...incoming.payload,
+        invoice: existingInvoice,
+      },
+    };
+  }
+
+  return incoming;
+};
 
 const isSupportedWebhookEvent = (eventName: string): boolean => {
   return SUPPORTED_EVENT_PREFIXES.some((prefix) =>
@@ -230,12 +290,10 @@ export const handleRazorpayWebhook = async (
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
   if (!signature || !secret) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Missing webhook signature configuration",
-      });
+    res.status(400).json({
+      success: false,
+      message: "Missing webhook signature configuration",
+    });
     return;
   }
 
@@ -455,7 +513,8 @@ export const handleRazorpayWebhook = async (
           subscription.currency ||
           null;
 
-        const paymentRecordData = {
+        // Build the base payment record data (without rawSnapshot — that gets merged below)
+        const basePaymentData = {
           provider: "razorpay",
           externalPaymentId: paymentIdFromPayload,
           externalInvoiceId: invoiceIdFromPayload,
@@ -476,10 +535,30 @@ export const handleRazorpayWebhook = async (
               : undefined,
           failedAt:
             payload.event === "payment.failed" ? eventCreatedAt : undefined,
-          rawSnapshot: payload as unknown as Prisma.InputJsonValue,
         };
 
         if (paymentIdFromPayload) {
+          // Fetch existing record to merge snapshots (preserve invoice short_url)
+          const existingPayment = await tx.subscriptionPayment.findUnique({
+            where: {
+              provider_externalPaymentId: {
+                provider: "razorpay",
+                externalPaymentId: paymentIdFromPayload,
+              },
+            },
+            select: { rawSnapshot: true },
+          });
+
+          const mergedSnapshot = mergeSnapshot(
+            payload,
+            existingPayment?.rawSnapshot,
+          );
+
+          const paymentRecordData = {
+            ...basePaymentData,
+            rawSnapshot: mergedSnapshot as unknown as Prisma.InputJsonValue,
+          };
+
           await tx.subscriptionPayment.upsert({
             where: {
               provider_externalPaymentId: {
@@ -491,6 +570,27 @@ export const handleRazorpayWebhook = async (
             update: paymentRecordData,
           });
         } else if (invoiceIdFromPayload) {
+          // Fetch existing record to merge snapshots (preserve invoice short_url)
+          const existingPayment = await tx.subscriptionPayment.findUnique({
+            where: {
+              provider_externalInvoiceId: {
+                provider: "razorpay",
+                externalInvoiceId: invoiceIdFromPayload,
+              },
+            },
+            select: { rawSnapshot: true },
+          });
+
+          const mergedSnapshot = mergeSnapshot(
+            payload,
+            existingPayment?.rawSnapshot,
+          );
+
+          const paymentRecordData = {
+            ...basePaymentData,
+            rawSnapshot: mergedSnapshot as unknown as Prisma.InputJsonValue,
+          };
+
           await tx.subscriptionPayment.upsert({
             where: {
               provider_externalInvoiceId: {
