@@ -1,30 +1,46 @@
 import { Router } from "express";
-import { getPublicProjectBySlug } from '../controllers/project.controller.js';
-import { renderWidgetPage } from '../controllers/widget.controller.js';
-import { publicRateLimitMiddleware } from '../middleware/rate-limiter.js';
+import { getPublicProjectBySlug } from "../controllers/project.controller.js";
+import { renderWidgetPage } from "../controllers/widget.controller.js";
+import { publicRateLimitMiddleware } from "../middleware/rate-limiter.js";
 import {
-	createTestimonial,
-	listPublicTestimonialsByApiKey,
-} from '../controllers/testimonial.controller.js';
+  createTestimonial,
+  listPublicTestimonialsByApiKey,
+  generatePublicUploadUrl,
+} from "../controllers/testimonial.controller.js";
 import {
-	validateApiKeyMiddleware,
-	requirePermission,
-} from '../middleware/api-key.middleware.js';
+  validateApiKeyMiddleware,
+  requirePermission,
+} from "../middleware/api-key.middleware.js";
 
 const router: Router = Router();
 
 // Public project endpoint - no authentication required
-router.get("/projects/:slug", publicRateLimitMiddleware, getPublicProjectBySlug);
+router.get(
+  "/projects/:slug",
+  publicRateLimitMiddleware,
+  getPublicProjectBySlug,
+);
+
+// Public media upload (e.g. avatars and videos for testimonials)
+router.post(
+  "/projects/:slug/media/upload-url",
+  publicRateLimitMiddleware,
+  generatePublicUploadUrl,
+);
 
 // Public testimonial submission
-router.post("/projects/:slug/testimonials", publicRateLimitMiddleware, createTestimonial);
+router.post(
+  "/projects/:slug/testimonials",
+  publicRateLimitMiddleware,
+  createTestimonial,
+);
 
 // Public API access (rate-limited by API key): fetch all published testimonials for a project
 router.get(
-	"/projects/:slug/testimonials",
-	validateApiKeyMiddleware,
-	requirePermission("testimonials"),
-	listPublicTestimonialsByApiKey,
+  "/projects/:slug/testimonials",
+  validateApiKeyMiddleware,
+  requirePermission("testimonials"),
+  listPublicTestimonialsByApiKey,
 );
 
 // Public widget embed page for iframe

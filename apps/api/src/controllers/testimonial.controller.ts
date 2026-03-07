@@ -16,6 +16,11 @@ import {
   calculateSkip,
 } from "../lib/response.js";
 import { verifyGoogleIdToken } from "../lib/google-oauth.js";
+import { z } from "zod";
+import {
+  blobStorageService,
+  StorageDirectory,
+} from "../services/blob-storage.service.js";
 import {
   moderateTestimonial,
   checkDuplicateContent,
@@ -1161,6 +1166,95 @@ const updateModerationStatus = async (
   }
 };
 
+const generatePublicUploadUrlSchema = z.object({
+  filename: z.string().min(1, "Filename is required"),
+  contentType: z.string().min(1, "Content type is required"),
+  directory: z.enum(
+    [
+      StorageDirectory.TESTIMONIALS,
+      StorageDirectory.AVATARS,
+      StorageDirectory.VIDEOS,
+    ] as const,
+    {
+      errorMap: () => ({
+        message: `Directory must be one of: testimonials, avatars, videos`,
+      }),
+    },
+  ),
+  fileSize: z.number().positive().optional(),
+});
+
+/**
+ * Generate a pre-signed upload URL for direct client-side public uploads
+ * POST /api/public/projects/:slug/media/upload-url
+ */
+const generatePublicUploadUrl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { slug } = req.params;
+
+    if (!slug || typeof slug !== "string") {
+      throw new ValidationError("Project slug is required", {
+        field: "slug",
+        received: typeof slug,
+      });
+    }
+
+    const validationResult = generatePublicUploadUrlSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      throw new ValidationError(firstError?.message || "Invalid request data", {
+        field: firstError?.path.join("."),
+        issues: validationResult.error.errors.map((err) => ({
+          path: err.path.join("."),
+          message: err.message,
+          code: err.code,
+        })),
+      });
+    }
+
+    const { filename, contentType, directory, fileSize } =
+      validationResult.data;
+
+    // Verify project exists and is active
+    const project = await prisma.project.findUnique({
+      where: { slug },
+      select: { id: true, userId: true, isActive: true },
+    });
+
+    if (!project) {
+      throw new NotFoundError(`Project with slug "${slug}" not found`);
+    }
+
+    if (!project.isActive) {
+      throw new ForbiddenError(
+        "This project is not currently accepting submissions.",
+      );
+    }
+
+    // Generate upload URL with SAS token using project owner's userId
+    const uploadData = await blobStorageService.generateUploadUrl({
+      directory,
+      filename,
+      contentType,
+      fileSize,
+      expiresInMinutes: 10,
+      userId: project.userId, // Isolate blobs by the project owner
+    });
+
+    return ResponseHandler.success(res, {
+      data: uploadData,
+      message: "Upload URL generated successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   createTestimonial,
   listTestimonials,
@@ -1171,4 +1265,5 @@ export {
   getModerationQueue,
   bulkModerationAction,
   updateModerationStatus,
+  generatePublicUploadUrl,
 };

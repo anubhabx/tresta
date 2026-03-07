@@ -33,6 +33,8 @@ interface AzureFileUploadProps<TFieldValues extends FieldValues> {
   preview?: boolean;
   className?: string;
   onUploadComplete?: (blobUrl: string) => void;
+  isPublic?: boolean;
+  projectSlug?: string;
 }
 
 /**
@@ -62,6 +64,8 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
   preview = false,
   className,
   onUploadComplete,
+  isPublic,
+  projectSlug,
 }: AzureFileUploadProps<TFieldValues>) {
   const { uploadFile, uploading, progress, error, reset } = useAzureSAS();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -91,6 +95,8 @@ export function AzureFileUpload<TFieldValues extends FieldValues>({
 
       // Upload to Azure
       const result = await uploadFile(file, directory, {
+        isPublic,
+        projectSlug,
         onProgress: () => {
           // Progress is automatically tracked by the hook
         },

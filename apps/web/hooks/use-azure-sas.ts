@@ -34,6 +34,8 @@ interface UploadOptions {
   onProgress?: (progress: number) => void;
   onSuccess?: (result: UploadResult) => void;
   onError?: (error: Error) => void;
+  isPublic?: boolean;
+  projectSlug?: string;
 }
 
 export interface UploadResult {
@@ -125,29 +127,33 @@ export function useAzureSAS() {
         setProgress(0);
         setError(null);
 
-        // Get authentication token
-        const authToken = await getToken();
-        if (!authToken) {
-          throw new Error("Authentication required");
+        let uploadUrlEndpoint = "/api/media/generate-upload-url";
+        let headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+
+        if (options?.isPublic && options?.projectSlug) {
+          uploadUrlEndpoint = `/api/public/projects/${options.projectSlug}/media/upload-url`;
+        } else {
+          // Get authentication token for private uploads
+          const authToken = await getToken();
+          if (!authToken) {
+            throw new Error("Authentication required");
+          }
+          headers["Authorization"] = `Bearer ${authToken}`;
         }
 
         // Step 1: Request upload URL from backend
-        const response = await fetch(
-          getApiUrl("/api/media/generate-upload-url"),
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({
-              filename: file.name,
-              contentType: file.type,
-              directory,
-              fileSize: file.size,
-            } as GenerateUploadUrlRequest),
-          },
-        );
+        const response = await fetch(getApiUrl(uploadUrlEndpoint), {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            directory,
+            fileSize: file.size,
+          } as GenerateUploadUrlRequest),
+        });
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -235,22 +241,19 @@ export async function uploadFileToAzure(
     }
 
     // Step 1: Request upload URL from backend
-    const response = await fetch(
-      getApiUrl("/api/media/generate-upload-url"),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          directory,
-          fileSize: file.size,
-        } as GenerateUploadUrlRequest),
+    const response = await fetch(getApiUrl("/api/media/generate-upload-url"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
       },
-    );
+      body: JSON.stringify({
+        filename: file.name,
+        contentType: file.type,
+        directory,
+        fileSize: file.size,
+      } as GenerateUploadUrlRequest),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();

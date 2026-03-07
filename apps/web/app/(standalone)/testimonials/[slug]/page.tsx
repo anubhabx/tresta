@@ -3,9 +3,7 @@
 import { use } from "react";
 import { GoogleOAuthProvider } from "@/components/auth/google-oauth-provider";
 import { CollectionPageShell } from "@/components/testimonials/collection-page-shell";
-import {
-  CollectionFormBody,
-} from "@/components/collection-form";
+import { CollectionFormBody } from "@/components/collection-form";
 import { useTestimonialSubmissionFlow } from "./use-testimonial-submission-flow";
 import {
   ExistingSubmissionState,
@@ -65,6 +63,7 @@ export default function TestimonialSubmissionPage({
           mode="hosted"
           formConfig={project?.formConfig}
           projectName={project?.name}
+          projectSlug={slug}
           projectTagline={project?.shortDescription}
           projectDescription={project?.description}
           logoUrl={project?.logoUrl}

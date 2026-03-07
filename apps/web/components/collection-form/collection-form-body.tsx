@@ -225,7 +225,11 @@ function ProjectContextPanel({
       >
         {logoUrl ? (
           <Avatar className="h-24 w-24 rounded-lg ring-1 ring-border/65 shadow-[0_16px_35px_-20px_rgba(15,23,42,0.5)]">
-            <AvatarImage src={logoUrl} alt={`${projectName} logo`} className="object-cover" />
+            <AvatarImage
+              src={logoUrl}
+              alt={`${projectName} logo`}
+              className="object-cover"
+            />
             <AvatarFallback
               className={cn(
                 "text-2xl font-semibold text-foreground",
@@ -289,6 +293,7 @@ export interface CollectionFormBodyProps {
   previewViewport?: "desktop" | "tablet" | "mobile";
   formConfig?: FormConfig | null;
   projectName?: string;
+  projectSlug?: string;
   projectTagline?: string | null;
   projectDescription?: string | null;
   logoUrl?: string | null;
@@ -320,6 +325,7 @@ export function CollectionFormBody({
   previewViewport = "desktop",
   formConfig,
   projectName = "Your Project",
+  projectSlug,
   projectTagline,
   projectDescription,
   logoUrl,
@@ -715,6 +721,8 @@ export function CollectionFormBody({
             directory="avatars"
             accept="image/png,image/jpeg,image/jpg,image/webp"
             maxSizeMB={2}
+            isPublic={isHosted}
+            projectSlug={projectSlug}
             description={
               requireAvatar
                 ? "Required · JPG, PNG, or WebP (max 2MB)"
