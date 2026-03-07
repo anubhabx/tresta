@@ -18,13 +18,14 @@ interface SendEmailParams {
     to: string;
     subject: string;
     html: string;
+    text?: string;
 }
 
 export class EmailService {
     /**
      * Send an email using Resend
      */
-    static async sendEmail({ to, subject, html }: SendEmailParams): Promise<boolean> {
+    static async sendEmail({ to, subject, html, text }: SendEmailParams): Promise<boolean> {
         if (!isRealEmailDeliveryEnabled()) {
             console.log(`[EMAIL MOCK] To: ${to}, Subject: ${subject}`);
             return true;
@@ -37,6 +38,7 @@ export class EmailService {
                 to,
                 subject,
                 html,
+                text,
             });
 
             if (error) {
