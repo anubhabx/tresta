@@ -1,7 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useApi } from "@/hooks/use-api";
-import { toast } from "sonner";
-import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import type { ApiSuccessResponse } from "@workspace/types";
 import type {
   Project,
@@ -101,13 +99,6 @@ export const projects = {
 
           // Invalidate list cache
           queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
-
-          toast.success("Project updated successfully!");
-        },
-        onError: (error: unknown) => {
-          toast.error(
-            getHttpErrorMessage(error, "Failed to update project"),
-          );
         },
       });
     },
@@ -126,13 +117,6 @@ export const projects = {
 
           // Invalidate list cache
           queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
-
-          toast.success("Project deleted successfully!");
-        },
-        onError: (error: unknown) => {
-          toast.error(
-            getHttpErrorMessage(error, "Failed to delete project"),
-          );
         },
       });
     },
