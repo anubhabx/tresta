@@ -38,16 +38,18 @@ export function NotificationSidebarSection() {
             variant="ghost"
           >
             <div className="relative">
-              <Bell className="h-4 w-4" />
+              <Bell className="h-4 w-4 text-foreground/80" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-destructive text-[8px] font-bold text-destructive-foreground">
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground shadow-[0_0_8px_rgba(var(--primary),0.5)]">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </div>
-            <span className="flex-1 text-left">Notifications</span>
+            <span className="flex-1 text-left text-foreground/90">
+              Notifications
+            </span>
             {unreadCount > 0 && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-foreground/50 font-medium">
                 {unreadCount}
               </span>
             )}
@@ -61,22 +63,22 @@ export function NotificationSidebarSection() {
                 <SidebarMenuSubButton
                   onClick={toggleCenter}
                   className={cn(
-                    "flex-col items-start gap-1 py-2 h-auto",
-                    !notification.isRead && "bg-info-highlight-bg",
+                    "flex-col items-start gap-1 py-2 h-auto hover:bg-white/[0.02]",
+                    !notification.isRead && "bg-white/[0.01]",
                   )}
                 >
-                  <div className="flex items-start gap-2 w-full">
+                  <div className="flex items-start gap-3 w-full">
                     {!notification.isRead && (
-                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                      <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0 animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">
+                      <p className="text-xs font-medium truncate text-foreground/90">
                         {notification.title}
                       </p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">
+                      <p className="text-xs text-foreground/50 line-clamp-1 mt-0.5">
                         {notification.message}
                       </p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                      <p className="text-[10px] text-foreground/40 mt-1 font-medium">
                         {formatDistanceToNow(new Date(notification.createdAt), {
                           addSuffix: true,
                         })}
@@ -89,7 +91,7 @@ export function NotificationSidebarSection() {
             <SidebarMenuSubItem>
               <SidebarMenuSubButton
                 onClick={toggleCenter}
-                className="justify-center text-xs text-muted-foreground"
+                className="justify-center text-xs text-foreground/50 hover:text-foreground/80 hover:bg-white/[0.02] py-2 h-auto"
               >
                 View all notifications
               </SidebarMenuSubButton>

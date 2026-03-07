@@ -142,7 +142,7 @@ function getDefaultValues(project?: Project | null): Step1FormData {
       project?.formConfig?.allowAnonymousSubmissions ?? true,
     allowFingerprintOptOut:
       project?.formConfig?.allowFingerprintOptOut ?? false,
-    notifyOnSubmission: project?.formConfig?.notifyOnSubmission ?? false,
+    notifyOnSubmission: project?.formConfig?.notifyOnSubmission ?? true,
   };
 }
 

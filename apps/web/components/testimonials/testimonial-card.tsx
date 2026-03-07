@@ -42,6 +42,7 @@ import {
   getEffectiveModerationStatus,
   isModerationApproved,
 } from "@/lib/testimonial-list-utils";
+import { useSasUrl } from "@/hooks/use-sas-url";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -58,6 +59,7 @@ export function TestimonialCard({
 }: TestimonialCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const effectiveModerationStatus = getEffectiveModerationStatus(testimonial);
+  const { sasUrl: resolvedAvatarUrl } = useSasUrl(testimonial.authorAvatar);
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsLoading(true);
@@ -178,7 +180,7 @@ export function TestimonialCard({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-2 flex-1 min-w-0">
             <CustomAvatar
-              src={testimonial.authorAvatar}
+              src={resolvedAvatarUrl ?? testimonial.authorAvatar}
               name={testimonial.authorName}
               alt={testimonial.authorName}
               size="md"

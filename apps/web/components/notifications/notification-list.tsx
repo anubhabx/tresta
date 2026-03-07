@@ -42,7 +42,7 @@ export function NotificationList({ onClose }: NotificationListProps) {
       </div>
 
       {hasNextPage && (
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-white/[0.05]">
           <Button
             variant="outline"
             className="w-full"

@@ -36,9 +36,9 @@ export function NotificationCenter() {
     <Sheet open={isOpen} onOpenChange={closeCenter}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md p-0 flex flex-col"
+        className="w-full sm:max-w-md p-0 flex flex-col bg-background/60 backdrop-blur-xl border-l border-white/[0.05]"
       >
-        <SheetHeader className="p-6 pb-4 border-b">
+        <SheetHeader className="p-6 pb-4 border-b border-white/[0.05]">
           <div className="flex items-center justify-between">
             <SheetTitle>Notifications</SheetTitle>
             {unreadCount > 0 && (

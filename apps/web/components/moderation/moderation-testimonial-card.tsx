@@ -18,6 +18,7 @@ import {
 import { Testimonial } from "@/types/api";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@workspace/ui/lib/utils";
+import { useSasUrl } from "@/hooks/use-sas-url";
 
 interface ModerationTestimonialCardProps {
   testimonial: Testimonial;
@@ -40,6 +41,7 @@ export function ModerationTestimonialCard({
 }: ModerationTestimonialCardProps) {
   const riskScore = testimonial.moderationScore ?? 0;
   const flags = (testimonial.moderationFlags as string[]) ?? [];
+  const { sasUrl: resolvedAvatarUrl } = useSasUrl(testimonial.authorAvatar);
 
   // Calculate risk level
   const getRiskLevel = (score: number) => {
@@ -70,11 +72,11 @@ export function ModerationTestimonialCard({
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3 sm:mb-4">
           <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
             <CustomAvatar
-              src={testimonial.authorAvatar}
+              src={resolvedAvatarUrl ?? testimonial.authorAvatar}
               name={testimonial.authorName}
               alt={testimonial.authorName}
               size="md"
-              className="flex-shrink-0"
+              className="flex-shrink-0 object-cover"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">

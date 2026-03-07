@@ -18,13 +18,13 @@ export function NotificationBadge() {
     <Button
       variant="ghost"
       size="icon"
-      className="relative"
+      className="relative hover:bg-white/[0.02]"
       onClick={toggleCenter}
       aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
     >
-      <Bell className="h-5 w-5" />
+      <Bell className="h-5 w-5 text-foreground/80" />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground shadow-[0_0_8px_rgba(var(--primary),0.5)]">
           {displayCount}
         </span>
       )}

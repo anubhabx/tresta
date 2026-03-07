@@ -43,30 +43,34 @@ export function NotificationItem({
     <button
       onClick={handleClick}
       className={cn(
-        "w-full text-left p-4 hover:bg-accent transition-colors border-b last:border-b-0",
-        !notification.isRead && "bg-info-highlight-bg",
+        "w-full text-left p-5 hover:bg-white/[0.02] transition-colors border-b border-white/[0.05] last:border-b-0",
+        !notification.isRead && "bg-white/[0.01]",
       )}
     >
-      <div className="flex items-start gap-2">
-        {!notification.isRead && (
-          <div className="mt-2 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-        )}
+      <div className="flex items-start gap-4">
+        <div className="mt-1.5 flex h-2 w-2 items-center justify-center flex-shrink-0">
+          {!notification.isRead && (
+            <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
+          )}
+        </div>
         <div className="flex-1 min-w-0">
-          <p
-            className={cn(
-              "text-sm font-medium mb-1",
-              !notification.isRead && "font-semibold",
-            )}
-          >
-            {notification.title}
-          </p>
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p
+              className={cn(
+                "text-sm font-medium text-foreground/90",
+                !notification.isRead && "text-foreground font-semibold",
+              )}
+            >
+              {notification.title}
+            </p>
+            <span className="text-[11px] text-foreground/40 font-medium whitespace-nowrap mt-0.5">
+              {formatDistanceToNow(new Date(notification.createdAt), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
+          <p className="text-[13px] leading-relaxed text-foreground/60 line-clamp-2">
             {notification.message}
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            {formatDistanceToNow(new Date(notification.createdAt), {
-              addSuffix: true,
-            })}
           </p>
         </div>
       </div>
