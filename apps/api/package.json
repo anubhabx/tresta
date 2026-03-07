@@ -6,12 +6,14 @@
   "type": "module",
   "scripts": {
     "test": "vitest tests",
-    "dev": "pnpm dlx tsx --watch src/index.ts",
+    "dev": "concurrently --kill-others-on-fail -n api,worker -c auto \"pnpm run dev:api\" \"pnpm run dev:workers\"",
+    "dev:api": "pnpm dlx tsx --watch src/index.ts",
     "dev:workers": "pnpm dlx tsx --watch src/workers/index.ts",
     "build": "pnpm --filter @workspace/database build && tsc",
-    "start": "node dist/apps/api/src/index.js",
+    "start": "concurrently --kill-others-on-fail -n api,worker -c auto \"pnpm run start:api\" \"pnpm run start:workers\"",
+    "start:api": "node dist/apps/api/src/index.js",
     "start:workers": "node dist/apps/api/src/workers/index.js",
-    "start:all": "concurrently --kill-others-on-fail -n api,worker -c auto \"pnpm run start\" \"pnpm run start:workers\"",
+    "start:all": "pnpm run start",
     "migrate:testimonials": "ts-node src/scripts/migrate-existing-testimonials.ts",
     "reconcile:subscriptions": "pnpm dlx tsx src/scripts/reconcile-subscriptions.ts"
   },

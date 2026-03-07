@@ -291,7 +291,7 @@ tresta/
 
    # Or start individually
    pnpm dev --filter web   # Next.js (http://localhost:3000)
-   pnpm dev --filter api   # Express API (http://localhost:8000)
+   pnpm dev --filter api   # Express API + workers (http://localhost:8000)
    ```
 
 ---
@@ -304,7 +304,7 @@ tresta/
 # Development
 pnpm dev                    # Run all apps
 pnpm dev --filter web       # Run Next.js only
-pnpm dev --filter api       # Run API only
+pnpm dev --filter api       # Run API + workers
 
 # Database
 pnpm generate               # Generate Prisma Client
