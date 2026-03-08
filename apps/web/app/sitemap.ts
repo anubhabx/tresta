@@ -1,7 +1,34 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
-import { prisma } from "@workspace/database/prisma";
+
+async function getPublicProjectPages(): Promise<MetadataRoute.Sitemap> {
+  if (!process.env.DATABASE_URL) {
+    return [];
+  }
+
+  try {
+    const { prisma } = await import("@workspace/database/prisma");
+
+    const publicProjects = await prisma.project.findMany({
+      where: { visibility: "PUBLIC", isActive: true },
+      select: { slug: true, updatedAt: true },
+    });
+
+    return publicProjects.map((project) => ({
+      url: `${siteConfig.url}/testimonials/${project.slug}`,
+      lastModified: project.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch (error) {
+    console.warn(
+      "[sitemap] Could not fetch public projects — using static pages only",
+      error instanceof Error ? error.message : error,
+    );
+    return [];
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   /* ── Static pages ──────────────────────────────────────────── */
@@ -45,23 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   /* ── Dynamic pages: public testimonial forms ───────────────── */
-  let projectPages: MetadataRoute.Sitemap = [];
-  try {
-    const publicProjects = await prisma.project.findMany({
-      where: { visibility: "PUBLIC", isActive: true },
-      select: { slug: true, updatedAt: true },
-    });
-
-    projectPages = publicProjects.map((project) => ({
-      url: `${siteConfig.url}/testimonials/${project.slug}`,
-      lastModified: project.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    }));
-  } catch {
-    // Gracefully degrade — DB unavailable at build time still produces static sitemap
-    console.warn("[sitemap] Could not fetch public projects — using static pages only");
-  }
+  const projectPages = await getPublicProjectPages();
 
   return [...staticPages, ...projectPages];
 }
