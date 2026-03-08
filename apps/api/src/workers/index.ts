@@ -23,6 +23,10 @@ import {
   analyticsCleanupJob,
 } from "../jobs/widget-analytics.job.js";
 import {
+  operationalAlertsJob,
+  startOperationalAlertsJob,
+} from '../jobs/operational-alerts.job.js';
+import {
   startDowngradeEnforcementJob,
   downgradeEnforcementJob,
 } from "../jobs/downgrade-enforcement.job.js";
@@ -64,6 +68,7 @@ async function startWorkersAndJobs(): Promise<void> {
   startSubscriptionReconciliationJob();
   startDowngradeEnforcementJob();
   scheduleWidgetAnalyticsJobs();
+  startOperationalAlertsJob();
 
   const { retryFailedAuditLogs } = await import(
     "../middleware/audit-log.middleware.js"
@@ -90,6 +95,7 @@ async function stopWorkersAndJobs(): Promise<void> {
     subscriptionReconciliationJob.stop();
     performanceCheckJob.stop();
     analyticsCleanupJob.stop();
+    operationalAlertsJob.stop();
     downgradeEnforcementJob.stop();
   } catch (error) {
     logger.error({ error }, "Failed to stop one or more cron jobs");

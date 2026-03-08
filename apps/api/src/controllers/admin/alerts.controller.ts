@@ -1,13 +1,14 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ResponseHandler } from '../../lib/response.js';
-import { getRedisClient } from '../../lib/redis.js';
-import { BadRequestError } from '../../lib/errors.js';
+import { getAuth } from '@clerk/express';
 
-const ALERT_KEYS = {
-  EMAIL_QUOTA_THRESHOLD: 'alerts:email_quota_threshold',
-  DLQ_COUNT_THRESHOLD: 'alerts:dlq_count_threshold',
-  FAILED_JOB_RATE_THRESHOLD: 'alerts:failed_job_rate_threshold',
-};
+import { ResponseHandler } from '../../lib/response.js';
+import { BadRequestError } from '../../lib/errors.js';
+import {
+  getOperationalAlertConfig,
+  getOperationalAlertSummary,
+  listRecentOperationalAlerts,
+  updateOperationalAlertConfig,
+} from '../../services/operational-alerts.service.js';
 
 /**
  * GET /admin/alerts
@@ -19,26 +20,31 @@ export const getAlerts = async (
   next: NextFunction
 ) => {
   try {
-    const redis = getRedisClient();
-    
-    const [
-      emailQuotaThreshold,
-      dlqCountThreshold,
-      failedJobRateThreshold,
-    ] = await Promise.all([
-      redis.get(ALERT_KEYS.EMAIL_QUOTA_THRESHOLD),
-      redis.get(ALERT_KEYS.DLQ_COUNT_THRESHOLD),
-      redis.get(ALERT_KEYS.FAILED_JOB_RATE_THRESHOLD),
+    const [config, history, summary] = await Promise.all([
+      getOperationalAlertConfig(),
+      listRecentOperationalAlerts(),
+      getOperationalAlertSummary(),
     ]);
-    
+
     return ResponseHandler.success(res, {
       data: {
         config: {
-          emailQuotaThreshold: parseInt(emailQuotaThreshold || '80'),
-          dlqCountThreshold: parseInt(dlqCountThreshold || '100'),
-          failedJobRateThreshold: parseFloat(failedJobRateThreshold || '0.1'),
+          emailQuotaThreshold: config.emailQuotaThreshold,
+          dlqCountThreshold: config.dlqCountThreshold,
+          failedJobRateThreshold: config.failedJobRateThreshold,
+          slackWebhookUrl: config.slackWebhookUrl,
         },
-        history: [],
+        history: history.map((alert) => ({
+          id: alert.id,
+          alertType: alert.alertType,
+          severity: alert.severity,
+          message: alert.message,
+          metadata: alert.metadata,
+          triggeredAt: alert.createdAt.toISOString(),
+          resolved: alert.resolved,
+          resolvedAt: alert.resolvedAt?.toISOString() || null,
+        })),
+        summary,
       },
     });
   } catch (error) {
@@ -60,6 +66,7 @@ export const updateAlertConfig = async (
       emailQuotaThreshold,
       dlqCountThreshold,
       failedJobRateThreshold,
+      slackWebhookUrl,
     } = req.body;
     
     // Validate inputs
@@ -83,38 +90,36 @@ export const updateAlertConfig = async (
         throw new BadRequestError('failedJobRateThreshold must be between 0 and 1');
       }
     }
-    
-    const redis = getRedisClient();
-    
-    // Update thresholds
-    if (emailQuotaThreshold !== undefined) {
-      await redis.set(ALERT_KEYS.EMAIL_QUOTA_THRESHOLD, emailQuotaThreshold.toString());
+
+    if (slackWebhookUrl !== undefined) {
+      if (typeof slackWebhookUrl !== 'string') {
+        throw new BadRequestError('slackWebhookUrl must be a string');
+      }
+
+      const trimmedWebhookUrl = slackWebhookUrl.trim();
+      if (
+        trimmedWebhookUrl.length > 0 &&
+        !trimmedWebhookUrl.startsWith('https://hooks.slack.com/')
+      ) {
+        throw new BadRequestError('slackWebhookUrl must be a valid Slack incoming webhook URL');
+      }
     }
-    
-    if (dlqCountThreshold !== undefined) {
-      await redis.set(ALERT_KEYS.DLQ_COUNT_THRESHOLD, dlqCountThreshold.toString());
-    }
-    
-    if (failedJobRateThreshold !== undefined) {
-      await redis.set(ALERT_KEYS.FAILED_JOB_RATE_THRESHOLD, failedJobRateThreshold.toString());
-    }
-    
-    // Fetch updated configuration
-    const [
-      updatedEmailQuotaThreshold,
-      updatedDlqCountThreshold,
-      updatedFailedJobRateThreshold,
-    ] = await Promise.all([
-      redis.get(ALERT_KEYS.EMAIL_QUOTA_THRESHOLD),
-      redis.get(ALERT_KEYS.DLQ_COUNT_THRESHOLD),
-      redis.get(ALERT_KEYS.FAILED_JOB_RATE_THRESHOLD),
-    ]);
-    
+
+    const { userId } = getAuth(req);
+    const updatedConfig = await updateOperationalAlertConfig({
+      emailQuotaThreshold,
+      dlqCountThreshold,
+      failedJobRateThreshold,
+      slackWebhookUrl,
+      updatedBy: userId || undefined,
+    });
+
     return ResponseHandler.success(res, {
       data: {
-        emailQuotaThreshold: parseInt(updatedEmailQuotaThreshold || '80'),
-        dlqCountThreshold: parseInt(updatedDlqCountThreshold || '100'),
-        failedJobRateThreshold: parseFloat(updatedFailedJobRateThreshold || '0.1'),
+        emailQuotaThreshold: updatedConfig.emailQuotaThreshold,
+        dlqCountThreshold: updatedConfig.dlqCountThreshold,
+        failedJobRateThreshold: updatedConfig.failedJobRateThreshold,
+        slackWebhookUrl: updatedConfig.slackWebhookUrl,
       },
     });
   } catch (error) {

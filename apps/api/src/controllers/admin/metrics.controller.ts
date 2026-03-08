@@ -4,6 +4,7 @@ import { getRedisClient } from '../../lib/redis.js';
 import { REDIS_KEYS, getCurrentDateUTC } from '../../lib/redis-keys.js';
 import { ResponseHandler } from '../../lib/response.js';
 import { handlePrismaError } from '../../lib/errors.js';
+import { getOperationalAlertSummary } from '../../services/operational-alerts.service.js';
 
 /**
  * GET /admin/metrics
@@ -40,9 +41,9 @@ export const getMetrics = async (
     ]);
     
     // Get last 7 days of email usage from database
-    let last7Days, dlqCount, outboxPending;
+    let last7Days, dlqCount, outboxPending, recentWebhookFailures, recentPaymentFailures, alertSummary;
     try {
-      [last7Days, dlqCount, outboxPending] = await Promise.all([
+      [last7Days, dlqCount, outboxPending, recentWebhookFailures, recentPaymentFailures, alertSummary] = await Promise.all([
         prisma.emailUsage.findMany({
           orderBy: { date: 'desc' },
           take: 7,
@@ -53,6 +54,33 @@ export const getMetrics = async (
         prisma.notificationOutbox.count({
           where: { status: 'pending' },
         }),
+        prisma.paymentWebhookEvent.count({
+          where: {
+            status: 'failed',
+            receivedAt: { gte: new Date(Date.now() - 60 * 60 * 1000) },
+          },
+        }),
+        prisma.subscriptionPayment.count({
+          where: {
+            OR: [
+              {
+                paymentStatus: { equals: 'failed', mode: 'insensitive' },
+                OR: [
+                  { failedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+                  { eventCreatedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+                ],
+              },
+              {
+                invoiceStatus: { equals: 'expired', mode: 'insensitive' },
+                OR: [
+                  { failedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+                  { eventCreatedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+                ],
+              },
+            ],
+          },
+        }),
+        getOperationalAlertSummary(),
       ]);
     } catch (error) {
       throw handlePrismaError(error);
@@ -82,6 +110,13 @@ export const getMetrics = async (
         queues: {
           dlqCount,
           outboxPending,
+        },
+        alerts: {
+          active: alertSummary.activeCount,
+          critical: alertSummary.criticalCount,
+          warning: alertSummary.warningCount,
+          recentWebhookFailures,
+          recentPaymentFailures,
         },
         history: last7Days,
         timestamp: new Date().toISOString(),

@@ -6,6 +6,7 @@ import {
   blobStorageService,
   StorageDirectory,
 } from '../services/blob-storage.service.js';
+import { recordOperationalAlert } from '../services/operational-alerts.service.js';
 import { logger } from '../lib/logger.js';
 
 const clerkWebhookLogger = logger.child({ module: 'clerk-webhook' });
@@ -104,6 +105,16 @@ export const syncUserToDB = async (
     res.status(200).send("User synced to DB");
   } catch (error) {
     requestLogger.error({ error }, 'Webhook verification failed');
+    void recordOperationalAlert({
+      alertType: 'WEBHOOK_FAILURES_DETECTED',
+      severity: 'WARNING',
+      message: 'Clerk webhook verification failed.',
+      metadata: {
+        provider: 'clerk',
+        requestId: req.requestId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+    });
     res.status(400).send("Webhook verification failed");
   }
 };

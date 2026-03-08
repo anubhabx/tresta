@@ -5,6 +5,7 @@ import { Prisma, prisma } from "@workspace/database/prisma";
 import { logger } from "../lib/logger.js";
 
 import { verifyWebhookSignature } from "../services/razorpay.service.js";
+import { recordOperationalAlert } from '../services/operational-alerts.service.js';
 import { mapProviderSignalsToInternal } from "../services/subscription-status.service.js";
 
 type RazorpayEventPayload = {
@@ -294,6 +295,15 @@ export const handleRazorpayWebhook = async (
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
   if (!signature || !secret) {
+    void recordOperationalAlert({
+      alertType: 'DEPENDENCY_DEGRADED',
+      severity: 'CRITICAL',
+      message: 'Razorpay webhook secret is missing; webhook verification cannot proceed.',
+      metadata: {
+        provider: 'razorpay',
+        requestId: req.requestId,
+      },
+    });
     res.status(400).json({
       success: false,
       message: "Missing webhook signature configuration",
@@ -320,6 +330,15 @@ export const handleRazorpayWebhook = async (
   );
 
   if (!isValidSignature) {
+    void recordOperationalAlert({
+      alertType: 'WEBHOOK_FAILURES_DETECTED',
+      severity: 'WARNING',
+      message: 'Razorpay webhook signature validation failed.',
+      metadata: {
+        provider: 'razorpay',
+        requestId: req.requestId,
+      },
+    });
     res
       .status(400)
       .json({ success: false, message: "Invalid Razorpay webhook signature" });
@@ -638,6 +657,17 @@ export const handleRazorpayWebhook = async (
     res.status(200).json({ success: true, message: "Webhook processed" });
   } catch (error) {
     requestLogger.error({ error, providerEventId }, 'Razorpay webhook processing failed');
+    void recordOperationalAlert({
+      alertType: 'WEBHOOK_FAILURES_DETECTED',
+      severity: 'CRITICAL',
+      message: 'Razorpay webhook processing failed.',
+      metadata: {
+        provider: 'razorpay',
+        providerEventId,
+        requestId: req.requestId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+    });
 
     try {
       await prisma.paymentWebhookEvent.update({

@@ -13,9 +13,12 @@ export interface AlertConfig {
 export interface AlertHistory {
   id: string;
   alertType: string;
+  severity?: string;
   message: string;
   triggeredAt: string;
   resolved: boolean;
+  resolvedAt?: string | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 interface AlertsResponse {

@@ -93,7 +93,7 @@ Current note:
   - [x] Replace remaining script `console.*` usage.
 - [x] Add request correlation across API, workers, webhooks, and admin actions.
 - [x] Add error tracking for web and API.
-- [ ] Add dashboards/alerts for webhook failures, queue backlog, payment failures, and degraded dependencies.
+- [x] Add dashboards/alerts for webhook failures, queue backlog, payment failures, and degraded dependencies.
 
 ---
 

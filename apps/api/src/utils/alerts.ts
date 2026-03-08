@@ -2,6 +2,7 @@ import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS } from '../lib/redis-keys.js';
 import { EMAIL_LIMITS } from '../config/constants.js';
 import { logger } from '../lib/logger.js';
+import { getConfiguredSlackWebhookUrl } from '../services/operational-alerts.service.js';
 
 const alertsLogger = logger.child({ module: 'alerts' });
 
@@ -69,7 +70,7 @@ export async function checkAndAlertQuota(currentCount: number): Promise<void> {
  * @param level - Alert level (warning, critical, exhausted)
  */
 async function sendSlackAlert(message: string, level: string): Promise<void> {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  const webhookUrl = await getConfiguredSlackWebhookUrl();
 
   if (!webhookUrl) {
     alertsLogger.warn({ message, level }, 'SLACK_WEBHOOK_URL not configured, skipping alert');
@@ -163,7 +164,7 @@ export async function sendDailySummary(stats: {
   digestsSent: number;
   failedJobs: number;
 }): Promise<void> {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  const webhookUrl = await getConfiguredSlackWebhookUrl();
 
   if (!webhookUrl) {
     return;

@@ -9,7 +9,11 @@ export const performanceCheckJob = new CronJob(
   '*/15 * * * *',
   async () => {
     widgetAnalyticsJobLogger.info('Running widget performance check');
-    await checkWidgetPerformance();
+    try {
+      await checkWidgetPerformance();
+    } catch (error) {
+      widgetAnalyticsJobLogger.error({ error }, 'Widget performance check failed');
+    }
   },
   null,
   false,
@@ -21,7 +25,11 @@ export const analyticsCleanupJob = new CronJob(
   '0 2 * * *',
   async () => {
     widgetAnalyticsJobLogger.info('Running analytics cleanup');
-    await cleanupOldAnalytics();
+    try {
+      await cleanupOldAnalytics();
+    } catch (error) {
+      widgetAnalyticsJobLogger.error({ error }, 'Widget analytics cleanup failed');
+    }
   },
   null,
   false,
