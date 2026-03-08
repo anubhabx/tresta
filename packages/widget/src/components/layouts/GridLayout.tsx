@@ -17,14 +17,15 @@ export function GridLayout({
   const cols = Math.min(layout.columns ?? 3, 4);
 
   return (
-    <div className="tresta-grid" data-cols={cols}>
+    <div className="tresta-grid" data-cols={cols} role="list" aria-label="Customer testimonials">
       {testimonials.map((testimonial) => (
-        <TestimonialCard
-          key={testimonial.id}
-          testimonial={testimonial}
-          displayOptions={displayOptions}
-          theme={theme}
-        />
+        <div key={testimonial.id} className="tresta-grid-item" role="listitem">
+          <TestimonialCard
+            testimonial={testimonial}
+            displayOptions={displayOptions}
+            theme={theme}
+          />
+        </div>
       ))}
     </div>
   );

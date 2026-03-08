@@ -330,7 +330,8 @@ describe('Widget Core', () => {
       expect(() => widget.unmount()).not.toThrow();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget] Unmount failed'),
+        '[TrestaWidget v1.0.0]',
+        'Unmount failed:',
         expect.any(Error)
       );
 

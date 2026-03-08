@@ -275,7 +275,8 @@ describe('Loader - autoInitialize', () => {
 
       // Should log error but not throw
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TrestaWidget] Failed to initialize widget:'),
+        '[TrestaWidget]',
+        'Failed to initialize widget:',
         expect.any(Error)
       );
 

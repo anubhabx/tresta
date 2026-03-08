@@ -263,6 +263,11 @@ export class Widget implements WidgetInstance {
       return;
     }
 
+    if (!data.testimonials || data.testimonials.length === 0) {
+      this.renderEmptyState();
+      return;
+    }
+
     // Apply maxTestimonials limit before rendering
     // Check both layoutConfig and displayOptions for maxTestimonials
     const maxTestimonials = data.config.layout.maxTestimonials ?? data.config.display.maxTestimonials;
@@ -302,6 +307,26 @@ export class Widget implements WidgetInstance {
   }
 
   /**
+   * Render empty state
+   */
+  private renderEmptyState(): void {
+    if (!this.contentRoot) return;
+
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'tresta-widget-empty-state tresta-empty';
+    emptyEl.setAttribute('role', 'status');
+    emptyEl.setAttribute('aria-live', 'polite');
+
+    const messageEl = document.createElement('p');
+    messageEl.className = 'tresta-widget-state-message';
+    messageEl.textContent = this.config.emptyMessage ?? 'No testimonials yet';
+    emptyEl.appendChild(messageEl);
+
+    this.contentRoot.replaceChildren(emptyEl);
+    this.logger.logEmpty();
+  }
+
+  /**
    * Render error state
    */
   private renderErrorState(error: unknown): void {
@@ -319,10 +344,15 @@ export class Widget implements WidgetInstance {
     }
 
     const errorEl = document.createElement('div');
-    errorEl.className = 'tresta-error';
+    errorEl.className = 'tresta-widget-error-state tresta-error';
     errorEl.setAttribute('role', 'alert');
     errorEl.setAttribute('aria-live', 'assertive');
-    errorEl.textContent = message;
+
+    const messageEl = document.createElement('p');
+    messageEl.className = 'tresta-widget-state-message';
+    messageEl.textContent = message;
+    errorEl.appendChild(messageEl);
+
     this.contentRoot.replaceChildren(errorEl);
   }
 

@@ -21,6 +21,8 @@ function StarIcon({ filled }: { filled: boolean }) {
       width="16"
       height="16"
       viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
       fill={filled ? "#eab308" : "none"}
       stroke={filled ? "#eab308" : "currentColor"}
       stroke-width="2"
@@ -42,13 +44,14 @@ export function TestimonialCard({
   const cardStyle = theme.cardStyle ?? "default";
 
   const cardClass = cn(
+    'tresta-testimonial-card',
     "tresta-card",
     isDark ? "tresta-card--dark" : "tresta-card--light",
     `tresta-card--${cardStyle}`,
   );
 
   return (
-    <div className={cardClass}>
+    <article className={cardClass} data-testimonial-id={testimonial.id}>
       <div className="tresta-card__body">
         {/* Star Rating */}
         {displayOptions.showRating && testimonial.rating > 0 && (
@@ -111,6 +114,8 @@ export function TestimonialCard({
                     width="14"
                     height="14"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2.5"
@@ -153,7 +158,7 @@ export function TestimonialCard({
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 }
 

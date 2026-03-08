@@ -93,6 +93,10 @@ export function CarouselLayout({
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
+      <p className="tresta-sr-only">
+        Use arrow keys to navigate between testimonials.
+      </p>
+
       {/* Track */}
       <div
         ref={trackRef}
@@ -141,6 +145,8 @@ export function CarouselLayout({
               width="20"
               height="20"
               viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
@@ -160,6 +166,8 @@ export function CarouselLayout({
               width="20"
               height="20"
               viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
               fill="none"
               stroke="currentColor"
               stroke-width="2"

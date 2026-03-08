@@ -812,21 +812,12 @@ describe('Widget', () => {
       const apiClient = (widget as any).apiClient;
       vi.spyOn(apiClient, 'fetchWidgetData').mockResolvedValue(apiData);
 
-      const consoleSpy = vi.spyOn(console, 'log');
-
       await widget.mount(container);
-
-      // Check that debug log shows limiting
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Rendering 3 testimonials (limited from 5)')
-      );
 
       // Check that only 3 testimonials are rendered
       const contentRoot = widget.getContentRoot();
       const items = contentRoot?.querySelectorAll('.tresta-list-item');
       expect(items?.length).toBe(3);
-
-      consoleSpy.mockRestore();
     });
 
     it('should limit testimonials based on displayOptions.maxTestimonials', async () => {

@@ -16,12 +16,13 @@ export function ListLayout({
   return (
     <div className="tresta-list">
       {testimonials.map((testimonial) => (
-        <TestimonialCard
-          key={testimonial.id}
-          testimonial={testimonial}
-          displayOptions={displayOptions}
-          theme={theme}
-        />
+        <div key={testimonial.id} className="tresta-list-item">
+          <TestimonialCard
+            testimonial={testimonial}
+            displayOptions={displayOptions}
+            theme={theme}
+          />
+        </div>
       ))}
     </div>
   );
