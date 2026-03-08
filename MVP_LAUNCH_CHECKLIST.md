@@ -10,7 +10,7 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 - [x] Create a dedicated launch branch.
 - [x] Remove generated terminal output artifact files from the workspace root.
-- [ ] Link this checklist from the main README after the content stabilizes.
+- [x] Link this checklist from the main README after the content stabilizes.
 
 ---
 
@@ -44,8 +44,8 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 ### Documentation blockers
 
-- [ ] Remove or restore broken documentation links in [README.md](README.md#L384-L394).
-- [ ] Replace the unsupported “97% complete” claim with checklist-driven readiness criteria.
+- [x] Remove or restore broken documentation links in [README.md](README.md#L384-L397).
+- [x] Replace the unsupported “97% complete” claim with checklist-driven readiness criteria in [README.md](README.md#L5-L10).
 
 ---
 

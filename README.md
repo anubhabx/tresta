@@ -5,10 +5,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.x-green)](https://www.prisma.io/)
-[![MVP Progress](https://img.shields.io/badge/MVP-97%25-brightgreen)](PROJECT_STATUS.md)
+[![MVP Launch](https://img.shields.io/badge/MVP-launch%20checklist-blue)](MVP_LAUNCH_CHECKLIST.md)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-> **📊 Project Status:** 97% complete - [View detailed status report](PROJECT_STATUS.md)
+> **📊 Launch readiness:** tracked in the [MVP launch checklist](MVP_LAUNCH_CHECKLIST.md).
 
 ---
 
@@ -381,23 +381,24 @@ Comprehensive documentation is available in the repository:
 
 ### Project Documentation
 
-- **[Project Status](PROJECT_STATUS.md)** - Detailed completion status and accomplishments (97% complete)
-- **[Features](FEATURES.md)** - Complete feature implementation status and details
-- **[Roadmap](ROADMAP.md)** - Development timeline and future plans
-- **[Changelog](CHANGELOG.md)** - Version history and recent changes
-- **[PRD](PRD.MD)** - Product Requirements Document
+- **[MVP Launch Checklist](MVP_LAUNCH_CHECKLIST.md)** - Launch blockers, validation scope, and post-launch follow-ups
+- **[Widget Package Guide](packages/widget/README.md)** - Widget package overview, development, and build details
+- **[Admin App Notes](apps/admin/README.md)** - Admin app setup and local development notes
 
 ### Technical Documentation
 
-- **[Feature Plan](FEATURE_PLAN.md)** - Planned enhancements and architecture improvements
-- **[Widget API](WIDGET_API.md)** - Widget integration guide and API reference
-- **[Testing Guide](TESTING_GUIDE.md)** - Testing strategies and guidelines
-- **[Moderation UX](MODERATION_UX_IMPROVEMENTS.md)** - Auto-moderation implementation details
-- **[Copilot Instructions](.github/copilot-instructions.md)** - Development patterns and conventions
+- **[Project Form UX](apps/web/docs/PROJECT_FORM_UX.md)** - Project form behavior and UX decisions
+- **[Widget Preview Notes](apps/web/components/widgets/WIDGET_PREVIEW_README.md)** - Dashboard widget preview implementation notes
+- **[Widget Security Notes](packages/widget/src/security/README.md)** - CSP and sanitization guidance for embeds
+- **[Widget Telemetry Notes](packages/widget/src/telemetry/README.md)** - Widget telemetry design notes
+- **[Widget Components Notes](packages/widget/src/components/README.md)** - Widget component-level implementation notes
+- **[Shared ESLint Config](packages/eslint-config/README.md)** - Monorepo lint conventions
+- **[Shared TypeScript Config](packages/typescript-config/README.md)** - Base TypeScript configuration guidance
 
 ### Quick Links
 
 - 🚀 **[Getting Started](#getting-started)** - Setup and development
+- ✅ **[Launch Checklist](MVP_LAUNCH_CHECKLIST.md)** - Current launch readiness status
 - 🎨 **[Widget Layouts](packages/widget/README.md)** - Widget customization
 - 🔐 **[Authentication](apps/api/src/middleware/auth.middleware.ts)** - Auth implementation
 - 📊 **[Database Schema](packages/database/prisma/schema.prisma)** - Data models
