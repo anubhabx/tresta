@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { ApiError } from '../lib/errors.js';
 import { ResponseHandler } from '../lib/response.js';
 import { getRequestLogger } from '../lib/logger.js';
+import { captureRequestError } from '../lib/error-tracking.js';
 
 /**
  * Global error handling middleware
@@ -34,6 +35,8 @@ export const errorHandler = (
   } else {
     requestLogger.error(errorLog, "Request error");
   }
+
+  captureRequestError(error, req);
 
   if (error instanceof ApiError) {
     return ResponseHandler.error(

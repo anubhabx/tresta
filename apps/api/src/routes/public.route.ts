@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getPublicProjectBySlug } from "../controllers/project.controller.js";
 import { renderWidgetPage } from "../controllers/widget.controller.js";
+import { captureClientError } from "../controllers/client-errors.controller.js";
 import { publicRateLimitMiddleware } from "../middleware/rate-limiter.js";
 import {
   createTestimonial,
@@ -45,5 +46,8 @@ router.get(
 
 // Public widget embed page for iframe
 router.get("/embed/:widgetId", publicRateLimitMiddleware, renderWidgetPage);
+
+// Client-side error reports from the web app
+router.post("/errors/client", publicRateLimitMiddleware, captureClientError);
 
 export { router as publicRouter };

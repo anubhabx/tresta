@@ -92,7 +92,7 @@ Current note:
   - [x] Replace remaining service, utility, and config `console.*` usage with the shared logger.
   - [x] Replace remaining script `console.*` usage.
 - [x] Add request correlation across API, workers, webhooks, and admin actions.
-- [ ] Add error tracking for web and API.
+- [x] Add error tracking for web and API.
 - [ ] Add dashboards/alerts for webhook failures, queue backlog, payment failures, and degraded dependencies.
 
 ---

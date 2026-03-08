@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { reportClientError } from '@/lib/errors/report-client-error';
 
 export default function GlobalError({
   error,
@@ -10,7 +11,13 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Unhandled error:', error);
+    reportClientError({
+      source: 'react-boundary',
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      digest: error.digest,
+    });
   }, [error]);
 
   return (

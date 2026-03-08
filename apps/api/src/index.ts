@@ -31,6 +31,7 @@ import { privacyRouter } from './routes/privacy.routes.js';
 import { blobStorageService } from './services/blob-storage.service.js';
 import { validateEnv } from './config/env.js';
 import { logger, requestContextMiddleware } from './lib/logger.js';
+import { captureProcessError } from './lib/error-tracking.js';
 
 dotenv.config();
 validateEnv('api');
@@ -196,10 +197,22 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
   logger.fatal({ error }, 'Uncaught Exception');
-  gracefulShutdown('uncaughtException');
+  void captureProcessError(error, 'uncaughtException').finally(() => {
+    gracefulShutdown('uncaughtException');
+  });
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   logger.error({ promise, reason }, 'Unhandled Rejection');
-  gracefulShutdown('unhandledRejection');
+
+  const rejectionError = reason instanceof Error
+    ? reason
+    : new Error(typeof reason === 'string' ? reason : 'Unhandled promise rejection');
+
+  void captureProcessError(rejectionError, 'unhandledRejection', {
+    promise: String(promise),
+    reason: reason instanceof Error ? reason.message : reason,
+  }).finally(() => {
+    gracefulShutdown('unhandledRejection');
+  });
 });
