@@ -85,8 +85,7 @@ describe('Loader - autoInitialize', () => {
       consoleSpy.mockRestore();
     });
 
-    it.skip('should skip already initialized widgets', () => {
-      // TODO: Fix test - needs to handle async mount and add API key
+    it('should skip already initialized widgets', async () => {
       const container = document.createElement('div');
       container.id = 'tresta-widget-test-123';
       document.body.appendChild(container);
@@ -97,10 +96,13 @@ describe('Loader - autoInitialize', () => {
       script.setAttribute('data-debug', 'true');
       document.body.appendChild(script);
 
-      const consoleSpy = vi.spyOn(console, 'log');
+      const consoleSpy = vi.spyOn(console, 'debug');
 
       // First initialization
       autoInitialize();
+
+      // Wait for the first mount to register its instance
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Second initialization
       autoInitialize();
@@ -170,8 +172,7 @@ describe('Loader - autoInitialize', () => {
       consoleSpy.mockRestore();
     });
 
-    it.skip('should use default version if not specified', async () => {
-      // TODO: Fix test - version attribute not being set on root element
+    it('should use default version if not specified', async () => {
       const container = document.createElement('div');
       container.id = 'tresta-widget-version-test';
       document.body.appendChild(container);
@@ -188,8 +189,7 @@ describe('Loader - autoInitialize', () => {
       expect(root?.getAttribute('data-version')).toBe('1.0.0');
     });
 
-    it.skip('should parse custom version from data attribute', async () => {
-      // TODO: Fix test - version attribute not being set on root element
+    it('should parse custom version from data attribute', async () => {
       const container = document.createElement('div');
       container.id = 'tresta-widget-custom-version';
       document.body.appendChild(container);

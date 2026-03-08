@@ -11,6 +11,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { StorageManager } from '../storage/cache-manager.js';
 import type { WidgetData } from '../types/index.js';
+import type { StorageAdapter } from '../storage/types.js';
 
 describe('Storage Manager', () => {
   let storageManager: StorageManager;
@@ -58,6 +59,16 @@ describe('Storage Manager', () => {
       },
     ],
   });
+
+  const attachAdapter = (manager: StorageManager, adapter: StorageAdapter) => {
+    const managerWithInternals = manager as StorageManager & {
+      adapter: StorageAdapter | null;
+      initPromise: Promise<void> | null;
+    };
+
+    managerWithInternals.adapter = adapter;
+    managerWithInternals.initPromise = Promise.resolve();
+  };
 
   describe('Initialization', () => {
     it('should initialize storage manager', () => {
@@ -296,33 +307,36 @@ describe('Storage Manager', () => {
   });
 
   describe('Error Handling', () => {
-    it.skip('should handle get errors gracefully', async () => {
-      // TODO: Fix test - console.error spy not catching localStorage parse errors
+    it('should handle get errors gracefully', async () => {
       const consoleSpy = vi.spyOn(console, 'error');
-
       const manager = new StorageManager();
 
-      // Force an error by corrupting localStorage
-      localStorage.setItem('tresta-widget-test-123', 'invalid json');
+      attachAdapter(manager, {
+        isAvailable: vi.fn().mockResolvedValue(true),
+        get: vi.fn().mockRejectedValue(new Error('Storage get error')),
+        set: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
+        clear: vi.fn().mockResolvedValue(undefined),
+      });
 
       const retrieved = await manager.get('test-123');
 
       expect(retrieved).toBeNull();
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith('[TrestaWidget]', 'Cache get error:', expect.any(Error));
 
       consoleSpy.mockRestore();
     });
 
-    it.skip('should handle set errors gracefully', async () => {
-      // TODO: Fix test - console.error spy not catching storage errors properly
+    it('should handle set errors gracefully', async () => {
       const consoleSpy = vi.spyOn(console, 'error');
-
       const manager = new StorageManager();
 
-      // Mock localStorage.setItem to throw
-      const originalSetItem = Storage.prototype.setItem;
-      Storage.prototype.setItem = vi.fn(() => {
-        throw new Error('Storage error');
+      attachAdapter(manager, {
+        isAvailable: vi.fn().mockResolvedValue(true),
+        get: vi.fn().mockResolvedValue(null),
+        set: vi.fn().mockRejectedValue(new Error('Storage set error')),
+        delete: vi.fn().mockResolvedValue(undefined),
+        clear: vi.fn().mockResolvedValue(undefined),
       });
 
       const data = createMockWidgetData('test-123');
@@ -330,10 +344,7 @@ describe('Storage Manager', () => {
       // Should not throw
       await expect(manager.set('test-123', data)).resolves.not.toThrow();
 
-      expect(consoleSpy).toHaveBeenCalled();
-
-      // Restore
-      Storage.prototype.setItem = originalSetItem;
+      expect(consoleSpy).toHaveBeenCalledWith('[TrestaWidget]', 'Cache set error:', expect.any(Error));
       consoleSpy.mockRestore();
     });
 
@@ -372,29 +383,56 @@ describe('Storage Manager', () => {
   });
 
   describe('Cache Key Format', () => {
-    it.skip('should use correct cache key format', async () => {
-      // TODO: Fix test - affected by global storage mocks
+    it('should use correct cache key format', async () => {
       const data = createMockWidgetData('test-123');
+      const adapter: StorageAdapter = {
+        isAvailable: vi.fn().mockResolvedValue(true),
+        get: vi.fn().mockResolvedValue(null),
+        set: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
+        clear: vi.fn().mockResolvedValue(undefined),
+      };
+
+      attachAdapter(storageManager, adapter);
 
       await storageManager.set('test-123', data);
 
-      // Check localStorage for the key (if localStorage is being used)
-      const keys = Object.keys(localStorage);
-      const widgetKeys = keys.filter((key) => key.startsWith('tresta-widget-'));
-
-      if (widgetKeys.length > 0) {
-        expect(widgetKeys).toContain('tresta-widget-test-123');
-      }
+      expect(adapter.set).toHaveBeenCalledWith(
+        'tresta-widget-test-123',
+        expect.objectContaining({
+          widgetId: 'test-123',
+          data,
+        })
+      );
     });
   });
 
   describe('Concurrent Access', () => {
-    it.skip('should handle concurrent set operations', async () => {
-      // TODO: Fix test - affected by global storage mocks from error handling tests
+    it('should handle concurrent set operations', async () => {
       const manager = new StorageManager();
       const data1 = createMockWidgetData('widget-1');
       const data2 = createMockWidgetData('widget-2');
       const data3 = createMockWidgetData('widget-3');
+      const cache = new Map<string, {
+        widgetId: string;
+        data: WidgetData;
+        timestamp: number;
+        expiresAt: number;
+      }>();
+
+      attachAdapter(manager, {
+        isAvailable: vi.fn().mockResolvedValue(true),
+        get: vi.fn(async (key: string) => cache.get(key) ?? null),
+        set: vi.fn(async (key: string, entry) => {
+          cache.set(key, { data: entry.data });
+        }),
+        delete: vi.fn(async (key: string) => {
+          cache.delete(key);
+        }),
+        clear: vi.fn(async () => {
+          cache.clear();
+        }),
+      });
 
       // Set multiple widgets concurrently
       await Promise.all([
@@ -415,10 +453,24 @@ describe('Storage Manager', () => {
       expect(retrieved3?.widgetId).toBe('widget-3');
     });
 
-    it.skip('should handle concurrent get operations', async () => {
-      // TODO: Fix test - affected by global storage mocks from error handling tests
+    it('should handle concurrent get operations', async () => {
       const manager = new StorageManager();
       const data = createMockWidgetData('test-123');
+      const entry = {
+        widgetId: 'test-123',
+        data,
+        timestamp: Date.now(),
+        expiresAt: Date.now() + 1000,
+      };
+
+      attachAdapter(manager, {
+        isAvailable: vi.fn().mockResolvedValue(true),
+        get: vi.fn().mockResolvedValue(entry),
+        set: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
+        clear: vi.fn().mockResolvedValue(undefined),
+      });
+
       await manager.set('test-123', data);
 
       // Get same widget concurrently

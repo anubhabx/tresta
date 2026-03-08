@@ -31,9 +31,9 @@ This checklist is organized in phases so launch work can move from hard blockers
 - [x] Fix stale import expectations and outdated component test coverage in the widget package.
 - [x] Verify widget path alias resolution for [packages/widget/src/components/WidgetRoot.tsx](packages/widget/src/components/WidgetRoot.tsx#L17).
 - [ ] Replace the currently skipped widget accessibility checks with stable assertions against the active DOM structure.
-- [ ] Resolve known TODO-based tests still left in the widget package.
-  - [ ] [packages/widget/src/__tests__/storage-manager.test.ts](packages/widget/src/__tests__/storage-manager.test.ts#L300-L419)
-  - [ ] [packages/widget/src/core/__tests__/loader.test.ts](packages/widget/src/core/__tests__/loader.test.ts#L89-L192)
+- [x] Resolve known TODO-based tests still left in the widget package.
+  - [x] [packages/widget/src/__tests__/storage-manager.test.ts](packages/widget/src/__tests__/storage-manager.test.ts#L300-L419)
+  - [x] [packages/widget/src/core/__tests__/loader.test.ts](packages/widget/src/core/__tests__/loader.test.ts#L89-L192)
 
 ### Env and deployment blockers
 
