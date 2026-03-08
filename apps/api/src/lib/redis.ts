@@ -1,7 +1,10 @@
 import { Redis } from 'ioredis';
 import * as dotenv from 'dotenv';
+import { logger } from './logger.js';
 
 dotenv.config();
+
+const redisLogger = logger.child({ module: 'redis' });
 
 /**
  * Shared Redis client - prevents connection explosion
@@ -32,19 +35,19 @@ export function getRedisClient(): Redis {
     });
 
     redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err);
+      redisLogger.error({ err }, 'Redis connection error');
     });
 
     redisClient.on('connect', () => {
-      console.log('Redis connected');
+      redisLogger.info('Redis connected');
     });
 
     redisClient.on('ready', () => {
-      console.log('Redis ready');
+      redisLogger.info('Redis ready');
     });
 
     redisClient.on('close', () => {
-      console.log('Redis connection closed');
+      redisLogger.warn('Redis connection closed');
     });
   }
 
@@ -57,9 +60,9 @@ export function getRedisClient(): Redis {
  */
 export async function disconnectRedis(): Promise<void> {
   if (redisClient) {
-    console.log('Disconnecting Redis...');
+    redisLogger.info('Disconnecting Redis');
     await redisClient.quit();
     redisClient = null;
-    console.log('Redis disconnected');
+    redisLogger.info('Redis disconnected');
   }
 }

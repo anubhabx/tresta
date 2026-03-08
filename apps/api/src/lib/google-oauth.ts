@@ -1,6 +1,8 @@
 import { OAuth2Client } from "google-auth-library";
+import { logger } from "./logger.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
+const googleOAuthLogger = logger.child({ module: 'google-oauth' });
 
 export interface GoogleTokenPayload {
   email: string;
@@ -32,7 +34,7 @@ export async function verifyGoogleIdToken(
 
     // Ensure email is verified
     if (!payload.email_verified) {
-      console.warn("Google email not verified:", payload.email);
+      googleOAuthLogger.warn({ email: payload.email }, 'Google email not verified');
       return null;
     }
 
@@ -44,7 +46,7 @@ export async function verifyGoogleIdToken(
       email_verified: payload.email_verified,
     };
   } catch (error) {
-    console.error("Failed to verify Google ID token:", error);
+    googleOAuthLogger.error({ error }, 'Failed to verify Google ID token');
     return null;
   }
 }

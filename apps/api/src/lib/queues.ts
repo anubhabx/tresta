@@ -1,8 +1,11 @@
 import { Queue } from 'bullmq';
 import { getRedisClient } from './redis.js';
 import * as dotenv from 'dotenv';
+import { logger } from './logger.js';
 
 dotenv.config();
+
+const queueLogger = logger.child({ module: 'queues' });
 
 /**
  * Singleton Queue Manager
@@ -39,7 +42,10 @@ class QueueManager {
 
         this.queues.set(name, queue);
 
-        console.log(`Initialized queue: ${name} (Active queues: ${this.queues.size})`);
+        queueLogger.info(
+            { queueName: name, activeQueues: this.queues.size },
+            'Initialized queue'
+        );
 
         return queue;
     }
@@ -51,7 +57,7 @@ class QueueManager {
         const closePromises = Array.from(this.queues.values()).map(queue => queue.close());
         await Promise.all(closePromises);
         this.queues.clear();
-        console.log('All queues closed');
+        queueLogger.info('All queues closed');
     }
 }
 

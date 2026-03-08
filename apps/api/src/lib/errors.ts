@@ -1,3 +1,5 @@
+import { logger } from './logger.js';
+
 import { Prisma } from "@workspace/database/prisma";
 
 /**
@@ -197,7 +199,7 @@ export function handlePrismaError(error: any): ApiError {
   }
 
   // Fallback for unknown errors
-  console.error("Unknown API Error:", error);
+  logger.error({ error }, 'Unknown API error');
   return new InternalServerError(
     "An unexpected error occurred.",
     { type: "unknown_error", originalError: process.env.NODE_ENV === 'development' ? error.message : undefined }
