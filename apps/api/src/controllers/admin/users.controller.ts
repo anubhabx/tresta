@@ -334,7 +334,7 @@ export const exportUserData = async (
           targetId: id,
           statusCode: 200,
           success: true,
-          requestId: (req as any).id || 'unknown',
+          requestId: req.requestId || 'unknown',
           ipAddress: req.ip || req.socket.remoteAddress || null,
           userAgent: req.get('user-agent') || null,
         },

@@ -289,6 +289,7 @@ export const handleRazorpayWebhook = async (
   res: Response,
   _next: NextFunction,
 ) => {
+  const requestLogger = razorpayWebhookLogger.child({ requestId: req.requestId });
   const signature = req.header("x-razorpay-signature");
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
@@ -636,7 +637,7 @@ export const handleRazorpayWebhook = async (
 
     res.status(200).json({ success: true, message: "Webhook processed" });
   } catch (error) {
-    razorpayWebhookLogger.error({ error, providerEventId }, 'Razorpay webhook processing failed');
+    requestLogger.error({ error, providerEventId }, 'Razorpay webhook processing failed');
 
     try {
       await prisma.paymentWebhookEvent.update({

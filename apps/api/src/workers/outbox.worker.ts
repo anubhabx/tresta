@@ -46,6 +46,11 @@ export const createOutboxWorker = () => {
         return; // Already processed or doesn't exist
       }
 
+      const requestId = typeof outboxEntry.payload === 'object' && outboxEntry.payload && 'requestId' in outboxEntry.payload
+        ? (outboxEntry.payload as { requestId?: string }).requestId
+        : undefined;
+      const jobLogger = outboxWorkerLogger.child({ requestId, jobId: job.id, outboxId });
+
       try {
         await NotificationService.enqueueFromOutbox(outboxEntry.notificationId);
       } catch (error) {
@@ -59,7 +64,7 @@ export const createOutboxWorker = () => {
         });
 
         if (outboxEntry.attempts >= 4) {
-          outboxWorkerLogger.error({ outboxId, error }, 'Outbox entry failed after 5 attempts');
+          jobLogger.error({ error }, 'Outbox entry failed after 5 attempts');
         }
 
         throw error;
@@ -72,11 +77,11 @@ export const createOutboxWorker = () => {
   );
 
   outboxWorker.on('completed', (job) => {
-    outboxWorkerLogger.info({ jobId: job.id }, 'Outbox entry processed successfully');
+    outboxWorkerLogger.info({ jobId: job.id, requestId: job.data?.requestId }, 'Outbox entry processed successfully');
   });
 
   outboxWorker.on('failed', (job, err) => {
-    outboxWorkerLogger.error({ jobId: job?.id, err }, 'Outbox worker job failed');
+    outboxWorkerLogger.error({ jobId: job?.id, requestId: job?.data?.requestId, err }, 'Outbox worker job failed');
   });
 
   // Create queue for adding jobs
@@ -95,7 +100,10 @@ export const createOutboxWorker = () => {
       });
 
       for (const entry of pendingEntries) {
-        await outboxQueue.add('process-outbox', { outboxId: entry.id });
+        const requestId = typeof entry.payload === 'object' && entry.payload && 'requestId' in entry.payload
+          ? (entry.payload as { requestId?: string }).requestId
+          : undefined;
+        await outboxQueue.add('process-outbox', { outboxId: entry.id, requestId });
       }
     } catch (error) {
       outboxWorkerLogger.error({ error }, 'Error polling outbox');

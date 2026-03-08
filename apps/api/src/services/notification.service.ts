@@ -28,6 +28,7 @@ interface CreateNotificationParams {
   message: string;
   link?: string;
   metadata?: Record<string, any>;
+  requestId?: string;
 }
 
 interface QuotaResult {
@@ -274,6 +275,7 @@ export class NotificationService {
             notificationId: notification.id,
             userId: params.userId,
             type: params.type,
+            requestId: params.requestId,
           },
           status: "pending",
         },
@@ -287,7 +289,7 @@ export class NotificationService {
       await this.enqueueFromOutbox(result.id);
     } catch (error) {
       notificationServiceLogger.error(
-        { notificationId: result.id, error },
+        { notificationId: result.id, requestId: params.requestId, error },
         'Failed to enqueue notification; outbox worker will retry',
       );
     }

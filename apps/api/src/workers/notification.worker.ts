@@ -26,13 +26,15 @@ export const createNotificationWorker = () => {
   const notificationWorker = new Worker(
     'notifications',
     async (job) => {
-      const { notificationId, userId, type } = job.data;
+      const { notificationId, userId, requestId } = job.data;
+      const jobLogger = notificationWorkerLogger.child({ requestId, jobId: job.id, notificationId, userId });
 
       const notification = await prisma.notification.findUnique({
         where: { id: notificationId },
       });
 
       if (!notification) {
+        jobLogger.error('Notification not found during worker processing');
         throw new Error('Notification not found');
       }
 
@@ -68,11 +70,11 @@ export const createNotificationWorker = () => {
   );
 
   notificationWorker.on('completed', (job) => {
-    notificationWorkerLogger.info({ jobId: job.id }, 'Notification sent successfully');
+    notificationWorkerLogger.info({ jobId: job.id, requestId: job.data?.requestId }, 'Notification sent successfully');
   });
 
   notificationWorker.on('failed', async (job, err) => {
-    notificationWorkerLogger.error({ jobId: job?.id, err }, 'Notification worker job failed');
+    notificationWorkerLogger.error({ jobId: job?.id, requestId: job?.data?.requestId, err }, 'Notification worker job failed');
 
     if (!job) return;
 

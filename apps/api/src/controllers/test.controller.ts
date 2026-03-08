@@ -37,6 +37,7 @@ export async function createTestNotification(
             title,
             message,
             link,
+            requestId: req.requestId,
             metadata: {
                 test: true,
                 createdAt: new Date().toISOString(),
@@ -76,6 +77,7 @@ export async function createMultipleTestNotifications(
                 title: `Test Notification #${i + 1}`,
                 message: `This is test notification number ${i + 1} for testing pagination and list display`,
                 link: '/dashboard',
+                requestId: req.requestId,
                 metadata: {
                     test: true,
                     index: i + 1,

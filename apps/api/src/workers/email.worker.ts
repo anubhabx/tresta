@@ -51,7 +51,8 @@ export const createEmailWorker = () => {
   const emailWorker = new Worker(
     'send-email',
     async (job) => {
-      const { userId, notificationId, priority = 'normal' } = job.data;
+      const { userId, notificationId, priority = 'normal', requestId } = job.data;
+      const jobLogger = emailWorkerLogger.child({ requestId, jobId: job.id, notificationId, userId });
 
       const notification = await prisma.notification.findUnique({
         where: { id: notificationId },
@@ -59,15 +60,14 @@ export const createEmailWorker = () => {
       });
 
       if (!notification) {
+        jobLogger.error('Notification not found during email worker processing');
         throw new Error('Notification not found');
       }
 
       if (!realEmailEnabled) {
-        emailWorkerLogger.info({
+        jobLogger.info({
           to: notification.user.email,
           subject: notification.title,
-          notificationId,
-          userId,
         }, '[MOCK] Email');
         return;
       }
@@ -80,7 +80,7 @@ export const createEmailWorker = () => {
       const { success, count } = await NotificationService.tryIncrementEmailUsage(priority);
 
       if (!success) {
-        emailWorkerLogger.warn({ notificationId, count }, 'Email quota exhausted, deferring email');
+        jobLogger.warn({ count }, 'Email quota exhausted, deferring email');
         throw new Error('QUOTA_EXCEEDED');
       }
 
@@ -105,7 +105,7 @@ export const createEmailWorker = () => {
         const { checkAndAlertQuota } = await import('../utils/alerts.js');
         await checkAndAlertQuota(count);
 
-        emailWorkerLogger.info({ notificationId, count }, 'Email sent successfully');
+        jobLogger.info({ count }, 'Email sent successfully');
       } catch (error: any) {
         // Distinguish between transient and permanent failures
         if (error.statusCode === 429 || error.statusCode >= 500) {
@@ -113,7 +113,7 @@ export const createEmailWorker = () => {
           throw new Error(`TRANSIENT_ERROR: ${error.message}`);
         } else {
           // Permanent error (invalid email, etc.) - don't retry
-          emailWorkerLogger.error({ notificationId, error }, 'Permanent email error');
+          jobLogger.error({ error }, 'Permanent email error');
           throw new Error(`PERMANENT_ERROR: ${error.message}`);
         }
       }
@@ -140,11 +140,11 @@ export const createEmailWorker = () => {
   );
 
   emailWorker.on('completed', (job) => {
-    emailWorkerLogger.info({ jobId: job.id }, 'Email worker job completed');
+    emailWorkerLogger.info({ jobId: job.id, requestId: job.data?.requestId }, 'Email worker job completed');
   });
 
   emailWorker.on('failed', async (job, err) => {
-    emailWorkerLogger.error({ jobId: job?.id, err }, 'Email worker job failed');
+    emailWorkerLogger.error({ jobId: job?.id, requestId: job?.data?.requestId, err }, 'Email worker job failed');
 
     // Don't persist quota failures to DLQ (expected behavior)
     if (err.message.includes('QUOTA_EXCEEDED')) {

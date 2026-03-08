@@ -36,7 +36,8 @@ export function auditLog(
   }
 
   // Generate or use existing X-Request-ID
-  const requestId = (req.headers['x-request-id'] as string) || uuidv4();
+  const requestId = req.requestId || (req.headers['x-request-id'] as string) || uuidv4();
+  req.requestId = requestId;
   req.headers['x-request-id'] = requestId;
   res.setHeader('X-Request-ID', requestId);
 

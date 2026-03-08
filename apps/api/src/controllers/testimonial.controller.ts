@@ -629,6 +629,7 @@ const createTestimonial = async (
           title,
           message,
           link: `/dashboard/projects/${project.slug}?tab=testimonials`,
+          requestId: req.requestId,
           metadata: {
             testimonialId: newTestimonial.id,
             projectId: project.id,
