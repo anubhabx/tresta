@@ -7,6 +7,9 @@ import {
 } from "@azure/storage-blob";
 import { v4 as uuidv4 } from "uuid";
 import { InternalServerError } from '../lib/errors.js';
+import { logger } from '../lib/logger.js';
+
+const blobStorageLogger = logger.child({ module: 'blob-storage-service' });
 
 // Environment variables
 const getStorageConfig = () => {
@@ -165,7 +168,7 @@ class BlobStorageService {
         // console.log(`Container "${containerName}" created successfully (private access)`);
       }
     } catch (error) {
-      console.error("Error ensuring container exists:", error);
+      blobStorageLogger.error({ error }, 'Error ensuring storage container exists');
       throw new InternalServerError("Failed to initialize storage container");
     }
   }
@@ -201,10 +204,10 @@ class BlobStorageService {
       //   console.log('CORS configured successfully for Azure Blob Storage');
       //   console.log('Allowed origins:', allowedOrigins);
     } catch (error) {
-      console.error("Error configuring CORS:", error);
+      blobStorageLogger.error({ error }, 'Error configuring blob storage CORS');
       // Don't throw - CORS configuration failure shouldn't stop the app
-      console.warn(
-        "Failed to configure CORS. You may need to configure it manually in Azure Portal.",
+      blobStorageLogger.warn(
+        'Failed to configure CORS. You may need to configure it manually in Azure Portal.',
       );
     }
   }
@@ -461,7 +464,7 @@ class BlobStorageService {
       const { accountName, containerName } = getStorageConfig();
       return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}`;
     } catch (error) {
-      console.error("Error uploading from URL:", error);
+      blobStorageLogger.error({ imageUrl, directory, userId, error }, 'Error uploading from URL');
       throw new InternalServerError("Failed to upload image from URL");
     }
   }
@@ -496,7 +499,7 @@ class BlobStorageService {
         blobUrl: `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}`,
       };
     } catch (error) {
-      console.error('Error uploading text content:', error);
+      blobStorageLogger.error({ directory, filename, userId, error }, 'Error uploading text content');
       throw new InternalServerError('Failed to upload export file');
     }
   }

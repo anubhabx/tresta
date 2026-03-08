@@ -1,4 +1,7 @@
 import { prisma } from "@workspace/database/prisma";
+import { logger } from "../lib/logger.js";
+
+const widgetAnalyticsLogger = logger.child({ module: 'widget-analytics-service' });
 
 /**
  * Check widget performance and create alerts if thresholds are exceeded.
@@ -24,7 +27,7 @@ export async function checkWidgetPerformance() {
     });
 
     if (recentAnalytics.length === 0) {
-      console.log('[Widget Analytics] No recent analytics — skipping performance check');
+      widgetAnalyticsLogger.info('No recent analytics, skipping performance check');
       return;
     }
 
@@ -111,11 +114,12 @@ export async function checkWidgetPerformance() {
       );
     }
 
-    console.log(
-      `[Widget Analytics] Performance check completed for ${analyticsByWidget.size} widgets, ${alertsToCreate.length} new alerts created`,
+    widgetAnalyticsLogger.info(
+      { widgetCount: analyticsByWidget.size, alertsCreated: alertsToCreate.length },
+      'Widget performance check completed',
     );
   } catch (error) {
-    console.error('[Widget Analytics] Error checking performance:', error);
+    widgetAnalyticsLogger.error({ error }, 'Error checking widget performance');
   }
 }
 
@@ -135,8 +139,8 @@ export async function cleanupOldAnalytics() {
       },
     });
 
-    console.log(`[Widget Analytics] Cleaned up ${result.count} old analytics records`);
+    widgetAnalyticsLogger.info({ deletedCount: result.count }, 'Cleaned up old analytics records');
   } catch (error) {
-    console.error('[Widget Analytics] Error cleaning up old analytics:', error);
+    widgetAnalyticsLogger.error({ error }, 'Error cleaning up old analytics');
   }
 }

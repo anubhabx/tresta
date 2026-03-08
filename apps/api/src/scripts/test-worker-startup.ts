@@ -8,6 +8,7 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { logger } from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,22 +16,25 @@ const __dirname = path.dirname(__filename);
 // Load .env
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+const workerStartupLogger = logger.child({ module: 'script-test-worker-startup' });
+
 async function testWorkerStartup() {
-  console.log('🧪 Testing Worker Startup...\n');
+  workerStartupLogger.info('Testing worker startup');
 
   try {
     // Test 1: Import cron jobs
-    console.log('1. Importing cron jobs...');
+    workerStartupLogger.info('Importing cron jobs');
     const { dailyDigestJob, startDailyDigestJob } = await import('../jobs/daily-digest.job.js');
     const { reconciliationJob, startReconciliationJob } = await import('../jobs/reconciliation.job.js');
     const { subscriptionReconciliationJob, startSubscriptionReconciliationJob } = await import('../jobs/subscription-reconciliation.job.js');
-    console.log('   ✅ Cron jobs imported successfully');
+    workerStartupLogger.info('Cron jobs imported successfully');
 
     // Test 2: Verify cron expressions
-    console.log('\n2. Verifying cron expressions...');
-    console.log(`   Daily Digest: ${dailyDigestJob.cronTime.source}`);
-    console.log(`   Reconciliation: ${reconciliationJob.cronTime.source}`);
-    console.log(`   Subscription Reconciliation: ${subscriptionReconciliationJob.cronTime.source}`);
+    workerStartupLogger.info({
+      dailyDigest: dailyDigestJob.cronTime.source,
+      reconciliation: reconciliationJob.cronTime.source,
+      subscriptionReconciliation: subscriptionReconciliationJob.cronTime.source,
+    }, 'Verifying cron expressions');
 
     if (dailyDigestJob.cronTime.source !== '0 9 * * *') {
       throw new Error('Daily digest cron expression is incorrect');
@@ -38,39 +42,38 @@ async function testWorkerStartup() {
     if (reconciliationJob.cronTime.source !== '59 23 * * *') {
       throw new Error('Reconciliation cron expression is incorrect');
     }
-    console.log('   ✅ Cron expressions are correct');
+    workerStartupLogger.info('Cron expressions are correct');
 
     // Test 3: Start cron jobs (don't wait for execution)
-    console.log('\n3. Starting cron jobs...');
+    workerStartupLogger.info('Starting cron jobs');
     startDailyDigestJob();
     startReconciliationJob();
     startSubscriptionReconciliationJob();
-    console.log('   ✅ Cron jobs started');
+    workerStartupLogger.info('Cron jobs started');
 
     // Test 4: Verify jobs can be stopped (means they started)
-    console.log('\n4. Verifying jobs started...');
-    console.log('   ✅ Jobs started successfully (no errors thrown)');
+    workerStartupLogger.info('Jobs started successfully without errors');
 
     // Test 5: Stop jobs
-    console.log('\n5. Stopping cron jobs...');
+    workerStartupLogger.info('Stopping cron jobs');
     dailyDigestJob.stop();
     reconciliationJob.stop();
     subscriptionReconciliationJob.stop();
-    console.log('   ✅ Cron jobs stopped');
+    workerStartupLogger.info('Cron jobs stopped');
 
-    console.log('\n🎉 Worker startup test passed!\n');
+    workerStartupLogger.info('Worker startup test passed');
 
     // Test 6: Import workers (verify no syntax errors)
-    console.log('6. Importing workers...');
+    workerStartupLogger.info('Importing workers');
     await import('../workers/outbox.worker.js');
     await import('../workers/notification.worker.js');
     await import('../workers/email.worker.js');
-    console.log('   ✅ Workers imported successfully');
+    workerStartupLogger.info('Workers imported successfully');
 
-    console.log('\n✅ All startup tests passed!\n');
+    workerStartupLogger.info('All startup tests passed');
 
   } catch (error) {
-    console.error('❌ Test failed:', error);
+    workerStartupLogger.error({ error }, 'Worker startup test failed');
     process.exit(1);
   }
 

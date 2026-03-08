@@ -17,6 +17,9 @@ import {
   renderEmailTemplate,
   renderPlainTextTemplate,
 } from "../templates/notification-email.js";
+import { logger } from "../lib/logger.js";
+
+const notificationServiceLogger = logger.child({ module: 'notification-service' });
 
 interface CreateNotificationParams {
   userId: string;
@@ -120,7 +123,7 @@ export class NotificationService {
     // Snapshot to DB every 10 emails (async, non-blocking)
     if (success && count % EMAIL_LIMITS.snapshotInterval === 0) {
       this.snapshotEmailUsage(today, count).catch((err) => {
-        console.error("Failed to snapshot email usage:", err);
+        notificationServiceLogger.error({ date: today, count, err }, 'Failed to snapshot email usage');
       });
     }
 
@@ -151,7 +154,7 @@ export class NotificationService {
         },
       });
     } catch (error) {
-      console.error("Failed to snapshot email usage:", error);
+      notificationServiceLogger.error({ date, count, error }, 'Failed to snapshot email usage');
       // Non-critical - Redis is source of truth
     }
   }
@@ -179,8 +182,9 @@ export class NotificationService {
 
     if (!dbUsage || dbUsage.lastSnapshotCount < redisCount) {
       // Missed snapshots - reconcile now
-      console.log(
-        `Reconciling email usage: Redis=${redisCount}, DB=${dbUsage?.lastSnapshotCount || 0}`,
+      notificationServiceLogger.info(
+        { redisCount, dbCount: dbUsage?.lastSnapshotCount || 0, date: today },
+        'Reconciling email usage snapshot',
       );
       await this.snapshotEmailUsage(today, redisCount);
     }
@@ -201,7 +205,7 @@ export class NotificationService {
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_LOCKED, 3600, "1");
     await redis.setex(REDIS_KEYS.EMAIL_QUOTA_NEXT_RETRY, 3600, nextRetryAt);
 
-    console.log(`Email quota locked until ${nextRetryAt}`);
+    notificationServiceLogger.info({ nextRetryAt }, 'Email quota locked');
     return nextRetryAt;
   }
 
@@ -233,7 +237,7 @@ export class NotificationService {
     const redis = getRedisClient();
     await redis.del(REDIS_KEYS.EMAIL_QUOTA_LOCKED);
     await redis.del(REDIS_KEYS.EMAIL_QUOTA_NEXT_RETRY);
-    console.log("Email quota lock cleared");
+    notificationServiceLogger.info('Email quota lock cleared');
   }
 
   /**
@@ -282,9 +286,9 @@ export class NotificationService {
     try {
       await this.enqueueFromOutbox(result.id);
     } catch (error) {
-      console.error(
-        "Failed to enqueue notification, will be picked up by outbox worker:",
-        error,
+      notificationServiceLogger.error(
+        { notificationId: result.id, error },
+        'Failed to enqueue notification; outbox worker will retry',
       );
     }
 

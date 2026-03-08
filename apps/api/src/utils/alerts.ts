@@ -1,6 +1,9 @@
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS } from '../lib/redis-keys.js';
 import { EMAIL_LIMITS } from '../config/constants.js';
+import { logger } from '../lib/logger.js';
+
+const alertsLogger = logger.child({ module: 'alerts' });
 
 /**
  * Check email quota and send alerts at key thresholds
@@ -54,7 +57,7 @@ export async function checkAndAlertQuota(currentCount: number): Promise<void> {
       const ttl = Math.floor((tomorrow - Date.now()) / 1000);
       await redis.setex(alertKey, ttl, '1');
 
-      console.log(`📢 Alert sent: ${message}`);
+      alertsLogger.info({ threshold: threshold.count, level: threshold.level, message }, 'Quota alert sent');
     }
   }
 }
@@ -69,7 +72,7 @@ async function sendSlackAlert(message: string, level: string): Promise<void> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    console.warn('⚠️ SLACK_WEBHOOK_URL not configured, skipping alert:', message);
+    alertsLogger.warn({ message, level }, 'SLACK_WEBHOOK_URL not configured, skipping alert');
     return;
   }
 
@@ -119,9 +122,9 @@ async function sendSlackAlert(message: string, level: string): Promise<void> {
       throw new Error(`Slack API error: ${response.status}`);
     }
 
-    console.log('✅ Slack alert sent successfully');
+    alertsLogger.info({ level }, 'Slack alert sent successfully');
   } catch (error) {
-    console.error('❌ Failed to send Slack alert:', error);
+    alertsLogger.error({ error, level, message }, 'Failed to send Slack alert');
     // Don't throw - alerting failure shouldn't break the main flow
   }
 }
@@ -208,6 +211,6 @@ export async function sendDailySummary(stats: {
       }),
     });
   } catch (error) {
-    console.error('Failed to send daily summary:', error);
+    alertsLogger.error({ error, stats }, 'Failed to send daily summary');
   }
 }

@@ -1,12 +1,15 @@
 import { prisma } from "@workspace/database/prisma";
+import { logger } from '../lib/logger.js';
 import { moderateTestimonial } from '../services/moderation.service.js';
+
+const migrateTestimonialsLogger = logger.child({ module: 'script-migrate-existing-testimonials' });
 
 /**
  * Migration script to auto-moderate all existing testimonials
  * Run this once to apply moderation rules to testimonials created before auto-moderation was implemented
  */
 async function migrateExistingTestimonials() {
-  console.log("🔍 Starting migration of existing testimonials...");
+  migrateTestimonialsLogger.info('Starting migration of existing testimonials');
 
   try {
     // Get all testimonials that haven't been moderated yet (moderationStatus = PENDING)
@@ -27,7 +30,7 @@ async function migrateExistingTestimonials() {
       },
     });
 
-    console.log(`📊 Found ${testimonials.length} testimonials to moderate`);
+    migrateTestimonialsLogger.info({ count: testimonials.length }, 'Found testimonials to moderate');
 
     let processed = 0;
     let approved = 0;
@@ -44,16 +47,18 @@ async function migrateExistingTestimonials() {
           try {
             // Skip if project doesn't exist
             if (!testimonial.Project) {
-              console.log(
-                `⏭️  Skipping testimonial ${testimonial.id} (no project)`,
+              migrateTestimonialsLogger.info(
+                { testimonialId: testimonial.id },
+                'Skipping testimonial with no project',
               );
               return;
             }
 
             // Skip if project doesn't have auto-moderation enabled
             if (!testimonial.Project.autoModeration) {
-              console.log(
-                `⏭️  Skipping testimonial ${testimonial.id} (auto-moderation disabled)`,
+              migrateTestimonialsLogger.info(
+                { testimonialId: testimonial.id },
+                'Skipping testimonial with auto-moderation disabled',
               );
               return;
             }
@@ -94,30 +99,32 @@ async function migrateExistingTestimonials() {
             else if (result.status === "FLAGGED") flagged++;
             else if (result.status === "REJECTED") rejected++;
 
-            console.log(
-              `✅ Processed ${testimonial.id}: ${result.status} (score: ${result.score.toFixed(2)})`,
+            migrateTestimonialsLogger.info(
+              {
+                testimonialId: testimonial.id,
+                status: result.status,
+                score: result.score,
+              },
+              'Processed testimonial moderation',
             );
           } catch (error) {
-            console.error(
-              `❌ Error processing testimonial ${testimonial.id}:`,
-              error,
+            migrateTestimonialsLogger.error(
+              { testimonialId: testimonial.id, error },
+              'Error processing testimonial during migration',
             );
           }
         }),
       );
 
-      console.log(`📦 Batch ${Math.floor(i / BATCH_SIZE) + 1} complete`);
+      migrateTestimonialsLogger.info({ batchNumber: Math.floor(i / BATCH_SIZE) + 1 }, 'Migration batch complete');
     }
 
-    console.log("\n🎉 Migration complete!");
-    console.log(`📊 Results:
-    - Processed: ${processed}
-    - Approved: ${approved}
-    - Flagged: ${flagged}
-    - Rejected: ${rejected}
-    `);
+    migrateTestimonialsLogger.info(
+      { processed, approved, flagged, rejected },
+      'Migration complete',
+    );
   } catch (error) {
-    console.error("❌ Migration failed:", error);
+    migrateTestimonialsLogger.error({ error }, 'Migration failed');
     process.exit(1);
   } finally {
     await prisma.$disconnect();

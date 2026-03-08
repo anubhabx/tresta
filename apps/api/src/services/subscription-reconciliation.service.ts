@@ -1,7 +1,10 @@
 import { prisma } from "@workspace/database/prisma";
 
+import { logger } from "../lib/logger.js";
 import { getSubscription } from "./razorpay.service.js";
 import { mapProviderStatusToInternal } from "./subscription-status.service.js";
+
+const subscriptionReconciliationLogger = logger.child({ module: 'subscription-reconciliation-service' });
 
 type ReconcileOptions = {
   staleMinutes?: number;
@@ -125,9 +128,9 @@ export const reconcileStaleSubscriptions = async (
 
       result.updated += 1;
     } catch (error) {
-      console.error(
-        `Subscription reconciliation failed for ${subscription.id}`,
-        error,
+      subscriptionReconciliationLogger.error(
+        { subscriptionId: subscription.id, error },
+        'Subscription reconciliation failed',
       );
       result.failed += 1;
     }

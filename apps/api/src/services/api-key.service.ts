@@ -7,6 +7,9 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@workspace/database/prisma';
 import type { ApiKey } from '@workspace/database/prisma';
+import { logger } from '../lib/logger.js';
+
+const apiKeyServiceLogger = logger.child({ module: 'api-key-service' });
 
 /**
  * API Key environment types
@@ -213,7 +216,7 @@ export async function validateApiKey(key: string): Promise<ApiKeyValidation> {
 
     return { isValid: false, reason: 'API key not found or invalid' };
   } catch (error) {
-    console.error('Error validating API key:', error);
+    apiKeyServiceLogger.error({ error }, 'Error validating API key');
     return { 
       isValid: false, 
       reason: 'Failed to validate API key due to a server error' 
@@ -239,7 +242,7 @@ export async function incrementUsage(apiKeyId: string): Promise<void> {
     });
   } catch (error) {
     // Log error but don't throw - usage tracking shouldn't break the request
-    console.error('Failed to increment API key usage:', error);
+    apiKeyServiceLogger.error({ apiKeyId, error }, 'Failed to increment API key usage');
   }
 }
 

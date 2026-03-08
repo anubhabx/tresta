@@ -1,8 +1,11 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { logger } from "../lib/logger.js";
+
+const razorpayServiceLogger = logger.child({ module: 'razorpay-service' });
 
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  console.warn("Razorpay credentials missing in environment variables.");
+  razorpayServiceLogger.warn("Razorpay credentials missing in environment variables.");
 }
 
 export const razorpay = new Razorpay({
@@ -92,9 +95,9 @@ export const fetchRazorpayInvoice = async (
     const invoice = await razorpay.invoices.fetch(invoiceId);
     return invoice as { short_url?: string; invoice_url?: string };
   } catch (error) {
-    console.error(
-      `[fetchRazorpayInvoice] Failed to fetch invoice ${invoiceId}:`,
-      error,
+    razorpayServiceLogger.error(
+      { invoiceId, error },
+      'Failed to fetch Razorpay invoice',
     );
     return null;
   }

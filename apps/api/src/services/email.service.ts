@@ -3,8 +3,10 @@ import {
     assertResendApiKey,
     isRealEmailDeliveryEnabled,
 } from '../config/email-delivery.js';
+import { logger } from '../lib/logger.js';
 
 let resendClient: Resend | null = null;
+const emailServiceLogger = logger.child({ module: 'email-service' });
 
 function getResendClient(): Resend {
     if (!resendClient) {
@@ -27,7 +29,7 @@ export class EmailService {
      */
     static async sendEmail({ to, subject, html, text }: SendEmailParams): Promise<boolean> {
         if (!isRealEmailDeliveryEnabled()) {
-            console.log(`[EMAIL MOCK] To: ${to}, Subject: ${subject}`);
+            emailServiceLogger.info({ to, subject }, 'Email mock send');
             return true;
         }
 
@@ -42,13 +44,13 @@ export class EmailService {
             });
 
             if (error) {
-                console.error('Failed to send email:', error);
+                emailServiceLogger.error({ to, subject, error }, 'Failed to send email');
                 return false;
             }
 
             return true;
         } catch (error) {
-            console.error('Email service error:', error);
+            emailServiceLogger.error({ to, subject, error }, 'Email service error');
             return false;
         }
     }

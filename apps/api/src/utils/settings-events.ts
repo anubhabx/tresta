@@ -1,8 +1,10 @@
 import crypto from 'crypto';
 import { getRedisClient } from '../lib/redis.js';
 import { SETTINGS_HMAC_SECRET } from '../config/secrets.js';
+import { logger } from '../lib/logger.js';
 
 const SETTINGS_CHANGE_CHANNEL = 'settings:changes';
+const settingsEventsLogger = logger.child({ module: 'settings-events' });
 
 export interface SettingsChangeEvent {
   version: number;
@@ -52,20 +54,20 @@ export async function subscribeToSettingsChanges(
 
       // Verify signature
       if (!verifySettingsEventSignature(event)) {
-        console.error('Invalid settings change event signature - possible tampering detected');
+        settingsEventsLogger.error('Invalid settings change event signature - possible tampering detected');
         return;
       }
 
-      console.log('Received verified settings change event:', event);
+      settingsEventsLogger.info({ event }, 'Received verified settings change event');
 
       // Call the callback
       await callback(event);
     } catch (error) {
-      console.error('Error processing settings change event:', error);
+      settingsEventsLogger.error({ error }, 'Error processing settings change event');
     }
   });
 
-  console.log('Subscribed to settings change events');
+  settingsEventsLogger.info('Subscribed to settings change events');
 }
 
 /**
@@ -73,8 +75,10 @@ export async function subscribeToSettingsChanges(
  */
 export async function startSettingsChangeConsumer(): Promise<void> {
   await subscribeToSettingsChanges(async (event) => {
-    console.log(`Settings updated to version ${event.version} by ${event.updatedBy}`);
-    console.log('Changes:', event.changes);
+    settingsEventsLogger.info(
+      { version: event.version, updatedBy: event.updatedBy, changes: event.changes },
+      'Settings updated from event stream',
+    );
 
     // Here you could:
     // - Update local cache

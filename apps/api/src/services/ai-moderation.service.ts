@@ -13,8 +13,11 @@
  * @see https://platform.openai.com/docs/guides/moderation
  */
 
+import { logger } from "../lib/logger.js";
+
 const OPENAI_MODERATION_URL = "https://api.openai.com/v1/moderations";
 const TIMEOUT_MS = 5_000;
+const aiModerationLogger = logger.child({ module: 'ai-moderation-service' });
 
 export interface AIModerationResult {
   flagged: boolean;
@@ -58,8 +61,9 @@ export async function checkWithAI(
     clearTimeout(timer);
 
     if (!response.ok) {
-      console.error(
-        `[AI Moderation] OpenAI API returned ${response.status}: ${response.statusText}`,
+      aiModerationLogger.error(
+        { status: response.status, statusText: response.statusText },
+        'OpenAI moderation API returned an error response',
       );
       return null;
     }
@@ -87,9 +91,9 @@ export async function checkWithAI(
     };
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      console.warn("[AI Moderation] OpenAI API request timed out");
+      aiModerationLogger.warn('OpenAI moderation API request timed out');
     } else {
-      console.error("[AI Moderation] OpenAI API call failed:", error);
+      aiModerationLogger.error({ error }, 'OpenAI moderation API call failed');
     }
     return null;
   }

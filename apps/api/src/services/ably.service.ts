@@ -1,6 +1,8 @@
 import Ably from 'ably';
+import { logger } from '../lib/logger.js';
 
 let ablyInstance: Ably.Realtime | null = null;
+const ablyServiceLogger = logger.child({ module: 'ably-service' });
 
 export class AblyService {
     /**
@@ -8,7 +10,7 @@ export class AblyService {
      */
     static getInstance(): Ably.Realtime | null {
         if (!process.env.ABLY_API_KEY) {
-            console.warn('ABLY_API_KEY is not set. Real-time features disabled.');
+            ablyServiceLogger.warn('ABLY_API_KEY is not set. Real-time features disabled.');
             return null;
         }
 
@@ -29,7 +31,7 @@ export class AblyService {
             const channel = ably.channels.get(channelName);
             await channel.publish(eventName, data);
         } catch (error) {
-            console.error(`Failed to publish to Ably channel ${channelName}:`, error);
+            ablyServiceLogger.error({ channelName, eventName, error }, 'Failed to publish to Ably channel');
         }
     }
 }

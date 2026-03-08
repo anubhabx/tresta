@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { logger } from '../lib/logger.js';
+
+const envLogger = logger.child({ module: 'env-config' });
 
 const baseSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -41,11 +44,11 @@ function ensureConditionalRequirements(env: ValidatedEnv): void {
   const hasRazorpayWebhookSecret = Boolean(env.RAZORPAY_WEBHOOK_SECRET);
 
   if (!hasRazorpayKeys) {
-    console.warn('[env] Razorpay payment keys are not fully configured; payment endpoints may fail.');
+    envLogger.warn('Razorpay payment keys are not fully configured; payment endpoints may fail.');
   }
 
   if (!hasRazorpayWebhookSecret) {
-    console.warn('[env] RAZORPAY_WEBHOOK_SECRET is missing; Razorpay webhook verification will fail.');
+    envLogger.warn('RAZORPAY_WEBHOOK_SECRET is missing; Razorpay webhook verification will fail.');
   }
 
   if (env.ENABLE_REAL_EMAILS === 'true' && !env.RESEND_API_KEY) {
