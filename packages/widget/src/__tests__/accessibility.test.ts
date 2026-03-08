@@ -12,9 +12,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 import { Widget } from '../core/widget.js';
-import type { WidgetConfig, WidgetData } from '../types/index.js';
+import type { WidgetConfig } from '../types/index.js';
 
-describe.skip('Accessibility Features', () => {
+describe('Accessibility Features', () => {
   let dom: JSDOM;
   let container: HTMLElement;
   let widget: Widget;
@@ -45,30 +45,20 @@ describe.skip('Accessibility Features', () => {
           content: 'Great product!',
           rating: 5,
           createdAt: '2025-01-01T00:00:00Z',
-          isPublished: true,
-          isApproved: true,
           isOAuthVerified: true,
           oauthProvider: 'Google',
-          author: {
-            name: 'John Doe',
-            email: 'john@example.com',
-            avatar: 'https://example.com/avatar.jpg',
-            role: 'CEO',
-            company: 'Acme Inc',
-          },
+          authorName: 'John Doe',
+          authorAvatar: 'https://example.com/avatar.jpg',
+          authorRole: 'CEO',
+          authorCompany: 'Acme Inc',
         },
         {
           id: '2',
           content: 'Excellent service!',
           rating: 4,
           createdAt: '2025-01-02T00:00:00Z',
-          isPublished: true,
-          isApproved: true,
           isOAuthVerified: false,
-          author: {
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-          },
+          authorName: 'Jane Smith',
         },
       ],
     },
@@ -108,6 +98,8 @@ describe.skip('Accessibility Features', () => {
     if (widget) {
       widget.unmount();
     }
+
+    vi.restoreAllMocks();
   });
 
   describe('ARIA Labels and Roles', () => {
@@ -141,9 +133,7 @@ describe.skip('Accessibility Features', () => {
       expect(widgetRoot?.getAttribute('lang')).toBe('es');
     });
 
-    it.skip('should create ARIA live region for announcements', async () => {
-      // Skipped: Live region is created inside content root which may be in Shadow DOM
-      // This is tested manually and verified to work correctly
+    it('should create ARIA live region for announcements', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
         apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
@@ -153,10 +143,10 @@ describe.skip('Accessibility Features', () => {
       widget = new Widget(config);
       await widget.mount(container);
 
-      // Query for the live region specifically (with class selector)
       const liveRegion = container.querySelector('.tresta-sr-only[aria-live]');
       expect(liveRegion).toBeTruthy();
       expect(liveRegion?.getAttribute('role')).toBe('status');
+      expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
       expect(liveRegion?.getAttribute('aria-atomic')).toBe('true');
     });
 
@@ -412,12 +402,7 @@ describe.skip('Accessibility Features', () => {
   });
 
   describe('Error States', () => {
-    it.skip('should use role="alert" for error messages', async () => {
-      // Skipped: Retry logic takes too long for unit tests
-      // This is tested manually and in integration tests
-      // Mock fetch to fail
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-
+    it('should use role="alert" for error messages', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
         apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
@@ -425,15 +410,19 @@ describe.skip('Accessibility Features', () => {
       };
 
       widget = new Widget(config);
-      await widget.mount(container);
 
-      // Wait for error state to render (API has 3 retries with exponential backoff)
-      await new Promise((resolve) => setTimeout(resolve, 8000));
+      const storageManager = (widget as unknown as { storageManager: { get: (widgetId: string) => Promise<null> } }).storageManager;
+      vi.spyOn(storageManager, 'get').mockResolvedValue(null);
+
+      const apiClient = (widget as unknown as { apiClient: { fetchWidgetData: (widgetId: string) => Promise<never> } }).apiClient;
+      vi.spyOn(apiClient, 'fetchWidgetData').mockRejectedValue(new Error('Network error'));
+
+      await widget.mount(container);
 
       const errorState = container.querySelector('.tresta-widget-error-state');
       expect(errorState?.getAttribute('role')).toBe('alert');
       expect(errorState?.getAttribute('aria-live')).toBe('assertive');
-    }, 10000); // Increase test timeout to 10 seconds
+    });
 
     it('should use role="status" for empty state', async () => {
       // Mock fetch to return empty testimonials
@@ -474,7 +463,7 @@ describe.skip('Accessibility Features', () => {
   });
 
   describe('Screen Reader Support', () => {
-    it.skip('should have screen-reader-only instructions for carousel', async () => {
+    it('should have screen-reader-only instructions for carousel', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
         apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
@@ -489,7 +478,7 @@ describe.skip('Accessibility Features', () => {
       expect(srOnly?.textContent).toContain('arrow keys');
     });
 
-    it.skip('should have screen-reader-only class with proper CSS', async () => {
+    it('should have screen-reader-only class with proper CSS', async () => {
       const config: WidgetConfig = {
         widgetId: 'cmh50570x0001iy5cvm3gjjzc',
         apiKey: 'tresta_test_REPLACE_WITH_MOCK_KEY',
@@ -501,11 +490,14 @@ describe.skip('Accessibility Features', () => {
 
       const srElements = container.querySelectorAll('.tresta-sr-only');
       expect(srElements.length).toBeGreaterThan(0);
+
+      const styleTags = Array.from(document.querySelectorAll('style'));
+      expect(styleTags.some((styleTag) => styleTag.textContent?.includes('.tresta-sr-only'))).toBe(true);
     });
   });
 
   describe('Grid Layout Accessibility', () => {
-    it.skip('should add role="list" to grid layout', async () => {
+    it('should add role="list" to grid layout', async () => {
       // Mock data with grid layout
       const gridResponse = {
         data: {
@@ -549,7 +541,7 @@ describe.skip('Accessibility Features', () => {
       expect(grid?.getAttribute('aria-label')).toBe('Customer testimonials');
     });
 
-    it.skip('should add role="listitem" to grid items', async () => {
+    it('should add role="listitem" to grid items', async () => {
       // Mock data with grid layout
       const gridResponse = {
         data: {

@@ -55,7 +55,11 @@ export function TestimonialCard({
       <div className="tresta-card__body">
         {/* Star Rating */}
         {displayOptions.showRating && testimonial.rating > 0 && (
-          <div className="tresta-card__stars">
+          <div
+            className="tresta-card__stars tresta-rating"
+            role="img"
+            aria-label={`${testimonial.rating} out of 5 stars`}
+          >
             {[1, 2, 3, 4, 5].map((star) => (
               <StarIcon key={star} filled={star <= testimonial.rating} />
             ))}
@@ -144,18 +148,19 @@ export function TestimonialCard({
 
         {/* Date */}
         {displayOptions.showDate && (
-          <div
+          <time
             className={cn(
               "tresta-card__date",
               isDark ? "tresta-card__date--dark" : "tresta-card__date--light",
             )}
+            dateTime={new Date(testimonial.createdAt).toISOString()}
           >
             {new Date(testimonial.createdAt).toLocaleDateString(undefined, {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
-          </div>
+          </time>
         )}
       </div>
     </article>

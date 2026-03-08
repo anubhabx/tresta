@@ -23,14 +23,14 @@ This checklist is organized in phases so launch work can move from hard blockers
 - [x] Add missing `eslint` dependency to the UI package so the monorepo lint command can execute.
 - [x] Run repo-wide lint again and fix all launch-critical failures.
 - [x] Stabilize the widget test suite so it passes in CI.
-- [ ] Rebuild the quarantined widget accessibility assertions instead of keeping them skipped.
+- [x] Rebuild the quarantined widget accessibility assertions instead of keeping them skipped.
 - [x] Add a single release validation command that runs lint, typecheck, tests, and builds.
 
 ### Widget test blockers to fix first
 
 - [x] Fix stale import expectations and outdated component test coverage in the widget package.
 - [x] Verify widget path alias resolution for [packages/widget/src/components/WidgetRoot.tsx](packages/widget/src/components/WidgetRoot.tsx#L17).
-- [ ] Replace the currently skipped widget accessibility checks with stable assertions against the active DOM structure.
+- [x] Replace the currently skipped widget accessibility checks with stable assertions against the active DOM structure.
 - [x] Resolve known TODO-based tests still left in the widget package.
   - [x] [packages/widget/src/__tests__/storage-manager.test.ts](packages/widget/src/__tests__/storage-manager.test.ts#L300-L419)
   - [x] [packages/widget/src/core/__tests__/loader.test.ts](packages/widget/src/core/__tests__/loader.test.ts#L89-L192)

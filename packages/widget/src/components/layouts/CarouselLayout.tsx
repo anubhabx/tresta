@@ -89,7 +89,7 @@ export function CarouselLayout({
       style={{ position: "relative", width: "100%" }}
       role="region"
       aria-roledescription="carousel"
-      aria-label="Testimonials"
+      aria-label="Customer testimonials"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
@@ -113,6 +113,7 @@ export function CarouselLayout({
           <div
             key={testimonial.id}
             className="tresta-carousel-slide"
+            id={`testimonial-slide-${idx}`}
             role="tabpanel"
             aria-roledescription="slide"
             aria-label={`Testimonial ${idx + 1} of ${total}`}
@@ -196,6 +197,7 @@ export function CarouselLayout({
               role="tab"
               aria-selected={idx === current}
               aria-label={`Go to testimonial ${idx + 1}`}
+              aria-controls={`testimonial-slide-${idx}`}
               tabIndex={idx === current ? 0 : -1}
             />
           ))}
