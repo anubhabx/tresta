@@ -318,6 +318,7 @@ cd packages/widget && pnpm demo     # Preview widget demos
 # Building
 pnpm build                  # Build all packages (respects dependency graph)
 pnpm lint                   # Lint all packages
+pnpm validate:release       # Lint, typecheck, test, and build in one pass
 ```
 
 ### Project-Specific Conventions

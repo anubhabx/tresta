@@ -10,6 +10,7 @@
     "prisma": "^5.22.0"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "tsc && node scripts/copy-generated.js",
     "generate": "prisma generate"
   },

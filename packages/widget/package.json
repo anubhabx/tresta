@@ -10,6 +10,7 @@
     "check-budgets": "node scripts/check-bundle-budgets.js",
     "audit-csp": "node scripts/audit-csp-compliance.js",
     "analyze": "vite build --mode analyze",
+    "typecheck": "tsc -b --pretty false",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"

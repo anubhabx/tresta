@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run tests",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "dev": "concurrently --kill-others-on-fail -n api,worker -c auto \"pnpm run dev:api\" \"pnpm run dev:workers\"",
     "dev:api": "pnpm dlx tsx --watch src/index.ts",
     "dev:workers": "pnpm dlx tsx --watch src/workers/index.ts",

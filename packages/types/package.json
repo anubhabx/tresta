@@ -15,6 +15,7 @@
     "dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "build": "tsc",
     "dev": "tsc --watch"
   },

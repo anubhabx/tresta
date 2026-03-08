@@ -24,7 +24,7 @@ This checklist is organized in phases so launch work can move from hard blockers
 - [x] Run repo-wide lint again and fix all launch-critical failures.
 - [x] Stabilize the widget test suite so it passes in CI.
 - [ ] Rebuild the quarantined widget accessibility assertions instead of keeping them skipped.
-- [ ] Add a single release validation command that runs lint, typecheck, tests, and builds.
+- [x] Add a single release validation command that runs lint, typecheck, tests, and builds.
 
 ### Widget test blockers to fix first
 
