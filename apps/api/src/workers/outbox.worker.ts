@@ -4,6 +4,7 @@ import { prisma } from '@workspace/database/prisma';
 import { NotificationService } from '../services/notification.service.js';
 import { POP_WORKER_OPTIONS } from '../lib/worker-options.js';
 import * as dotenv from 'dotenv';
+import { logger } from '../lib/logger.js';
 
 dotenv.config();
 
@@ -12,6 +13,8 @@ const redisUrl = process.env.REDIS_URL;
 if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is required');
 }
+
+const outboxWorkerLogger = logger.child({ module: 'outbox-worker' });
 
 const redisConnection = {
   url: redisUrl,
@@ -56,7 +59,7 @@ export const createOutboxWorker = () => {
         });
 
         if (outboxEntry.attempts >= 4) {
-          console.error(`Outbox entry ${outboxId} failed after 5 attempts:`, error);
+          outboxWorkerLogger.error({ outboxId, error }, 'Outbox entry failed after 5 attempts');
         }
 
         throw error;
@@ -69,11 +72,11 @@ export const createOutboxWorker = () => {
   );
 
   outboxWorker.on('completed', (job) => {
-    console.log(`Outbox entry ${job.id} processed successfully`);
+    outboxWorkerLogger.info({ jobId: job.id }, 'Outbox entry processed successfully');
   });
 
   outboxWorker.on('failed', (job, err) => {
-    console.error(`Outbox entry ${job?.id} failed:`, err);
+    outboxWorkerLogger.error({ jobId: job?.id, err }, 'Outbox worker job failed');
   });
 
   // Create queue for adding jobs
@@ -95,7 +98,7 @@ export const createOutboxWorker = () => {
         await outboxQueue.add('process-outbox', { outboxId: entry.id });
       }
     } catch (error) {
-      console.error('Error polling outbox:', error);
+      outboxWorkerLogger.error({ error }, 'Error polling outbox');
     }
   }, 10000);
 
@@ -109,4 +112,4 @@ export const createOutboxWorker = () => {
   };
 }
 
-console.log('Outbox worker factory ready');
+outboxWorkerLogger.info('Outbox worker factory ready');

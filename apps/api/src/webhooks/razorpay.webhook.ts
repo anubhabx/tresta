@@ -2,6 +2,7 @@ import crypto from "crypto";
 import type { NextFunction, Request, Response } from "express";
 
 import { Prisma, prisma } from "@workspace/database/prisma";
+import { logger } from "../lib/logger.js";
 
 import { verifyWebhookSignature } from "../services/razorpay.service.js";
 import { mapProviderSignalsToInternal } from "../services/subscription-status.service.js";
@@ -56,6 +57,8 @@ const SUPPORTED_EVENT_PREFIXES = [
   "invoice.",
   "payment.",
 ] as const;
+
+const razorpayWebhookLogger = logger.child({ module: 'razorpay-webhook' });
 
 /**
  * Extract the invoice short_url from an existing rawSnapshot.
@@ -633,7 +636,7 @@ export const handleRazorpayWebhook = async (
 
     res.status(200).json({ success: true, message: "Webhook processed" });
   } catch (error) {
-    console.error("Razorpay webhook processing failed", error);
+    razorpayWebhookLogger.error({ error, providerEventId }, 'Razorpay webhook processing failed');
 
     try {
       await prisma.paymentWebhookEvent.update({

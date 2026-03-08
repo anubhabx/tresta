@@ -86,7 +86,8 @@ Current note:
 
 - [ ] Replace high-value `console.*` usage in the API with the shared logger.
   - [x] Replace core Redis, queue, Google OAuth, and unknown API error logging with the shared logger.
-  - [ ] Replace remaining worker, webhook, job, and rate-limit `console.*` usage.
+  - [x] Replace notification, email, and outbox worker logging plus Clerk and Razorpay webhook logging with the shared logger.
+  - [ ] Replace remaining job, rate-limit, middleware, service, and script `console.*` usage.
 - [ ] Add request correlation across API, workers, webhooks, and admin actions.
 - [ ] Add error tracking for web and API.
 - [ ] Add dashboards/alerts for webhook failures, queue backlog, payment failures, and degraded dependencies.

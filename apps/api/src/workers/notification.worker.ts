@@ -2,12 +2,15 @@ import { Worker } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
 import { NotificationService } from '../services/notification.service.js';
 import { POP_WORKER_OPTIONS } from '../lib/worker-options.js';
+import { logger } from '../lib/logger.js';
 
 const redisUrl = process.env.REDIS_URL;
 
 if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is required');
 }
+
+const notificationWorkerLogger = logger.child({ module: 'notification-worker' });
 
 /**
  * Notification worker - processes notification delivery
@@ -65,11 +68,11 @@ export const createNotificationWorker = () => {
   );
 
   notificationWorker.on('completed', (job) => {
-    console.log(`Notification ${job.id} sent successfully`);
+    notificationWorkerLogger.info({ jobId: job.id }, 'Notification sent successfully');
   });
 
   notificationWorker.on('failed', async (job, err) => {
-    console.error(`Notification ${job?.id} failed:`, err);
+    notificationWorkerLogger.error({ jobId: job?.id, err }, 'Notification worker job failed');
 
     if (!job) return;
 
@@ -107,4 +110,4 @@ export const createNotificationWorker = () => {
   return notificationWorker;
 }
 
-console.log('Notification worker factory ready');
+notificationWorkerLogger.info('Notification worker factory ready');

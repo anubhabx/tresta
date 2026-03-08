@@ -8,6 +8,7 @@ import {
   assertResendApiKey,
   isRealEmailDeliveryEnabled,
 } from '../config/email-delivery.js';
+import { logger } from '../lib/logger.js';
 
 const redisUrl = process.env.REDIS_URL;
 const realEmailEnabled = isRealEmailDeliveryEnabled();
@@ -16,8 +17,10 @@ if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is required');
 }
 
+const emailWorkerLogger = logger.child({ module: 'email-worker' });
+
 if (!realEmailEnabled) {
-  console.warn('ENABLE_REAL_EMAILS is disabled - email worker will run in mock mode');
+  emailWorkerLogger.warn('ENABLE_REAL_EMAILS is disabled - email worker will run in mock mode');
 }
 
 const resend = realEmailEnabled ? new Resend(assertResendApiKey()) : null;
@@ -60,12 +63,12 @@ export const createEmailWorker = () => {
       }
 
       if (!realEmailEnabled) {
-        console.log('[MOCK] Email:', {
+        emailWorkerLogger.info({
           to: notification.user.email,
           subject: notification.title,
           notificationId,
           userId,
-        });
+        }, '[MOCK] Email');
         return;
       }
 
@@ -77,7 +80,7 @@ export const createEmailWorker = () => {
       const { success, count } = await NotificationService.tryIncrementEmailUsage(priority);
 
       if (!success) {
-        console.log(`Email quota exhausted (${count}/200), deferring email ${notificationId}`);
+        emailWorkerLogger.warn({ notificationId, count }, 'Email quota exhausted, deferring email');
         throw new Error('QUOTA_EXCEEDED');
       }
 
@@ -102,7 +105,7 @@ export const createEmailWorker = () => {
         const { checkAndAlertQuota } = await import('../utils/alerts.js');
         await checkAndAlertQuota(count);
 
-        console.log(`Email sent successfully: ${notificationId} (${count}/200 today)`);
+        emailWorkerLogger.info({ notificationId, count }, 'Email sent successfully');
       } catch (error: any) {
         // Distinguish between transient and permanent failures
         if (error.statusCode === 429 || error.statusCode >= 500) {
@@ -110,7 +113,7 @@ export const createEmailWorker = () => {
           throw new Error(`TRANSIENT_ERROR: ${error.message}`);
         } else {
           // Permanent error (invalid email, etc.) - don't retry
-          console.error(`Permanent email error for ${notificationId}:`, error);
+          emailWorkerLogger.error({ notificationId, error }, 'Permanent email error');
           throw new Error(`PERMANENT_ERROR: ${error.message}`);
         }
       }
@@ -137,11 +140,11 @@ export const createEmailWorker = () => {
   );
 
   emailWorker.on('completed', (job) => {
-    console.log(`Email ${job.id} sent successfully`);
+    emailWorkerLogger.info({ jobId: job.id }, 'Email worker job completed');
   });
 
   emailWorker.on('failed', async (job, err) => {
-    console.error(`Email ${job?.id} failed:`, err);
+    emailWorkerLogger.error({ jobId: job?.id, err }, 'Email worker job failed');
 
     // Don't persist quota failures to DLQ (expected behavior)
     if (err.message.includes('QUOTA_EXCEEDED')) {
@@ -186,7 +189,7 @@ export const createEmailWorker = () => {
 
 // Call reconciliation on boot
 NotificationService.reconcileEmailUsageOnBoot()
-  .then(() => console.log('Email usage reconciliation completed'))
-  .catch(err => console.error('Email usage reconciliation failed:', err));
+  .then(() => emailWorkerLogger.info('Email usage reconciliation completed'))
+  .catch(err => emailWorkerLogger.error({ err }, 'Email usage reconciliation failed'));
 
-console.log('Email worker factory ready');
+emailWorkerLogger.info('Email worker factory ready');

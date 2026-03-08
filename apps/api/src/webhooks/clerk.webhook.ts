@@ -6,6 +6,9 @@ import {
   blobStorageService,
   StorageDirectory,
 } from '../services/blob-storage.service.js';
+import { logger } from '../lib/logger.js';
+
+const clerkWebhookLogger = logger.child({ module: 'clerk-webhook' });
 
 export const syncUserToDB = async (
   req: Request,
@@ -26,7 +29,7 @@ export const syncUserToDB = async (
       return;
     }
 
-    console.log("Clerk Webhook Event:", evt.type);
+  clerkWebhookLogger.info({ eventType: evt.type }, 'Clerk webhook event received');
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
       const { id, email_addresses, first_name, last_name, image_url } =
@@ -50,9 +53,9 @@ export const syncUserToDB = async (
             StorageDirectory.AVATARS,
             id,
           );
-          console.log(`Avatar synced for user ${id}: ${avatarUrl}`);
+          clerkWebhookLogger.info({ userId: id, avatarUrl }, 'Avatar synced for user');
         } catch (error) {
-          console.error("Error syncing avatar:", error);
+          clerkWebhookLogger.error({ userId: id, error }, 'Error syncing avatar');
           // Continue even if avatar sync fails
         }
       }
@@ -76,7 +79,7 @@ export const syncUserToDB = async (
           },
         });
       } catch (error) {
-        console.error("Error syncing user to DB:", error);
+        clerkWebhookLogger.error({ userId: id, error }, 'Error syncing user to DB');
         res.status(500).send("Error syncing user to DB");
         return;
       }
@@ -90,7 +93,7 @@ export const syncUserToDB = async (
           where: { id },
         });
       } catch (error) {
-        console.error("Error deleting user from DB:", error);
+        clerkWebhookLogger.error({ userId: id, error }, 'Error deleting user from DB');
         res.status(500).send("Error deleting user from DB");
         return;
       }
@@ -98,7 +101,7 @@ export const syncUserToDB = async (
 
     res.status(200).send("User synced to DB");
   } catch (error) {
-    console.error("Webhook verification failed:", error);
+    clerkWebhookLogger.error({ error }, 'Webhook verification failed');
     res.status(400).send("Webhook verification failed");
   }
 };
