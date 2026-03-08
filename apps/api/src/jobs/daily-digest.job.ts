@@ -10,9 +10,11 @@ import {
   assertResendApiKey,
   isRealEmailDeliveryEnabled,
 } from '../config/email-delivery.js';
+import { logger } from '../lib/logger.js';
 
 const realEmailEnabled = isRealEmailDeliveryEnabled();
 const resend = realEmailEnabled ? new Resend(assertResendApiKey()) : null;
+const dailyDigestLogger = logger.child({ module: 'daily-digest-job' });
 
 /**
  * Daily digest job - sends batched email summaries
@@ -26,7 +28,7 @@ const resend = realEmailEnabled ? new Resend(assertResendApiKey()) : null;
 export const dailyDigestJob = new CronJob(
   '0 9 * * *', // Every day at 9 AM UTC
   async () => {
-    console.log('🔔 Starting daily digest job...');
+    dailyDigestLogger.info('Starting daily digest job');
 
     const redis = getRedisClient();
 
@@ -35,7 +37,7 @@ export const dailyDigestJob = new CronJob(
     const lockAcquired = await redis.set(lockKey, '1', 'EX', 3600, 'NX'); // 1 hour lock
 
     if (!lockAcquired) {
-      console.log('⚠️ Digest job already running, skipping');
+      dailyDigestLogger.warn('Digest job already running, skipping');
       return;
     }
 
@@ -44,7 +46,7 @@ export const dailyDigestJob = new CronJob(
       const quotaLocked = await NotificationService.isQuotaLocked();
       if (quotaLocked) {
         const nextRetry = await NotificationService.getNextRetryTime();
-        console.log(`⚠️ Email quota locked until ${nextRetry}, skipping digest job`);
+        dailyDigestLogger.warn({ nextRetry }, 'Email quota locked, skipping digest job');
         return;
       }
 
@@ -60,7 +62,7 @@ export const dailyDigestJob = new CronJob(
         },
       });
 
-      console.log(`📧 Processing digest for ${users.length} users`);
+  dailyDigestLogger.info({ userCount: users.length }, 'Processing daily digest');
 
       let sentCount = 0;
       let skippedCount = 0;
@@ -93,7 +95,7 @@ export const dailyDigestJob = new CronJob(
         }
 
         if (!realEmailEnabled) {
-          console.log(`[MOCK] Digest email for ${user.email}: ${notifications.length} notifications`);
+          dailyDigestLogger.info({ userEmail: user.email, notificationCount: notifications.length }, 'Mock digest email');
           sentCount++;
           continue;
         }
@@ -102,7 +104,7 @@ export const dailyDigestJob = new CronJob(
         const { success, count } = await NotificationService.tryIncrementEmailUsage('normal');
 
         if (!success) {
-          console.log(`⚠️ Email quota exhausted (${count}/200), stopping digest job`);
+          dailyDigestLogger.warn({ count }, 'Email quota exhausted, stopping digest job');
           skippedCount++;
 
           // Lock quota for rest of day and record next retry time
@@ -111,7 +113,7 @@ export const dailyDigestJob = new CronJob(
         }
 
         if (!resend) {
-          console.error('❌ RESEND_API_KEY not configured');
+          dailyDigestLogger.error('RESEND_API_KEY not configured');
           break;
         }
 
@@ -130,23 +132,26 @@ export const dailyDigestJob = new CronJob(
           });
 
           sentCount++;
-          console.log(`✅ Digest sent to ${user.email}: ${notifications.length} notifications (${count}/200)`);
+          dailyDigestLogger.info(
+            { userEmail: user.email, notificationCount: notifications.length, count },
+            'Digest sent successfully',
+          );
 
           // Check for quota alerts
           const { checkAndAlertQuota } = await import('../utils/alerts.js');
           await checkAndAlertQuota(count);
         } catch (error) {
-          console.error(`❌ Failed to send digest to ${user.email}:`, error);
+          dailyDigestLogger.error({ userEmail: user.email, error }, 'Failed to send digest');
           // Continue with other users
         }
       }
 
-      console.log(`✅ Daily digest job completed:`);
-      console.log(`   - Sent: ${sentCount}`);
-      console.log(`   - Skipped (quota): ${skippedCount}`);
-      console.log(`   - No notifications: ${noNotificationsCount}`);
+      dailyDigestLogger.info(
+        { sentCount, skippedCount, noNotificationsCount },
+        'Daily digest job completed',
+      );
     } catch (error) {
-      console.error('❌ Daily digest job error:', error);
+      dailyDigestLogger.error({ error }, 'Daily digest job error');
     } finally {
       // Release lock
       await redis.del(lockKey);
@@ -163,5 +168,5 @@ export const dailyDigestJob = new CronJob(
  */
 export function startDailyDigestJob() {
   dailyDigestJob.start();
-  console.log('✅ Daily digest job scheduled (9 AM UTC)');
+  dailyDigestLogger.info('Daily digest job scheduled (9 AM UTC)');
 }

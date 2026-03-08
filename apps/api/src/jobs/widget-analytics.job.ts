@@ -1,11 +1,14 @@
 import { CronJob } from 'cron';
 import { checkWidgetPerformance, cleanupOldAnalytics } from '../services/widget-analytics.service.js';
+import { logger } from '../lib/logger.js';
+
+const widgetAnalyticsJobLogger = logger.child({ module: 'widget-analytics-job' });
 
 // Performance check job (every 15 minutes)
 export const performanceCheckJob = new CronJob(
   '*/15 * * * *',
   async () => {
-    console.log('[Cron] Running widget performance check...');
+    widgetAnalyticsJobLogger.info('Running widget performance check');
     await checkWidgetPerformance();
   },
   null,
@@ -17,7 +20,7 @@ export const performanceCheckJob = new CronJob(
 export const analyticsCleanupJob = new CronJob(
   '0 2 * * *',
   async () => {
-    console.log('[Cron] Running analytics cleanup...');
+    widgetAnalyticsJobLogger.info('Running analytics cleanup');
     await cleanupOldAnalytics();
   },
   null,
@@ -31,5 +34,5 @@ export const analyticsCleanupJob = new CronJob(
 export function scheduleWidgetAnalyticsJobs() {
   performanceCheckJob.start();
   analyticsCleanupJob.start();
-  console.log('[Cron] Widget analytics jobs scheduled');
+  widgetAnalyticsJobLogger.info('Widget analytics jobs scheduled');
 }

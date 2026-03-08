@@ -2,7 +2,10 @@ import type { Request, Response, NextFunction } from 'express';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { getAuth } from '@clerk/express';
 import { getRedisClient } from '../lib/redis.js';
+import { logger } from '../lib/logger.js';
 import { ResponseHandler } from '../lib/response.js';
+
+const rateLimiterLogger = logger.child({ module: 'rate-limiter' });
 
 /**
  * Rate limiter instances
@@ -80,6 +83,10 @@ function sendRateLimitError(
   );
 }
 
+function logRateLimiterFailure(limiter: string, error: unknown): void {
+  rateLimiterLogger.error({ limiter, error }, 'Rate limiter backend error');
+}
+
 /**
  * Express middleware for API rate limiting
  * 
@@ -133,7 +140,7 @@ export async function rateLimitMiddleware(
       return;
     } else {
       // Redis error - don't block the request
-      console.error('Rate limiter error:', error);
+      logRateLimiterFailure('api', error);
       return next();
     }
   }
@@ -184,7 +191,7 @@ export async function publicRateLimitMiddleware(
       );
       return;
     } else {
-      console.error('Public rate limiter error:', error);
+      logRateLimiterFailure('public-ip', error);
       return next();
     }
   }
@@ -241,7 +248,7 @@ export async function emailRateLimitMiddleware(
       return;
     } else {
       // Redis error - don't block the request
-      console.error('Email rate limiter error:', error);
+      logRateLimiterFailure('email', error);
       return next();
     }
   }
@@ -306,7 +313,7 @@ export function createRateLimiter(
         );
         return;
       } else {
-        console.error('Rate limiter error:', error);
+        logRateLimiterFailure(`custom:${keyPrefix}`, error);
         return next();
       }
     }
@@ -363,7 +370,7 @@ export function createIpRateLimiter(
         );
         return;
       } else {
-        console.error('IP rate limiter error:', error);
+        logRateLimiterFailure(`ip:${keyPrefix}`, error);
         return next();
       }
     }
@@ -415,7 +422,7 @@ export async function adminReadRateLimitMiddleware(
       );
       return;
     } else {
-      console.error('Admin read rate limiter error:', error);
+      logRateLimiterFailure('admin-read', error);
       return next();
     }
   }
@@ -466,7 +473,7 @@ export async function adminWriteRateLimitMiddleware(
       );
       return;
     } else {
-      console.error('Admin write rate limiter error:', error);
+      logRateLimiterFailure('admin-write', error);
       return next();
     }
   }
@@ -517,7 +524,7 @@ export async function adminHeavyRateLimitMiddleware(
       );
       return;
     } else {
-      console.error('Admin heavy rate limiter error:', error);
+      logRateLimiterFailure('admin-heavy', error);
       return next();
     }
   }

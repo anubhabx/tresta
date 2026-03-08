@@ -2,6 +2,9 @@ import { CronJob } from 'cron';
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS, getCurrentDateUTC } from '../lib/redis-keys.js';
 import { NotificationService } from '../services/notification.service.js';
+import { logger } from '../lib/logger.js';
+
+const reconciliationLogger = logger.child({ module: 'reconciliation-job' });
 
 /**
  * Nightly reconciliation job - snapshots Redis quota to Postgres
@@ -17,7 +20,7 @@ import { NotificationService } from '../services/notification.service.js';
 export const reconciliationJob = new CronJob(
   '59 23 * * *', // Every day at 11:59 PM UTC
   async () => {
-    console.log('🔄 Starting reconciliation job...');
+    reconciliationLogger.info('Starting reconciliation job');
     
     try {
       const redis = getRedisClient();
@@ -28,12 +31,12 @@ export const reconciliationJob = new CronJob(
       
       if (count > 0) {
         await NotificationService.snapshotEmailUsage(today, count);
-        console.log(`✅ Reconciliation complete: ${count} emails on ${today}`);
+        reconciliationLogger.info({ count, day: today }, 'Reconciliation complete');
       } else {
-        console.log(`ℹ️ No emails sent today (${today})`);
+        reconciliationLogger.info({ day: today }, 'No emails sent today');
       }
     } catch (error) {
-      console.error('❌ Reconciliation job error:', error);
+      reconciliationLogger.error({ error }, 'Reconciliation job error');
     }
   },
   null,
@@ -47,5 +50,5 @@ export const reconciliationJob = new CronJob(
  */
 export function startReconciliationJob() {
   reconciliationJob.start();
-  console.log('✅ Reconciliation job scheduled (11:59 PM UTC)');
+  reconciliationLogger.info('Reconciliation job scheduled (11:59 PM UTC)');
 }
