@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../lib/redis.js';
 import { REDIS_KEYS } from '../lib/redis-keys.js';
+import { logger } from '../lib/logger.js';
+
+const idempotencyLogger = logger.child({ module: 'idempotency-middleware' });
 
 /**
  * Idempotency middleware for webhook endpoints (Clerk retries)
@@ -40,7 +43,7 @@ export async function idempotencyMiddleware(
     // Check if already processed
     const alreadyProcessed = await redis.get(processedKey);
     if (alreadyProcessed) {
-      console.log(`Webhook ${webhookId} (${eventType}) already processed (idempotent)`);
+      idempotencyLogger.info({ webhookId, eventType }, 'Webhook already processed idempotently');
       res.status(200).json({
         success: true,
         message: 'Already processed (idempotent)',
@@ -67,19 +70,19 @@ export async function idempotencyMiddleware(
           await redis.setex(processedKey, 86400, '1');
         }
       } catch (error) {
-        console.error('Failed to finalize idempotency state:', error);
+        idempotencyLogger.error({ webhookId, eventType, error }, 'Failed to finalize idempotency state');
       } finally {
         try {
           await redis.del(processingKey);
         } catch (error) {
-          console.error('Failed to release idempotency lock:', error);
+          idempotencyLogger.error({ webhookId, eventType, error }, 'Failed to release idempotency lock');
         }
       }
     });
 
     next();
   } catch (error) {
-    console.error('Idempotency middleware error:', error);
+    idempotencyLogger.error({ error }, 'Idempotency middleware error');
     // Don't block the request if Redis fails
     next();
   }

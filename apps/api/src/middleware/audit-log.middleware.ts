@@ -3,6 +3,9 @@ import { getAuth } from '@clerk/express';
 import { v4 as uuidv4 } from 'uuid';
 import { getRedisClient } from '../lib/redis.js';
 import { prisma } from '@workspace/database/prisma';
+import { logger } from '../lib/logger.js';
+
+const auditLogLogger = logger.child({ module: 'audit-log-middleware' });
 
 /**
  * Audit log middleware with guaranteed delivery
@@ -71,11 +74,11 @@ export function auditLog(
 
     // Write audit log asynchronously (don't block response)
     writeAuditLog(completeAuditEntry).catch((error) => {
-      console.error('Failed to write audit log:', error);
+      auditLogLogger.error({ auditId: completeAuditEntry.id, error }, 'Failed to write audit log');
       addToRetryQueue(completeAuditEntry).catch((retryError) => {
-        console.error(
-          `[CRITICAL] Audit log ${completeAuditEntry.id} lost — write and retry queue both failed.`,
-          { writeError: error, retryError },
+        auditLogLogger.fatal(
+          { auditId: completeAuditEntry.id, writeError: error, retryError },
+          'Audit log lost after write and retry queue failures',
         );
       });
     });
@@ -191,9 +194,9 @@ export async function retryFailedAuditLogs(): Promise<void> {
         // Remove from retry queue on success
         await redis.lrem('audit_logs:retry_queue', 1, entryStr);
 
-        console.log(`Successfully retried audit log: ${entry.id}`);
+        auditLogLogger.info({ auditId: entry.id }, 'Successfully retried audit log');
       } catch (error) {
-        console.error('Failed to retry audit log:', error);
+        auditLogLogger.error({ error }, 'Failed to retry audit log');
 
         // Increment retry count
         const entry = JSON.parse(entryStr);
@@ -206,14 +209,20 @@ export async function retryFailedAuditLogs(): Promise<void> {
         if (entry.retryCount < 5) {
           await redis.lpush('audit_logs:retry_queue', JSON.stringify(entry));
         } else {
-          console.error(
-            `[CRITICAL] Audit log ${entry.id} dropped after ${entry.retryCount} retries`,
-            { action: entry.action, adminId: entry.adminId, timestamp: entry.timestamp },
+          auditLogLogger.fatal(
+            {
+              auditId: entry.id,
+              retryCount: entry.retryCount,
+              action: entry.action,
+              adminId: entry.adminId,
+              timestamp: entry.timestamp,
+            },
+            'Audit log dropped after max retries',
           );
         }
       }
     }
   } catch (error) {
-    console.error('Error in retryFailedAuditLogs:', error);
+    auditLogLogger.error({ error }, 'Error in retryFailedAuditLogs');
   }
 }

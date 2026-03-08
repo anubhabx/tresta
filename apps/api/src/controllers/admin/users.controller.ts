@@ -7,6 +7,9 @@ import {
   blobStorageService,
   StorageDirectory,
 } from '../../services/blob-storage.service.js';
+import { logger } from '../../lib/logger.js';
+
+const adminUsersLogger = logger.child({ module: 'admin-users-controller' });
 
 /**
  * GET /admin/users
@@ -337,7 +340,7 @@ export const exportUserData = async (
         },
       });
     } catch (error) {
-      console.error('Failed to log export action:', error);
+      adminUsersLogger.error({ userId: id, adminId, error }, 'Failed to log export action');
     }
 
     return ResponseHandler.success(res, {

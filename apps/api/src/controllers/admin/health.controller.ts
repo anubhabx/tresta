@@ -2,6 +2,9 @@ import type { Request, Response, NextFunction } from 'express';
 import { Queue } from 'bullmq';
 import { prisma } from '@workspace/database/prisma';
 import { getRedisClient } from '../../lib/redis.js';
+import { logger } from '../../lib/logger.js';
+
+const adminHealthLogger = logger.child({ module: 'admin-health-controller' });
 
 /**
  * GET /healthz
@@ -29,7 +32,7 @@ export const readinessCheck = async (
       await prisma.$queryRaw`SELECT 1`;
       checks.database = true;
     } catch (error) {
-      console.error('Database health check failed:', error);
+      adminHealthLogger.error({ error }, 'Database health check failed');
       checks.database = false;
       allHealthy = false;
     }
@@ -40,7 +43,7 @@ export const readinessCheck = async (
       await redis.ping();
       checks.redis = true;
     } catch (error) {
-      console.error('Redis health check failed:', error);
+      adminHealthLogger.error({ error }, 'Redis health check failed');
       checks.redis = false;
       allHealthy = false;
     }
@@ -53,7 +56,7 @@ export const readinessCheck = async (
       await notificationQueue.getJobCounts();
       checks.bullmq = true;
     } catch (error) {
-      console.error('BullMQ health check failed:', error);
+      adminHealthLogger.error({ error }, 'BullMQ health check failed');
       checks.bullmq = false;
       allHealthy = false;
     }

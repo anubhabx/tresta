@@ -15,6 +15,9 @@ import {
 import { Subscriptions } from "razorpay/dist/types/subscriptions.js";
 import { requireUserId } from "../lib/auth.js";
 import { PLAN_LIMITS } from "../config/constants.js";
+import { logger } from "../lib/logger.js";
+
+const paymentsControllerLogger = logger.child({ module: 'payments-controller' });
 
 export const createSubscription = async (
   req: Request,
@@ -135,9 +138,9 @@ export const verifyPayment = async (
       if (subDetails.current_end)
         currentPeriodEnd = new Date(subDetails.current_end * 1000);
     } catch (e) {
-      console.error(
-        `[WARNING] Failed to fetch Razorpay subscription details for ${razorpay_subscription_id} — billing period dates will not be set.`,
-        e,
+      paymentsControllerLogger.warn(
+        { razorpaySubscriptionId: razorpay_subscription_id, error: e },
+        'Failed to fetch Razorpay subscription details; billing period dates will not be set',
       );
     }
 

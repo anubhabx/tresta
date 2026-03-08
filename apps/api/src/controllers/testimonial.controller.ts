@@ -28,8 +28,10 @@ import {
 } from "../services/moderation.service.js";
 import { hashIp, encrypt } from "../utils/encryption.js";
 import { requireUserId } from "../lib/auth.js";
+import { logger } from "../lib/logger.js";
 
 const FALLBACK_TESTIMONIAL_LIMIT = 10;
+const testimonialControllerLogger = logger.child({ module: 'testimonial-controller' });
 
 type SubmissionFormConfig = {
   enableRating?: boolean;
@@ -638,7 +640,10 @@ const createTestimonial = async (
         });
       } catch (error) {
         // Non-blocking error - don't fail the request if notification fails
-        console.error("Failed to create notification:", error);
+        testimonialControllerLogger.error(
+          { projectId: project.id, testimonialId: newTestimonial.id, error },
+          'Failed to create notification for testimonial submission',
+        );
       }
     }
 

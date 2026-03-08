@@ -1,13 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
 import Ably from 'ably';
 import { InternalServerError } from '../lib/errors.js';
+import { logger } from '../lib/logger.js';
 import { ResponseHandler } from '../lib/response.js';
 import { requireUserId } from '../lib/auth.js';
 
 const ablyApiKey = process.env.ABLY_API_KEY;
+const ablyControllerLogger = logger.child({ module: 'ably-controller' });
 
 if (!ablyApiKey) {
-  console.warn('ABLY_API_KEY not configured - Ably token authentication will fail');
+  ablyControllerLogger.warn('ABLY_API_KEY not configured - Ably token authentication will fail');
 }
 
 /**

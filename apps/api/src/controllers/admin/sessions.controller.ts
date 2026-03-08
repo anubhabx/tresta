@@ -3,7 +3,10 @@ import { ResponseHandler } from '../../lib/response.js';
 import { clerkClient } from '@clerk/express';
 import { getCachedUser } from '../../lib/clerk-cache.js';
 import { InternalServerError } from '../../lib/errors.js';
+import { logger } from '../../lib/logger.js';
 import { requireUserId } from '../../lib/auth.js';
+
+const adminSessionsLogger = logger.child({ module: 'admin-sessions-controller' });
 
 /**
  * GET /admin/sessions
@@ -44,7 +47,7 @@ export const getSessions = async (
             createdAt: session.createdAt,
           };
         } catch (error) {
-          console.error(`Failed to fetch user for session ${session.id}:`, error);
+          adminSessionsLogger.error({ sessionId: session.id, error }, 'Failed to fetch user for session');
           return null;
         }
       })
@@ -65,7 +68,7 @@ export const getSessions = async (
       },
     });
   } catch (error) {
-    console.error('Failed to fetch sessions:', error);
+    adminSessionsLogger.error({ error }, 'Failed to fetch sessions');
     next(new InternalServerError('Failed to fetch sessions from Clerk API'));
   }
 };
@@ -90,7 +93,7 @@ export const revokeSession = async (
     // Revoke the session via Clerk API
     await clerkClient.sessions.revokeSession(sessionId);
 
-    console.log(`Session ${sessionId} revoked by admin ${adminId}`);
+    adminSessionsLogger.info({ sessionId, adminId }, 'Session revoked by admin');
 
     return ResponseHandler.success(res, {
       data: {
@@ -100,7 +103,7 @@ export const revokeSession = async (
       },
     });
   } catch (error) {
-    console.error('Failed to revoke session:', error);
+    adminSessionsLogger.error({ sessionId: req.params.sessionId, error }, 'Failed to revoke session');
     next(new InternalServerError('Failed to revoke session via Clerk API'));
   }
 };

@@ -2,6 +2,9 @@ import type { Request, Response, NextFunction } from 'express';
 import { getAuth } from '@clerk/express';
 import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
 import { getCachedUser } from '../lib/clerk-cache.js';
+import { logger } from '../lib/logger.js';
+
+const adminMiddlewareLogger = logger.child({ module: 'admin-middleware' });
 
 /**
  * Admin authentication middleware
@@ -38,15 +41,18 @@ export const requireAdmin = async (
     const role = user.publicMetadata?.role as string | undefined;
 
     if (role !== 'admin') {
-      console.warn(`Access denied: User ${userId} attempted to access admin endpoint without admin role`);
+      adminMiddlewareLogger.warn({ userId }, 'Access denied for non-admin user');
       return next(new ForbiddenError('Admin access required'));
     }
 
     // User is admin, proceed
-    console.log(`Admin access granted: User ${userId} (${user.emailAddresses[0]?.emailAddress})`);
+    adminMiddlewareLogger.info(
+      { userId, email: user.emailAddresses[0]?.emailAddress },
+      'Admin access granted',
+    );
     next();
   } catch (error) {
-    console.error('Admin middleware error:', error);
+    adminMiddlewareLogger.error({ error }, 'Admin middleware error');
     
     // If it's already one of our custom errors, pass it through
     if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
@@ -80,14 +86,17 @@ export const requireRole = (allowedRoles: string[]) => {
       const role = user.publicMetadata?.role as string | undefined;
 
       if (!role || !allowedRoles.includes(role)) {
-        console.warn(`Access denied: User ${userId} with role "${role}" attempted to access endpoint requiring roles: ${allowedRoles.join(', ')}`);
+        adminMiddlewareLogger.warn(
+          { userId, role, allowedRoles },
+          'Access denied for user missing required role',
+        );
         return next(new ForbiddenError(`Access requires one of: ${allowedRoles.join(', ')}`));
       }
 
-      console.log(`Role-based access granted: User ${userId} with role "${role}"`);
+      adminMiddlewareLogger.info({ userId, role }, 'Role-based access granted');
       next();
     } catch (error) {
-      console.error('Role middleware error:', error);
+      adminMiddlewareLogger.error({ error }, 'Role middleware error');
       
       if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
         return next(error);
@@ -130,7 +139,7 @@ export const checkAdmin = async (
     (req as any).isAdmin = role === 'admin';
     next();
   } catch (error) {
-    console.error('Check admin error:', error);
+    adminMiddlewareLogger.error({ error }, 'Check admin error');
     (req as any).isAdmin = false;
     next();
   }

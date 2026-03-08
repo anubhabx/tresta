@@ -8,6 +8,9 @@ import { validateApiKey, incrementUsage } from '../services/api-key.service.js';
 import { UnauthorizedError, ForbiddenError } from '../lib/errors.js';
 import type { ApiKey } from '@workspace/database/prisma';
 import { getRedisClient } from '../lib/redis.js';
+import { logger } from '../lib/logger.js';
+
+const apiKeyMiddlewareLogger = logger.child({ module: 'api-key-middleware' });
 
 /**
  * Check rate limit for an API key
@@ -104,7 +107,7 @@ export async function validateApiKeyMiddleware(
     
     // Increment usage count asynchronously (don't wait for it)
     incrementUsage(validation.apiKey.id).catch(err => {
-      console.error('Failed to increment API key usage:', err);
+      apiKeyMiddlewareLogger.error({ apiKeyId: validation.apiKey?.id, err }, 'Failed to increment API key usage');
     });
     
     // Attach API key data to request
