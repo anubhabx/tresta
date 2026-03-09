@@ -178,10 +178,10 @@ Phase status: ✅ Complete
 
 ### Billing and subscriptions
 
-- [ ] Unit test payment signature verification and provider mapping.
-- [ ] Unit test reconciliation logic and idempotency handling.
-- [ ] Integration test payment webhooks for duplicate and out-of-order events.
-- [ ] Integration test plan enforcement on gated features.
+- [x] Unit test payment signature verification and provider mapping.
+- [x] Unit test reconciliation logic and idempotency handling.
+- [x] Integration test payment webhooks for duplicate and out-of-order events.
+- [x] Integration test plan enforcement on gated features.
 
 ### Notifications, jobs, and workers
 
