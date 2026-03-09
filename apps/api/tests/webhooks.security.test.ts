@@ -14,6 +14,7 @@ vi.mock("@clerk/express/webhooks", () => ({
 
 vi.mock("@workspace/database/prisma", () => ({
   prisma: {
+    $transaction: vi.fn(),
     user: {
       upsert: vi.fn(),
       delete: vi.fn(),
@@ -21,13 +22,15 @@ vi.mock("@workspace/database/prisma", () => ({
     paymentWebhookEvent: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
     },
     subscription: {
       findUnique: vi.fn(),
+      findFirst: vi.fn(),
       update: vi.fn(),
     },
-    payment: {
-      findFirst: vi.fn(),
+    subscriptionPayment: {
+      findUnique: vi.fn(),
       upsert: vi.fn(),
     },
   },
@@ -42,17 +45,20 @@ vi.mock("../src/services/razorpay.service.js", () => ({
 }));
 
 const mockedPrisma = prisma as unknown as {
+  $transaction: ReturnType<typeof vi.fn>;
   user: { upsert: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn> };
   paymentWebhookEvent: {
     findUnique: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
   };
   subscription: {
     findUnique: ReturnType<typeof vi.fn>;
+    findFirst: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
-  payment: {
-    findFirst: ReturnType<typeof vi.fn>;
+  subscriptionPayment: {
+    findUnique: ReturnType<typeof vi.fn>;
     upsert: ReturnType<typeof vi.fn>;
   };
 };
@@ -169,6 +175,86 @@ describe("webhook signature enforcement", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ success: true, message: "Already processed" }),
+    );
+  });
+
+  it("marks out-of-order webhook events as stale without mutating subscription state", async () => {
+    mockedVerifyWebhookSignature.mockReturnValue(true);
+    mockedPrisma.paymentWebhookEvent.findUnique.mockResolvedValue(null);
+
+    const tx = {
+      paymentWebhookEvent: {
+        create: vi.fn().mockResolvedValue(undefined),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      subscription: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "sub_local_1",
+          userId: "user_1",
+          userPlan: "PRO",
+          planId: "plan_1",
+          amount: 30000,
+          currency: "INR",
+          externalSubscriptionId: "sub_123",
+          providerStatus: "active",
+          lastPaymentStatus: "captured",
+          lastInvoiceStatus: "paid",
+          currentPeriodStart: null,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          razorpayPaymentId: null,
+          lastWebhookAt: new Date("2026-03-09T12:00:00.000Z"),
+        }),
+        findFirst: vi.fn().mockResolvedValue(null),
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+      subscriptionPayment: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        upsert: vi.fn().mockResolvedValue(undefined),
+      },
+      user: {
+        update: vi.fn().mockResolvedValue(undefined),
+      },
+    };
+
+    mockedPrisma.$transaction.mockImplementation(async (callback: any) => callback(tx));
+
+    const staleEventPayload = {
+      event: "subscription.activated",
+      created_at: 1773050400,
+      payload: {
+        subscription: {
+          entity: {
+            id: "sub_123",
+            status: "active",
+          },
+        },
+      },
+    };
+
+    const req = {
+      requestId: "req_rzp_stale_1",
+      header: vi.fn().mockImplementation((name: string) => {
+        if (name === "x-razorpay-signature") return "valid_signature";
+        if (name === "x-razorpay-event-id") return "evt_stale_1";
+        return undefined;
+      }),
+      body: Buffer.from(JSON.stringify(staleEventPayload)),
+    } as unknown as Request;
+
+    const res = createResponse();
+    const next = createNext();
+
+    await handleRazorpayWebhook(req, res, next as unknown as NextFunction);
+
+    expect(tx.paymentWebhookEvent.update).toHaveBeenCalledWith({
+      where: { providerEventId: "razorpay:evt_stale_1" },
+      data: expect.objectContaining({ status: "stale" }),
+    });
+    expect(tx.subscription.update).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, message: "Webhook processed" }),
     );
   });
 });
