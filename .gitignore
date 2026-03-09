@@ -73,3 +73,5 @@ pnpm-lock.yaml
 
 packages/database/supabase/
 packages/database/prisma/migrations/
+
+.secrets/
