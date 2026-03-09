@@ -142,9 +142,9 @@ Phase status: ✅ Complete
 
 ### Authentication and identity
 
-- [ ] Unit test Clerk auth guards and helper utilities.
-- [ ] Unit test Google OAuth verification success/failure branches.
-- [ ] Integration test protected route access with valid, invalid, and expired auth.
+- [x] Unit test Clerk auth guards and helper utilities.
+- [x] Unit test Google OAuth verification success/failure branches.
+- [x] Integration test protected route access with valid, invalid, and expired auth.
 
 ### Projects
 
