@@ -437,6 +437,43 @@ describe("testimonial controller lifecycle coverage", () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  it("bulk moderation handles mixed valid and invalid testimonial IDs", async () => {
+    mockedPrisma.project.findFirst.mockResolvedValue({ id: "proj_1" });
+    mockedPrisma.testimonial.updateMany.mockResolvedValue({ count: 2 });
+
+    const req = {
+      params: { slug: "demo-project" },
+      body: {
+        testimonialIds: ["t_valid_1", "t_wrong_project", "t_missing", "t_valid_2"],
+        action: "reject",
+      },
+      user: { id: "user_1" },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = createNext();
+
+    await bulkModerationAction(req, res, next as unknown as NextFunction);
+
+    expect(mockedPrisma.testimonial.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: { in: ["t_valid_1", "t_wrong_project", "t_missing", "t_valid_2"] },
+        projectId: "proj_1",
+      },
+      data: {
+        moderationStatus: "REJECTED",
+        isApproved: false,
+        isPublished: false,
+      },
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.data).toEqual({ count: 2, action: "reject" });
+    expect(responseBody!.message).toContain("2 testimonial(s) rejectd successfully");
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it("blocks public testimonials when project is inactive", async () => {
     mockedPrisma.project.findUnique.mockResolvedValue({
       id: "proj_1",
