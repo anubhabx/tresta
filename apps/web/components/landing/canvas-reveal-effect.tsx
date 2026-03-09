@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react/no-unknown-property */
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { cn } from "@workspace/ui/lib/utils";
 import React, { useMemo, useRef } from "react";
@@ -181,6 +182,16 @@ type Uniforms = {
     type: string;
   };
 };
+
+type PreparedUniformValue =
+  | number
+  | number[]
+  | THREE.Vector2
+  | THREE.Vector3
+  | THREE.Vector3[];
+
+type PreparedUniforms = Record<string, THREE.IUniform<PreparedUniformValue>>;
+
 const ShaderMaterial = ({
   source,
   uniforms,
@@ -203,42 +214,53 @@ const ShaderMaterial = ({
     }
     lastFrameTime = timestamp;
 
-    const material: any = ref.current.material;
-    const timeLocation = material.uniforms.u_time;
+    const meshMaterial = ref.current.material;
+    if (Array.isArray(meshMaterial)) {
+      return;
+    }
+
+    if (!(meshMaterial instanceof THREE.ShaderMaterial)) {
+      return;
+    }
+
+    const timeLocation = meshMaterial.uniforms.u_time as THREE.IUniform<
+      number
+    >;
     timeLocation.value = timestamp;
   });
 
-  const getUniforms = () => {
-    const preparedUniforms: any = {};
+  const preparedUniforms = useMemo(() => {
+    const nextUniforms: PreparedUniforms = {};
 
-    for (const uniformName in uniforms) {
-      const uniform: any = uniforms[uniformName];
+    for (const [uniformName, uniform] of Object.entries(uniforms)) {
+      const uniformValue = uniform.value;
 
       switch (uniform.type) {
         case "uniform1f":
-          preparedUniforms[uniformName] = { value: uniform.value, type: "1f" };
+          nextUniforms[uniformName] = {
+            value: uniformValue as number,
+          };
           break;
         case "uniform3f":
-          preparedUniforms[uniformName] = {
-            value: new THREE.Vector3().fromArray(uniform.value),
-            type: "3f",
+          nextUniforms[uniformName] = {
+            value: new THREE.Vector3().fromArray(uniformValue as number[]),
           };
           break;
         case "uniform1fv":
-          preparedUniforms[uniformName] = { value: uniform.value, type: "1fv" };
+          nextUniforms[uniformName] = {
+            value: uniformValue as number[],
+          };
           break;
         case "uniform3fv":
-          preparedUniforms[uniformName] = {
-            value: uniform.value.map((v: number[]) =>
-              new THREE.Vector3().fromArray(v)
+          nextUniforms[uniformName] = {
+            value: (uniformValue as number[][]).map((vector) =>
+              new THREE.Vector3().fromArray(vector)
             ),
-            type: "3fv",
           };
           break;
         case "uniform2f":
-          preparedUniforms[uniformName] = {
-            value: new THREE.Vector2().fromArray(uniform.value),
-            type: "2f",
+          nextUniforms[uniformName] = {
+            value: new THREE.Vector2().fromArray(uniformValue as number[]),
           };
           break;
         default:
@@ -247,12 +269,13 @@ const ShaderMaterial = ({
       }
     }
 
-    preparedUniforms["u_time"] = { value: 0, type: "1f" };
-    preparedUniforms["u_resolution"] = {
+    nextUniforms["u_time"] = { value: 0 };
+    nextUniforms["u_resolution"] = {
       value: new THREE.Vector2(size.width * 2, size.height * 2),
-    }; // Initialize u_resolution
-    return preparedUniforms;
-  };
+    };
+
+    return nextUniforms;
+  }, [uniforms, size.height, size.width]);
 
   // Shader material
   const material = useMemo(() => {
@@ -271,7 +294,7 @@ const ShaderMaterial = ({
       }
       `,
       fragmentShader: source,
-      uniforms: getUniforms(),
+      uniforms: preparedUniforms,
       glslVersion: THREE.GLSL3,
       blending: THREE.CustomBlending,
       blendSrc: THREE.SrcAlphaFactor,
@@ -279,10 +302,10 @@ const ShaderMaterial = ({
     });
 
     return materialObject;
-  }, [size.width, size.height, source]);
+  }, [preparedUniforms, source]);
 
   return (
-    <mesh ref={ref as any}>
+    <mesh ref={ref}>
       <planeGeometry args={[2, 2]} />
       <primitive object={material} attach="material" />
     </mesh>

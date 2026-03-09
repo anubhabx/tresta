@@ -16,6 +16,8 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 ## Phase 1 — Critical blockers before MVP launch
 
+Phase status: ✅ Complete (all launch blockers in this phase are now closed)
+
 ### Release gate blockers
 
 - [x] Make API tests non-watch and CI-safe by using a one-shot `vitest run` script.
@@ -59,8 +61,8 @@ This checklist is organized in phases so launch work can move from hard blockers
 ## Phase 2 — MVP stability and user-facing correctness
 
 Current note:
-- Repo lint now completes, but the web app still emits many non-blocking warnings that should be reduced before launch hardening.
-- Latest status: warning volume has been significantly reduced; remaining warnings are now concentrated in `apps/web/components/landing/canvas-reveal-effect.tsx`.
+- Repo lint completes.
+- Latest status: `pnpm --filter web run lint` now reports zero warnings/errors.
 
 ### Core product journeys
 
@@ -83,15 +85,15 @@ Current note:
 
 ### Quality cleanup
 
-- [ ] Reduce launch-relevant warnings from the web build.
+- [x] Reduce launch-relevant warnings from the web build.
   - [x] Remove broad unused-import / dead-code warnings across account settings, project detail, project wizard, and widget embed surfaces.
   - [x] Remove low-risk `any` and no-useless-catch warnings in wizard/widget flows where behavior is unchanged.
 - [x] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
   - [x] Remove dead/unused code in moderation and dashboard cards (`activity-feed`, `pending-actions-card`, `moderation-stats-dashboard`, `moderation-testimonial-card`).
   - [x] Remove additional dashboard dead imports (`projects page`, `quick-embed`, `keyboard-shortcuts`, `recent-projects`, `theme-toggle`, `command-palette`, `landing page`).
-- [ ] Replace unsafe `any` usage in moderation and project settings forms.
+- [x] Replace unsafe `any` usage in moderation and project settings forms.
   - [x] Remove explicit `any` usage from moderation and project settings form components and switch form `watch` props to typed `UseFormWatch`.
-- [ ] Review hook dependency warnings on launch-critical components.
+- [x] Review hook dependency warnings on launch-critical components.
   - [x] Fix route-change `useEffect` dependency list in dashboard sidebar (`ui-sidebar`).
 
 ### Observability and ops
