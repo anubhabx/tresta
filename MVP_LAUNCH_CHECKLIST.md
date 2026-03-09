@@ -160,6 +160,7 @@ Current note:
 - [ ] Integration test moderation queue filtering and pagination.
 - [ ] Integration test bulk moderation with mixed valid/invalid IDs.
 - [x] Add API contract tests for owner list, moderation queue metadata, and public testimonial response fields.
+- [x] Add controller-level lifecycle coverage for owner list empty state, detail ownership checks, update publish-guard, delete flow, moderation filters, and bulk approve path.
 
 ### Widgets
 
@@ -250,14 +251,14 @@ Potential gaps for embed consumers:
 
 ### Edge cases to test explicitly
 
-- [ ] Empty list for a valid project with zero testimonials.
+- [x] Empty list for a valid project with zero testimonials.
 - [ ] Project not found.
-- [ ] Authenticated user without ownership.
+- [x] Authenticated user without ownership.
 - [ ] Invalid pagination values.
 - [ ] Testimonials with `null` rating, avatar, role, company, and media fields.
 - [ ] Testimonials with large `moderationFlags` arrays.
 - [ ] Mixed text/video testimonial datasets.
-- [ ] Inactive project or revoked API key on public fetch.
+- [x] Inactive project or revoked API key on public fetch.
 - [ ] Date serialization consistency across list, detail, moderation queue, and public API routes.
 - [ ] Backward compatibility for frontend consumers expecting current `Testimonial` shape from [apps/web/types/api.ts](apps/web/types/api.ts#L104-L131).
 
