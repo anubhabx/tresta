@@ -164,17 +164,17 @@ Phase status: ✅ Complete
 - [x] Integration test testimonial submission endpoint for happy path and invalid payloads.
 - [x] Integration test testimonial list/detail/update/delete endpoints.
 - [x] Integration test moderation queue filtering and pagination.
-- [ ] Integration test bulk moderation with mixed valid/invalid IDs.
+- [x] Integration test bulk moderation with mixed valid/invalid IDs.
 - [x] Add API contract tests for owner list, moderation queue metadata, and public testimonial response fields.
 - [x] Add controller-level lifecycle coverage for owner list empty state, detail ownership checks, update publish-guard, delete flow, moderation filters, and bulk approve path.
 
 ### Widgets
 
-- [ ] Unit test widget config normalization and defaults.
-- [ ] Unit test widget rendering for each layout.
-- [ ] Unit test CSS sanitization and CSP helpers.
-- [ ] Integration test public widget API response parsing.
-- [ ] Integration test embed bootstrapping, rate limiting, and error states.
+- [x] Unit test widget config normalization and defaults.
+- [x] Unit test widget rendering for each layout.
+- [x] Unit test CSS sanitization and CSP helpers.
+- [x] Integration test public widget API response parsing.
+- [x] Integration test embed bootstrapping, rate limiting, and error states.
 
 ### Billing and subscriptions
 
