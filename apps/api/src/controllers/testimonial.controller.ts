@@ -51,6 +51,93 @@ type SubmissionFormConfig = {
   notifyOnSubmission?: boolean;
 };
 
+type ProjectSummary = {
+  id: string;
+  slug: string;
+  name: string;
+};
+
+type TestimonialWithDates = {
+  id: string;
+  userId: string | null;
+  projectId: string | null;
+  authorName: string;
+  authorEmail: string | null;
+  authorRole: string | null;
+  authorCompany: string | null;
+  authorAvatar: string | null;
+  content: string;
+  type: "TEXT" | "VIDEO" | "AUDIO";
+  videoUrl: string | null;
+  mediaUrl: string | null;
+  source: string | null;
+  sourceUrl: string | null;
+  oembedData: unknown;
+  isPublished: boolean;
+  rating: number | null;
+  isApproved: boolean;
+  isOAuthVerified: boolean;
+  oauthProvider: string | null;
+  moderationStatus: "PENDING" | "APPROVED" | "REJECTED" | "FLAGGED";
+  moderationScore: number | null;
+  moderationFlags: unknown;
+  autoPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+const serializeProjectSummary = (project: ProjectSummary): ProjectSummary => ({
+  id: project.id,
+  slug: project.slug,
+  name: project.name,
+});
+
+const serializeOwnerTestimonial = (
+  testimonial: TestimonialWithDates,
+  project: ProjectSummary,
+) => {
+  const needsReview =
+    testimonial.moderationStatus === "PENDING" ||
+    testimonial.moderationStatus === "FLAGGED";
+
+  return {
+    id: testimonial.id,
+    userId: testimonial.userId,
+    projectId: testimonial.projectId,
+    authorName: testimonial.authorName,
+    authorEmail: testimonial.authorEmail,
+    authorRole: testimonial.authorRole,
+    authorCompany: testimonial.authorCompany,
+    authorAvatar: testimonial.authorAvatar,
+    content: testimonial.content,
+    type: testimonial.type,
+    videoUrl: testimonial.videoUrl,
+    mediaUrl: testimonial.mediaUrl,
+    source: testimonial.source,
+    sourceUrl: testimonial.sourceUrl,
+    oembedData: testimonial.oembedData,
+    isPublished: testimonial.isPublished,
+    rating: testimonial.rating,
+    isApproved: testimonial.isApproved,
+    isOAuthVerified: testimonial.isOAuthVerified,
+    oauthProvider: testimonial.oauthProvider,
+    moderationStatus: testimonial.moderationStatus,
+    moderationScore: testimonial.moderationScore,
+    moderationFlags: testimonial.moderationFlags,
+    autoPublished: testimonial.autoPublished,
+    createdAt: testimonial.createdAt.toISOString(),
+    updatedAt: testimonial.updatedAt.toISOString(),
+    project: serializeProjectSummary(project),
+    moderationContext: {
+      needsReview,
+      canAutoPublish:
+        testimonial.moderationStatus === "APPROVED" &&
+        testimonial.isApproved &&
+        !testimonial.isPublished,
+    },
+  };
+};
+
 const normalizeFormConfig = (formConfig: unknown): SubmissionFormConfig => {
   if (
     !formConfig ||
@@ -683,6 +770,11 @@ const listTestimonials = async (
 
     const project = await prisma.project.findFirst({
       where: { slug, userId },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+      },
     });
 
     if (!project) {
@@ -702,11 +794,22 @@ const listTestimonials = async (
     ]);
 
     return ResponseHandler.paginated(res, {
-      data: testimonials,
+      data: testimonials.map((testimonial) =>
+        serializeOwnerTestimonial(testimonial as TestimonialWithDates, project),
+      ),
       page,
       limit,
       total,
       message: "Testimonials retrieved successfully",
+      meta: {
+        filters: {
+          projectSlug: slug,
+        },
+        sort: {
+          field: "createdAt",
+          direction: "desc",
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -770,7 +873,9 @@ const listPublicTestimonialsByApiKey = async (
         rating: true,
         type: true,
         videoUrl: true,
+        mediaUrl: true,
         createdAt: true,
+        updatedAt: true,
         isOAuthVerified: true,
         oauthProvider: true,
       },
@@ -790,6 +895,7 @@ const listPublicTestimonialsByApiKey = async (
         testimonials: testimonials.map((testimonial) => ({
           ...testimonial,
           createdAt: testimonial.createdAt.toISOString(),
+          updatedAt: testimonial.updatedAt.toISOString(),
         })),
         total: testimonials.length,
       },
@@ -811,6 +917,11 @@ const getTestimonialById = async (
     // Verify project ownership
     const project = await prisma.project.findFirst({
       where: { slug, userId },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+      },
     });
 
     if (!project) {
@@ -831,7 +942,10 @@ const getTestimonialById = async (
 
     return ResponseHandler.success(res, {
       message: "Testimonial retrieved successfully",
-      data: testimonial,
+      data: serializeOwnerTestimonial(
+        testimonial as TestimonialWithDates,
+        project,
+      ),
     });
   } catch (error) {
     next(error);
@@ -851,6 +965,11 @@ const updateTestimonial = async (
     // Verify project ownership
     const project = await prisma.project.findFirst({
       where: { slug, userId },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+      },
     });
 
     if (!project) {
@@ -1021,23 +1140,42 @@ const getModerationQueue = async (
         stats.find((s) => s.moderationStatus === "REJECTED")?._count || 0,
     };
 
-    const response = ResponseHandler.paginated(res, {
-      data: testimonials,
+    const highRiskCount = testimonials.filter(
+      (testimonial) => (testimonial.moderationScore ?? 0) >= 0.75,
+    ).length;
+    const mediumRiskCount = testimonials.filter(
+      (testimonial) =>
+        (testimonial.moderationScore ?? 0) >= 0.4 &&
+        (testimonial.moderationScore ?? 0) < 0.75,
+    ).length;
+    const lowRiskCount = testimonials.length - highRiskCount - mediumRiskCount;
+
+    return ResponseHandler.paginated(res, {
+      data: testimonials.map((testimonial) =>
+        serializeOwnerTestimonial(testimonial as TestimonialWithDates, project),
+      ),
       page,
       limit,
       total,
       message: "Moderation queue retrieved successfully",
-    });
-
-    // Add stats to meta
-    if (response && typeof response === "object") {
-      (response as any).meta = {
-        ...(response as any).meta,
+      meta: {
         stats: moderationStats,
-      };
-    }
-
-    return response;
+        filters: {
+          status: typeof status === "string" ? status : undefined,
+          verified: verified === "true" ? true : verified === "false" ? false : undefined,
+          projectSlug: slug,
+        },
+        sort: {
+          primary: "moderationScore:desc",
+          secondary: "createdAt:desc",
+        },
+        reviewPriority: {
+          high: highRiskCount,
+          medium: mediumRiskCount,
+          low: lowRiskCount,
+        },
+      },
+    });
   } catch (error) {
     next(error);
   }

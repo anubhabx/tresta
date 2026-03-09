@@ -16,6 +16,7 @@ export interface ApiResponse<T = any> {
     timestamp: string;
     requestId?: string;
     pagination?: PaginationMeta;
+    [key: string]: unknown;
   };
 }
 
@@ -50,6 +51,7 @@ export interface PaginatedResponseOptions<T = any> {
   limit: number;
   total: number;
   message?: string;
+  meta?: Partial<ApiResponse["meta"]>;
 }
 
 /**
@@ -150,6 +152,7 @@ export class ResponseHandler {
       limit,
       total,
       message = "Request successful",
+      meta = {},
     } = options;
 
     const totalPages = Math.ceil(total / limit);
@@ -170,6 +173,7 @@ export class ResponseHandler {
       data,
       meta: {
         pagination: paginationMeta,
+        ...meta,
       },
     });
   }

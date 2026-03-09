@@ -39,13 +39,14 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 - [x] Add missing `ENCRYPTION_KEY` to [apps/api/.env.example](apps/api/.env.example).
 - [x] Add missing `NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID` to [apps/web/.env.example](apps/web/.env.example).
-- [ ] Confirm staging and production env parity for Clerk, Razorpay, Redis, Ably, Resend, Azure Blob, and Postgres.
+- [x] Confirm staging and production env parity for Clerk, Razorpay, Redis, Ably, Resend, Azure Blob, and Postgres.
   - [x] Add a parity audit command in [package.json](package.json#L9-L17) and [scripts/check-env-parity.mjs](scripts/check-env-parity.mjs).
   - [x] Document the launch-critical env matrix in [ENV_PARITY_CHECKLIST.md](ENV_PARITY_CHECKLIST.md).
   - [x] Run the parity audit against exported staging and production env files.
     - Result (2026-03-09): `pnpm env:parity .secrets/.env.staging.combined .secrets/.env.production.combined` failed on missing `CORS_ALLOWED_ORIGINS` and `API_URL` in both snapshots.
   - [x] Critical follow-up: export sanitized staging/prod env snapshots into the repo workspace (or provide paths) so `pnpm env:parity <staging.env> <production.env>` can be executed in CI and locally.
-  - [ ] Add `CORS_ALLOWED_ORIGINS` and `API_URL` to both staging and production env snapshots, then rerun parity audit.
+  - [x] Add `CORS_ALLOWED_ORIGINS` and `API_URL` to both staging and production env snapshots, then rerun parity audit.
+    - Result (2026-03-09): `pnpm env:parity .secrets/.env.staging.combined .secrets/.env.production.combined` now passes.
 - [x] Fix Prisma runtime/build-time path behavior seen during sitemap generation in [apps/web/app/sitemap.ts](apps/web/app/sitemap.ts).
 
 ### Documentation blockers
@@ -198,10 +199,10 @@ Current strengths:
 - [x] Returns full testimonial objects with moderation and publish state.
 
 Gaps to address:
-- [ ] Add related project summary or explicitly document why it is omitted.
-- [ ] Add derived flags useful to UI such as `needsReview` or `canAutoPublish` if the frontend repeatedly computes them.
-- [ ] Ensure date fields are consistently serialized as ISO strings.
-- [ ] Consider returning `meta.filters` or `meta.sort` for client traceability.
+- [x] Add related project summary or explicitly document why it is omitted.
+- [x] Add derived flags useful to UI such as `needsReview` or `canAutoPublish` if the frontend repeatedly computes them.
+- [x] Ensure date fields are consistently serialized as ISO strings.
+- [x] Consider returning `meta.filters` or `meta.sort` for client traceability.
 
 #### Owner testimonial detail
 
@@ -212,9 +213,9 @@ Current strengths:
 - [x] Returns the raw record.
 
 Gaps to address:
-- [ ] Include related project summary.
-- [ ] Include moderation context if present, especially normalized `moderationFlags`.
-- [ ] Decide whether internal-only fields such as encrypted IP metadata should remain omitted for UI safety.
+- [x] Include related project summary.
+- [x] Include moderation context if present, especially normalized `moderationFlags`.
+- [x] Decide whether internal-only fields such as encrypted IP metadata should remain omitted for UI safety.
 
 #### Moderation queue
 
@@ -226,9 +227,9 @@ Current strengths:
 - [x] Computes moderation stats.
 
 Gaps to address:
-- [ ] Confirm `meta.stats` is actually returned in the serialized response path.
-- [ ] Add explicit filter echo in response metadata.
-- [ ] Add high-risk counts or review-priority buckets if used by the dashboard.
+- [x] Confirm `meta.stats` is actually returned in the serialized response path.
+- [x] Add explicit filter echo in response metadata.
+- [x] Add high-risk counts or review-priority buckets if used by the dashboard.
 
 #### Public testimonials by API key
 
@@ -240,8 +241,8 @@ Current strengths:
 - [x] Excludes sensitive fields like email and IP data.
 
 Potential gaps for embed consumers:
-- [ ] Consider including `mediaUrl` in addition to `videoUrl` if rich media is part of MVP scope.
-- [ ] Consider including `updatedAt` if cache invalidation or freshness matters.
+- [x] Consider including `mediaUrl` in addition to `videoUrl` if rich media is part of MVP scope.
+- [x] Consider including `updatedAt` if cache invalidation or freshness matters.
 - [ ] Consider including per-project branding hints if the widget should not require a second fetch.
 
 ### Edge cases to test explicitly
@@ -260,6 +261,6 @@ Potential gaps for embed consumers:
 ### Recommended response-shape improvements
 
 - [ ] Define one canonical testimonial response DTO shared across API and web types.
-- [ ] Add explicit serializers instead of returning raw Prisma objects in owner endpoints.
+- [x] Add explicit serializers instead of returning raw Prisma objects in owner endpoints.
 - [ ] Separate public, owner, moderation, and admin testimonial DTOs.
 - [ ] Add contract tests to lock response shape before launch.
