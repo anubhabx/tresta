@@ -9,6 +9,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "quality:check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "lint": "turbo lint",
     "typecheck": "pnpm -r --if-present run typecheck",
     "test": "pnpm -r --if-present run test",
@@ -22,6 +23,7 @@
     "admin:dev": "pnpm --filter admin dev",
     "admin:build": "pnpm --filter admin build",
     "admin:start": "pnpm --filter admin start",
+    "hooks:install": "node ./scripts/install-git-hooks.mjs",
     "postinstall": "turbo run generate"
   },
   "devDependencies": {

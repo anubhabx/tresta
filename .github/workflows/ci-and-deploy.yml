@@ -1,4 +1,4 @@
-name: CI and Deploy Gate
+name: CI Quality Gate
 
 on:
   pull_request:
@@ -81,66 +81,3 @@ jobs:
 
       - name: Build ${{ matrix.app }}
         run: pnpm --filter ${{ matrix.app }} run build
-
-  deploy-digitalocean:
-    name: Trigger DigitalOcean Deploy
-    runs-on: ubuntu-latest
-    needs:
-      - quality-gate
-      - vercel-app-builds
-    if: >-
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Trigger DigitalOcean app deploy hook
-        env:
-          DO_DEPLOY_HOOK: ${{ secrets.DIGITALOCEAN_APP_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -z "$DO_DEPLOY_HOOK" ]; then
-            echo "DigitalOcean deploy hook secret is not configured; skipping deployment trigger."
-            exit 0
-          fi
-          curl -fsSL -X POST "$DO_DEPLOY_HOOK"
-
-  deploy-vercel-web:
-    name: Trigger Vercel Deploy (web)
-    runs-on: ubuntu-latest
-    needs:
-      - quality-gate
-      - vercel-app-builds
-    if: >-
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Trigger Vercel web deploy hook
-        env:
-          VERCEL_WEB_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_WEB }}
-        run: |
-          if [ -z "$VERCEL_WEB_HOOK" ]; then
-            echo "Vercel web deploy hook secret is not configured; skipping deployment trigger."
-            exit 0
-          fi
-          curl -fsSL -X POST "$VERCEL_WEB_HOOK"
-
-  deploy-vercel-admin:
-    name: Trigger Vercel Deploy (admin)
-    runs-on: ubuntu-latest
-    needs:
-      - quality-gate
-      - vercel-app-builds
-    if: >-
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Trigger Vercel admin deploy hook
-        env:
-          VERCEL_ADMIN_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_ADMIN }}
-        run: |
-          if [ -z "$VERCEL_ADMIN_HOOK" ]; then
-            echo "Vercel admin deploy hook secret is not configured; skipping deployment trigger."
-            exit 0
-          fi
-          curl -fsSL -X POST "$VERCEL_ADMIN_HOOK"
