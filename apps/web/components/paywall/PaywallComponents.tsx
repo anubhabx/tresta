@@ -142,7 +142,6 @@ interface LockedToggleProps extends BasePaywallProps {
  */
 export function LockedToggle({
   isPro,
-  featureName,
   tooltipMessage,
   requiredPlan = "pro",
   checked,
@@ -265,11 +264,9 @@ interface PremiumOptionProps extends BasePaywallProps {
 export function PremiumOption({
   isPro,
   featureName,
-  tooltipMessage,
   requiredPlan = "pro",
   children,
   onSelect,
-  isSelected,
   className,
 }: PremiumOptionProps) {
   const handleSelect = () => {
@@ -401,14 +398,7 @@ interface UseFeatureGateOptions {
 export function useFeatureGate({ isPro, onGated }: UseFeatureGateOptions) {
   const { open: openUpgradeModal } = useUpgradeModal();
 
-  const canUse = React.useCallback(
-    (feature: string): boolean => {
-      // In a real implementation, this would check a feature flags config
-      // For now, all "premium" features require Pro
-      return isPro;
-    },
-    [isPro],
-  );
+  const canUse = React.useCallback((): boolean => isPro, [isPro]);
 
   const showUpgradePrompt = React.useCallback(
     (featureName: string, plan: "pro" | "business" | "enterprise" = "pro") => {

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { toast } from "sonner";
@@ -125,7 +126,7 @@ function PrivacyManageContent() {
           </CardHeader>
           <CardContent className="flex justify-center">
             <Button asChild>
-              <a href="/">Return Home</a>
+              <Link href="/">Return Home</Link>
             </Button>
           </CardContent>
         </Card>
@@ -220,7 +221,7 @@ function PrivacyManageContent() {
                         <br />
                         <br />
                         The content of the testimonials will remain, but will be
-                        attributed to "Anonymous".
+                        attributed to &quot;Anonymous&quot;.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

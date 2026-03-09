@@ -73,7 +73,7 @@ export default function PrivacyRequestPage() {
             <div className="space-y-2">
               <h1 className="text-2xl font-bold">Check Your Email</h1>
               <p className="text-muted-foreground">
-                We've sent a magic link to the email you provided. Click the
+                We&apos;ve sent a magic link to the email you provided. Click the
                 link to access your data management portal.
               </p>
             </div>

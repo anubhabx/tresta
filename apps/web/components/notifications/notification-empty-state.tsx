@@ -10,7 +10,7 @@ export function NotificationEmptyState() {
         No notifications yet
       </h3>
       <p className="text-sm text-foreground/50 max-w-sm">
-        When you receive notifications, they'll appear here.
+        When you receive notifications, they&apos;ll appear here.
       </p>
     </div>
   );

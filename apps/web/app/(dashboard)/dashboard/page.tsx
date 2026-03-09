@@ -99,8 +99,8 @@ const DashboardPage = () => {
           </h1>
           <p className="mt-2 text-sm text-zinc-400 font-sans">
             Welcome back
-            {user.user?.firstName ? `, ${user.user.firstName}` : ""}! Here's
-            what's happening.
+            {user.user?.firstName ? `, ${user.user.firstName}` : ""}! Here&apos;s
+            what&apos;s happening.
           </p>
         </div>
         <Button

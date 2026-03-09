@@ -73,7 +73,7 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
         <div className="text-center">
           <h2 className="text-2xl font-bold">Project Not Found</h2>
           <p className="text-muted-foreground mt-2">
-            The project you're looking for doesn't exist or you don't have
+            The project you&apos;re looking for doesn&apos;t exist or you don&apos;t have
             access to it.
           </p>
           <Link href="/projects">

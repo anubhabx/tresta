@@ -59,7 +59,7 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 Current note:
 - Repo lint now completes, but the web app still emits many non-blocking warnings that should be reduced before launch hardening.
-- Latest status: warning volume has been significantly reduced; the remaining hotspots are mostly `react/no-unescaped-entities` content strings and the complex `canvas-reveal-effect` component lint/type warnings.
+- Latest status: warning volume has been significantly reduced; remaining warnings are now concentrated in `apps/web/components/landing/canvas-reveal-effect.tsx`.
 
 ### Core product journeys
 

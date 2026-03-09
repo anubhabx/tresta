@@ -68,7 +68,7 @@ export function NotificationSettings() {
 
           {preferences?.emailEnabled && (
             <div className="rounded-lg bg-muted p-4 space-y-2 max-w-md">
-              <h4 className="text-sm font-medium">What you'll receive:</h4>
+              <h4 className="text-sm font-medium">What you&apos;ll receive:</h4>
               <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Immediate emails for critical alerts</li>
                 <li>Daily digest of non-critical notifications (9 AM UTC)</li>
@@ -90,8 +90,8 @@ export function NotificationSettings() {
 
         <div className="rounded-lg bg-muted p-4 max-w-md">
           <p className="text-sm text-muted-foreground">
-            You'll always receive real-time notifications in the app via the
-            notification bell. These appear instantly when you're logged in.
+            You&apos;ll always receive real-time notifications in the app via the
+            notification bell. These appear instantly when you&apos;re logged in.
           </p>
         </div>
       </div>
