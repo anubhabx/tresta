@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { siteConfig } from "@/config/site";
 import { SiteHeader } from "@/components/landing/site-header";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorks } from "@/components/landing/how-it-works";

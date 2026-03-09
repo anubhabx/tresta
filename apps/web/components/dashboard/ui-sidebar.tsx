@@ -60,7 +60,7 @@ const UISidebar = () => {
   // Close mobile sidebar on route change
   useEffect(() => {
     if (isMobile) setOpenMobile(false);
-  }, [pathname]);
+  }, [isMobile, pathname, setOpenMobile]);
 
   // Fetch projects list - will automatically update when new project is created
   const { data: projectsData, isLoading: isLoadingProjects } =

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { Card, CardContent } from "@workspace/ui/components/card";
 import { FolderIcon, ClockIcon } from "lucide-react";
 import type { Project } from "@/types/api";
 

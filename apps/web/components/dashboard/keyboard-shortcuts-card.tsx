@@ -2,9 +2,6 @@
 
 import {
   Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
 } from "@workspace/ui/components/card";
 import { Kbd } from "@workspace/ui/components/kbd";
 import { Keyboard } from "lucide-react";

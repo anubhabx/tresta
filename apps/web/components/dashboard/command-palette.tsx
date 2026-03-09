@@ -20,7 +20,6 @@ import {
   Search,
   FileText,
   Code,
-  Palette,
   Sun,
   Moon,
   Monitor,

@@ -74,16 +74,19 @@ Current note:
 - [ ] Verify widget builder flow: create, edit, preview, publish, embed copy.
 - [ ] Verify public widget consumption with a real API key and external site embed.
 - [ ] Verify billing lifecycle: checkout, webhook processing, plan upgrades, downgrades, failed payments, cancellation.
+  - [ ] Depends on staging credentials + env parity evidence for Razorpay/Clerk/Redis/Postgres before end-to-end verification is reliable.
 - [ ] Verify privacy workflows: data export and deletion request lifecycle.
 
 ### Quality cleanup
 
 - [ ] Reduce launch-relevant warnings from the web build.
-- [ ] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
+- [x] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
   - [x] Remove dead/unused code in moderation and dashboard cards (`activity-feed`, `pending-actions-card`, `moderation-stats-dashboard`, `moderation-testimonial-card`).
+  - [x] Remove additional dashboard dead imports (`projects page`, `quick-embed`, `keyboard-shortcuts`, `recent-projects`, `theme-toggle`, `command-palette`, `landing page`).
 - [ ] Replace unsafe `any` usage in moderation and project settings forms.
   - [x] Remove explicit `any` usage from moderation and project settings form components and switch form `watch` props to typed `UseFormWatch`.
 - [ ] Review hook dependency warnings on launch-critical components.
+  - [x] Fix route-change `useEffect` dependency list in dashboard sidebar (`ui-sidebar`).
 
 ### Observability and ops
 
@@ -105,6 +108,7 @@ Current note:
 - [ ] Patch vulnerable container base images in [Dockerfile](Dockerfile#L1-L21).
 - [ ] Re-run rate-limit and abuse prevention verification on all public endpoints.
 - [ ] Verify webhook signature enforcement for Clerk and Razorpay in staging.
+  - [ ] Depends on parity-complete staging env and webhook secrets.
 - [ ] Review CORS, CSP, upload limits, and SAS URL expiry configuration.
 - [ ] Confirm backup, restore, and rollback procedures.
 - [ ] Write a production runbook for deploy, rollback, queue recovery, and webhook replay.

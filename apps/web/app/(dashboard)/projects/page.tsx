@@ -4,14 +4,7 @@ import { EmptyProjects } from "@/components/dashboard/empty-projects";
 import { ProjectsListPageSkeleton } from "@/components/skeletons";
 import { projects } from "@/lib/queries";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
+import { Card } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   FolderIcon,
