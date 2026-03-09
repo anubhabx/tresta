@@ -39,6 +39,7 @@ router.post(
 // Public API access (rate-limited by API key): fetch all published testimonials for a project
 router.get(
   "/projects/:slug/testimonials",
+  publicRateLimitMiddleware,
   validateApiKeyMiddleware,
   requirePermission("testimonials"),
   listPublicTestimonialsByApiKey,

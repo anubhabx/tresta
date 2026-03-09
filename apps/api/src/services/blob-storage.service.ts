@@ -11,6 +11,11 @@ import { logger } from '../lib/logger.js';
 
 const blobStorageLogger = logger.child({ module: 'blob-storage-service' });
 
+const MIN_UPLOAD_SAS_MINUTES = 1;
+const MAX_UPLOAD_SAS_MINUTES = 30;
+const MIN_READ_SAS_MINUTES = 1;
+const MAX_READ_SAS_MINUTES = 240;
+
 // Environment variables
 const getStorageConfig = () => {
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME || "";
@@ -289,6 +294,11 @@ class BlobStorageService {
         userId,
       } = options;
 
+      const normalizedExpiry = Math.max(
+        MIN_UPLOAD_SAS_MINUTES,
+        Math.min(MAX_UPLOAD_SAS_MINUTES, expiresInMinutes),
+      );
+
       const { accountName, containerName } = getStorageConfig();
       const credentials = getCredentials();
 
@@ -301,7 +311,7 @@ class BlobStorageService {
 
       // Set expiry time
       const expiresOn = new Date(
-        new Date().valueOf() + expiresInMinutes * 60 * 1000,
+        new Date().valueOf() + normalizedExpiry * 60 * 1000,
       );
 
       // Generate SAS token with create and write permissions
@@ -343,11 +353,20 @@ class BlobStorageService {
     expiresInMinutes: number = 60,
   ): Promise<string> {
     try {
+      if (!Number.isFinite(expiresInMinutes)) {
+        throw new InternalServerError("Invalid read URL expiry time provided");
+      }
+
+      const normalizedExpiry = Math.max(
+        MIN_READ_SAS_MINUTES,
+        Math.min(MAX_READ_SAS_MINUTES, expiresInMinutes),
+      );
+
       const { accountName, containerName } = getStorageConfig();
       const credentials = getCredentials();
 
       const expiresOn = new Date(
-        new Date().valueOf() + expiresInMinutes * 60 * 1000,
+        new Date().valueOf() + normalizedExpiry * 60 * 1000,
       );
 
       const sasToken = generateBlobSASQueryParameters(
