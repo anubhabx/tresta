@@ -148,9 +148,9 @@ Phase status: ✅ Complete
 
 ### Projects
 
-- [ ] Unit test project validation, slug normalization, and duplicate detection.
-- [ ] Integration test create/update/delete project endpoints.
-- [ ] Integration test project visibility and inactive project behavior.
+- [x] Unit test project validation, slug normalization, and duplicate detection.
+- [x] Integration test create/update/delete project endpoints.
+- [x] Integration test project visibility and inactive project behavior.
 
 ### Testimonials
 
