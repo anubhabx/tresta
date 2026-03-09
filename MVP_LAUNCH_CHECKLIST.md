@@ -261,12 +261,12 @@ Potential gaps for embed consumers:
 - [x] Project not found.
 - [x] Authenticated user without ownership.
 - [x] Invalid pagination values.
-- [ ] Testimonials with `null` rating, avatar, role, company, and media fields.
-- [ ] Testimonials with large `moderationFlags` arrays.
-- [ ] Mixed text/video testimonial datasets.
+- [x] Testimonials with `null` rating, avatar, role, company, and media fields.
+- [x] Testimonials with large `moderationFlags` arrays.
+- [x] Mixed text/video testimonial datasets.
 - [x] Inactive project or revoked API key on public fetch.
-- [ ] Date serialization consistency across list, detail, moderation queue, and public API routes.
-- [ ] Backward compatibility for frontend consumers expecting current `Testimonial` shape from [apps/web/types/api.ts](apps/web/types/api.ts#L104-L131).
+- [x] Date serialization consistency across list, detail, moderation queue, and public API routes.
+- [x] Backward compatibility for frontend consumers expecting current `Testimonial` shape from [apps/web/types/api.ts](apps/web/types/api.ts#L104-L131).
 
 ### Recommended response-shape improvements
 
