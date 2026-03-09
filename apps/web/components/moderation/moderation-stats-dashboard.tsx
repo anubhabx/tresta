@@ -3,8 +3,6 @@
 import { Badge } from "@workspace/ui/components/badge";
 import {
   AlertTriangle,
-  CheckCircle2,
-  Clock,
   XCircle,
   Shield,
   Zap,

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Card } from "@workspace/ui/components/card";
 import { AlertCircleIcon, InboxIcon, TrendingUpIcon } from "lucide-react";
 import type { Project } from "@/types/api";
 
@@ -10,13 +10,6 @@ interface PendingActionsCardProps {
 }
 
 export function PendingActionsCard({ projects }: PendingActionsCardProps) {
-  // Calculate pending testimonials (assuming pending = not approved)
-  const totalPending = projects.reduce((acc, project) => {
-    // This would need actual pending count from API
-    // For now, we'll show projects with zero testimonials as needing attention
-    return acc;
-  }, 0);
-
   // Find projects with zero testimonials
   const projectsNeedingTestimonials = projects.filter(
     (p) => (p._count?.testimonials || 0) === 0,

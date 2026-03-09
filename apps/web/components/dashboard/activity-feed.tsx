@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
+import { Card } from "@workspace/ui/components/card";
 import {
   MessageSquare,
   Check,
@@ -201,7 +196,7 @@ export function ActivityFeed({
       </div>
 
       <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
-        {visibleItems.map((item, index) => (
+        {visibleItems.map((item) => (
           <div key={item.id} className="relative flex items-start gap-4 z-10">
             <div className="relative z-10 -ml-[11px] md:ml-0 md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center justify-center bg-background rounded-full border border-white/10 shadow-[0_0_15px_-3px_rgba(0,0,0,0.5)]">
               <ActivityIcon type={item.type} />

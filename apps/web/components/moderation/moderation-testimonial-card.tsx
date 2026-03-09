@@ -5,13 +5,11 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { CustomAvatar } from "@workspace/ui/components/avatar";
 import {
-  AlertTriangle,
   CheckCircle2,
   XCircle,
   Trash2,
   Shield,
   Star,
-  User,
   Mail,
   Loader2,
 } from "lucide-react";

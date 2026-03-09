@@ -80,6 +80,7 @@ Current note:
 
 - [ ] Reduce launch-relevant warnings from the web build.
 - [ ] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
+  - [x] Remove dead/unused code in moderation and dashboard cards (`activity-feed`, `pending-actions-card`, `moderation-stats-dashboard`, `moderation-testimonial-card`).
 - [ ] Replace unsafe `any` usage in moderation and project settings forms.
   - [x] Remove explicit `any` usage from moderation and project settings form components and switch form `watch` props to typed `UseFormWatch`.
 - [ ] Review hook dependency warnings on launch-critical components.
