@@ -1,9 +1,13 @@
-FROM node:22-alpine AS builder
+ARG NODE_IMAGE=node:22-alpine3.21
+
+FROM ${NODE_IMAGE} AS builder
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN corepack enable && apk add --no-cache openssl ca-certificates libc6-compat
+RUN corepack enable \
+	&& apk add --no-cache openssl ca-certificates libc6-compat \
+	&& apk upgrade --no-cache
 
 WORKDIR /app
 
@@ -18,14 +22,16 @@ RUN pnpm --filter @workspace/database build
 RUN pnpm --filter @workspace/widget build
 RUN pnpm --filter api build
 
-FROM node:22-alpine AS runner
+FROM ${NODE_IMAGE} AS runner
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_ENV=production
 ENV PORT=8000
 
-RUN corepack enable && apk add --no-cache openssl ca-certificates
+RUN corepack enable \
+	&& apk add --no-cache openssl ca-certificates \
+	&& apk upgrade --no-cache
 
 WORKDIR /app
 

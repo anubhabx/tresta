@@ -113,7 +113,7 @@ Current note:
 
 ## Phase 3 — Security and operational readiness
 
-- [ ] Patch vulnerable container base images in [Dockerfile](Dockerfile#L1-L21).
+- [x] Patch vulnerable container base images in [Dockerfile](Dockerfile#L1-L21).
 - [ ] Re-run rate-limit and abuse prevention verification on all public endpoints.
 - [ ] Verify webhook signature enforcement for Clerk and Razorpay in staging.
   - [ ] Depends on parity-complete staging env and webhook secrets.
