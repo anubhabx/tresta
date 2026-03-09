@@ -253,7 +253,7 @@ Current strengths:
 Potential gaps for embed consumers:
 - [x] Consider including `mediaUrl` in addition to `videoUrl` if rich media is part of MVP scope.
 - [x] Consider including `updatedAt` if cache invalidation or freshness matters.
-- [ ] Consider including per-project branding hints if the widget should not require a second fetch.
+- [x] Consider including per-project branding hints if the widget should not require a second fetch.
 
 ### Edge cases to test explicitly
 
@@ -270,7 +270,7 @@ Potential gaps for embed consumers:
 
 ### Recommended response-shape improvements
 
-- [ ] Define one canonical testimonial response DTO shared across API and web types.
+- [x] Define one canonical testimonial response DTO shared across API and web types.
 - [x] Add explicit serializers instead of returning raw Prisma objects in owner endpoints.
-- [ ] Separate public, owner, moderation, and admin testimonial DTOs.
+- [x] Separate public, owner, moderation, and admin testimonial DTOs.
 - [x] Add contract tests to lock response shape before launch.
