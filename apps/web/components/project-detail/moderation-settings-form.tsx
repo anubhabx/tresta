@@ -7,13 +7,12 @@ import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "sonner";
-import { Loader2, Save, Shield, Info } from "lucide-react";
+import { Loader2, Save, Info } from "lucide-react";
 import type { Project } from "@/types/api";
 import {
   moderationSettingsFormSchema,
@@ -27,11 +26,6 @@ import {
 } from "@/components/forms/moderation";
 import { projects } from "@/lib/queries";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@workspace/ui/components/alert";
 
 interface ModerationSettingsFormProps {
   project: Project;
@@ -56,7 +50,7 @@ export function ModerationSettingsForm({
       await updateMutation.mutateAsync(payload);
 
       toast.success("Moderation settings updated successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update moderation settings:", error);
       toast.error(
         getHttpErrorMessage(error, "Failed to update moderation settings"),

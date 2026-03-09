@@ -1,6 +1,6 @@
 "use client";
 
-import { Control } from "react-hook-form";
+import { Control, UseFormWatch } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -27,7 +27,7 @@ import {
 
 interface CoreModerationSettingsProps {
   control: Control<ModerationSettingsFormData>;
-  watch: (name: keyof ModerationSettingsFormData) => any;
+  watch: UseFormWatch<ModerationSettingsFormData>;
 }
 
 export function CoreModerationSettings({

@@ -2,7 +2,7 @@
 
 Status owner: product + engineering
 Branch: `chore/mvp-launch-phases`
-Last updated: 2026-03-08
+Last updated: 2026-03-09
 
 This checklist is organized in phases so launch work can move from hard blockers to post-launch quality upgrades.
 
@@ -43,6 +43,7 @@ This checklist is organized in phases so launch work can move from hard blockers
   - [x] Add a parity audit command in [package.json](package.json#L9-L17) and [scripts/check-env-parity.mjs](scripts/check-env-parity.mjs).
   - [x] Document the launch-critical env matrix in [ENV_PARITY_CHECKLIST.md](ENV_PARITY_CHECKLIST.md).
   - [ ] Run the parity audit against exported staging and production env files.
+  - [ ] Critical follow-up: export sanitized staging/prod env snapshots into the repo workspace (or provide paths) so `pnpm env:parity <staging.env> <production.env>` can be executed in CI and locally.
 - [x] Fix Prisma runtime/build-time path behavior seen during sitemap generation in [apps/web/app/sitemap.ts](apps/web/app/sitemap.ts).
 
 ### Documentation blockers
@@ -80,6 +81,7 @@ Current note:
 - [ ] Reduce launch-relevant warnings from the web build.
 - [ ] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
 - [ ] Replace unsafe `any` usage in moderation and project settings forms.
+  - [x] Remove explicit `any` usage from moderation and project settings form components and switch form `watch` props to typed `UseFormWatch`.
 - [ ] Review hook dependency warnings on launch-critical components.
 
 ### Observability and ops

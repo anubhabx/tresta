@@ -18,7 +18,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { Switch } from "@workspace/ui/components/switch";
 import { Separator } from "@workspace/ui/components/separator";
 import { toast } from "sonner";
-import { Loader2, Save, FileText } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import type { Project } from "@/types/api";
 import {
   formConfigSchema,
@@ -28,11 +28,6 @@ import {
 } from "@/lib/schemas/form-config-schema";
 import { projects } from "@/lib/queries";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@workspace/ui/components/alert";
 
 interface FormConfigSettingsProps {
   project: Project;
@@ -53,7 +48,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
       const payload = convertFormConfigToPayload(data);
       await updateMutation.mutateAsync({ formConfig: payload });
       toast.success("Collection form settings updated successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update form config:", error);
       toast.error(getHttpErrorMessage(error, "Failed to update form settings"));
     } finally {

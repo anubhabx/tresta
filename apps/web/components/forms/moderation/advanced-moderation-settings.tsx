@@ -1,6 +1,6 @@
 "use client";
 
-import { Control } from "react-hook-form";
+import { Control, UseFormWatch } from "react-hook-form";
 import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { ModerationSettingsFormData } from "@/lib/schemas/moderation-settings-schema";
 import { Info } from "lucide-react";
@@ -13,7 +13,7 @@ import {
 
 interface AdvancedModerationSettingsProps {
   control: Control<ModerationSettingsFormData>;
-  watch: (name: keyof ModerationSettingsFormData) => any;
+  watch: UseFormWatch<ModerationSettingsFormData>;
 }
 
 export function AdvancedModerationSettings({
