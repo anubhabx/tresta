@@ -31,88 +31,37 @@ export default function OgImage() {
             marginBottom: "32px",
           }}
         >
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 18,
-              background: "#101720",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-            }}
+          <svg
+            width="72"
+            height="72"
+            viewBox="0 0 72 72"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <div
-              style={{
-                position: "absolute",
-                left: 14,
-                top: 16,
-                width: 18,
-                height: 8,
-                borderRadius: 4,
-                background: "#ffffff",
-              }}
+            <rect width="72" height="72" rx="18" fill="#101720" />
+            <rect x="14" y="16" width="18" height="8" rx="4" fill="white" />
+            <rect x="14" y="26" width="8" height="16" rx="4" fill="white" />
+            <rect
+              x="38"
+              y="16"
+              width="18"
+              height="8"
+              rx="4"
+              fill="white"
+              opacity="0.3"
             />
-            <div
-              style={{
-                position: "absolute",
-                left: 14,
-                top: 26,
-                width: 8,
-                height: 16,
-                borderRadius: 4,
-                background: "#ffffff",
-              }}
+            <rect
+              x="38"
+              y="26"
+              width="8"
+              height="16"
+              rx="4"
+              fill="white"
+              opacity="0.3"
             />
-            <div
-              style={{
-                position: "absolute",
-                left: 38,
-                top: 16,
-                width: 18,
-                height: 8,
-                borderRadius: 4,
-                background: "#ffffff",
-                opacity: 0.3,
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                left: 38,
-                top: 26,
-                width: 8,
-                height: 16,
-                borderRadius: 4,
-                background: "#ffffff",
-                opacity: 0.3,
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                left: 49,
-                top: 49,
-                width: 12,
-                height: 12,
-                borderRadius: 999,
-                background: "#4A3BFF",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 999,
-                  background: "#ffffff",
-                }}
-              />
-            </div>
-          </div>
+            <circle cx="55" cy="55" r="6" fill="#4A3BFF" />
+            <circle cx="55" cy="55" r="3" fill="white" />
+          </svg>
           <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-0.02em" }}>
             Tresta
           </span>
