@@ -185,14 +185,14 @@ Phase status: ✅ Complete
 
 ### Notifications, jobs, and workers
 
-- [ ] Unit test notification eligibility and preference filtering.
-- [ ] Unit test queue enqueue/idempotency behavior.
-- [ ] Integration test worker processing for success, retry, and dead-letter scenarios.
+- [x] Unit test notification eligibility and preference filtering.
+- [x] Unit test queue enqueue/idempotency behavior.
+- [x] Integration test worker processing for success, retry, and dead-letter scenarios.
 
 ### Privacy and compliance
 
-- [ ] Unit test export formatting and deletion helpers.
-- [ ] Integration test privacy request flows and authorization checks.
+- [x] Unit test export formatting and deletion helpers.
+- [x] Integration test privacy request flows and authorization checks.
 
 ---
 
