@@ -4,16 +4,14 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "@workspace/database/prisma";
 import { moderateTestimonial } from "../src/services/moderation.service.js";
 
-let createTestimonial: (
+type ControllerHandler = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Promise<void>;
-let listTestimonials: (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => Promise<void>;
+) => Promise<unknown>;
+
+let createTestimonial: ControllerHandler | null = null;
+let listTestimonials: ControllerHandler | null = null;
 
 vi.mock("@workspace/database/prisma", () => ({
   prisma: {
@@ -92,6 +90,19 @@ const createResponse = () => {
 
 const createNext = () => vi.fn<NextFunction>();
 
+const loadController = async () => {
+  if (createTestimonial && listTestimonials) {
+    return;
+  }
+
+  const testimonialController = await import(
+    "../src/controllers/testimonial.controller.js"
+  );
+
+  createTestimonial = testimonialController.createTestimonial;
+  listTestimonials = testimonialController.listTestimonials;
+};
+
 describe("testimonial submission + pagination integration coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -105,25 +116,14 @@ describe("testimonial submission + pagination integration coverage", () => {
   });
 
   it("loads controller exports", async () => {
-    const testimonialController = await import(
-      "../src/controllers/testimonial.controller.js"
-    );
-
-    createTestimonial = testimonialController.createTestimonial;
-    listTestimonials = testimonialController.listTestimonials;
+    await loadController();
 
     expect(createTestimonial).toBeDefined();
     expect(listTestimonials).toBeDefined();
   });
 
   it("submits testimonial successfully for valid payload", async () => {
-    if (!createTestimonial) {
-      const testimonialController = await import(
-        "../src/controllers/testimonial.controller.js"
-      );
-      createTestimonial = testimonialController.createTestimonial;
-      listTestimonials = testimonialController.listTestimonials;
-    }
+    await loadController();
 
     mockedPrisma.project.findUnique.mockResolvedValue({
       id: "proj_1",
@@ -174,7 +174,7 @@ describe("testimonial submission + pagination integration coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await createTestimonial(req, res, next as unknown as NextFunction);
+    await createTestimonial!(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.create).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(201);
@@ -187,13 +187,7 @@ describe("testimonial submission + pagination integration coverage", () => {
   });
 
   it("rejects testimonial submission with invalid payload", async () => {
-    if (!createTestimonial) {
-      const testimonialController = await import(
-        "../src/controllers/testimonial.controller.js"
-      );
-      createTestimonial = testimonialController.createTestimonial;
-      listTestimonials = testimonialController.listTestimonials;
-    }
+    await loadController();
 
     const req = {
       params: { slug: "demo-project" },
@@ -209,7 +203,7 @@ describe("testimonial submission + pagination integration coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await createTestimonial(req, res, next as unknown as NextFunction);
+    await createTestimonial!(req, res, next as unknown as NextFunction);
 
     expect(next).toHaveBeenCalledTimes(1);
     const error = next.mock.calls[0]?.[0] as unknown as Error;
@@ -218,13 +212,7 @@ describe("testimonial submission + pagination integration coverage", () => {
   });
 
   it("returns not found when project slug does not exist", async () => {
-    if (!createTestimonial) {
-      const testimonialController = await import(
-        "../src/controllers/testimonial.controller.js"
-      );
-      createTestimonial = testimonialController.createTestimonial;
-      listTestimonials = testimonialController.listTestimonials;
-    }
+    await loadController();
 
     mockedPrisma.project.findUnique.mockResolvedValue(null);
 
@@ -243,7 +231,7 @@ describe("testimonial submission + pagination integration coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await createTestimonial(req, res, next as unknown as NextFunction);
+    await createTestimonial!(req, res, next as unknown as NextFunction);
 
     expect(next).toHaveBeenCalledTimes(1);
     const error = next.mock.calls[0]?.[0] as unknown as Error;
@@ -252,13 +240,7 @@ describe("testimonial submission + pagination integration coverage", () => {
   });
 
   it("normalizes invalid pagination values instead of failing", async () => {
-    if (!listTestimonials) {
-      const testimonialController = await import(
-        "../src/controllers/testimonial.controller.js"
-      );
-      createTestimonial = testimonialController.createTestimonial;
-      listTestimonials = testimonialController.listTestimonials;
-    }
+    await loadController();
 
     mockedPrisma.project.findFirst.mockResolvedValue({
       id: "proj_1",
@@ -278,7 +260,7 @@ describe("testimonial submission + pagination integration coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await listTestimonials(req, res, next as unknown as NextFunction);
+    await listTestimonials!(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.findMany).toHaveBeenCalledWith(
       expect.objectContaining({

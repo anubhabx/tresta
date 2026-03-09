@@ -69,6 +69,71 @@ describe("testimonial controller lifecycle coverage", () => {
     vi.clearAllMocks();
   });
 
+  it("returns owner testimonial list with pagination metadata", async () => {
+    mockedPrisma.project.findFirst.mockResolvedValue({
+      id: "proj_1",
+      slug: "demo-project",
+      name: "Demo Project",
+    });
+    mockedPrisma.testimonial.findMany.mockResolvedValue([
+      {
+        id: "t_10",
+        userId: null,
+        projectId: "proj_1",
+        authorName: "A",
+        authorEmail: "a@example.com",
+        authorRole: null,
+        authorCompany: null,
+        authorAvatar: null,
+        content: "Some testimonial content",
+        type: "TEXT",
+        videoUrl: null,
+        mediaUrl: null,
+        source: null,
+        sourceUrl: null,
+        oembedData: null,
+        isPublished: false,
+        rating: 4,
+        isApproved: true,
+        isOAuthVerified: false,
+        oauthProvider: null,
+        moderationStatus: "APPROVED",
+        moderationScore: 0.1,
+        moderationFlags: null,
+        autoPublished: false,
+        createdAt: new Date("2026-03-09T10:00:00.000Z"),
+        updatedAt: new Date("2026-03-09T10:00:00.000Z"),
+      },
+    ]);
+    mockedPrisma.testimonial.count.mockResolvedValue(23);
+
+    const req = {
+      params: { slug: "demo-project" },
+      query: { page: "2", limit: "10" },
+      user: { id: "user_1" },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = createNext();
+
+    await listTestimonials(req, res, next as unknown as NextFunction);
+
+    expect(mockedPrisma.testimonial.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 10, take: 10 }),
+    );
+
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.meta.pagination).toMatchObject({
+      page: 2,
+      limit: 10,
+      total: 23,
+      totalPages: 3,
+      hasNextPage: true,
+      hasPreviousPage: true,
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it("returns empty owner testimonial list for a valid project", async () => {
     mockedPrisma.project.findFirst.mockResolvedValue({
       id: "proj_1",
@@ -114,6 +179,64 @@ describe("testimonial controller lifecycle coverage", () => {
     expect(error.message).toContain("Project not found or you don't have access");
   });
 
+  it("returns testimonial detail for owned project", async () => {
+    mockedPrisma.project.findFirst.mockResolvedValue({
+      id: "proj_1",
+      slug: "demo-project",
+      name: "Demo Project",
+    });
+    mockedPrisma.testimonial.findFirst.mockResolvedValue({
+      id: "t_1",
+      userId: null,
+      projectId: "proj_1",
+      authorName: "A",
+      authorEmail: "a@example.com",
+      authorRole: null,
+      authorCompany: null,
+      authorAvatar: null,
+      content: "Detailed testimonial",
+      type: "TEXT",
+      videoUrl: null,
+      mediaUrl: null,
+      source: null,
+      sourceUrl: null,
+      oembedData: null,
+      isPublished: false,
+      rating: 5,
+      isApproved: true,
+      isOAuthVerified: true,
+      oauthProvider: "google",
+      moderationStatus: "APPROVED",
+      moderationScore: 0.05,
+      moderationFlags: null,
+      autoPublished: false,
+      createdAt: new Date("2026-03-09T10:00:00.000Z"),
+      updatedAt: new Date("2026-03-09T10:00:00.000Z"),
+    });
+
+    const req = {
+      params: { slug: "demo-project", id: "t_1" },
+      user: { id: "user_1" },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = createNext();
+
+    await getTestimonialById(req, res, next as unknown as NextFunction);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.data).toMatchObject({
+      id: "t_1",
+      project: {
+        id: "proj_1",
+        slug: "demo-project",
+        name: "Demo Project",
+      },
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it("prevents publishing unapproved testimonial in update endpoint", async () => {
     mockedPrisma.project.findFirst.mockResolvedValue({
       id: "proj_1",
@@ -141,6 +264,50 @@ describe("testimonial controller lifecycle coverage", () => {
     const error = next.mock.calls[0]?.[0] as unknown as Error;
     expect(error).toBeDefined();
     expect(error.message).toContain("Cannot publish unapproved testimonial");
+  });
+
+  it("updates testimonial moderation fields for owned project", async () => {
+    mockedPrisma.project.findFirst.mockResolvedValue({
+      id: "proj_1",
+      slug: "demo-project",
+      name: "Demo Project",
+    });
+    mockedPrisma.testimonial.findFirst.mockResolvedValue({
+      id: "t_1",
+      projectId: "proj_1",
+      isApproved: true,
+    });
+    mockedPrisma.testimonial.update.mockResolvedValue({
+      id: "t_1",
+      moderationStatus: "APPROVED",
+      isApproved: true,
+      isPublished: true,
+    });
+
+    const req = {
+      params: { slug: "demo-project", id: "t_1" },
+      body: {
+        moderationStatus: "APPROVED",
+        isApproved: true,
+        isPublished: true,
+      },
+      user: { id: "user_1" },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = createNext();
+
+    await updateTestimonial(req, res, next as unknown as NextFunction);
+
+    expect(mockedPrisma.testimonial.update).toHaveBeenCalledWith({
+      where: { id: "t_1" },
+      data: {
+        isPublished: true,
+        isApproved: true,
+        moderationStatus: "APPROVED",
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(next).not.toHaveBeenCalled();
   });
 
   it("deletes testimonial when ownership and membership checks pass", async () => {
@@ -200,6 +367,43 @@ describe("testimonial controller lifecycle coverage", () => {
       }),
     );
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("returns moderation queue pagination metadata for requested page", async () => {
+    mockedPrisma.project.findFirst.mockResolvedValue({
+      id: "proj_1",
+      slug: "demo-project",
+      name: "Demo Project",
+    });
+    mockedPrisma.testimonial.findMany.mockResolvedValue([]);
+    mockedPrisma.testimonial.count.mockResolvedValue(26);
+    mockedPrisma.testimonial.groupBy.mockResolvedValue([]);
+
+    const req = {
+      params: { slug: "demo-project" },
+      query: { page: "2", limit: "10" },
+      user: { id: "user_1" },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = createNext();
+
+    await getModerationQueue(req, res, next as unknown as NextFunction);
+
+    expect(mockedPrisma.testimonial.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 10, take: 10 }),
+    );
+
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.meta.pagination).toMatchObject({
+      page: 2,
+      limit: 10,
+      total: 26,
+      totalPages: 3,
+      hasNextPage: true,
+      hasPreviousPage: true,
+    });
     expect(next).not.toHaveBeenCalled();
   });
 

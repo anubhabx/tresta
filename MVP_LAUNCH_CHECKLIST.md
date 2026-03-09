@@ -162,8 +162,8 @@ Phase status: ✅ Complete
 - [ ] Unit test moderation heuristics and scoring.
 - [ ] Unit test duplicate-content detection and reviewer behavior analysis.
 - [x] Integration test testimonial submission endpoint for happy path and invalid payloads.
-- [ ] Integration test testimonial list/detail/update/delete endpoints.
-- [ ] Integration test moderation queue filtering and pagination.
+- [x] Integration test testimonial list/detail/update/delete endpoints.
+- [x] Integration test moderation queue filtering and pagination.
 - [ ] Integration test bulk moderation with mixed valid/invalid IDs.
 - [x] Add API contract tests for owner list, moderation queue metadata, and public testimonial response fields.
 - [x] Add controller-level lifecycle coverage for owner list empty state, detail ownership checks, update publish-guard, delete flow, moderation filters, and bulk approve path.
