@@ -113,13 +113,16 @@ Current note:
 
 ## Phase 3 — Security and operational readiness
 
+Phase status: 🚧 In progress (all local/code tasks complete; live staging webhook probe still pending reachable staging API URL)
+
 - [x] Patch vulnerable container base images in [Dockerfile](Dockerfile#L1-L21).
-- [ ] Re-run rate-limit and abuse prevention verification on all public endpoints.
+- [x] Re-run rate-limit and abuse prevention verification on all public endpoints.
 - [ ] Verify webhook signature enforcement for Clerk and Razorpay in staging.
-  - [ ] Depends on parity-complete staging env and webhook secrets.
-- [ ] Review CORS, CSP, upload limits, and SAS URL expiry configuration.
-- [ ] Confirm backup, restore, and rollback procedures.
-- [ ] Write a production runbook for deploy, rollback, queue recovery, and webhook replay.
+  - [x] Depends on parity-complete staging env and webhook secrets.
+  - [ ] Local/code verification complete (tests + middleware), but live probe is blocked when env snapshots point `API_URL` to localhost. Execute [staging webhook verification playbook](PRODUCTION_RUNBOOK.md#7-staging-webhook-verification-playbook) once a reachable staging URL is provided.
+- [x] Review CORS, CSP, upload limits, and SAS URL expiry configuration.
+- [x] Confirm backup, restore, and rollback procedures.
+- [x] Write a production runbook for deploy, rollback, queue recovery, and webhook replay.
 
 ---
 
