@@ -62,7 +62,7 @@ const createResponse = () => {
   };
 };
 
-const createNext = () => vi.fn<Parameters<NextFunction>, void>();
+const createNext = () => vi.fn<NextFunction>();
 
 describe("testimonial controller lifecycle coverage", () => {
   beforeEach(() => {
@@ -86,12 +86,13 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await listTestimonials(req, res, next);
+    await listTestimonials(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    const responseBody = res.json.mock.calls[0][0];
-    expect(responseBody.data).toEqual([]);
-    expect(responseBody.meta.pagination.total).toBe(0);
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.data).toEqual([]);
+    expect(responseBody!.meta.pagination.total).toBe(0);
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -105,10 +106,11 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await getTestimonialById(req, res, next);
+    await getTestimonialById(req, res, next as unknown as NextFunction);
 
     expect(next).toHaveBeenCalledTimes(1);
-    const error = next.mock.calls[0][0] as Error;
+    const error = next.mock.calls[0]?.[0] as unknown as Error;
+    expect(error).toBeDefined();
     expect(error.message).toContain("Project not found or you don't have access");
   });
 
@@ -132,11 +134,12 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await updateTestimonial(req, res, next);
+    await updateTestimonial(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.update).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(1);
-    const error = next.mock.calls[0][0] as Error;
+    const error = next.mock.calls[0]?.[0] as unknown as Error;
+    expect(error).toBeDefined();
     expect(error.message).toContain("Cannot publish unapproved testimonial");
   });
 
@@ -158,7 +161,7 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await deleteTestimonial(req, res, next);
+    await deleteTestimonial(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.delete).toHaveBeenCalledWith({
       where: { id: "t_1" },
@@ -185,7 +188,7 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await getModerationQueue(req, res, next);
+    await getModerationQueue(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -212,7 +215,7 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await bulkModerationAction(req, res, next);
+    await bulkModerationAction(req, res, next as unknown as NextFunction);
 
     expect(mockedPrisma.testimonial.updateMany).toHaveBeenCalledWith({
       where: {
@@ -245,10 +248,11 @@ describe("testimonial controller lifecycle coverage", () => {
     const res = createResponse();
     const next = createNext();
 
-    await listPublicTestimonialsByApiKey(req, res, next);
+    await listPublicTestimonialsByApiKey(req, res, next as unknown as NextFunction);
 
     expect(next).toHaveBeenCalledTimes(1);
-    const error = next.mock.calls[0][0] as Error;
+    const error = next.mock.calls[0]?.[0] as unknown as Error;
+    expect(error).toBeDefined();
     expect(error.message).toContain("project is not active");
   });
 });

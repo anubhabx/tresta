@@ -70,7 +70,7 @@ const createRequest = (overrides?: Partial<Request>, userId = "user_1") =>
 
 const createResponse = () => ({}) as Response;
 
-const createNext = () => vi.fn<Parameters<NextFunction>, void>();
+const createNext = () => vi.fn<NextFunction>();
 
 describe("verifyPayment", () => {
   beforeEach(() => {

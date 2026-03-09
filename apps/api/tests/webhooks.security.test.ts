@@ -77,7 +77,7 @@ const createResponse = () => {
   };
 };
 
-const createNext = () => vi.fn<Parameters<NextFunction>, void>();
+const createNext = () => vi.fn<NextFunction>();
 
 describe("webhook signature enforcement", () => {
   beforeEach(() => {
@@ -95,7 +95,7 @@ describe("webhook signature enforcement", () => {
     const res = createResponse();
     const next = createNext();
 
-    await syncUserToDB(req, res, next);
+    await syncUserToDB(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith("Webhook verification failed");
@@ -114,7 +114,7 @@ describe("webhook signature enforcement", () => {
     const res = createResponse();
     const next = createNext();
 
-    await handleRazorpayWebhook(req, res, next);
+    await handleRazorpayWebhook(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
@@ -138,7 +138,7 @@ describe("webhook signature enforcement", () => {
     const res = createResponse();
     const next = createNext();
 
-    await handleRazorpayWebhook(req, res, next);
+    await handleRazorpayWebhook(req, res, next as unknown as NextFunction);
 
     expect(mockedVerifyWebhookSignature).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(400);
@@ -164,7 +164,7 @@ describe("webhook signature enforcement", () => {
     const res = createResponse();
     const next = createNext();
 
-    await handleRazorpayWebhook(req, res, next);
+    await handleRazorpayWebhook(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(

@@ -50,7 +50,7 @@ const createResponse = () => {
   };
 };
 
-const createNext = () => vi.fn<Parameters<NextFunction>, void>();
+const createNext = () => vi.fn<NextFunction>();
 
 describe("testimonial controller response contracts", () => {
   beforeEach(() => {
@@ -108,12 +108,13 @@ describe("testimonial controller response contracts", () => {
     const res = createResponse();
     const next = createNext();
 
-    await listTestimonials(req, res, next);
+    await listTestimonials(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    const responseBody = res.json.mock.calls[0][0];
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
 
-    expect(responseBody.data[0]).toMatchObject({
+    expect(responseBody!.data[0]).toMatchObject({
       project: {
         id: "proj_1",
         slug: "demo-project",
@@ -127,10 +128,10 @@ describe("testimonial controller response contracts", () => {
       updatedAt: updatedAt.toISOString(),
     });
 
-    expect(responseBody.meta.filters).toEqual({
+    expect(responseBody!.meta.filters).toEqual({
       projectSlug: "demo-project",
     });
-    expect(responseBody.meta.sort).toEqual({
+    expect(responseBody!.meta.sort).toEqual({
       field: "createdAt",
       direction: "desc",
     });
@@ -191,24 +192,25 @@ describe("testimonial controller response contracts", () => {
     const res = createResponse();
     const next = createNext();
 
-    await getModerationQueue(req, res, next);
+    await getModerationQueue(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    const responseBody = res.json.mock.calls[0][0];
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
 
-    expect(responseBody.meta.stats).toEqual({
+    expect(responseBody!.meta.stats).toEqual({
       total: 1,
       pending: 1,
       flagged: 0,
       approved: 0,
       rejected: 0,
     });
-    expect(responseBody.meta.filters).toEqual({
+    expect(responseBody!.meta.filters).toEqual({
       status: "pending",
       verified: false,
       projectSlug: "demo-project",
     });
-    expect(responseBody.meta.reviewPriority).toEqual({
+    expect(responseBody!.meta.reviewPriority).toEqual({
       high: 1,
       medium: 0,
       low: 0,
@@ -253,11 +255,12 @@ describe("testimonial controller response contracts", () => {
     const res = createResponse();
     const next = createNext();
 
-    await listPublicTestimonialsByApiKey(req, res, next);
+    await listPublicTestimonialsByApiKey(req, res, next as unknown as NextFunction);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    const responseBody = res.json.mock.calls[0][0];
-    expect(responseBody.data.testimonials[0]).toMatchObject({
+    const responseBody = res.json.mock.calls[0]?.[0];
+    expect(responseBody).toBeDefined();
+    expect(responseBody!.data.testimonials[0]).toMatchObject({
       mediaUrl: "https://cdn.example.com/media.mp4",
       createdAt: createdAt.toISOString(),
       updatedAt: updatedAt.toISOString(),
