@@ -1,36 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import { SasImage } from "@/components/forms/fields/sas-image";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@workspace/ui/components/alert-dialog";
-import {
   FolderIcon,
-  TrashIcon,
-  EditIcon,
   Link2,
   Code,
   Check,
   MessageSquare,
   LayoutGrid,
 } from "lucide-react";
-import { toast } from "sonner";
-import { getHttpErrorMessage } from "@/lib/errors/http-error";
 import { EmbedDialog } from "./embed-dialog";
 import type { Project } from "@/types/api";
 
@@ -40,27 +23,8 @@ interface ProjectHeaderProps {
   onDelete: () => Promise<void>;
 }
 
-export function ProjectHeader({ project, slug, onDelete }: ProjectHeaderProps) {
-  const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
+export function ProjectHeader({ project, slug }: ProjectHeaderProps) {
   const [linkCopied, setLinkCopied] = useState(false);
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await onDelete();
-      router.push("/projects");
-    } catch (error: unknown) {
-      console.error("Failed to delete project:", error);
-      toast.error(
-        getHttpErrorMessage(
-          error,
-          "Failed to delete project. Please try again.",
-        ),
-      );
-      setIsDeleting(false);
-    }
-  };
 
   const handleCopyCollectionLink = async () => {
     const collectionUrl =

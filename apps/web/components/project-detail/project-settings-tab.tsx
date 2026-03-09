@@ -2,12 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@workspace/ui/components/button";
-import { Badge } from "@workspace/ui/components/badge";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@workspace/ui/components/card";
 import { Switch } from "@workspace/ui/components/switch";
 import {

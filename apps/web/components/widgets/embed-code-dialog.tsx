@@ -23,7 +23,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { generateEmbedCodes, API_KEY_PLACEHOLDER } from "@/lib/embed-code";
+import { generateEmbedCodes } from "@/lib/embed-code";
 import { getPublicApiBaseUrl } from "@/config/env";
 
 interface EmbedCodeDialogProps {
@@ -105,7 +105,6 @@ export function EmbedCodeDialog({
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
 
   const apiUrl = getPublicApiBaseUrl();
-  const displayApiKey = apiKey || API_KEY_PLACEHOLDER;
   const apiEndpointUrl = `${apiUrl}/api/widgets/${widgetId}/public`;
 
   const embedCodes = generateEmbedCodes({ widgetId, apiKey });
@@ -185,7 +184,7 @@ export function EmbedCodeDialog({
       setCopiedTab(tab);
       toast.success("Code copied to clipboard!");
       setTimeout(() => setCopiedTab(null), 2000);
-    } catch (error) {
+    } catch {
       toast.error("Failed to copy code");
     }
   };

@@ -73,7 +73,6 @@ const MOCK_TESTIMONIALS = [
 
 export function ProjectWizardPreview({
   projectIdentity,
-  theme = "auto",
   isPro = false,
   className,
 }: ProjectWizardPreviewProps) {
@@ -312,14 +311,13 @@ function WidgetPreviewContent({
 
 function WallPreviewContent({
   testimonials,
-  primaryColor,
 }: {
   testimonials: typeof MOCK_TESTIMONIALS;
   primaryColor?: string;
 }) {
   return (
     <div className="columns-2 gap-3 space-y-3">
-      {testimonials.map((testimonial, index) => (
+      {testimonials.map((testimonial) => (
         <div
           key={testimonial.id}
           className="break-inside-avoid p-3 rounded-lg bg-background border shadow-sm"

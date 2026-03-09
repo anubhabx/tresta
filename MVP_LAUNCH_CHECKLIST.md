@@ -57,6 +57,7 @@ This checklist is organized in phases so launch work can move from hard blockers
 
 Current note:
 - Repo lint now completes, but the web app still emits many non-blocking warnings that should be reduced before launch hardening.
+- Latest status: warning volume has been significantly reduced; the remaining hotspots are mostly `react/no-unescaped-entities` content strings and the complex `canvas-reveal-effect` component lint/type warnings.
 
 ### Core product journeys
 
@@ -80,6 +81,8 @@ Current note:
 ### Quality cleanup
 
 - [ ] Reduce launch-relevant warnings from the web build.
+  - [x] Remove broad unused-import / dead-code warnings across account settings, project detail, project wizard, and widget embed surfaces.
+  - [x] Remove low-risk `any` and no-useless-catch warnings in wizard/widget flows where behavior is unchanged.
 - [x] Remove obvious unused imports and dead code in dashboard and moderation surfaces.
   - [x] Remove dead/unused code in moderation and dashboard cards (`activity-feed`, `pending-actions-card`, `moderation-stats-dashboard`, `moderation-testimonial-card`).
   - [x] Remove additional dashboard dead imports (`projects page`, `quick-embed`, `keyboard-shortcuts`, `recent-projects`, `theme-toggle`, `command-palette`, `landing page`).

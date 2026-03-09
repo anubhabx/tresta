@@ -21,7 +21,6 @@ import Link from "next/link";
 import { TestimonialList } from "@/components/testimonials/testimonial-list";
 import {
   ProjectHeader,
-  ProjectStatsCards,
   ProjectOverviewTab,
   ProjectSettingsTab,
   ProjectWidgetsTab,
@@ -195,7 +194,7 @@ const ProjectPageContent = ({ params }: ProjectPageProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ProjectWidgetsTab projectSlug={slug} projectId={project.id} />
+                <ProjectWidgetsTab projectSlug={slug} />
               </CardContent>
             </Card>
           </TabsContent>

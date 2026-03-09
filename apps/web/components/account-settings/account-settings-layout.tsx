@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CreditCard, User, ShieldAlert, Key, Lock, Users } from "lucide-react";
+import { CreditCard, User, ShieldAlert, Key } from "lucide-react";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarNav } from "./sidebar-nav";
 

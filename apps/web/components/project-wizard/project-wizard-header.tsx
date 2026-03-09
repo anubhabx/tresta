@@ -7,7 +7,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";

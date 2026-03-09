@@ -9,7 +9,7 @@
 
 import * as React from "react";
 import { useCallback, useState } from "react";
-import { Control, UseFormSetValue, UseFormGetValues } from "react-hook-form";
+import { Control, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { RefreshCw, Link2, Folder } from "lucide-react";
 
 import {
@@ -58,8 +58,7 @@ const COLOR_PRESETS: ColorPreset[] = [
 interface IdentitySectionProps {
   control: Control<ProjectFormData>;
   setValue: UseFormSetValue<ProjectFormData>;
-  getValues: UseFormGetValues<ProjectFormData>;
-  watch: (name: keyof ProjectFormData) => any;
+  watch: UseFormWatch<ProjectFormData>;
   selectedColor: ColorPreset;
   selectedPreset: IndustryPreset;
   onColorChange: (color: ColorPreset) => void;
@@ -73,7 +72,6 @@ interface IdentitySectionProps {
 export function IdentitySection({
   control,
   setValue,
-  getValues,
   watch,
   selectedColor,
   selectedPreset,

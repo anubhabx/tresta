@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, RefreshCw, Eye, EyeOff, Loader2, Key } from "lucide-react";
+import { Copy, RefreshCw, EyeOff, Loader2, Key } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "sonner";
 import {
@@ -62,7 +62,7 @@ export function ApiKeyCard({
       setIsRegenerating(true);
       await onRegenerate(apiKey.id);
       toast.success("API Key regenerated successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to regenerate API key");
     } finally {
       setIsRegenerating(false);
@@ -74,7 +74,7 @@ export function ApiKeyCard({
       setIsDeleting(true);
       await onDelete(apiKey.id);
       toast.success("API Key deleted successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete API key");
     } finally {
       setIsDeleting(false);

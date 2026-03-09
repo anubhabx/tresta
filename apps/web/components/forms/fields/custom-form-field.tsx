@@ -16,7 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { Info, Star, X } from "lucide-react";
+import { Info, Star } from "lucide-react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Button } from "@workspace/ui/components/button";
 import { ColorPicker } from "@/components/forms/fields/color-picker";

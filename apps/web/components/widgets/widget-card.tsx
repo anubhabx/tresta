@@ -72,7 +72,6 @@ export function WidgetCard({
   };
 
   const getLayoutIcon = () => {
-    const layout = widget.config?.layout || "carousel";
     return <LayoutGridIcon className="h-5 w-5" />;
   };
 

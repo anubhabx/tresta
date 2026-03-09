@@ -68,6 +68,7 @@ export const CheckoutButton = forwardRef<
   HTMLButtonElement,
   CheckoutButtonProps
 >(function CheckoutButton({ planId, planName, price }, ref) {
+  void price;
   const [loading, setLoading] = useState(false);
   const api = useApi();
   const { user } = useUser();

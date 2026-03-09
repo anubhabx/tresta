@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { Control, useController } from "react-hook-form";
-import { Sun, Moon, Monitor, Lock, Palette } from "lucide-react";
+import { Sun, Moon, Monitor, Palette } from "lucide-react";
 import { toast } from "sonner";
 
 import {

@@ -44,7 +44,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { AzureFileUpload } from "@/components/forms/fields/azure-file-upload";
 import { UploadDirectory } from "@/hooks/use-azure-sas";
 import { ConditionalColorPicker } from "@/components/forms/fields/conditional-color-picker";
-import type { FormConfig, Project } from "@/types/api";
+import type { Project } from "@/types/api";
 
 // ============================================================================
 // SCHEMA

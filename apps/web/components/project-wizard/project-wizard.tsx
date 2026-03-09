@@ -22,7 +22,7 @@ import { Form } from "@workspace/ui/components/form";
 import { Separator } from "@workspace/ui/components/separator";
 
 // Icons
-import { ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 // Project Wizard Components
 import { ProjectWizardHeader } from "./project-wizard-header";
@@ -32,7 +32,6 @@ import { BrandingWizardSection } from "./sections/branding-section";
 import { AdvancedSection } from "./sections/advanced-section";
 
 // Hooks & Schema
-import { useApi } from "@/hooks/use-api";
 import { useSubscription } from "@/hooks/use-subscription";
 import { projects } from "@/lib/queries";
 import { getHttpErrorMessage } from "@/lib/errors/http-error";
@@ -98,7 +97,6 @@ export function ProjectWizard({
   slug,
 }: ProjectWizardProps) {
   const router = useRouter();
-  const api = useApi();
   const createProject = projects.mutations.useCreate();
   const updateProject = projects.mutations.useUpdate(slug || "");
   const { data: projectData, isLoading: isLoadingProject } =
@@ -265,7 +263,7 @@ export function ProjectWizard({
         });
         router.push(`/projects/${data.slug}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
         getHttpErrorMessage(
           error,
@@ -365,7 +363,6 @@ export function ProjectWizard({
                 <IdentitySection
                   control={form.control}
                   setValue={form.setValue}
-                  getValues={form.getValues}
                   watch={form.watch}
                   selectedColor={selectedColor}
                   selectedPreset={selectedPreset}

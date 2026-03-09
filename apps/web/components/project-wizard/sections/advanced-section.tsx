@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { Control, UseFormRegister } from "react-hook-form";
-import { ChevronDown, Globe, Share2, Tags, Settings2 } from "lucide-react";
+import { Globe, Share2, Tags, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -17,12 +17,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@workspace/ui/components/accordion";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Card } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { cn } from "@workspace/ui/lib/utils";
-
 import { CustomFormField } from "@/components/forms/fields/custom-form-field";
 import { ProjectFormData } from "@/lib/schemas/project-schema";
 import { LockedToggle, ProBadge } from "@/components/paywall";

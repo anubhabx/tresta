@@ -14,12 +14,10 @@ import { PlusIcon } from "lucide-react";
 
 interface ProjectWidgetsTabProps {
   projectSlug: string;
-  projectId: string;
 }
 
 export function ProjectWidgetsTab({
   projectSlug,
-  projectId,
 }: ProjectWidgetsTabProps) {
   const router = useRouter();
   const [embedWidgetId, setEmbedWidgetId] = useState<string | null>(null);
@@ -31,11 +29,7 @@ export function ProjectWidgetsTab({
   };
 
   const handleDeleteWidget = async (widgetId: string) => {
-    try {
-      await widgets.mutations.useDelete(widgetId).mutateAsync();
-    } catch (error: any) {
-      throw error;
-    }
+    await widgets.mutations.useDelete(widgetId).mutateAsync();
   };
 
   const handleViewEmbed = (widgetId: string) => {
