@@ -159,6 +159,7 @@ Current note:
 - [ ] Integration test testimonial list/detail/update/delete endpoints.
 - [ ] Integration test moderation queue filtering and pagination.
 - [ ] Integration test bulk moderation with mixed valid/invalid IDs.
+- [x] Add API contract tests for owner list, moderation queue metadata, and public testimonial response fields.
 
 ### Widgets
 
@@ -265,4 +266,4 @@ Potential gaps for embed consumers:
 - [ ] Define one canonical testimonial response DTO shared across API and web types.
 - [x] Add explicit serializers instead of returning raw Prisma objects in owner endpoints.
 - [ ] Separate public, owner, moderation, and admin testimonial DTOs.
-- [ ] Add contract tests to lock response shape before launch.
+- [x] Add contract tests to lock response shape before launch.
