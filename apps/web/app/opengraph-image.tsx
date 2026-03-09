@@ -16,7 +16,7 @@ export default function OgImage() {
           justifyContent: "center",
           width: "100%",
           height: "100%",
-          background: "linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%)",
+          background: "radial-gradient(circle at 82% 18%, #4a3bff33 0%, #09090b 40%), linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%)",
           color: "#fafafa",
           fontFamily: "Inter, sans-serif",
           padding: "60px 80px",
@@ -33,19 +33,85 @@ export default function OgImage() {
         >
           <div
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              width: 72,
+              height: 72,
+              borderRadius: 18,
+              background: "#101720",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 800,
-              color: "#fff",
+              position: "relative",
             }}
           >
-            T
+            <div
+              style={{
+                position: "absolute",
+                left: 14,
+                top: 16,
+                width: 18,
+                height: 8,
+                borderRadius: 4,
+                background: "#ffffff",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 14,
+                top: 26,
+                width: 8,
+                height: 16,
+                borderRadius: 4,
+                background: "#ffffff",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 38,
+                top: 16,
+                width: 18,
+                height: 8,
+                borderRadius: 4,
+                background: "#ffffff",
+                opacity: 0.3,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 38,
+                top: 26,
+                width: 8,
+                height: 16,
+                borderRadius: 4,
+                background: "#ffffff",
+                opacity: 0.3,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 49,
+                top: 49,
+                width: 12,
+                height: 12,
+                borderRadius: 999,
+                background: "#4A3BFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 999,
+                  background: "#ffffff",
+                }}
+              />
+            </div>
           </div>
           <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-0.02em" }}>
             Tresta
