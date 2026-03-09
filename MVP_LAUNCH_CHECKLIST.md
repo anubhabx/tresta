@@ -154,13 +154,13 @@ Phase status: ✅ Complete
 
 ### Testimonials
 
-- [ ] Unit test testimonial validation rules.
-  - [ ] content length boundaries
-  - [ ] rating coercion and bounds
-  - [ ] required field toggles from `formConfig`
-  - [ ] anonymous submission restrictions
-- [ ] Unit test moderation heuristics and scoring.
-- [ ] Unit test duplicate-content detection and reviewer behavior analysis.
+- [x] Unit test testimonial validation rules.
+  - [x] content length boundaries
+  - [x] rating coercion and bounds
+  - [x] required field toggles from `formConfig`
+  - [x] anonymous submission restrictions
+- [x] Unit test moderation heuristics and scoring.
+- [x] Unit test duplicate-content detection and reviewer behavior analysis.
 - [x] Integration test testimonial submission endpoint for happy path and invalid payloads.
 - [x] Integration test testimonial list/detail/update/delete endpoints.
 - [x] Integration test moderation queue filtering and pagination.
