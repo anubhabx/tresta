@@ -1,5 +1,11 @@
 import { prisma, NotificationType } from "@workspace/database/prisma";
 import type { Request, Response, NextFunction } from "express";
+import type {
+  ModerationTestimonialDTO,
+  OwnerTestimonialDTO,
+  PublicTestimonialDTO,
+  TestimonialProjectSummaryDTO,
+} from "@workspace/types";
 import { NotificationService } from "../services/notification.service.js";
 import {
   BadRequestError,
@@ -51,11 +57,7 @@ type SubmissionFormConfig = {
   notifyOnSubmission?: boolean;
 };
 
-type ProjectSummary = {
-  id: string;
-  slug: string;
-  name: string;
-};
+type ProjectSummary = TestimonialProjectSummaryDTO;
 
 type TestimonialWithDates = {
   id: string;
@@ -92,10 +94,18 @@ const serializeProjectSummary = (project: ProjectSummary): ProjectSummary => ({
   name: project.name,
 });
 
+const normalizeModerationFlags = (value: unknown): string[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  return value.filter((entry): entry is string => typeof entry === "string");
+};
+
 const serializeOwnerTestimonial = (
   testimonial: TestimonialWithDates,
   project: ProjectSummary,
-) => {
+): OwnerTestimonialDTO => {
   const needsReview =
     testimonial.moderationStatus === "PENDING" ||
     testimonial.moderationStatus === "FLAGGED";
@@ -123,7 +133,7 @@ const serializeOwnerTestimonial = (
     oauthProvider: testimonial.oauthProvider,
     moderationStatus: testimonial.moderationStatus,
     moderationScore: testimonial.moderationScore,
-    moderationFlags: testimonial.moderationFlags,
+    moderationFlags: normalizeModerationFlags(testimonial.moderationFlags),
     autoPublished: testimonial.autoPublished,
     createdAt: testimonial.createdAt.toISOString(),
     updatedAt: testimonial.updatedAt.toISOString(),
@@ -138,6 +148,55 @@ const serializeOwnerTestimonial = (
   };
 };
 
+
+const serializeModerationTestimonial = (
+  testimonial: TestimonialWithDates,
+  project: ProjectSummary,
+): ModerationTestimonialDTO => {
+  const ownerDto = serializeOwnerTestimonial(testimonial, project);
+  const score = testimonial.moderationScore ?? 0;
+
+  return {
+    ...ownerDto,
+    reviewPriority: score >= 0.75 ? "high" : score >= 0.4 ? "medium" : "low",
+  };
+};
+
+type PublicTestimonialWithDates = {
+  id: string;
+  authorName: string;
+  authorAvatar: string | null;
+  authorRole: string | null;
+  authorCompany: string | null;
+  content: string;
+  rating: number | null;
+  type: "TEXT" | "VIDEO" | "AUDIO";
+  videoUrl: string | null;
+  mediaUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  isOAuthVerified: boolean;
+  oauthProvider: string | null;
+};
+
+const serializePublicTestimonial = (
+  testimonial: PublicTestimonialWithDates,
+): PublicTestimonialDTO => ({
+  id: testimonial.id,
+  authorName: testimonial.authorName,
+  authorAvatar: testimonial.authorAvatar,
+  authorRole: testimonial.authorRole,
+  authorCompany: testimonial.authorCompany,
+  content: testimonial.content,
+  rating: testimonial.rating,
+  type: testimonial.type,
+  videoUrl: testimonial.videoUrl,
+  mediaUrl: testimonial.mediaUrl,
+  createdAt: testimonial.createdAt.toISOString(),
+  updatedAt: testimonial.updatedAt.toISOString(),
+  isOAuthVerified: testimonial.isOAuthVerified,
+  oauthProvider: testimonial.oauthProvider,
+});
 const normalizeFormConfig = (formConfig: unknown): SubmissionFormConfig => {
   if (
     !formConfig ||
@@ -841,6 +900,9 @@ const listPublicTestimonialsByApiKey = async (
         id: true,
         slug: true,
         name: true,
+        logoUrl: true,
+        brandColorPrimary: true,
+        brandColorSecondary: true,
         isActive: true,
       },
     });
@@ -891,12 +953,13 @@ const listPublicTestimonialsByApiKey = async (
           id: project.id,
           slug: project.slug,
           name: project.name,
+          logoUrl: project.logoUrl,
+          brandColorPrimary: project.brandColorPrimary,
+          brandColorSecondary: project.brandColorSecondary,
         },
-        testimonials: testimonials.map((testimonial) => ({
-          ...testimonial,
-          createdAt: testimonial.createdAt.toISOString(),
-          updatedAt: testimonial.updatedAt.toISOString(),
-        })),
+        testimonials: testimonials.map((testimonial) =>
+          serializePublicTestimonial(testimonial as PublicTestimonialWithDates),
+        ),
         total: testimonials.length,
       },
     });
@@ -1152,7 +1215,10 @@ const getModerationQueue = async (
 
     return ResponseHandler.paginated(res, {
       data: testimonials.map((testimonial) =>
-        serializeOwnerTestimonial(testimonial as TestimonialWithDates, project),
+        serializeModerationTestimonial(
+          testimonial as TestimonialWithDates,
+          project,
+        ),
       ),
       page,
       limit,

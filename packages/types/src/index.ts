@@ -6,3 +6,4 @@
 export * from "./widget.js";
 export * from "./colors.js";
 export * from "./payments.js";
+export * from "./testimonial.js";

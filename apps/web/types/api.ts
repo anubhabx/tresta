@@ -1,4 +1,4 @@
-import type { ApiSuccessResponse } from "@workspace/types";
+import type { ApiSuccessResponse, CanonicalTestimonialDTO } from "@workspace/types";
 
 export type ApiResponse<T> = ApiSuccessResponse<T>;
 
@@ -122,34 +122,14 @@ export enum ModerationStatus {
   FLAGGED = "FLAGGED",
 }
 
-export interface Testimonial {
-  id: string;
-  authorName: string;
-  authorEmail: string | null;
-  authorRole: string | null;
-  authorCompany: string | null;
-  authorAvatar: string | null;
-  content: string;
-  type: "TEXT" | "VIDEO" | "AUDIO";
-  videoUrl: string | null;
-  mediaUrl: string | null;
-  rating: number | null;
-  isApproved: boolean;
-  isPublished: boolean;
-  isOAuthVerified: boolean;
-  oauthProvider: string | null;
+export interface Testimonial
+  extends Omit<CanonicalTestimonialDTO, "moderationStatus"> {
   moderationStatus: ModerationStatus;
-  moderationScore: number | null;
-  moderationFlags: string[] | null;
-  autoPublished: boolean;
-  projectId: string | null;
   Project?: {
     id: string;
     name: string;
     slug: string;
   };
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ModerationStats {

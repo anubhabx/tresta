@@ -229,6 +229,9 @@ describe("testimonial controller response contracts", () => {
       id: "proj_1",
       slug: "demo-project",
       name: "Demo Project",
+      logoUrl: "https://cdn.example.com/logo.png",
+      brandColorPrimary: "#123456",
+      brandColorSecondary: "#abcdef",
       isActive: true,
     });
 
@@ -263,6 +266,14 @@ describe("testimonial controller response contracts", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     const responseBody = res.json.mock.calls[0]?.[0];
     expect(responseBody).toBeDefined();
+    expect(responseBody!.data.project).toMatchObject({
+      id: "proj_1",
+      slug: "demo-project",
+      name: "Demo Project",
+      logoUrl: "https://cdn.example.com/logo.png",
+      brandColorPrimary: "#123456",
+      brandColorSecondary: "#abcdef",
+    });
     expect(responseBody!.data.testimonials[0]).toMatchObject({
       mediaUrl: "https://cdn.example.com/media.mp4",
       createdAt: createdAt.toISOString(),
