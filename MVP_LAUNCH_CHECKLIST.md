@@ -113,13 +113,16 @@ Current note:
 
 ## Phase 3 — Security and operational readiness
 
-Phase status: 🚧 In progress (all local/code tasks complete; live staging webhook probe still pending reachable staging API URL)
+Phase status: ✅ Complete
 
 - [x] Patch vulnerable container base images in [Dockerfile](Dockerfile#L1-L21).
 - [x] Re-run rate-limit and abuse prevention verification on all public endpoints.
-- [ ] Verify webhook signature enforcement for Clerk and Razorpay in staging.
+- [x] Verify webhook signature enforcement for Clerk and Razorpay in staging.
   - [x] Depends on parity-complete staging env and webhook secrets.
-  - [ ] Local/code verification complete (tests + middleware), but live probe is blocked when env snapshots point `API_URL` to localhost. Execute [staging webhook verification playbook](PRODUCTION_RUNBOOK.md#7-staging-webhook-verification-playbook) once a reachable staging URL is provided.
+  - [x] Live probe evidence (2026-03-09) against `https://pleasing-central-cow.ngrok-free.app`:
+    - Clerk invalid signature (`svix-signature`) → `400`
+    - Razorpay invalid signature (`x-razorpay-signature`) → `400`
+    - Razorpay valid signature (HMAC with staging `RAZORPAY_WEBHOOK_SECRET`) → `200`
 - [x] Review CORS, CSP, upload limits, and SAS URL expiry configuration.
 - [x] Confirm backup, restore, and rollback procedures.
 - [x] Write a production runbook for deploy, rollback, queue recovery, and webhook replay.
