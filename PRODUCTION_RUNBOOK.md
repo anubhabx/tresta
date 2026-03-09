@@ -114,3 +114,24 @@ Because some local env snapshots may use placeholder/localhost `API_URL`, run th
    - Razorpay: send invalid `x-razorpay-signature` to `/api/webhook/razorpay`.
 3. Positive replay (must return `200`) from provider dashboards.
 4. Capture evidence in release notes with timestamp and request IDs.
+
+## 8) CI deploy-gate configuration
+
+GitHub workflow: `.github/workflows/ci-and-deploy.yml`
+
+### What is gated
+- Lint, typecheck, tests, and monorepo build must pass.
+- Additional explicit build checks run for:
+   - `web`
+   - `admin`
+- Deploy trigger jobs run only after all checks pass.
+
+### Optional secrets for deployment hooks
+- `DIGITALOCEAN_APP_DEPLOY_HOOK_URL`
+- `VERCEL_DEPLOY_HOOK_WEB`
+- `VERCEL_DEPLOY_HOOK_ADMIN`
+
+If a hook secret is missing, the job logs a skip message and does not fail CI.
+
+### Important Vercel note
+This workflow can gate deploy-hook based deployments. If Vercel Git auto-deploy is enabled, disable it (or use ignored build settings) to ensure this CI gate is the single deploy path.

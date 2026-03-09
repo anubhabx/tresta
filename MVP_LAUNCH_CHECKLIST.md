@@ -131,7 +131,7 @@ Phase status: ✅ Complete
 
 ## Phase 4 — Post-launch iteration work
 
-- [ ] Add CI workflows for lint, typecheck, test, and build.
+- [x] Add CI workflows for lint, typecheck, test, and build.
 - [ ] Add E2E coverage for major flows.
 - [ ] Add product analytics around conversion funnel and moderation throughput.
 - [ ] Expand admin health dashboards and SLO reporting.
