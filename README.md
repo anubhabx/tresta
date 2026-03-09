@@ -438,7 +438,7 @@ Contributions are welcome! Please follow these guidelines:
    pnpm quality:check
    ```
 
-- Before merge to `main`: require GitHub Actions checks from `.github/workflows/ci-and-deploy.yml` in branch protection settings.
+- Before merge to `main`: require GitHub Actions checks from `.github/workflows/ci-quality-checks.yml` in branch protection settings.
    - Require `quality-gate`
    - Require both `Vercel Build Check (web)` and `Vercel Build Check (admin)`
 

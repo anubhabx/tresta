@@ -117,7 +117,7 @@ Because some local env snapshots may use placeholder/localhost `API_URL`, run th
 
 ## 8) CI deploy-gate configuration
 
-GitHub workflow: `.github/workflows/ci-and-deploy.yml`
+GitHub workflow: `.github/workflows/ci-quality-checks.yml`
 
 ### What is gated
 - Lint, typecheck, tests, and monorepo build must pass.

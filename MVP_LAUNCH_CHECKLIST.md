@@ -161,7 +161,7 @@ Phase status: ✅ Complete
   - [ ] anonymous submission restrictions
 - [ ] Unit test moderation heuristics and scoring.
 - [ ] Unit test duplicate-content detection and reviewer behavior analysis.
-- [ ] Integration test testimonial submission endpoint for happy path and invalid payloads.
+- [x] Integration test testimonial submission endpoint for happy path and invalid payloads.
 - [ ] Integration test testimonial list/detail/update/delete endpoints.
 - [ ] Integration test moderation queue filtering and pagination.
 - [ ] Integration test bulk moderation with mixed valid/invalid IDs.
@@ -258,9 +258,9 @@ Potential gaps for embed consumers:
 ### Edge cases to test explicitly
 
 - [x] Empty list for a valid project with zero testimonials.
-- [ ] Project not found.
+- [x] Project not found.
 - [x] Authenticated user without ownership.
-- [ ] Invalid pagination values.
+- [x] Invalid pagination values.
 - [ ] Testimonials with `null` rating, avatar, role, company, and media fields.
 - [ ] Testimonials with large `moderationFlags` arrays.
 - [ ] Mixed text/video testimonial datasets.
