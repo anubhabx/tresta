@@ -91,7 +91,7 @@ export function ProjectOverviewTab({
                   Ready to receive submissions
                 </p>
                 <p className="text-sm text-zinc-500 mt-1 leading-relaxed">
-                  Anyone with this link can submit a testimonial. You'll be able
+                  Anyone with this link can submit a testimonial. You&apos;ll be able
                   to review and approve all submissions before they become
                   visible.
                 </p>

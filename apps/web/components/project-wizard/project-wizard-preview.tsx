@@ -217,10 +217,7 @@ export function ProjectWizardPreview({
             />
           )}
           {previewMode === "wall" && (
-            <WallPreviewContent
-              testimonials={MOCK_TESTIMONIALS}
-              primaryColor={projectIdentity.primaryColor}
-            />
+            <WallPreviewContent testimonials={MOCK_TESTIMONIALS} />
           )}
           {previewMode === "form" && (
             <FormPreviewContent
@@ -313,7 +310,6 @@ function WallPreviewContent({
   testimonials,
 }: {
   testimonials: typeof MOCK_TESTIMONIALS;
-  primaryColor?: string;
 }) {
   return (
     <div className="columns-2 gap-3 space-y-3">
@@ -323,7 +319,7 @@ function WallPreviewContent({
           className="break-inside-avoid p-3 rounded-lg bg-background border shadow-sm"
         >
           <p className="text-xs text-foreground mb-2 line-clamp-4">
-            "{testimonial.content}"
+            &quot;{testimonial.content}&quot;
           </p>
           <p className="text-[10px] font-medium">— {testimonial.authorName}</p>
         </div>

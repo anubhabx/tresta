@@ -42,8 +42,10 @@ This checklist is organized in phases so launch work can move from hard blockers
 - [ ] Confirm staging and production env parity for Clerk, Razorpay, Redis, Ably, Resend, Azure Blob, and Postgres.
   - [x] Add a parity audit command in [package.json](package.json#L9-L17) and [scripts/check-env-parity.mjs](scripts/check-env-parity.mjs).
   - [x] Document the launch-critical env matrix in [ENV_PARITY_CHECKLIST.md](ENV_PARITY_CHECKLIST.md).
-  - [ ] Run the parity audit against exported staging and production env files.
-  - [ ] Critical follow-up: export sanitized staging/prod env snapshots into the repo workspace (or provide paths) so `pnpm env:parity <staging.env> <production.env>` can be executed in CI and locally.
+  - [x] Run the parity audit against exported staging and production env files.
+    - Result (2026-03-09): `pnpm env:parity .secrets/.env.staging.combined .secrets/.env.production.combined` failed on missing `CORS_ALLOWED_ORIGINS` and `API_URL` in both snapshots.
+  - [x] Critical follow-up: export sanitized staging/prod env snapshots into the repo workspace (or provide paths) so `pnpm env:parity <staging.env> <production.env>` can be executed in CI and locally.
+  - [ ] Add `CORS_ALLOWED_ORIGINS` and `API_URL` to both staging and production env snapshots, then rerun parity audit.
 - [x] Fix Prisma runtime/build-time path behavior seen during sitemap generation in [apps/web/app/sitemap.ts](apps/web/app/sitemap.ts).
 
 ### Documentation blockers

@@ -184,8 +184,8 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                         Job Title / Role
                       </FormLabel>
                       <FormDescription>
-                        Show field for role or job title (e.g., "CEO",
-                        "Developer")
+                        Show field for role or job title (e.g., &quot;CEO&quot;,
+                        &quot;Developer&quot;)
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -296,7 +296,7 @@ export function FormConfigSettings({ project }: FormConfigSettingsProps) {
                         Google Verification
                       </FormLabel>
                       <FormDescription>
-                        Show "Sign in with Google" for identity verification
+                        Show &quot;Sign in with Google&quot; for identity verification
                       </FormDescription>
                     </div>
                     <FormControl>

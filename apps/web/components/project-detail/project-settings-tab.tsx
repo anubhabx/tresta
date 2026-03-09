@@ -375,7 +375,7 @@ export function ProjectSettingsTab({
                             This action cannot be undone. This will permanently
                             delete the project{" "}
                             <span className="font-semibold text-foreground">
-                              "{project.name}"
+                              &quot;{project.name}&quot;
                             </span>{" "}
                             and all associated data.
                           </AlertDialogDescription>

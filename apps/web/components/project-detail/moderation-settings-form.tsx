@@ -101,7 +101,7 @@ export function ModerationSettingsForm({
                   </li>
                   <li>
                     <strong>Sentiment Analysis:</strong> Detects negative
-                    sentiment with negation handling ("not great" → negative)
+                    sentiment with negation handling (&quot;not great&quot; → negative)
                   </li>
                   <li>
                     <strong>Duplicate Detection:</strong> Identifies similar or
